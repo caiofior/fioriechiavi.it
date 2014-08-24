@@ -1,0 +1,159 @@
+html, body {
+margin : 0; 
+padding : 0; 
+background-color : #fff; 
+color : #333; 
+background-image : url(picks/3-2.jpg); 
+background-repeat : no-repeat;
+} 
+#left {
+width : 182px; 
+float : left; 
+margin-top : 10px; 
+margin-left : -1px; 
+padding-right : 2px; 
+border-right : 4px double #edb663;  
+background-image : url(picks/1.jpg);
+background-repeat: repeat-x;
+} 
+
+#left p {
+color: #000;
+font: 85% Tohoma;
+background-image : url(picks/p.gif);
+padding: 5px; 
+}
+
+#left p a {
+color : #006600; 
+text-decoration : underline;
+}
+
+img.right {
+float : right; 
+margin-right : 5px; 
+border : 0 outset #6d8458; 
+} 
+img.left {
+float : left; 
+margin-right : 5px; 
+border : 0px outset #6d8458; 
+} 
+#content {
+padding-right : 5px; 
+margin-top : 10px; 
+margin-left : 210px; 
+border-right : 0px double #edb663; 
+background-image : url(picks/5.jpg); 
+background-repeat : no-repeat;
+background-position : bottom right;
+} 
+
+blockquote{
+border: 2px solid #CECFC6;
+padding: 9px;
+background-image: url(#);
+background-color:#;
+font-size: 0.9em;
+font-family: "verdana",arial, sans-serif ;
+color:#000;
+}
+
+#content a {
+color : #77471F; 
+text-decoration : underline; 
+}
+
+#content a:hover {
+color : #006600; 
+} 
+
+#header {
+height : 25px; 
+padding-left : 0; 
+border-bottom : 0 solid #006; 
+margin-bottom : 0; 
+background-image : url(picks/1.jpg); 
+} 
+#contenthead {
+height : 66px; 
+margin-bottom : 10px; 
+margin-left : 5px; 
+background-image : url(picks/2.jpg); 
+} 
+h1 {
+font-size : 2.6em; 
+color : #000; 
+margin-top : 3px; 
+font-family : "firenze sf", verdana, arial, sans-serif ; 
+} 
+
+h2 {
+font-size : 2.2em; 
+color : #000; 
+margin-top : 25px; 
+margin-left : 29px;
+font-family : "firenze sf", verdana, arial, sans-serif ; 
+}
+
+#menu ul {
+margin : 0; 
+margin-bottom : 0; 
+float :right; 
+font : bold 110% Tohoma; 
+width : 80%; 
+border : 0 solid #625e00; 
+} 
+#menu ul li {
+display : inline; 
+} 
+#menu ul li a {
+color : #000; 
+padding-right : 38px; 
+text-decoration : none; 
+} 
+#menu ul li a:visited {
+color : gray; 
+} 
+#menu ul li a:hover {
+color : green; 
+} 
+#footer {
+float : right; 
+background-color : #fff; 
+color : #006; 
+border-top : 0px double #edb663; 
+font-size : 11px; 
+text-align : right; 
+padding : 2px 10px 0 0; 
+clear : both; 
+width : 300px; 
+} 
+#loubox {
+float : right; 
+width : 140px; 
+margin-top : 40px; 
+margin-right : 100px;
+font-size : 130%;
+font-family : "firenze sf", verdana, arial, sans-serif; 
+color : #000000;
+background-color : #ffffff; 
+} 
+.spacer {
+clear : both; 
+} 
+p {
+margin-left : 10px; 
+font-family : 'Lucida Grande', Verdana, Geneva, Lucida, Helvetica, Arial, sans-serif; 
+color : #000; 
+font-size : 1.0em; 
+} 
+dd {
+font-family : 'Lucida Grande', Verdana, Geneva, Lucida, Helvetica, Arial, sans-serif; 
+font-size : 0.95em; 
+} 
+dt {
+font-family : 'Lucida Grande', Verdana, Geneva, Lucida, Helvetica, Arial, sans-serif; 
+font-size : 0.95em; 
+margin-left : 10px; 
+}
