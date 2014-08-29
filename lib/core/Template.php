@@ -111,8 +111,12 @@ class Template {
          header('Content-Type: application/json');
          echo json_encode($response);
       }
-      else
-         require($this->baseDir.'template'.DIRECTORY_SEPARATOR.$this->templateFileName);
+      else {
+         $fileName = $this->baseDir.'template'.DIRECTORY_SEPARATOR.$this->templateFileName;
+         if (!is_file($fileName))
+            throw new \Exception('Template file is missing '.$fileName);
+         require($fileName);
+      }
    }
    /**
     * Creates new control

@@ -25,7 +25,7 @@ $template->setBlock('navigation','general/navigation.phtml');
 $template->setBlock('footer','general/footer.phtml');
 $control = $template->createControl();
 $control->setBaseDir(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'control');
-require 'session.php';
+//require 'session.php';
 if (key_exists('autocomplete', $_GET) && key_exists('domain', $_GET)) {
    if (!key_exists('term', $_GET))
       $_GET['term']=null;     
