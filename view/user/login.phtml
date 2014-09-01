@@ -1,8 +1,32 @@
-<?php
-
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+<h2>Inserisci le tue credenziali</h2>
+<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
+   <input type="hidden" name="action" value="login" />
+   <div>
+   <label for="username_login">Nome utente/Email</label>
+   <input type=text" name="username" id="username_login" value="" />
+   </div>
+   <div>
+   <label for="password_login">Password</label>
+   <input type="password" name="password" id="password_login" value="" />
+   </div>
+   <input type="submit" name="login" value="Accedi">
+</form>
+<h2>Non sei registrato, iscriviti.</h2>
+<p>Potrai raccogliere le tue osservazioni botaniche, segnalare eventuali errori e collaborare a la chiave della Flora d'Italia</p>
+<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
+   <input type="hidden" name="action" value="register" />
+   <div>
+   <label for="username_register">Nome utente/Email</label>
+   <input type=text" name="username" id="username_register" value="" />
+   </div>
+   <div>
+   <label for="password_register">Password</label>
+   <input type="password" name="password" id="password_register" value="" />
+   </div>
+   <div>
+   <label for="passwordr_register">Ripeti la password</label>
+   <input type="password" name="passwordr" id="passwordr_register" value="" />
+   </div>
+   <input type="submit" name="register" value="Registrati">
+</form>
+<p>Per attivare il tuo utente troverai le istruzioni nella mail che ti verrà inviata</p>

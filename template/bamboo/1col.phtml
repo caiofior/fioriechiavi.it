@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="style/bamboo/1.css" />
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>js/jquery-ui/jquery-ui.css">
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>js/jquery-ui/jquery-ui.theme.css">
 <?php $GLOBALS['template']->renderBlock('head'); ?>
 </head>
 <body>
@@ -10,6 +12,7 @@
 <div id="menu">
 <?php $GLOBALS['template']->renderBlock('header'); ?>
 </div>
+<div id="ajaxLoader" style="display: none;"><img src="<?php echo $GLOBALS['db']->config->baseUrl;?>style/bamboo/picks/ajax-loader.gif" alt="Flora.it"/></div>
 </div>
 
 <div id="left">
@@ -22,12 +25,10 @@
 
 
 <div id="footer">
-<p>
-Valid -XHTML and CSS 
-</p>
-</div>
-<div id="loubox">
-By Coollew
+<script src="<?php echo $GLOBALS['db']->config->baseUrl;?>js/jquery-ui/external/jquery/jquery.js"></script>
+<script src="<?php echo $GLOBALS['db']->config->baseUrl;?>js/jquery-ui/jquery-ui.js"></script>
+<script src="<?php echo $GLOBALS['db']->config->baseUrl;?>js/common/common.js"></script>
+<?php $GLOBALS['template']->renderBlock('footer'); ?>
 </div>
 </body>
 </html>

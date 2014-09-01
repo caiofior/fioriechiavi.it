@@ -121,6 +121,12 @@ abstract class Content {
       * @param int $id
       */
     public function loadFromId($id) {
+        if (
+               !is_object($this->table) ||
+               !$this->table instanceof \Zend\Db\TableGateway\TableGateway
+               ) {
+                  throw new \Exception('No database table associated with this content',1409011101);
+        }
         $data = $this->table->select(array($this->primary=>$id))->current();
         if (is_object($data))
             $this->data = $data->getArrayCopy();
