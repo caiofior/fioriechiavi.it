@@ -1,7 +1,7 @@
 <ul>
 <?php  if ($GLOBALS['user'] instanceof \flora\user\User) : ?>
-<li><a href="?logout">Esci</a></li>
+<li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?logout">Esci</a></li>
 <?php else: ?>
-<li><a href="user.php">Accedi/registrati</a></li>
+<li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>user.php">Accedi/registrati</a></li>
 <?php endif; ?>
 </ul>

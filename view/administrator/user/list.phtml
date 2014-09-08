@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="js/DataTables/media/css/jquery.dataTables.css">
+<h2>Utenti</h2>
+<table id="users">
+   	<thead>
+		<tr>
+			<th data-bSortable="true" data-asSorting="desc" data-sName="username" >email</th>
+			<th data-bSortable="true" data-sName="profile.first_name" >Nome</th>
+			<th data-bSortable="true" data-sName="profile.last_name" >Cognome</th>
+                        <th data-sName="active" >Att.</th>
+                        <th data-bSortable="true" data-sName="creation_datetime" >Data registrazione</th>
+                        <th data-bSortable="true" data-sName="last_login_datetime" >Data ultimo accesso</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>email</th>
+			<th>Nome</th>
+			<th>Cognome</th>
+                        <th>Att.</th>
+                        <th>Data registrazione</th>
+                        <th>Data ultimo accesso</th>
+		</tr>
+	</tfoot>
+</table>

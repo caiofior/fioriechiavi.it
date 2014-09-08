@@ -1,0 +1,32 @@
+<link rel="stylesheet" href="js/DataTables/media/css/jquery.dataTables.css">
+<h2>Categorie taxa</h2>
+<a id="addCategoryTaxa" href="#">Aggiungi una categoria</a>
+<form style="display: none;">
+   <label for="initial">Sigla</label>
+   <input id="initial" name="initial">
+   <label for="name">Nome</label>
+   <input id="name" name="name">
+   <label for="name">Descrizione</label>
+   <input id="name" name="description">
+</form>
+<table id="categoryTaxa">
+   	<thead>
+		<tr>
+			<th data-bSortable="false" data-sName="initial" >Sigla</th>
+			<th data-bSortable="false" data-sName="name" >Nome</th>
+			<th data-bSortable="false" data-sName="description" >Descrizione</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>Sigla</th>
+			<th>Nome</th>
+			<th>Descrizione</th>
+		</tr>
+	</tfoot>
+</table>
