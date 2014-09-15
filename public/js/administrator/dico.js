@@ -30,31 +30,9 @@ $(document).ready(function() {
             });
         }
     });
-      $("#addDico").click(function (e) {
-      e.preventDefault();
-        $("#addDico").dialog({
-           buttons: {
-              "Confermi la creazione della chiave radice?": function() {
-                 $.ajax({
-                    url: $(this).attr("href"),
-                    async : false
-                    });
-                 di.dataTable().fnDraw();
-              }
-           }
-        });
-     });
-    tinymce.init({
-      selector: "textarea"
-    });
-    $("#sortCategoryTaxaList" ).sortable();
-    $("#saveCategoryTaxaOrder").click(function (e) {
-       e.preventDefault();
-       $.ajax({
-        url: $(this).attr("href"),
-        type:"POST",
-        data: $.extend({},$("#sortCategoryTaxaList" ).sortable("toArray")),
-        async : false
-       });
+    $('.editable').editable('?task=dico&action=jeditable&id_dico='+$('#id').val(), {
+         "indicator" : "Salvataggio in corso...",
+         "tooltip"   : "Click per modificare...",
+         "placeholder" : "Clicca per modificare"
     });
 });

@@ -41,6 +41,8 @@ class Autoload {
 
       require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'Dico.php';
       require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoColl.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoItem.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoItemColl.php';
       
       require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaKind.php';
       require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaKindColl.php';

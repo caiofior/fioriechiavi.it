@@ -29,8 +29,10 @@ if (!key_exists('action',$_REQUEST)) {
 switch ($_REQUEST['action']) {
 case 'edit':
    $dico = new \flora\dico\Dico($GLOBALS['db']);
-   $dico->insert();
-   exit;
+   $dico->loadFromId($_REQUEST['id']);
+   $this->getTemplate()->setObjectData($dico);
+   $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
+   $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
    break; 
 case 'delete' :
    $dico = new \flora\dico\Dico($GLOBALS['db']);
@@ -40,10 +42,20 @@ case 'delete' :
    }
    exit;
    break;
-case 'sort' :
-   $this->getTemplate()->setBlock('middle','administrator/dico/sort.phtml');
-   $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');     
-break;
+case 'jeditable' :
+   if (
+           key_exists('id_dico',$_REQUEST) &&
+           is_numeric($_REQUEST['id_dico']) &&
+           key_exists('id',$_REQUEST) &&
+           strlen($_REQUEST['id']) > 1 &&
+           is_numeric(substr($_REQUEST['id'],1))
+       ) {
+         $dico = new \flora\dico\Dico($GLOBALS['db']);
+         $dico->loadFromId($_REQUEST['id_dico']);
+         echo $dico->setDicoItemValue(substr($_REQUEST['id'],1),$_REQUEST['value']);
+         exit;
+       }
+   break;
 default:
    $this->getTemplate()->setBlock('middle','administrator/dico/list.phtml');
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  

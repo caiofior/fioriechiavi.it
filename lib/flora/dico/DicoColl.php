@@ -22,6 +22,23 @@ class DicoColl extends \ContentColl {
        if ($dico_count == 0) {
           $dico = $this->addItem();
           $dico->insert();
+       } elseif ($dico_count > 1) {
+         trigger_error ('Multiple root dicotomic key items found ',E_USER_WARNING);
+         $count = 0;
+         $dicoStmt = $this->content->getDb()->query('
+         SELECT `dico`.`id` as dico_root_id FROM `dico`
+         LEFT JOIN `taxa` ON dico.id=taxa.dico_id
+         WHERE ISNULL(`taxa`.`name`)
+         ORDER BY `dico`.`id` ASC
+         ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         while ($dico_root_id = $dicoStmt->next()->getArrayCopy()) {
+            if (++$count>1 && is_numeric($dico_root_id)) {
+               $this->content->getDb()->query('
+               DELETE FROM `dico`
+               WHERE `dico`.`id` = '.$dico_root_id.'
+               ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+            }
+         }
        } 
        $select->columns(array(
            'id',
