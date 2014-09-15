@@ -19,16 +19,38 @@ class Dico extends \Content
     * @return \flora\dico\DicoItemColl
     */
    public function getDicoItemColl () {
-      $dicoItremColl = new \flora\dico\DicoItemColl($this->db);
-      $dicoItremColl->loadAll(array('id_dico'=>$this->data['id']));
-      if ($dicoItremColl->count() == 0) {
+      $dicoItemColl = new \flora\dico\DicoItemColl($this->db);
+      $dicoItemColl->loadAll(array('id_dico'=>$this->data['id']));
+      if ($dicoItemColl->count() == 0) {
          for ($c = 0 ; $c < 2; $c++) {
-            $dicoItem = $dicoItremColl->addItem();
+            $dicoItem = $dicoItemColl->addItem();
             $dicoItem->setData($c, 'id');
             $dicoItem->setData(true, 'incomplete');
          }
+      } else  {
+         foreach ($dicoItemColl->getItems() as $dicoItem) {
+            $siblingCode = $dicoItem->getSiblingCode();
+            $siblingDicoItemColl = $dicoItemColl->filterByAttributeValue($siblingCode, 'id');
+            if ($siblingDicoItemColl->count() == 0) {
+               $dicoItem = $dicoItemColl->addItem();
+               $dicoItem->setData($siblingCode, 'id');
+               $dicoItem->setData(true, 'incomplete');
+            }
+            $taxaId = $dicoItem->getRawData('taxa_id');
+            if ($taxaId == '') {
+               $childrenCodeArray = $dicoItem->getChildrenCodeArray();
+               foreach($childrenCodeArray as $childrenCode) {
+                  $childrenDicoItemColl = $dicoItemColl->filterByAttributeValue($childrenCode, 'id');
+                  if ($childrenDicoItemColl->count() == 0) {
+                     $dicoItem = $dicoItemColl->addItem();
+                     $dicoItem->setData($childrenCode, 'id');
+                     $dicoItem->setData(true, 'incomplete');
+                  }      
+               } 
+            }
+         }
       }
-      return $dicoItremColl;
+      return $dicoItemColl;
    }
    /**
     * Sets dico Item value

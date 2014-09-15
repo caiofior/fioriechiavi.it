@@ -7,6 +7,7 @@ namespace flora\dico;
  */
 class DicoItem extends \Content
 {
+   const maxCode='1';
    /**
     * Associates the database table
     * @param \Zend\Db\Adapter\Adapter $db
@@ -69,5 +70,27 @@ class DicoItem extends \Content
               VALUES
               ('.intval($this->rawData['id']).','.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['value']).'")
               ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   }
+   /**
+    * Returns the sibling code
+    * @return string
+    */
+   public function getSiblingCode() {
+      $siblingCode = substr($this->rawData['id'],0,-1);
+      $lastCode = substr($this->rawData['id'],0,1)+1;
+      if ($lastCode>self::maxCode) 
+         $lastCode = 0;
+      $siblingCode .= $lastCode;
+      return $siblingCode;
+   }
+   /**
+    * Returns an array with childen codes
+    * @return array
+    */
+   public function getChildrenCodeArray () {
+      $childrenCodeArray = array();
+      for ($c =0; $c <= self::maxCode; $c++)
+         $childrenCodeArray[]=$this->rawData['id'].$c;
+      return $childrenCodeArray;
    }
 }
