@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    ct = $("#categoryTaxa").dataTable({
+    di = $("#dico").dataTable({
         "oLanguage":  {
                 "sUrl": "js/DataTables/lang/it.json"
          },
@@ -9,8 +9,8 @@ $(document).ready(function() {
         "bProcessing": true,
         "bServerSide": true,
         "sAjaxSource": "#",
-         "fnServerParams": function ( aoData ) {
-            aoData.push({ "name": "task", "value": "taxa_category" });  
+        "fnServerParams": function ( aoData ) {
+            aoData.push({ "name": "task", "value": "dico" });  
          },
         "aoColumnDefs":  getDatatableMetadata(this),
         "drawCallback": function( ) {
@@ -23,15 +23,38 @@ $(document).ready(function() {
                            url: $(this).attr("href"),
                            async : false
                            });
-                        ct.dataTable().fnDraw();
+                        di.dataTable().fnDraw();
                      }
                   }
                });
             });
         }
     });
+      $("#addDico").click(function (e) {
+      e.preventDefault();
+        $("#addDico").dialog({
+           buttons: {
+              "Confermi la creazione della chiave radice?": function() {
+                 $.ajax({
+                    url: $(this).attr("href"),
+                    async : false
+                    });
+                 di.dataTable().fnDraw();
+              }
+           }
+        });
+     });
     tinymce.init({
       selector: "textarea"
     });
     $("#sortCategoryTaxaList" ).sortable();
+    $("#saveCategoryTaxaOrder").click(function (e) {
+       e.preventDefault();
+       $.ajax({
+        url: $(this).attr("href"),
+        type:"POST",
+        data: $.extend({},$("#sortCategoryTaxaList" ).sortable("toArray")),
+        async : false
+       });
+    });
 });

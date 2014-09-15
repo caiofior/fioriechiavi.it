@@ -1,7 +1,8 @@
 <link rel="stylesheet" href="js/DataTables/media/css/jquery.dataTables.css">
-<h2>Categorie taxa</h2>
-<a id="listCategoryTaxa" href="?task=taxa_category">Elenco delle categorie</a>
-<a id="addCategoryTaxa" href="?task=taxa_category&amp;action=edit">Aggiungi una categoria</a>
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category">Elenco delle categorie</a></p> &gt; <h2>Categorie taxa</h2>
+</div>
+<a id="addCategoryTaxa" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category&amp;action=edit">Aggiungi una categoria</a>
 <ul id="sortCategoryTaxaList">
 <?php
 $taxaKindColl = new \flora\taxa\TaxaKindColl($GLOBALS['db']);

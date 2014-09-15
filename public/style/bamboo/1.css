@@ -5,7 +5,10 @@ background-color : #fff;
 color : #333; 
 background-image : url(picks/3.jpg); 
 background-repeat : no-repeat; 
-} 
+}
+#breadcrump * {
+   display:inline-block;   
+}
 #left {
 width : 200px; 
 float : left; 

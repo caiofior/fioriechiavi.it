@@ -38,6 +38,9 @@ class Autoload {
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'User.php';
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'UserColl.php';
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'Profile.php';
+
+      require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'Dico.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoColl.php';
       
       require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaKind.php';
       require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaKindColl.php';

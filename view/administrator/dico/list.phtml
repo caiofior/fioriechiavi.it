@@ -1,0 +1,25 @@
+<link rel="stylesheet" href="js/DataTables/media/css/jquery.dataTables.css">
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <h2>Chiavi dicotomiche</h2>
+</div>
+<table id="dico">
+   	<thead>
+		<tr>
+			<th data-bSortable="false" data-bVisible="false" data-sName="id" >Id</th>
+			<th data-bSortable="true" data-sName="taxa.name" >Nome</th>
+                        <th data-bSortable="false" data-sName="actions" >Azioni</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="3" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>Id</th>
+			<th>Nome</th>
+                        <th>Azioni</th>
+		</tr>
+	</tfoot>
+</table>

@@ -71,7 +71,7 @@ abstract class ContentColl {
                    }
                     $sort = ' '.$criteria['sSortDir_'.$c];
                 }
-                if (key_exists($criteria['iSortCol_'.$c], $this->columns)) {
+                if (key_exists($criteria['iSortCol_'.$c], $this->columns) && $this->columns[$criteria['iSortCol_'.$c]] != '') {
                    if (strpos($this->columns[$criteria['iSortCol_'.$c]],'.') === false)
                      $select->order($this->content->getTable()->getTable().'.'.$this->columns[$criteria['iSortCol_'.$c]].$sort);
                    else
