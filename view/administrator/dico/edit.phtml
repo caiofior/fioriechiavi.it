@@ -3,6 +3,11 @@
 </div>
 <?php
 $dico = $this->object;
+?>
+<form>
+   <input type="hidden" name="id" id="id" value="<?php echo $dico->getData('id');?>">
+</form>
+<?php
 $dicoItemColl = $dico->getDicoItemColl();
 foreach ($dicoItemColl->getItems() as $dicoItem): 
    $label = $dicoItem->getData('text');
@@ -10,8 +15,5 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    if ($dicoItem->getRawData('incomplete') == 1)
       $editable='class="editable"';
 ?>
-<form>
-   <input type="hidden" name="id" id="id" value="<?php echo $dico->getData('id');?>">
-</form>
-<p id="d<?php echo $dicoItem->getData('id'); ?>" <?php echo $editable;?>><?php echo $label;?></p>
+<div><?php echo str_repeat('-', strlen($dicoItem->getData('id'))-1); ?><span id="d<?php echo $dicoItem->getData('id'); ?>" <?php echo $editable;?>><?php echo $label;?></span></div>
 <?php endforeach; ?>
