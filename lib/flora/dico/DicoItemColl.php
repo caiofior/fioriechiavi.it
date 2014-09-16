@@ -24,4 +24,18 @@ class DicoItemColl extends \ContentColl {
        $select->order('id_dico asc, id asc');
        return $select;
     }
+    /**
+     * Sort criteria
+     * @param \flora\dico\DicoItem $a
+     * @param \flora\dico\DicoItem $b
+     * @return int
+     */
+    protected static function customSort($a, $b) {
+      $a = $a->getData(self::$sortCriteria['field']);
+      $b = $b->getData(self::$sortCriteria['field']);
+      if ($a == $b) {
+         return 0;
+      }
+      return ($a < $b) ? -1 : 1;
+    } 
 }

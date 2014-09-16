@@ -20,15 +20,20 @@ abstract class ContentColl {
 */
     protected $content;
     /**
-* Array of items
-* @var array
-*/
+   * Array of items
+   * @var array
+   */
     protected $items=array();
     /**
-* Columns array
-* @var array
-*/
+   * Columns array
+   * @var array
+   */
     protected $columns=null;
+    /**
+     *Sort criteria
+     * @var array
+     */
+    protected static $sortCriteria=array();
      /**
    * Instantiates the collection
    * @param \Content $content Content base of the collection
@@ -43,6 +48,20 @@ abstract class ContentColl {
    * @return Zend_Db_Select Select is expected
    */
     abstract protected function customSelect ( \Zend\Db\Sql\Select $select,array $criteria );
+    /**
+     * Sort criteria
+     * @param \Content $a
+     * @param \Content $b
+     * @return int
+     */
+    protected static function customSort ($a, $b ){
+      $a = $a->getData($a->getPrimaryKey());
+      $b = $b->getData($b->getPrimaryKey());
+      if ($a == $b) {
+         return 0;
+      }
+      return ($a < $b) ? -1 : 1;
+    }
     /**
       * Load all contents
       * @param array $criteria Filtering criteria
@@ -219,5 +238,13 @@ abstract class ContentColl {
              $filteredColl->appendItem ($item);
        }
        return $filteredColl;
+    }
+    /**
+     * Sort teh array with user defined function
+     * @param array $criteria
+     */
+    public function sort(array $criteria) {
+       self::$sortCriteria = $criteria;
+       usort($this->items, array(get_class($this),'customSort'));
     }
 }

@@ -50,6 +50,9 @@ class Dico extends \Content
             }
          }
       }
+      $dicoItemColl->sort(array(
+          'field'=>'id'
+      ));
       return $dicoItemColl;
    }
    /**

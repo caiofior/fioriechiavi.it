@@ -229,4 +229,11 @@ abstract class Content {
     public function getCache() {
        return $this->db->cache;
     }
+    /**
+     * Returns primary key name
+     * @return string
+     */
+    public function getPrimaryKey() {
+       return $this->primary;
+    }
 }
