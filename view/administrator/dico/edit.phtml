@@ -8,7 +8,7 @@ $dico = $this->object;
    <input type="hidden" name="id" id="id" value="<?php echo $dico->getData('id');?>">
 </form>
 <?php
-$dicoItemColl = $dico->getDicoItemColl();
+$dicoItemColl = $dico->getDicoItemColl(true);
 foreach ($dicoItemColl->getItems() as $dicoItem): 
    $label = $dicoItem->getData('text');
    $missing='';

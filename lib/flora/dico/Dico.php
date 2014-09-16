@@ -15,50 +15,84 @@ class Dico extends \Content
       parent::__construct($db, 'dico');
    }
    /**
+    * Load root element
+    */
+   public function loadRoot() {
+      extract($this->db->query('
+         SELECT `dico`.`id` as dico_root_id FROM `dico`
+         LEFT JOIN `taxa` ON dico.id=taxa.dico_id
+         WHERE ISNULL(`taxa`.`name`)
+         LIMIT 1
+      ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current()->getArrayCopy());
+      $this->loadFromId($dico_root_id);
+   }
+   /**
+    * Returns the associated taxa
+    * @return \flora\taxa\Taxa
+    */
+   public function getTaxa() {
+         $taxa = new \flora\taxa\Taxa($this->db);
+         $taxa_stmt = $this->db->query('
+         SELECT `taxa`.`id` as taxa_id
+         FROM `taxa` 
+         WHERE `dico_id`='.$this->data['id'].'
+         LIMIT 1
+      ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+      if (!is_null($taxa_stmt)) {
+         export($taxa_stmt->getArrayCopy());
+         $taxa->loadFromId($taxa_id);
+      }
+      return $taxa;
+   }
+
+   /**
     * Returns a collection of dicotomic key items
+    * @param boolean $edit Collection is loaded for editing
     * @return \flora\dico\DicoItemColl
     */
-   public function getDicoItemColl () {
+   public function getDicoItemColl ($edit=false) {
       $dicoItemColl = new \flora\dico\DicoItemColl($this->db);
       $dicoItemColl->loadAll(array('id_dico'=>$this->data['id']));
-      if ($dicoItemColl->count() == 0) {
-         for ($c = 0 ; $c < 2; $c++) {
-            $dicoItem = $dicoItemColl->addItem();
-            $dicoItem->setData($c, 'id');
-            $dicoItem->setData(true, 'incomplete');
-         }
-      } else  {
-         foreach ($dicoItemColl->getItems() as $dicoItem) {
-            $siblingCode = $dicoItem->getSiblingCode();
-            $siblingDicoItemColl = $dicoItemColl->filterByAttributeValue($siblingCode, 'id');
-            for ($c = 0; $c < (\flora\dico\DicoItem::maxCode-$siblingDicoItemColl->count()); $c++) {
-               $dicoItemSibling = $dicoItemColl->addItem();
-               $dicoItemSibling->setData($siblingCode, 'id');
-               $dicoItemSibling->setData(true, 'incomplete');
+      if ($edit == true) {
+         if ($dicoItemColl->count() == 0) {
+            for ($c = 0 ; $c < 2; $c++) {
+               $dicoItem = $dicoItemColl->addItem();
+               $dicoItem->setData($c, 'id');
+               $dicoItem->setData(true, 'incomplete');
             }
-            $possible_taxa = true;
-            $taxaId = $dicoItem->getRawData('taxa_id');
-            if ($taxaId == '') {
-               $childrenCodeArray = $dicoItem->getChildrenCodeArray();
-               foreach($childrenCodeArray as $childrenCode) {
-                  $childrenDicoItemColl = $dicoItemColl->filterByAttributeValue($childrenCode, 'id');
-                  if ($childrenDicoItemColl->count() == 0) {
-                     $dicoItemChildren = $dicoItemColl->addItem();
-                     $dicoItemChildren->setData($childrenCode, 'id');
-                     $dicoItemChildren->setData(true, 'incomplete');
-                  } else {
-                     $possible_taxa = false;
+         } else  {
+            foreach ($dicoItemColl->getItems() as $dicoItem) {
+               $siblingCode = $dicoItem->getSiblingCode();
+               $siblingDicoItemColl = $dicoItemColl->filterByAttributeValue($siblingCode, 'id');
+               for ($c = 0; $c < (\flora\dico\DicoItem::maxCode-$siblingDicoItemColl->count()); $c++) {
+                  $dicoItemSibling = $dicoItemColl->addItem();
+                  $dicoItemSibling->setData($siblingCode, 'id');
+                  $dicoItemSibling->setData(true, 'incomplete');
+               }
+               $possible_taxa = true;
+               $taxaId = $dicoItem->getRawData('taxa_id');
+               if ($taxaId == '') {
+                  $childrenCodeArray = $dicoItem->getChildrenCodeArray();
+                  foreach($childrenCodeArray as $childrenCode) {
+                     $childrenDicoItemColl = $dicoItemColl->filterByAttributeValue($childrenCode, 'id');
+                     if ($childrenDicoItemColl->count() == 0) {
+                        $dicoItemChildren = $dicoItemColl->addItem();
+                        $dicoItemChildren->setData($childrenCode, 'id');
+                        $dicoItemChildren->setData(true, 'incomplete');
+                     } else {
+                        $possible_taxa = false;
+                     }
+                  }
+                  if ($possible_taxa === true) {
+                     $dicoItem->setData(true, 'possible_taxa');
                   }
                }
-               if ($possible_taxa === true) {
-                  $dicoItem->setData(true, 'possible_taxa');
-               }
             }
          }
+         $dicoItemColl->sort(array(
+             'field'=>'id'
+         ));
       }
-      $dicoItemColl->sort(array(
-          'field'=>'id'
-      ));
       return $dicoItemColl;
    }
    /**
