@@ -11,9 +11,16 @@ $dico = $this->object;
 $dicoItemColl = $dico->getDicoItemColl();
 foreach ($dicoItemColl->getItems() as $dicoItem): 
    $label = $dicoItem->getData('text');
-   $editable='';
+   $missing='';
    if ($dicoItem->getRawData('incomplete') == 1)
-      $editable='class="editable"';
+      $missing=' missing';
 ?>
-<div><?php echo str_repeat('-', strlen($dicoItem->getData('id'))-1); ?><span id="d<?php echo $dicoItem->getData('id'); ?>" <?php echo $editable;?>><?php echo $label;?></span></div>
+<div>
+   <?php echo str_repeat('&#160;', strlen($dicoItem->getData('id'))-1); ?>
+   <?php echo strlen($dicoItem->getData('id')); ?>
+   <span id="d<?php echo $dicoItem->getData('id'); ?>" class="editable<?php echo $missing;?>"><?php echo $label;?></span>
+   <?php if($dicoItem->getRawData('possible_taxa') === true) : ?>
+   <a href="#">Aggiungi Taxa</a>
+   <?php endif; ?>
+</div>
 <?php endforeach; ?>

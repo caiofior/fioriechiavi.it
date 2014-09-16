@@ -31,22 +31,28 @@ class Dico extends \Content
          foreach ($dicoItemColl->getItems() as $dicoItem) {
             $siblingCode = $dicoItem->getSiblingCode();
             $siblingDicoItemColl = $dicoItemColl->filterByAttributeValue($siblingCode, 'id');
-            if ($siblingDicoItemColl->count() == 0) {
-               $dicoItem = $dicoItemColl->addItem();
-               $dicoItem->setData($siblingCode, 'id');
-               $dicoItem->setData(true, 'incomplete');
+            for ($c = 0; $c < (\flora\dico\DicoItem::maxCode-$siblingDicoItemColl->count()); $c++) {
+               $dicoItemSibling = $dicoItemColl->addItem();
+               $dicoItemSibling->setData($siblingCode, 'id');
+               $dicoItemSibling->setData(true, 'incomplete');
             }
+            $possible_taxa = true;
             $taxaId = $dicoItem->getRawData('taxa_id');
             if ($taxaId == '') {
                $childrenCodeArray = $dicoItem->getChildrenCodeArray();
                foreach($childrenCodeArray as $childrenCode) {
                   $childrenDicoItemColl = $dicoItemColl->filterByAttributeValue($childrenCode, 'id');
                   if ($childrenDicoItemColl->count() == 0) {
-                     $dicoItem = $dicoItemColl->addItem();
-                     $dicoItem->setData($childrenCode, 'id');
-                     $dicoItem->setData(true, 'incomplete');
-                  }      
-               } 
+                     $dicoItemChildren = $dicoItemColl->addItem();
+                     $dicoItemChildren->setData($childrenCode, 'id');
+                     $dicoItemChildren->setData(true, 'incomplete');
+                  } else {
+                     $possible_taxa = false;
+                  }
+               }
+               if ($possible_taxa === true) {
+                  $dicoItem->setData(true, 'possible_taxa');
+               }
             }
          }
       }

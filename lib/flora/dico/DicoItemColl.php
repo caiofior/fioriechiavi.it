@@ -33,9 +33,30 @@ class DicoItemColl extends \ContentColl {
     protected static function customSort($a, $b) {
       $a = $a->getData(self::$sortCriteria['field']);
       $b = $b->getData(self::$sortCriteria['field']);
-      if ($a == $b) {
+      if ($a === $b) {
          return 0;
       }
-      return ($a < $b) ? -1 : 1;
+      for($c =0; $c < min(strlen($a),strlen($b)); $c++) {
+         if ($a[$c] == $b[$c]) {
+            continue;
+         }
+         return ($a[$c] < $b[$c]) ? -1 : 1;
+      }
+      return (strlen($a) < strlen($b)) ? -1 : 1;
     } 
+     /**
+     * Filter collection by attribute and value
+     * @param mixed $value
+     * @param mixed $field
+     * @return \ContentColl
+     */
+    public function filterByAttributeValue($value,$field) {
+       $filteredColl = clone $this;
+       $filteredColl->emptyColl();
+       foreach ($this->items as $item) {
+          if ($item->getData($field) === $value)
+             $filteredColl->appendItem ($item);
+       }
+       return $filteredColl;
+    }
 }
