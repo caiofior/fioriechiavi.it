@@ -56,6 +56,20 @@ case 'jeditable' :
          exit;
        }
    break;
+case 'taxalist':
+   $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
+   $taxaColl->loadAll($_REQUEST);
+   $result = array();
+   foreach ($taxaColl->getItems() as $taxa) {
+      $result[] = array(
+          'label'=>$taxa->getData('name'),
+          'value'=>$taxa->getData('id')
+      );
+   } 
+   header('Content-Type: application/json');
+   echo json_encode($result);
+   exit;
+   break;
 default:
    $this->getTemplate()->setBlock('middle','administrator/dico/list.phtml');
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  

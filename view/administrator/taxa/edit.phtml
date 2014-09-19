@@ -1,0 +1,30 @@
+<?php
+$taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+if (key_exists('id', $_REQUEST)) {
+   $taxa->loadFromId($_REQUEST['id']);
+} else {
+   $taxa->setData($_REQUEST);
+}
+?><div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica un taxa</h2>
+</div>
+<form method="post" action="#">
+   <input type="hidden" id="id" name="id" value="<?php echo $taxa->getData('id')?>">
+   <input type="hidden" id="dico_id" name="dico_id" value="<?php echo $taxa->getData('dico_id')?>">
+   <input type="hidden" id="taxa_kind_id" name="taxa_kind_id" value="<?php echo $taxa->getData('taxa_kind_id')?>">
+   <div>
+   <label for="taxa_kind_id_name">Categoria</label>
+   <input id="taxa_kind_id_name" name="taxa_kind_id_name" value="<?php echo $taxa->getData('taxa_kind_id_name')?>">
+   </div>
+   <div>
+   <label for="name">Nome</label>
+   <input id="name" name="name" value="<?php echo $taxa->getData('name')?>">
+   </div>
+   <div>
+   <label for="description">Descrizione</label>
+   <textarea id="description" name="description"><?php echo $taxa->getData('description')?></textarea>
+   </div>
+   <div>
+      <input type="submit" name="submit" value="Salva">
+   </div>
+</form>

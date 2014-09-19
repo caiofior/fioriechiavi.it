@@ -4,7 +4,8 @@
 <?php
 $dico = $this->object;
 ?>
-<form>
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/administrator/taxa.css">
+<form method="post" cation="#">
    <input type="hidden" name="id" id="id" value="<?php echo $dico->getData('id');?>">
 </form>
 <?php
@@ -20,7 +21,12 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    <?php echo strlen($dicoItem->getData('id')); ?>
    <span id="d<?php echo $dicoItem->getData('id'); ?>" class="editable<?php echo $missing;?>"><?php echo $label;?></span>
    <?php if($dicoItem->getRawData('possible_taxa') === true) : ?>
-   <a href="#">Aggiungi Taxa</a>
+   <a class="addTaxaButton" href="#">Aggiungi Taxa</a>
+   <form style="display:none;" class="addTaxa" method="post" action="?task=taxa&amp;action=edit&amp;dico_id=<?php echo $dico->getData('id');?>">
+      <input class="taxaName" name="name"/>
+      <input type="submit" name="submit" value="Crea"/>
+      <a class="restoreTaxaButton" href="#">Chiudi</a>
+   </form>
    <?php endif; ?>
 </div>
 <?php endforeach; ?>

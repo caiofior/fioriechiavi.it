@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    di = $("#dico").dataTable({
+    ct = $("#categoryTaxa").dataTable({
         "oLanguage":  {
                 "sUrl": "js/DataTables/lang/it.json"
          },
@@ -9,8 +9,8 @@ $(document).ready(function() {
         "bProcessing": true,
         "bServerSide": true,
         "sAjaxSource": "#",
-        "fnServerParams": function ( aoData ) {
-            aoData.push({ "name": "task", "value": "dico" });  
+         "fnServerParams": function ( aoData ) {
+            aoData.push({ "name": "task", "value": "taxa_category" });  
          },
         "aoColumnDefs":  getDatatableMetadata(this),
         "drawCallback": function( ) {
@@ -23,26 +23,26 @@ $(document).ready(function() {
                            url: $(this).attr("href"),
                            async : false
                            });
-                        di.dataTable().fnDraw();
+                        ct.dataTable().fnDraw();
                      }
                   }
                });
             });
         }
     });
-    $('.editable').editable('?task=dico&action=jeditable&id_dico='+$('#id').val(), {
-         "indicator" : "Salvataggio in corso...",
-         "tooltip"   : "Click per modificare...",
-         "placeholder" : "Clicca per modificare"
+    tinymce.init({
+      selector: "textarea"
     });
-    $(".addTaxaButton").click(function() {
-      $(this).hide().siblings(".addTaxa").show();
+    $( "#taxa_kind_id_name" ).autocomplete({
+      source: "?task=taxa&action=taxakindlist",
+      select: function( e, ui ) {
+         $("#taxa_kind_id").val(ui.item.value);
+         $( "#taxa_kind_id_name" ).val(ui.item.label);
+         e.preventDefault();
+      },
+      change: function (e, ui) {
+          if (!ui.item)
+              $(this).val("");
+      }
     });
-    $(".restoreTaxaButton").click(function () {
-       $(this).parent("form").hide().siblings(".addTaxaButton").show();      
-    });
-    $("input:submit").unbind("click");
-   $( ".taxaName" ).autocomplete({
-    source: "?task=dico&action=taxalist"
-   });
 });
