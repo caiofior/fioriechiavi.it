@@ -51,8 +51,8 @@ case 'edit':
          } else {
             $taxaKind->insert();
          }
-         $this->getTemplate()->setBlock('middle','administrator/taxa_category/list.phtml');
-         $this->getTemplate()->setBlock('footer','administrator/taxa_category/footer.phtml'); 
+         header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa_category');
+         exit(); 
       }
    }
    break; 

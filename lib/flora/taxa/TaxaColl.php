@@ -16,6 +16,7 @@ class TaxaColl extends \ContentColl {
       * @return Zend_Db_Select Select is expected
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
+       $select->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array('taxa_kind_initials'=>'initials','taxa_kind_id_name'=>'name'), \Zend\Db\Sql\Select::JOIN_LEFT);
        if (key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
           $select->where('`name` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
           $select->where('`description` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);

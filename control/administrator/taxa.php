@@ -12,7 +12,9 @@ if (key_exists('sEcho', $_REQUEST)) {
          $row=array();
          foreach($columns as $column) {
             $data = $taxa->getRawData($column);
-            if ($column == 'actions') {
+            if ($column == 'taxa_kind_id') {
+               $data=$taxa->getRawData('taxa_kind_initials');
+            } else if ($column == 'actions') {
                $data = '<a class="actions modify" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a><a class="actions delete" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>';
             } 
             $row[] = $data;     
@@ -34,8 +36,8 @@ case 'edit':
             key_exists('xhrValidate', $_REQUEST) ||
             key_exists('submit', $_REQUEST)
       ) {
-      if (!key_exists('taxonomy_kind', $_REQUEST) ||$_REQUEST['taxonomy_kind']=='') {
-          $this->addValidationMessage('initials','Il tipo di tassonomia è obbligatorio');
+      if (!key_exists('taxa_kind_id', $_REQUEST) ||$_REQUEST['taxa_kind_id']=='') {
+          $this->addValidationMessage('taxa_kind_id','Il tipo di tassonomia è obbligatorio');
       }
       if (!key_exists('name', $_REQUEST) ||$_REQUEST['name']=='') {
           $this->addValidationMessage('name','Il nome è obbligatorio');
@@ -51,8 +53,8 @@ case 'edit':
          } else {
             $taxa->insert();
          }
-         $this->getTemplate()->setBlock('middle','administrator/taxa/list.phtml');
-         $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml'); 
+         header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa');
+         exit(); 
       }
    }
    break; 

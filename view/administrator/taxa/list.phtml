@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="js/DataTables/media/css/jquery.dataTables.css">
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <h2>Taxa</h2>
+</div>
+<a id="addTaxa" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=edit">Aggiungi un taxa</a>
+<table id="taxa">
+   	<thead>
+		<tr>
+			<th data-sName="id" >Id</th>
+			<th data-sName="taxa_kind_id" >Raggruppamento sistematico</th>
+			<th data-sName="name" >Nome</th>
+                        <th data-sName="description" >Descrizione</th>
+                        <th data-bSortable="false" data-sName="actions" >Azioni</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>Id</th>
+			<th>Raggruppamento sistematico</th>
+			<th>Nome</th>
+                        <th>Descrizione</th>
+                        <th>Azioni</th>
+		</tr>
+	</tfoot>
+</table>

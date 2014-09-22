@@ -18,7 +18,7 @@ $(document).ready(function() {
                e.preventDefault();
                $(".actions.delete").dialog({
                   buttons: {
-                     "Confermi la cancellazione della categoria del taxa?": function() {
+                     "Confermi la cancellazione del raggruppamento sistematico?": function() {
                         $.ajax({
                            url: $(this).attr("href"),
                            async : false

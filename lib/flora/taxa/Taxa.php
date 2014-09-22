@@ -14,6 +14,32 @@ class Taxa extends \Content
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
       parent::__construct($db, 'taxa');
    }
+   /**
+      * Loads data from its id
+      * @param int $id
+      */
+    public function loadFromId($id) {
+       
+         if (
+         !is_object($this->table) ||
+         !$this->table instanceof \Zend\Db\TableGateway\TableGateway
+         ) {
+            throw new \Exception('No database table associated with this content',1409011101);
+        }
+        $select =  $this->table->getSql()->select()
+        ->where('`taxa`.`id` = '.intval($id))
+        ->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array('taxa_kind_initials'=>'initials','taxa_kind_id_name'=>'name'), \Zend\Db\Sql\Select::JOIN_LEFT);
+        $data = $this->table->selectWith($select)->current();
+        if (is_object($data))
+            $this->data = $data->getArrayCopy();
+        
+ 
+    }
+    public function update() {
+       unset($this->data['taxa_kind_initials']);
+       unset($this->data['taxa_kind_id_name']);
+       parent::update();
+    }
     // --- ASSOCIATIONS ---
 
 

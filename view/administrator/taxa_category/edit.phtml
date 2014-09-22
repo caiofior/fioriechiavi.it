@@ -4,7 +4,7 @@ if (key_exists('id', $_REQUEST)) {
    $taxaKind->loadFromId($_REQUEST['id']);
 }
 ?><div id="breadcrump">
-   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category">Elenco delle categorie</a></p> &gt; <h2>Modifica una categoria taxa</h2>
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category">Elenco dei raggruppamenti sistematici</a></p> &gt; <h2>Modifica un raggruppamento sistematico</h2>
 </div>
 <a id="sortCategoryTaxa" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category&amp;action=sort">Ordina le categorie</a>
 <form method="post" action="#">

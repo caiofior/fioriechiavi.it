@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    ct = $("#categoryTaxa").dataTable({
+    ct = $("#taxa").dataTable({
         "oLanguage":  {
                 "sUrl": "js/DataTables/lang/it.json"
          },
@@ -10,7 +10,7 @@ $(document).ready(function() {
         "bServerSide": true,
         "sAjaxSource": "#",
          "fnServerParams": function ( aoData ) {
-            aoData.push({ "name": "task", "value": "taxa_category" });  
+            aoData.push({ "name": "task", "value": "taxa" });  
          },
         "aoColumnDefs":  getDatatableMetadata(this),
         "drawCallback": function( ) {
@@ -18,7 +18,7 @@ $(document).ready(function() {
                e.preventDefault();
                $(".actions.delete").dialog({
                   buttons: {
-                     "Confermi la cancellazione della categoria del taxa?": function() {
+                     "Confermi la cancellazione del taxa?": function() {
                         $.ajax({
                            url: $(this).attr("href"),
                            async : false
