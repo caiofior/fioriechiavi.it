@@ -38,10 +38,10 @@ class Control {
       $this->template = $template;
       if (
         (
-            !key_exists('user', $GLOBALS) ||  
+            !array_key_exists('user', $GLOBALS) ||
             is_null($GLOBALS['user']) ||
             $GLOBALS['user'] instanceof \abbrevia\user\User 
-        ) && !key_exists('login', $_GET)
+        ) && !array_key_exists('login', $_GET)
    )
    $this->template->setBlock('middle','general/middle.phtml');
 else
@@ -122,7 +122,7 @@ else
    public function formIsValid() {
       if (
               sizeof($this->validationMessages) == 1 &&
-              array_key_exists('validMessage',$this->validationMessages)
+              array_array_key_exists('validMessage',$this->validationMessages)
          ) return true;
       return false;
    }

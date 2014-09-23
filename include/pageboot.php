@@ -36,8 +36,8 @@ if(!is_null($config->smtp)) {
    $transport = new Zend\Mail\Transport\Sendmail();
 }
 require 'session.php';
-if (key_exists('autocomplete', $_GET) && key_exists('domain', $_GET)) {
-   if (!key_exists('term', $_GET))
+if (array_key_exists('autocomplete', $_GET) && array_key_exists('domain', $_GET)) {
+   if (!array_key_exists('term', $_GET))
       $_GET['term']=null;     
    $providerColl = new \abbrevia\domain\DomainColl($db);
    $providerColl->loadAll(array('cod_dominio'=>$_GET['domain'],'sSearch'=>$_GET['term']));

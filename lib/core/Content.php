@@ -74,7 +74,7 @@ abstract class Content {
            }
         }
         
-        if (!key_exists($table, self::$metadata)) {
+        if (!array_key_exists($table, self::$metadata)) {
            
             self::$metadata[$table]=array(
                 'columns'=>array(),
@@ -110,7 +110,7 @@ abstract class Content {
             $this->db->cache->setItem('metadata',self::$metadata);
          }
             
-      if (key_exists($table, self::$metadata)) {
+      if (array_key_exists($table, self::$metadata)) {
          $this->primary = self::$metadata[$table]['primaryKey'];
          $cols =self::$metadata[$table]['columns'];
          $this->empty_entity = array_combine($cols, array_fill ( 0 , sizeof($cols) , null ));
@@ -141,7 +141,7 @@ abstract class Content {
             return;
         if (is_null($field))
             return $this->data;
-        if (key_exists($field, $this->data))
+        if (array_key_exists($field, $this->data))
             return $this->data[$field];
     }
      /**
@@ -152,7 +152,7 @@ abstract class Content {
     public function getRawData($field = null) {
         if (is_null($field))
             return $this->rawData;
-        if (key_exists($field, $this->rawData))
+        if (array_key_exists($field, $this->rawData))
             return $this->rawData[$field];
     }
     /**
@@ -166,7 +166,7 @@ abstract class Content {
             $this->rawData = array_merge($this->data, $data);
          }
         else if (!is_null($field) ) {
-            if (array_key_exists($field,$this->empty_entity))
+            if (array_array_key_exists($field,$this->empty_entity))
                 $this->data[$field] = $data;
             $this->rawData[$field] = $data;
         }
@@ -177,7 +177,7 @@ abstract class Content {
     public function insert() {
         $id = $this->table->insert($this->data);
         if (is_null($id)) {
-            if (key_exists('firephp', $GLOBALS))
+            if (array_key_exists('firephp', $GLOBALS))
                $GLOBALS['firephp']->error('Error on query '.$this->table->getSql()->getSqlPlatform()->getSqlString($this->table->getAdapter()->getPlatform()));
            throw new Exception('Error on query '.$this->table->getSql()->getSqlPlatform()->getSqlString($this->table->getAdapter()->getPlatform())) ;
         }
@@ -187,7 +187,7 @@ abstract class Content {
    * Deletes data
    */
     public function delete() {
-        if (key_exists($this->primary, $this->data)) {
+        if (array_key_exists($this->primary, $this->data)) {
             $this->table->delete(array($this->primary=>$this->data[$this->primary]));
         }
     }
@@ -195,7 +195,7 @@ abstract class Content {
    * Updates data
    */
     public function update() {
-        if (!key_exists($this->primary, $this->data))
+        if (!array_key_exists($this->primary, $this->data))
             throw new Exception('Unable to update object without id',1301251051);
         $data = $this->data;
         unset($data[$this->primary]);

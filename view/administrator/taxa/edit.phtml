@@ -1,6 +1,6 @@
 <?php
 $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-if (key_exists('id', $_REQUEST)) {
+if (array_key_exists('id', $_REQUEST)) {
    $taxa->loadFromId($_REQUEST['id']);
 } else {
    $taxa->setData($_REQUEST);
@@ -12,10 +12,10 @@ if (key_exists('id', $_REQUEST)) {
    <input type="hidden" id="id" name="id" value="<?php echo $taxa->getData('id')?>">
    <input type="hidden" id="dico_id" name="dico_id" value="<?php echo $taxa->getData('dico_id')?>">
    <input type="hidden" id="taxa_kind_id" name="taxa_kind_id" value="<?php echo $taxa->getData('taxa_kind_id')?>">
-   <?php if (key_exists('children_dico_id', $_REQUEST)): ?>
+   <?php if (array_key_exists('children_dico_id', $_REQUEST)): ?>
    <input type="hidden" id="children_dico_id" name="children_dico_id" value="<?php echo $_REQUEST['children_dico_id'];?>">
    <?php endif; ?>
-   <?php if (key_exists('children_dico_item_id', $_REQUEST)): ?>
+   <?php if (array_key_exists('children_dico_item_id', $_REQUEST)): ?>
    <input type="hidden" id="children_dico_item_id" name="children_dico_item_id" value="<?php echo $_REQUEST['children_dico_item_id'];?>">
    <?php endif; ?>
    <div>

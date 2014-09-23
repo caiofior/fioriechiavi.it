@@ -1,6 +1,6 @@
 <?php
 $taxaKind = new \flora\taxa\TaxaKind($GLOBALS['db']);
-if (key_exists('id', $_REQUEST)) {
+if (array_key_exists('id', $_REQUEST)) {
    $taxaKind->loadFromId($_REQUEST['id']);
 }
 ?><div id="breadcrump">

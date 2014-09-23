@@ -1,5 +1,5 @@
 <?php
-if (!key_exists('task', $_REQUEST))
+if (!array_key_exists('task', $_REQUEST))
    $_REQUEST['task']=null;
 switch ($_REQUEST['task']) {
    case 'register' :

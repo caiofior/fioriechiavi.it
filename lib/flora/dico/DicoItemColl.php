@@ -17,7 +17,7 @@ class DicoItemColl extends \ContentColl {
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
        if (
-               key_exists('id_dico', $criteria) &&
+               array_key_exists('id_dico', $criteria) &&
                $criteria['id_dico'] != '') {
           $select->where('id_dico = '.intval($criteria['id_dico']));
        }

@@ -1,5 +1,5 @@
 <?php
-if (key_exists('sEcho', $_REQUEST)) {
+if (array_key_exists('sEcho', $_REQUEST)) {
       $result = array();
       $userColl = new \flora\user\UserColl($GLOBALS['db']);
       $userColl->loadAll($_REQUEST);

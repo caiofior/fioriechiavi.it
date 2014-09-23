@@ -74,7 +74,7 @@ class Template {
     * @throws Exception
     */
    public function renderBlock($blockName) {
-      if (!key_exists($blockName, $this->blocks))
+      if (!array_key_exists($blockName, $this->blocks))
          throw new Exception('Block undefined '.$blockName, 1401201255);
       $file = $this->baseDir.'view'.DIRECTORY_SEPARATOR.$this->blocks[$blockName];
       if (!is_file($file))
@@ -86,14 +86,14 @@ class Template {
     * @throws Exception
     */
    public function render() {
-      if ( key_exists('xhrValidate', $_POST)) {
+      if ( array_key_exists('xhrValidate', $_POST)) {
          header('Content-Type: application/json');
          echo json_encode($this->control->getValidationMessages());
       }
       else if (
-              key_exists('xhrUpdate', $_POST) &&
-              key_exists('update', $_POST) &&
-              key_exists('content', $_POST)
+              array_key_exists('xhrUpdate', $_POST) &&
+              array_key_exists('update', $_POST) &&
+              array_key_exists('content', $_POST)
          ) {
          $update = explode(',',$_POST['update']);
          $content = explode(',',$_POST['content']);

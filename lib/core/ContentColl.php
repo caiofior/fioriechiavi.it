@@ -70,12 +70,12 @@ abstract class ContentColl {
         if (is_null($criteria))
             $criteria = array();
         $select = $this->customSelect($this->content->getTable()->getSql()->select(),$criteria);
-        if (key_exists('sColumns', $criteria))
+        if (array_key_exists('sColumns', $criteria))
             $this->columns= explode(',', $criteria['sColumns']);
-        if (key_exists('iSortingCols', $criteria) && is_array($this->columns)) {
+        if (array_key_exists('iSortingCols', $criteria) && is_array($this->columns)) {
             for ($c =0; $c < $criteria['iSortingCols'];$c++) {
                 $sort = ' ASC';
-                if (key_exists('sSortDir_'.$c, $criteria) && $criteria['sSortDir_'.$c] != '') {
+                if (array_key_exists('sSortDir_'.$c, $criteria) && $criteria['sSortDir_'.$c] != '') {
                    switch (strtoupper($criteria['sSortDir_'.$c])) {
                       case 'ASC':
                       case 'E':   
@@ -90,7 +90,7 @@ abstract class ContentColl {
                    }
                     $sort = ' '.$criteria['sSortDir_'.$c];
                 }
-                if (key_exists($criteria['iSortCol_'.$c], $this->columns) && $this->columns[$criteria['iSortCol_'.$c]] != '') {
+                if (array_key_exists($criteria['iSortCol_'.$c], $this->columns) && $this->columns[$criteria['iSortCol_'.$c]] != '') {
                    if (strpos($this->columns[$criteria['iSortCol_'.$c]],'.') === false)
                      $select->order($this->content->getTable()->getTable().'.'.$this->columns[$criteria['iSortCol_'.$c]].$sort);
                    else
@@ -99,12 +99,12 @@ abstract class ContentColl {
             }
         }
         if (
-                key_exists('iDisplayStart',$criteria ) ||
-                key_exists('iDisplayLength',$criteria )
+                array_key_exists('iDisplayStart',$criteria ) ||
+                array_key_exists('iDisplayLength',$criteria )
             )
         $select->limit($criteria['iDisplayLength']);
         if (
-                key_exists('iDisplayStart', $criteria) &&
+                array_key_exists('iDisplayStart', $criteria) &&
                 $criteria['iDisplayStart']>0
             )
          $select->offset($criteria['iDisplayStart']);
@@ -126,7 +126,7 @@ abstract class ContentColl {
             }
             catch (\Exception $e) {
                $mysqli = $this->content->getTable()->getAdapter()->getDriver()->getConnection()->getResource();  
-               if (key_exists('firephp', $GLOBALS))
+               if (array_key_exists('firephp', $GLOBALS))
                    $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
                throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
             }
@@ -206,7 +206,7 @@ abstract class ContentColl {
    * @return \Content
    */
     public function getFirst() {
-        if (!key_exists(0, $this->items))
+        if (!array_key_exists(0, $this->items))
             return $this->addItem ();
         return $this->items[0];
     }
@@ -215,7 +215,7 @@ abstract class ContentColl {
    * @param type $key int
    */
     public function deleteByKey($key) {
-        if (key_exists($key, $this->items))
+        if (array_key_exists($key, $this->items))
             unset ($this->items[$key]);
     }
     /**

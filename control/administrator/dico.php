@@ -1,5 +1,5 @@
 <?php
-if (key_exists('sEcho', $_REQUEST)) {
+if (array_key_exists('sEcho', $_REQUEST)) {
       $result = array();
       $dicoColl = new \flora\dico\DicoColl($GLOBALS['db']);
       $dicoColl->loadAll($_REQUEST);
@@ -23,7 +23,7 @@ if (key_exists('sEcho', $_REQUEST)) {
       echo json_encode($result);
       exit;
 }
-if (!key_exists('action',$_REQUEST)) {
+if (!array_key_exists('action',$_REQUEST)) {
    $_REQUEST['action']=null;
 }
 switch ($_REQUEST['action']) {
@@ -36,7 +36,7 @@ case 'edit':
    break; 
 case 'delete' :
    $dico = new \flora\dico\Dico($GLOBALS['db']);
-   if (key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+   if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
       $dico->loadFromId($_REQUEST['id']);
       $dico->delete();
    }
@@ -44,9 +44,9 @@ case 'delete' :
    break;
 case 'jeditable' :
    if (
-           key_exists('id_dico',$_REQUEST) &&
+           array_key_exists('id_dico',$_REQUEST) &&
            is_numeric($_REQUEST['id_dico']) &&
-           key_exists('id',$_REQUEST) &&
+           array_key_exists('id',$_REQUEST) &&
            strlen($_REQUEST['id']) > 1 &&
            is_numeric(substr($_REQUEST['id'],1))
        ) {

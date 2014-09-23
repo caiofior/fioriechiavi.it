@@ -1,5 +1,5 @@
 <?php
-if (key_exists('sEcho', $_REQUEST)) {
+if (array_key_exists('sEcho', $_REQUEST)) {
       $result = array();
       $taxaKindColl = new \flora\taxa\TaxaKindColl($GLOBALS['db']);
       $taxaKindColl->loadAll($_REQUEST);
@@ -23,7 +23,7 @@ if (key_exists('sEcho', $_REQUEST)) {
       echo json_encode($result);
       exit;
 }
-if (!key_exists('action',$_REQUEST)) {
+if (!array_key_exists('action',$_REQUEST)) {
    $_REQUEST['action']=null;
 }
 switch ($_REQUEST['action']) {
@@ -31,22 +31,22 @@ case 'edit':
    $this->getTemplate()->setBlock('middle','administrator/taxa_category/edit.phtml');
    $this->getTemplate()->setBlock('footer','administrator/taxa_category/footer.phtml');  
    if (
-            key_exists('xhrValidate', $_REQUEST) ||
-            key_exists('submit', $_REQUEST)
+            array_key_exists('xhrValidate', $_REQUEST) ||
+            array_key_exists('submit', $_REQUEST)
       ) {
-      if (!key_exists('initials', $_REQUEST) ||$_REQUEST['initials']=='') {
+      if (!array_key_exists('initials', $_REQUEST) ||$_REQUEST['initials']=='') {
           $this->addValidationMessage('initials','Le iniziali sono obbligatorie');
       }
-      if (!key_exists('name', $_REQUEST) ||$_REQUEST['name']=='') {
+      if (!array_key_exists('name', $_REQUEST) ||$_REQUEST['name']=='') {
           $this->addValidationMessage('name','Il nome è obbligatorio');
       }
-      if (key_exists('submit', $_REQUEST) && $this->formIsValid()) {
+      if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
          $taxaKind = new \flora\taxa\TaxaKind($GLOBALS['db']);
-         if (key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+         if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxaKind->loadFromId($_REQUEST['id']);
          }
          $taxaKind->setData($_REQUEST);
-         if (key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+         if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxaKind->update();
          } else {
             $taxaKind->insert();
@@ -58,7 +58,7 @@ case 'edit':
    break; 
 case 'delete' :
    $taxaKind = new \flora\taxa\TaxaKind($GLOBALS['db']);
-   if (key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+   if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
       $taxaKind->loadFromId($_REQUEST['id']);
       $taxaKind->delete();
    }

@@ -106,7 +106,7 @@ class DicoItem extends \Content
     */
    public function getTaxa() {
       $taxa = new \flora\taxa\Taxa($this->db);
-      if (key_exists('taxa_id',$this->rawData) && $this->rawData['taxa_id'] != '') {
+      if (array_key_exists('taxa_id',$this->rawData) && $this->rawData['taxa_id'] != '') {
          $taxa->loadFromId($this->rawData['taxa_id']);
       }
       return $taxa;

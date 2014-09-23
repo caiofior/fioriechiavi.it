@@ -5,11 +5,11 @@ $manager->setName('abbrevia');
 $auth = new Zend\Authentication\AuthenticationService();
 $db->session = $manager->getStorage();
 if (
-        key_exists('action', $_REQUEST) &&
+        array_key_exists('action', $_REQUEST) &&
         $_REQUEST['action']=='login' &&
-        key_exists('xhrValidate', $_REQUEST)  &&
-        key_exists('username', $_REQUEST) &&
-        key_exists('password', $_REQUEST)
+        array_key_exists('xhrValidate', $_REQUEST)  &&
+        array_key_exists('username', $_REQUEST) &&
+        array_key_exists('password', $_REQUEST)
         ) {
    if (is_numeric(session_id())) session_destroy();
    $authAdapter = new login\Auth($db,$_REQUEST['username'], $_REQUEST['password']);
@@ -19,13 +19,13 @@ if (
    $db->session->plain_pwd= $_REQUEST['password'];
 }
 else if (
-        key_exists('action', $_REQUEST) &&
+        array_key_exists('action', $_REQUEST) &&
         $_REQUEST['action']=='register' &&
-        key_exists('username', $_REQUEST) &&
-        key_exists('password', $_REQUEST)
+        array_key_exists('username', $_REQUEST) &&
+        array_key_exists('password', $_REQUEST)
         ) {
    $_REQUEST['task']='register';
-   if(key_exists('xhrValidate', $_REQUEST)) {
+   if(array_key_exists('xhrValidate', $_REQUEST)) {
       if (!filter_var($_REQUEST['username'], FILTER_VALIDATE_EMAIL)) {
          $control->addValidationMessage('username_register','Inserisci una mail valida');
       }
@@ -46,7 +46,7 @@ else if (
    }
    $auth->getStorage()->clear();
    if (is_numeric(session_id())) session_destroy();
-} else if (key_exists('confirmCode', $_REQUEST)){
+} else if (array_key_exists('confirmCode', $_REQUEST)){
    $_REQUEST['task']='confirm';
    try {
       $user = \login\user\UserInstantiator::confirmUserInstance($db, $_REQUEST['confirmCode']);
@@ -66,7 +66,7 @@ else if (
    $auth->getStorage()->clear();
    if (is_numeric(session_id())) session_destroy();
    
-} else if (key_exists('logout', $_REQUEST)) {
+} else if (array_key_exists('logout', $_REQUEST)) {
    $auth->getStorage()->clear();
    if (is_numeric(session_id())) session_destroy();
 }

@@ -20,7 +20,7 @@ class Autoload {
       
       }
  
-      if (!class_exists('FirePHP') && key_exists('config', $GLOBALS) && $GLOBALS['config']->firePHPpath != '') {
+      if (!class_exists('FirePHP') && array_key_exists('config', $GLOBALS) && $GLOBALS['config']->firePHPpath != '') {
          require $GLOBALS['config']->firePHPpath.DIRECTORY_SEPARATOR.'FirePHP.class.php';
          require $GLOBALS['config']->firePHPpath.DIRECTORY_SEPARATOR.'fb.php';
          $GLOBALS['firephp'] = \FirePHP::getInstance(true);
