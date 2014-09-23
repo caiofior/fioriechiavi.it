@@ -1,7 +1,7 @@
 $(document).ready(function() {
     di = $("#dico").dataTable({
         "oLanguage":  {
-                "sUrl": "js/DataTables/lang/it.json"
+                "sUrl": "js/common/datatables/lang/it.json"
          },
         "bStateSave" : true,
         "aaSorting": [[ 1, "desc" ]],
@@ -18,12 +18,13 @@ $(document).ready(function() {
                e.preventDefault();
                $(".actions.delete").dialog({
                   buttons: {
-                     "Confermi la cancellazione della categoria del taxa?": function() {
+                     "Confermi la cancellazione della chiave dicotomica?": function() {
                         $.ajax({
                            url: $(this).attr("href"),
                            async : false
                            });
                         di.dataTable().fnDraw();
+                        $( this ).dialog( "close" );
                      }
                   }
                });

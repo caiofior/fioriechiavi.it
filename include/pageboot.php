@@ -15,7 +15,7 @@ $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
 $db->config = $config;
 
 require __DIR__.'/../lib/flora/Autoload.php';
-abbrevia\Autoload::getInstance();
+flora\Autoload::getInstance();
 
 $template = new Template(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,$config->template);
 $template->setBlock('head','general/head.phtml');

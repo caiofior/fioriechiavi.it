@@ -53,6 +53,15 @@ case 'edit':
          } else {
             $taxa->insert();
          }
+         if (
+                 key_exists('children_dico_item_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_item_id']) &&
+                 key_exists('children_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_id'])
+             ) {
+             $dicoItem = new flora\dico\DicoItem($GLOBALS['db']);
+             $dicoItem->loadFromIdAndDico($_REQUEST['children_dico_id'],$_REQUEST['children_dico_item_id']);
+             $dicoItem->setData($taxa->getData('id'), 'taxa_id');
+             $dicoItem->replace();
+         }
          header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa');
          exit(); 
       }

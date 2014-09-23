@@ -9,7 +9,7 @@ switch ($_REQUEST['task']) {
       $this->getTemplate()->setBlock('middle','user/confirm.phtml');      
    break;
    default :
-      if ($GLOBALS['user'] instanceof \flora\user\User) {
+      if ($GLOBALS['user'] instanceof \login\user\User) {
          switch ($GLOBALS['user']->getData('role_id')) {
             case 1 :
                $this->getTemplate()->setBlock('middle','administrator/dashboard.phtml');      

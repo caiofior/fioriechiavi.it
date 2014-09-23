@@ -12,7 +12,7 @@ if (
         key_exists('password', $_REQUEST)
         ) {
    if (is_numeric(session_id())) session_destroy();
-   $authAdapter = new flora\Auth($db,$_REQUEST['username'], $_REQUEST['password']);
+   $authAdapter = new login\Auth($db,$_REQUEST['username'], $_REQUEST['password']);
    $authResult = $auth->authenticate($authAdapter);
    if ($authResult->getCode() != \Zend\Authentication\Result::SUCCESS)
       $control->addValidationMessage('username_login','Credenziali errate');
@@ -36,20 +36,20 @@ else if (
          $control->addValidationMessage('password_register','Le due password non coincidono');
       }
       if ($control->formIsValid()) {
-         $user = \flora\user\UserInstantiator::getUserInstance($db, $_REQUEST['username']);
+         $user = \login\user\UserInstantiator::getUserInstance($db, $_REQUEST['username']);
          if($user->getData('username') != '') {
             $control->addValidationMessage('username_register','Utente già registrato');
          }
       }
    } else {
-      $user = \flora\user\UserInstantiator::createUserInstance($db, $_REQUEST['username'],$_REQUEST['password']);
+      $user = \login\user\UserInstantiator::createUserInstance($db, $_REQUEST['username'],$_REQUEST['password']);
    }
    $auth->getStorage()->clear();
    if (is_numeric(session_id())) session_destroy();
 } else if (key_exists('confirmCode', $_REQUEST)){
    $_REQUEST['task']='confirm';
    try {
-      $user = \flora\user\UserInstantiator::confirmUserInstance($db, $_REQUEST['confirmCode']);
+      $user = \login\user\UserInstantiator::confirmUserInstance($db, $_REQUEST['confirmCode']);
    } catch (\Exception $e) {
       switch ($e->getCode()) {
          case 1409011509 :
@@ -72,7 +72,7 @@ else if (
 }
 $user = null;
 try{
-   $user = flora\user\UserInstantiator::getUserInstance($db,$auth->getStorage()->read());
+   $user = login\user\UserInstantiator::getUserInstance($db,$auth->getStorage()->read());
 } catch (\Exception $e) {
    if ($e->getCode() != 1401231705)
       throw $e;

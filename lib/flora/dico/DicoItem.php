@@ -1,5 +1,9 @@
 <?php
 namespace flora\dico;
+if (!class_exists('\Autoload')) {
+   require __DIR__.'/../../core/Autoload.php';
+   \Autoload::getInstance();
+}
 /**
  * Taka dicotomic key item class
  *
@@ -37,11 +41,14 @@ class DicoItem extends \Content
       $this->data['id']=$id;
       $this->rawData['id']=$id;
       $data = $this->table->select(array(
-          'id'=>$this->data['id'],
-          'id_dico'=>$this->data['id_dico']
+          'id_dico'=>$this->data['id_dico'],
+          'id'=>$this->data['id']
       ))->current();
-      if (is_object($data))
+      var_dump($data->getArrayCopy());
+      if (is_object($data)) {
           $this->data = $data->getArrayCopy();
+          $this->rawData = $data->getArrayCopy();
+      }
    }
    /**
     * Not usable
@@ -66,9 +73,9 @@ class DicoItem extends \Content
      */
    public function replace() {
       $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
-              (id,id_dico,text)
+              (id,id_dico,text,taxa_id)
               VALUES
-              ('.intval($this->rawData['id']).','.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['value']).'")
+              ('.intval($this->rawData['id']).','.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
               ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
    }
    /**
@@ -92,5 +99,16 @@ class DicoItem extends \Content
       for ($c =0; $c <= self::maxCode; $c++)
          $childrenCodeArray[]=$this->rawData['id'].$c;
       return $childrenCodeArray;
+   }
+   /**
+    * Gets the associated taxa
+    * @return \flora\taxa\Taxa
+    */
+   public function getTaxa() {
+      $taxa = new \flora\taxa\Taxa($this->db);
+      if (key_exists('taxa_id',$this->rawData) && $this->rawData['taxa_id'] != '') {
+         $taxa->loadFromId($this->rawData['taxa_id']);
+      }
+      return $taxa;
    }
 }

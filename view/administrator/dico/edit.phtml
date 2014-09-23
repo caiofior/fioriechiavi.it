@@ -22,11 +22,14 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    <span id="d<?php echo $dicoItem->getData('id'); ?>" class="editable<?php echo $missing;?>"><?php echo $label;?></span>
    <?php if($dicoItem->getRawData('possible_taxa') === true) : ?>
    <a class="addTaxaButton" href="#">Aggiungi Taxa</a>
-   <form style="display:none;" class="addTaxa" method="post" action="?task=taxa&amp;action=edit&amp;dico_id=<?php echo $dico->getData('id');?>">
+   <form style="display:none;" class="addTaxa" method="post" action="?task=taxa&amp;action=edit&amp;children_dico_id=<?php echo $dico->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>">
       <input class="taxaName" name="name"/>
       <input type="submit" name="submit" value="Crea"/>
       <a class="restoreTaxaButton" href="#">Chiudi</a>
    </form>
+   <?php else: 
+      $taxa = $dicoItem->getTaxa();?>
+   <a class="restoreTaxaButton" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $taxa->getData('id');?>"><?php echo $taxa->getData('taxa_kind_initials');?> <?php echo $taxa->getData('name');?></a>
    <?php endif; ?>
 </div>
 <?php endforeach; ?>

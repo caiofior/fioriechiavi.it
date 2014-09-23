@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $("#users").dataTable({
         "oLanguage":  {
-                "sUrl": "js/DataTables/lang/it.json"
+                "sUrl": "js/common/datatables/lang/it.json"
          },
         "bStateSave" : true,
         "aaSorting": [[ 1, "desc" ]],

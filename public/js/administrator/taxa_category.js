@@ -1,7 +1,7 @@
 $(document).ready(function() {
     ct = $("#categoryTaxa").dataTable({
         "oLanguage":  {
-                "sUrl": "js/DataTables/lang/it.json"
+            "sUrl": "js/common/datatables/lang/it.json"
          },
         "bStateSave" : true,
         "aaSorting": [[ 1, "desc" ]],
@@ -24,6 +24,7 @@ $(document).ready(function() {
                            async : false
                            });
                         ct.dataTable().fnDraw();
+                        $( this ).dialog( "close" );
                      }
                   }
                });
