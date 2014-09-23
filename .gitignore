@@ -1,2 +1,5 @@
 /config/config.php
-/pubblic/js/tinymce/*
+/public/js/jquery/*
+/public/js/jqueryui/*
+/public/js/datatables/*
+/public/js/tinymce/*
