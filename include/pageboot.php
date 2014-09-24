@@ -1,5 +1,6 @@
 <?php
 require __DIR__.'/../config/config.php';
+ini_set('include_path','.:'.__DIR__.'/../lib/zendframework/library');
 ini_set('error_reporting',E_ALL);
 require 'Zend/Loader/StandardAutoloader.php';
 $loader = new Zend\Loader\StandardAutoloader(array(
