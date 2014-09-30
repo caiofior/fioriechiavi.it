@@ -24,7 +24,7 @@ class UserInstantiator {
     * @param \Zend\Db\Adapter\Adapter $db
     * @param type $login
     * @param type $password
-    * @return \flora\user\User
+    * @return \login\user\User
     */
    public static function createUserInstance(\Zend\Db\Adapter\Adapter $db ,$login,$password) {
       $user = self::getUserInstance($db, $login);
@@ -61,10 +61,10 @@ class UserInstantiator {
     * Confirms a user from confirm code
     * @param \Zend\Db\Adapter\Adapter $db
     * @param string $confirmCode
-    * @return \flora\user\User
+    * @return \login\user\User
     */
    public static function confirmUserInstance(\Zend\Db\Adapter\Adapter $db ,$confirmCode) {
-      $user = new \flora\user\User($db);
+      $user = new \login\user\User($db);
       $user->loadFromConfirmCode($confirmCode);
       if($user->getData('username') == '') {
          throw new \Exception('Utente non valido '.$user->getData('username'),1409011509);

@@ -166,7 +166,7 @@ abstract class Content {
             $this->rawData = array_merge($this->data, $data);
          }
         else if (!is_null($field) ) {
-            if (array_array_key_exists($field,$this->empty_entity))
+            if (array_key_exists($field,$this->empty_entity))
                 $this->data[$field] = $data;
             $this->rawData[$field] = $data;
         }

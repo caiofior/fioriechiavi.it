@@ -18,6 +18,8 @@ class DicoColl extends \ContentColl {
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
        extract($this->content->getDb()->query('
         SELECT COUNT(*) as dico_count FROM `dico`
+        LEFT JOIN `taxa` ON `taxa`.`dico_id`=`dico`.`id`
+        WHERE `taxa`.`dico_id` IS NULL
         ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current()->getArrayCopy());
        if ($dico_count == 0) {
           $dico = $this->addItem();
@@ -45,6 +47,9 @@ class DicoColl extends \ContentColl {
            'taxa.name'=>new \Zend\Db\Sql\Predicate\Expression('IF(ISNULL(`taxa`.`name`),"Radice",`taxa`.`name`)')
            ));
        $select->join('taxa', 'dico.id=taxa.dico_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
+       if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
+          $select->where('`taxa`.`name` LIKE "%'.addslashes($criteria['sSearch']).'%"');
+       }
        return $select;
     }
 }

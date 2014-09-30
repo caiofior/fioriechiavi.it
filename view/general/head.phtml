@@ -1,1 +1,9 @@
-<title>Flora</title>
+<?php
+$title = $GLOBALS['db']->config->siteName;
+if (key_exists('taxa', $this->object)) {
+   $taxa = $this->object['taxa'];
+   $taxaKind = $taxa->getTaxaKind();
+   $title .= ' :: '.$taxaKind->getData('initials').' '.$taxa->getData('name');
+}
+?>
+<title><?php echo $title;?></title>

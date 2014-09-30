@@ -44,10 +44,16 @@ class DicoItem extends \Content
           'id_dico'=>$this->data['id_dico'],
           'id'=>$this->data['id']
       ))->current();
-      var_dump($data->getArrayCopy());
       if (is_object($data)) {
-          $this->data = $data->getArrayCopy();
-          $this->rawData = $data->getArrayCopy();
+          $this->data = array_filter($data->getArrayCopy(),  create_function('$val', 'return !is_null($val);'));
+          $this->rawData = $this->data;
+      } else {
+         $this->data = array (
+             'id'=>$id,
+             'id_dico'=>$id_dico,
+             'text'=>''
+             );
+         $this->rawData = $this->data;
       }
    }
    /**
@@ -72,11 +78,19 @@ class DicoItem extends \Content
      * Replaces dico item data
      */
    public function replace() {
-      $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
+      if (array_key_exists('taxa_id', $this->rawData)) {
+         $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
               (id,id_dico,text,taxa_id)
               VALUES
               ('.intval($this->rawData['id']).','.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
               ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+      } else {
+         $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
+              (id,id_dico,text)
+              VALUES
+              ('.intval($this->rawData['id']).','.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'")
+              ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+      }
    }
    /**
     * Returns the sibling code

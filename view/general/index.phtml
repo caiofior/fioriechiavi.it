@@ -1,12 +1,16 @@
 <?php
 $title = 'Flora d\'Italia';
-$dico = $this->object;
-$taxa = $dico->getTaxa();
+$dico = $this->object['dico'];
+$taxa = $this->object['taxa'];
 if ($taxa->getData('name') != '') {
-   $title = $taxa->getData('name');
+   $taxaKind = $taxa->getTaxaKind(); 
+   $title = $taxaKind->getData('initials').' '.$taxa->getData('name');
 }
 ?><h1><?php echo $title; ?></h1>
 <?php
+if ($taxa->getData('description') != '') : ?>
+<?php echo $taxa->getData('description');?>
+<?php endif;
 $dicoItemColl = $dico->getDicoItemColl();
 foreach ($dicoItemColl->getItems() as $dicoItem): 
    $label = $dicoItem->getData('text');
@@ -14,6 +18,13 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
 <div>
    <?php echo str_repeat('&#160;', strlen($dicoItem->getData('id'))-1); ?>
    <?php echo strlen($dicoItem->getData('id')); ?>
-   <span id="d<?php echo $dicoItem->getData('id'); ?>"><?php echo $label;?></span>
+   <span id="d<?php echo $dicoItem->getData('id'); ?>">
+      <?php echo $label;
+      $taxa = $dicoItem->getTaxa();
+      if (is_numeric($taxa->getData('id'))) : 
+         $taxaKind = $taxa->getTaxaKind(); ?>
+      <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id'); ?>"><?php echo $taxaKind->getData('initials'); ?> <?php echo $taxa->getData('name'); ?></a>
+      <?php endif; ?>
+   </span>
 </div>
 <?php endforeach; ?>

@@ -15,7 +15,7 @@ if (array_key_exists('sEcho', $_REQUEST)) {
             if ($column == 'taxa_kind_id') {
                $data=$taxa->getRawData('taxa_kind_initials');
             } else if ($column == 'actions') {
-               $data = '<a class="actions modify" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a><a class="actions delete" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>';
+               $data = '<a class="actions modify" title="Modifica" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a><a class="actions delete" title="Cancella" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>';
             } 
             $row[] = $data;     
          }
@@ -34,7 +34,8 @@ case 'edit':
    $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml');  
    if (
             array_key_exists('xhrValidate', $_REQUEST) ||
-            array_key_exists('submit', $_REQUEST)
+            array_key_exists('submit', $_REQUEST) ||
+            array_key_exists('submit_create_key', $_REQUEST)
       ) {
       if (!array_key_exists('taxa_kind_id', $_REQUEST) ||$_REQUEST['taxa_kind_id']=='') {
           $this->addValidationMessage('taxa_kind_id','Il tipo di tassonomia è obbligatorio');
@@ -42,7 +43,17 @@ case 'edit':
       if (!array_key_exists('name', $_REQUEST) ||$_REQUEST['name']=='') {
           $this->addValidationMessage('name','Il nome è obbligatorio');
       }
-      if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
+      if (
+              (
+              array_key_exists('submit', $_REQUEST) ||
+              array_key_exists('submit_create_key', $_REQUEST) 
+              ) && $this->formIsValid()) {
+         if (array_key_exists('submit_create_key', $_REQUEST)) {
+            $dico = new \flora\dico\Dico($GLOBALS['db']);
+            $dico->insert();
+            $_REQUEST['dico_id']=$dico->getData('id');
+         }
+         
          $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxa->loadFromId($_REQUEST['id']);

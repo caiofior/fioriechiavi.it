@@ -39,7 +39,7 @@ class Dico extends \Content
          LIMIT 1
       ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
       if (!is_null($taxa_stmt)) {
-         export($taxa_stmt->getArrayCopy());
+         extract($taxa_stmt->getArrayCopy());
          $taxa->loadFromId($taxa_id);
       }
       return $taxa;
@@ -52,7 +52,9 @@ class Dico extends \Content
     */
    public function getDicoItemColl ($edit=false) {
       $dicoItemColl = new \flora\dico\DicoItemColl($this->db);
-      $dicoItemColl->loadAll(array('id_dico'=>$this->data['id']));
+      if (key_exists('id', $this->data) && $this->data['id'] != '') {
+         $dicoItemColl->loadAll(array('id_dico'=>$this->data['id']));
+      }
       if ($edit == true) {
          if ($dicoItemColl->count() == 0) {
             for ($c = 0 ; $c < 2; $c++) {
@@ -104,7 +106,7 @@ class Dico extends \Content
    public function setDicoItemValue($id_dico_item,$value) {
       $dicoItem = new \flora\dico\DicoItem($this->db);
       $dicoItem->loadFromIdAndDico($this->data['id'],$id_dico_item);
-      $dicoItem->setData($value,'value');
+      $dicoItem->setData($value,'text');
       $dicoItem->replace();
       $dicoItem->loadFromIdAndDico($this->data['id'],$id_dico_item);
       return $value;

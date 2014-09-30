@@ -32,6 +32,7 @@ $(document).ready(function() {
         }
     });
     $('.editable').editable('?task=dico&action=jeditable&id_dico='+$('#id').val(), {
+         "onblur": "submit",
          "indicator" : "Salvataggio in corso...",
          "tooltip"   : "Click per modificare...",
          "placeholder" : "Clicca per modificare"

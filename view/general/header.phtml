@@ -1,5 +1,7 @@
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/amistudio/action.css">
 <ul>
-<?php  if ($GLOBALS['user'] instanceof \flora\user\User) : ?>
+<li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>"><?php echo $GLOBALS['db']->config->siteName; ?></a></li>
+<?php  if ($GLOBALS['user'] instanceof \login\user\User) : ?>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Amministrazione</a></li>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?logout">Esci</a></li>
 <?php else: ?>

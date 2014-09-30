@@ -35,4 +35,13 @@ $(document).ready(function() {
       selector: "textarea"
     });
     $("#sortCategoryTaxaList" ).sortable();
+    $("#saveCategoryTaxaOrder").click(function (e) {
+      e.preventDefault();
+      $.ajax({
+         url: $(this).attr("href"),
+         type:"POST",
+         data: $.extend({},$("#sortCategoryTaxaList" ).sortable("toArray")),
+         async : false
+      });
+   });
 });

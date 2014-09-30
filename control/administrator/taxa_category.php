@@ -13,7 +13,7 @@ if (array_key_exists('sEcho', $_REQUEST)) {
          foreach($columns as $column) {
             $data = $taxaKind->getRawData($column);
             if ($column == 'actions') {
-               $data = '<a class="actions modify" href="?task=taxa_category&amp;action=edit&amp;id='.$taxaKind->getData('id').'">Modifica</a><a class="actions delete" href="?task=taxa_category&amp;action=delete&amp;id='.$taxaKind->getData('id').'">Cancella</a>';
+               $data = '<a class="actions modify" title="Modifica" href="?task=taxa_category&amp;action=edit&amp;id='.$taxaKind->getData('id').'">Modifica</a><a class="actions delete" title="Cancella" href="?task=taxa_category&amp;action=delete&amp;id='.$taxaKind->getData('id').'">Cancella</a>';
             } 
             $row[] = $data;     
          }

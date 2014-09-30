@@ -1,7 +1,7 @@
 <?php
 if (array_key_exists('sEcho', $_REQUEST)) {
       $result = array();
-      $userColl = new \flora\user\UserColl($GLOBALS['db']);
+      $userColl = new \login\user\UserColl($GLOBALS['db']);
       $userColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
       $result['iTotalRecords']=$userColl->countAll();

@@ -122,7 +122,7 @@ else
    public function formIsValid() {
       if (
               sizeof($this->validationMessages) == 1 &&
-              array_array_key_exists('validMessage',$this->validationMessages)
+              array_key_exists('validMessage',$this->validationMessages)
          ) return true;
       return false;
    }

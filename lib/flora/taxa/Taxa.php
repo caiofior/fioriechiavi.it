@@ -63,24 +63,30 @@ class Taxa extends \Content
 
         return $returnValue;
     }
-
     /**
-     * Short description of method getTaxaKind
-     *
-     * @access public
-     * @author firstname and lastname of author, <author@example.org>
-     * @return flora_taxa_TaxaKind
+     * Loads associated taxa kind
+     * @return \flora\taxa\TaxaKind
      */
     public function getTaxaKind()
     {
-        $returnValue = null;
-
-        // section 127-0-1-1--6479ccc9:147fd03277b:-8000:0000000000000AAC begin
-        // section 127-0-1-1--6479ccc9:147fd03277b:-8000:0000000000000AAC end
-
-        return $returnValue;
+        $taxaKind = new \flora\taxa\TaxaKind($this->db);
+        if (array_key_exists('taxa_kind_id',$this->data) && $this->data['taxa_kind_id'] != '') {
+         $taxaKind->loadFromId($this->data['taxa_kind_id']);
+        }
+        return $taxaKind;
     }
-
+     /**
+     * Loads associated dicotomic key
+     * @return \flora\dico\Dico
+     */
+    public function getDico()
+    {
+        $dico = new \flora\dico\Dico($this->db);
+        if (array_key_exists('dico_id',$this->data) && $this->data['dico_id'] != '') {
+         $dico->loadFromId($this->data['dico_id']);
+        }
+        return $dico;
+    }
     /**
      * Short description of method getTaxaImgeColl
      *
