@@ -1,6 +1,6 @@
 <?php
 $title = $GLOBALS['db']->config->siteName;
-if (key_exists('taxa', $this->object)) {
+if (is_array($this->object) && array_key_exists('taxa', $this->object)) {
    $taxa = $this->object['taxa'];
    $taxaKind = $taxa->getTaxaKind();
    $title .= ' :: '.$taxaKind->getData('initials').' '.$taxa->getData('name');

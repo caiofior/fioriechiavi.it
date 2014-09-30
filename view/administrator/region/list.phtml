@@ -1,0 +1,33 @@
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/js/datatables/media/css/jquery.dataTables.css">
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <h2>Regioni</h2>
+</div>
+<a id="addRegion" class="actions add" title="Aggiungi" href="#">Aggiungi</a>
+<form id="addRegionForm" style="display: none;" method="post" action="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=region&amp;action=edit">
+   <label for="id">Codice</label>
+   <input id="id" name="id" value="">
+   <label for="name">Nome</label>
+   <input id="name" name="name" value="">
+   <input type="submit" name="submit" value="Salva">
+</form>
+<table id="region">
+   	<thead>
+		<tr>
+			<th data-bSortable="false" data-sName="id" >Codice</th>
+			<th data-bSortable="false" data-sName="name" data-sClass="editable">Nome</th>
+                        <th data-bSortable="false" data-sName="actions" >Azioni</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>Codice</th>
+			<th>Nome</th>
+                        <th>Azioni</th>
+		</tr>
+	</tfoot>
+</table>
