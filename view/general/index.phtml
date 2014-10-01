@@ -6,11 +6,22 @@ if ($taxa->getData('name') != '') {
    $taxaKind = $taxa->getTaxaKind(); 
    $title = $taxaKind->getData('initials').' '.$taxa->getData('name');
 }
-?><h1><?php echo $title; ?></h1>
+?><link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/index.css">
+<h1><?php echo $title; ?></h1>
 <?php
-if ($taxa->getData('description') != '') : ?>
-<?php echo $taxa->getData('description');?>
+if ($taxa->getData('description') != '') :
+echo $taxa->getData('description');
+$regionColl = $taxa->getRegionColl();
+$regionColl = $regionColl->filterByAttributeValue('1','selected');
+if ($regionColl->count() >0) : ?>
+<div class="mapContainer">
+   <img class="baseMap" src="<?php echo $GLOBALS['db']->config->baseUrl;?>/images/map/italia.png">
+   <?php foreach($regionColl->getItems() as $region) : ?>
+   <img class="mapRegion" src="<?php echo $GLOBALS['db']->config->baseUrl;?>/images/map/<?php echo $region->getData('id');?>.png">
+   <?php endforeach; ?>
+</div>
 <?php endif;
+endif;
 $dicoItemColl = $dico->getDicoItemColl();
 foreach ($dicoItemColl->getItems() as $dicoItem): 
    $label = $dicoItem->getData('text');

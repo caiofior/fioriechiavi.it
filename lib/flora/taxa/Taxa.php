@@ -35,33 +35,49 @@ class Taxa extends \Content
         
  
     }
+    /**
+     * Updates the data
+     */
     public function update() {
        unset($this->data['taxa_kind_initials']);
        unset($this->data['taxa_kind_id_name']);
        parent::update();
     }
-    // --- ASSOCIATIONS ---
-
-
-    // --- ATTRIBUTES ---
-
-    // --- OPERATIONS ---
-
     /**
-     * Short description of method getRegionColl
-     *
-     * @access public
-     * @author firstname and lastname of author, <author@example.org>
-     * @return flora_region_RegionColl
+     * Returns the associated collection of regions
+     * @return \flora\region\RegionColl
      */
     public function getRegionColl()
     {
-        $returnValue = null;
-
-        // section 127-0-1-1--6479ccc9:147fd03277b:-8000:0000000000000AA4 begin
-        // section 127-0-1-1--6479ccc9:147fd03277b:-8000:0000000000000AA4 end
-
-        return $returnValue;
+       $regionColl = new \flora\region\RegionColl($this->db);
+       $regionColl->loadAll();
+       $resultSet = $this->db->query('SELECT `id_region` FROM `taxa_region` 
+              WHERE `id_taxa`='.intval($this->data['id'])
+              , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+       foreach ( $resultSet->toArray() as $region) {
+          $filteredRegionColl = $regionColl->filterByAttributeValue($region['id_region'],'id');
+          $filteredRegion = $filteredRegionColl->getFirst();
+          $filteredRegion->setData('1','selected');
+       }
+       return $regionColl;
+    }
+    /**
+     * Sets teh regions associated with a taxa
+     * @param array $regions
+     */
+    public function setRegions(array $regions) {
+       if (array_key_exists('id', $this->data) && $this->data['id'] != '')
+       $this->db->query('DELETE FROM `taxa_region` 
+              WHERE `id_taxa`='.intval($this->data['id'])
+              , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+       foreach ($regions as $region) {
+          var_dump($region);
+          $this->db->query('INSERT INTO `taxa_region` 
+              (id_taxa,id_region)
+              VALUES
+              ('.intval($this->data['id']).',"'.addslashes($region).'")'
+              , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+       }
     }
     /**
      * Loads associated taxa kind

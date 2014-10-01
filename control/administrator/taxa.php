@@ -59,6 +59,8 @@ case 'edit':
             $taxa->loadFromId($_REQUEST['id']);
          }
          $taxa->setData($_REQUEST);
+         $taxa->setRegions($_REQUEST['regions']);
+         
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxa->update();
          } else {

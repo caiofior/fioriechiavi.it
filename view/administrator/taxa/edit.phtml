@@ -5,6 +5,7 @@ if (array_key_exists('id', $_REQUEST)) {
 } else {
    $taxa->setData($_REQUEST);
 }
+$regionColl = $taxa->getRegionColl();
 ?><div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica un taxa</h2>
 </div>
@@ -30,6 +31,20 @@ if (array_key_exists('id', $_REQUEST)) {
    <label for="description">Descrizione</label>
    <textarea id="description" name="description"><?php echo $taxa->getData('description')?></textarea>
    </div>
+   <div>
+   <label for="regions">Regioni</label>
+   <select id="regions" name="regions[]" size="15" multiple="multiple">
+      <?php
+      $regionColl = $taxa->getRegionColl();
+      foreach ($regionColl->getItems() as $region) : 
+         $selected = '';
+         if ($region->getRawData('selected')==1) {
+            $selected = 'selected="delected"';   
+         }
+      ?>
+      <option <?php echo $selected; ?> value="<?php echo $region->getData('id');?>"><?php echo $region->getData('name');?></option>
+      <?php endforeach; ?>
+   </select>
    <div>
       <input type="submit" name="submit" value="Salva">
       <?php if ($taxa->getData('dico_id') == '') : ?>

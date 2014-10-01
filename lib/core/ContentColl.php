@@ -198,7 +198,7 @@ abstract class ContentColl {
      * Append an item
      * @param Content $item
      */
-    public function appendItem($item) {
+    public function appendItem(& $item) {
        $this->items[]=$item;
     }
     /**
@@ -234,7 +234,7 @@ abstract class ContentColl {
        $filteredColl = clone $this;
        $filteredColl->emptyColl();
        foreach ($this->items as $item) {
-          if ($item->getData($field) == $value)
+          if ($item->getRawData($field) == $value)
              $filteredColl->appendItem ($item);
        }
        return $filteredColl;
