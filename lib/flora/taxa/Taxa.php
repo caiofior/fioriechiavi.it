@@ -71,7 +71,6 @@ class Taxa extends \Content
               WHERE `id_taxa`='.intval($this->data['id'])
               , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
        foreach ($regions as $region) {
-          var_dump($region);
           $this->db->query('INSERT INTO `taxa_region` 
               (id_taxa,id_region)
               VALUES
@@ -104,6 +103,69 @@ class Taxa extends \Content
         return $dico;
     }
     /**
+     * Adds an attribute based on its name and value
+     * @param string $name
+     * @param string $value
+     */
+    public function addAttribute ($name,$value) {
+         $attibute = new \flora\taxa\TaxaAttribute($this->db);
+         $attibute->loadFromName($name);
+         if ($attibute->getData('id')== '') {
+            $attibute->setData($name, 'name');
+            $attibute->insert();
+            $attibute->loadFromName($name);
+         } 
+         $this->db->query('REPLACE INTO `taxa_attribute_value` 
+         (`id_taxa`,`id_taxa_attribute`,`value`)
+         VALUES
+         ('.intval($this->data['id']).','.intval($attibute->getData('id')).',"'.addslashes($value).'")'
+         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+    }
+    /**
+     * Adds an attribute based on its id and value
+     * @param int $id
+     * @param string $value
+     */
+    public function addAttributeById ($id,$value) {
+         $attibute = new \flora\taxa\TaxaAttribute($this->db);
+         $attibute->loadFromId($id);
+         if ($attibute->getData('id')== '') {
+            throw new \Exception('The id does not exists '.$id,1410011528);
+         } 
+         $this->db->query('REPLACE INTO `taxa_attribute_value` 
+         (`id_taxa`,`id_taxa_attribute`,`value`)
+         VALUES
+         ('.intval($this->data['id']).','.intval($id).',"'.addslashes($value).'")'
+         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+    }
+    /**
+     * Gets an attribute value based on its id
+     * @param int $id
+     * @return string
+     * @throws \Exception
+     */
+    public function getAttributeById ($id) {
+         $attibute = new \flora\taxa\TaxaAttribute($this->db);
+         $attibute->loadFromId($id);
+         if ($attibute->getData('id')== '') {
+            throw new \Exception('The id does not exists '.$id,1410011528);
+         } 
+         $value = $this->db->query('SELECT `value` FROM `taxa_attribute_value` 
+         WHERE `id_taxa` = '.intval($this->data['id']).' AND `id_taxa_attribute` ='.intval($id)
+         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+         $value = $value->value;
+         return $value;
+    }
+    /**
+     * Deletes an attribute by id
+     * @param int $id
+     */
+    public function deleteAttributeById($id) {
+         $this->db->query('DELETE FROM  `taxa_attribute_value` 
+         WHERE `id_taxa`='.intval($this->data['id']).' AND `id_taxa_attribute` = '.intval($id)
+         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+    }
+    /**
      * Short description of method getTaxaImgeColl
      *
      * @access public
@@ -121,22 +183,14 @@ class Taxa extends \Content
     }
 
     /**
-     * Short description of method getTaxaAttributeColl
-     *
-     * @access public
-     * @author firstname and lastname of author, <author@example.org>
-     * @return flora_taxa_TaxaAttributeColl
+     * Return a collection of taxa attributes
+     * @return \flora\taxa\TaxaAttributeColl
      */
     public function getTaxaAttributeColl()
     {
-        $returnValue = null;
-
-        // section 127-0-1-1--5b6a38ee:147fe1dda19:-8000:0000000000000ACF begin
-        // section 127-0-1-1--5b6a38ee:147fe1dda19:-8000:0000000000000ACF end
-
-        return $returnValue;
+       $taxaAttributeColl = new \flora\taxa\TaxaAttributeColl($this->db);
+       $taxaAttributeColl->loadAll(array('taxa_id'=>$this->data['id']));
+       return $taxaAttributeColl;
     }
 
-} /* end of class flora_taxa_Taxa */
-
-?>
+}

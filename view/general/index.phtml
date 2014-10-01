@@ -21,6 +21,17 @@ if ($regionColl->count() >0) : ?>
    <?php endforeach; ?>
 </div>
 <?php endif;
+$attributeColl = $taxa->getTaxaAttributeColl();
+   if ($attributeColl->count() > 0) : ?>
+<div class="attribute_list">
+      <?php foreach($attributeColl->getItems() as $attribute) : ?>
+      <div>
+            <?php echo $attribute->getData('name');?> :
+            <span><?php echo $attribute->getRawData('value');?></span>
+      </div>
+      <?php endforeach; ?>
+</div>
+   <?php endif;
 endif;
 $dicoItemColl = $dico->getDicoItemColl();
 foreach ($dicoItemColl->getItems() as $dicoItem): 

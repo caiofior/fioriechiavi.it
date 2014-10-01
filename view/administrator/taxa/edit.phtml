@@ -45,6 +45,18 @@ $regionColl = $taxa->getRegionColl();
       <option <?php echo $selected; ?> value="<?php echo $region->getData('id');?>"><?php echo $region->getData('name');?></option>
       <?php endforeach; ?>
    </select>
+   </div>
+   <div>
+      <p>Aggiungi attibuto:</p>
+      <label for="attribute_name" >Attributo</label>
+      <input id="attribute_name" name="attribute_name">
+      <label for="attribute_value" >Valore</label>
+      <input id="attribute_value" name="attribute_value">
+      <p id="attribute_error" style="display: none;">Indicare nome dell'attibuto e valore</p>
+      <div id="attribute_list">
+      <?php require __DIR__.'/attributeBlock.phtml'; ?>
+      </div>
+   </div>
    <div>
       <input type="submit" name="submit" value="Salva">
       <?php if ($taxa->getData('dico_id') == '') : ?>

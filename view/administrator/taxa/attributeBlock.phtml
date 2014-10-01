@@ -1,0 +1,9 @@
+<?php 
+      $attributeColl = $taxa->getTaxaAttributeColl(); 
+      foreach ($attributeColl->getItems() as $attribute): ?>
+         <div>
+            <?php echo $attribute->getData('name');?> :
+            <span class="editable" id="att_<?php echo $attribute->getData('id');?>"><?php echo $attribute->getRawData('value');?></span>
+            <a class="attribute actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=delete_attribute&amp;id=<?php echo $taxa->getData('id')?>&amp;attribute_id=<?php echo $attribute->getData('id')?>">Cancella</a>
+         </div>
+      <?php endforeach;

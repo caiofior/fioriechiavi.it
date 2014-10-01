@@ -78,14 +78,78 @@ case 'edit':
          header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa');
          exit(); 
       }
-   }
+   } else if (
+           array_key_exists('id', $_REQUEST) && 
+           $_REQUEST['id'] != '' &&
+           array_key_exists('attribute_name', $_REQUEST) && 
+           $_REQUEST['attribute_name'] != '' &&
+           array_key_exists('attribute_value', $_REQUEST) && 
+           $_REQUEST['attribute_value'] != ''
+           ) {
+            $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+            $taxa->loadFromId($_REQUEST['id']);
+            $taxa->addAttribute($_REQUEST['attribute_name'],$_REQUEST['attribute_value']);
+            exit();
+           }
    break; 
+case 'delete_attribute':
+   if (
+           array_key_exists('id', $_REQUEST) && 
+           $_REQUEST['id'] != '' &&
+           array_key_exists('attribute_id', $_REQUEST) && 
+           $_REQUEST['attribute_id'] != ''
+           ) {
+            $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+            $taxa->loadFromId($_REQUEST['id']);
+            $taxa->deleteAttributeById($_REQUEST['attribute_id']);
+            exit();
+           }
+   break;
 case 'delete' :
    $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
       $taxa->loadFromId($_REQUEST['id']);
       $taxa->delete();
    }
+   exit;
+   break;
+case 'taxaattributelist' :
+   $taxaAttributeColl = new \flora\taxa\TaxaAttributeColl($GLOBALS['db']);
+   $taxaAttributeColl->loadAll($_REQUEST);
+   $result = array();
+   foreach ($taxaAttributeColl->getItems() as $taxaAttribute) {
+      $result[] = array(
+          'label'=>$taxaAttribute->getData('name')
+      );
+   } 
+   header('Content-Type: application/json');
+   echo json_encode($result);
+   exit;
+   break;
+case 'reloadattribute' :
+   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+   if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+      $taxa->loadFromId($_REQUEST['id']);
+   }
+   require __DIR__.'/../../view/administrator/taxa/attributeBlock.phtml';
+   exit;
+   break;
+case 'jeditable':
+   
+   if (
+           array_key_exists('taxa_id', $_REQUEST) && 
+           is_numeric($_REQUEST['taxa_id']) &&
+           array_key_exists('id', $_REQUEST) && 
+           $_REQUEST['id'] != '' &&
+           array_key_exists('value', $_REQUEST) && 
+           $_REQUEST['value'] != ''
+      ) {
+      $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+      $taxa->loadFromId($_REQUEST['taxa_id']);
+      $taxa->addAttributeById(substr($_REQUEST['id'],4),$_REQUEST['value']);
+      echo $taxa->getAttributeById(substr($_REQUEST['id'],4));
+   }
+   
    exit;
    break;
 case 'taxakindlist':

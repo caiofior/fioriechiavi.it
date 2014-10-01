@@ -6,10 +6,14 @@ namespace flora\taxa;
  * @author caiofior
  */
 class TaxaColl extends \ContentColl {
+      /**
+       * Relation with th content
+       * @param type $db
+       */
       public function __construct($db) {
          parent::__construct(new \flora\taxa\Taxa($db));
       }
-    /**
+      /**
       * Customizes select statement
       * @param Zend_Db_Select $select Zend Db Select
       * @param array $criteria Filtering criteria

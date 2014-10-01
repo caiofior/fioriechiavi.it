@@ -16,7 +16,7 @@ $(document).ready(function() {
         "drawCallback": function( ) {
             $(".actions.delete").click(function (e) {
                e.preventDefault();
-               $(".actions.delete").dialog({
+               $(this).dialog({
                   buttons: {
                      "Confermi la cancellazione del taxa?": function() {
                         $.ajax({
@@ -46,4 +46,54 @@ $(document).ready(function() {
               $(this).val("");
       }
     });
+    $("#attribute_name, #attribute_value").change(function (e){
+       $("#attribute_error").hide();
+       if ($("#attribute_name").val() != "" && $("#attribute_value").val() != "") {
+          $.ajax({
+            url: $("form").attr("href"),
+            data: {
+               "attribute_name":$("#attribute_name").val(),
+               "attribute_value":$("#attribute_value").val()
+            },
+            async : false
+          });
+          updateAttributes();
+          $("#attribute_name").val("");
+          $("#attribute_value").val("");
+       } else {
+          $("#attribute_error").show();
+       }
+       
+    }); 
+
+   $( "#attribute_name" ).autocomplete({
+      source: "?task=taxa&action=taxaattributelist&exclude_taxa_id="+$("#id").val()
+   });
+   function updateAttributes() {
+      $("#attribute_list").load("?task=taxa&action=reloadattribute&id="+$("#id").val());
+      deleteAttribute ();
+   }
+   function deleteAttribute () {
+      $(".attribute.actions.delete").click(function (e) {
+      e.preventDefault();
+      $(this).dialog({
+         buttons: {
+            "Confermi la cancellazione dell'attributo?": function() {
+               $.ajax({
+                  url: $(this).attr("href"),
+                  async : false
+               });
+               updateAttributes()
+               $( this ).dialog( "close" );
+            }
+         }
+      });
+      });
+      $('.editable').editable('?task=taxa&action=jeditable&taxa_id='+$('#id').val(), {
+         "indicator" : "Salvataggio in corso...",
+         "tooltip"   : "Click per modificare...",
+         "placeholder" : "Clicca per modificare"
+      });
+   }
+   deleteAttribute ();
 });

@@ -16,7 +16,7 @@ $(document).ready(function() {
         "drawCallback": function( ) {
             $(".actions.delete").click(function (e) {
                e.preventDefault();
-               $(".actions.delete").dialog({
+               $(this).dialog({
                   buttons: {
                      "Confermi la cancellazione del raggruppamento sistematico?": function() {
                         $.ajax({
