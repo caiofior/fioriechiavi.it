@@ -52,6 +52,8 @@ class Autoload {
       require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaKindColl.php';
       require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaAttribute.php';
       require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaAttributeColl.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaImage.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'TaxaImageColl.php';
       
       require __DIR__.DIRECTORY_SEPARATOR.'region'.DIRECTORY_SEPARATOR.'Region.php';
       require __DIR__.DIRECTORY_SEPARATOR.'region'.DIRECTORY_SEPARATOR.'RegionColl.php';

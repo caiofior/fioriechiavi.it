@@ -1,7 +1,7 @@
 <?php
 namespace flora\taxa;
 /**
- * Taka class
+ * Taxa class
  *
  * @author caiofior
  */
@@ -166,20 +166,17 @@ class Taxa extends \Content
          , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
     /**
-     * Short description of method getTaxaImgeColl
-     *
-     * @access public
-     * @author firstname and lastname of author, <author@example.org>
-     * @return flora_taxa_TaxaImageColl
+     * Geths the associated taxa image collection
+     * @return \flora\taxa\TaxaImageColl
+     * @throws \Exception
      */
     public function getTaxaImgeColl()
     {
-        $returnValue = null;
-
-        // section 127-0-1-1--5b6a38ee:147fe1dda19:-8000:0000000000000AC5 begin
-        // section 127-0-1-1--5b6a38ee:147fe1dda19:-8000:0000000000000AC5 end
-
-        return $returnValue;
+        if (!key_exists('id', $this->data))
+           throw new \Exception('Load the taxa first',1410021622);
+        $taxaImageColl = new \flora\taxa\TaxaImageColl($this->db);
+        $taxaImageColl->loadAll(array('taxa_id'=>$this->data['id']));
+        return $taxaImageColl;
     }
 
     /**

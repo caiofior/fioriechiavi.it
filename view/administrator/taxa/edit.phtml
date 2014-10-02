@@ -6,7 +6,8 @@ if (array_key_exists('id', $_REQUEST)) {
    $taxa->setData($_REQUEST);
 }
 $regionColl = $taxa->getRegionColl();
-?><div id="breadcrump">
+?><link rel="stylesheet" href="js/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css">
+<div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica un taxa</h2>
 </div>
 <form method="post" action="#">
@@ -55,6 +56,11 @@ $regionColl = $taxa->getRegionColl();
       <p id="attribute_error" style="display: none;">Indicare nome dell'attibuto e valore</p>
       <div id="attribute_list">
       <?php require __DIR__.'/attributeBlock.phtml'; ?>
+      </div>
+   </div>
+   <div>
+      <div id="uploader">
+         <p>Il tuo browser non ha Flash, Silverlight e non supporta HTML5.</p>
       </div>
    </div>
    <div>

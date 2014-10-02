@@ -175,15 +175,15 @@ abstract class ContentColl {
       
     }
     /**
-* Return the colum names
-*/
+   * Return the colum names
+   */
     public function getColumns() {
         return $this->columns;
     }
     /**
-* Add new item to the collection
-* @return \Content
-*/
+   * Add new item to the collection
+   * @return \Content
+   */
     public function addItem($key = null) {
         $item = clone $this->content;
         if (is_null($key))

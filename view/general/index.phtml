@@ -1,5 +1,5 @@
 <?php
-$title = 'Flora d\'Italia';
+$title = $GLOBALS['db']->config->siteName;
 $dico = $this->object['dico'];
 $taxa = $this->object['taxa'];
 if ($taxa->getData('name') != '') {

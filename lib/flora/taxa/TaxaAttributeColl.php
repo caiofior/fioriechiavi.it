@@ -1,7 +1,7 @@
 <?php
 namespace flora\taxa;
 /**
- * Description of Taxa Coll
+ * Description of Taxa Attribute Coll
  *
  * @author caiofior
  */
