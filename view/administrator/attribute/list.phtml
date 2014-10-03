@@ -1,0 +1,27 @@
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/js/datatables/media/css/jquery.dataTables.css">
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <h2>Attributi</h2>
+</div>
+<table id="attribute">
+   	<thead>
+		<tr>
+			<th data-sName="id" >Codice</th>
+			<th data-sName="name" >Nome</th>
+                        <th data-sName="description" >Descrizione</th>
+                        <th data-bSortable="false" data-sName="actions" >Azioni</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>Codice</th>
+			<th>Nome</th>
+                        <th>Descrizione</th>
+                        <th>Azioni</th>
+		</tr>
+	</tfoot>
+</table>

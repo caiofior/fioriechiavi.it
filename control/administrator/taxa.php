@@ -12,7 +12,11 @@ if (array_key_exists('sEcho', $_REQUEST)) {
          $row=array();
          foreach($columns as $column) {
             $data = $taxa->getRawData($column);
-            if ($column == 'taxa_kind_id') {
+            if ($column == 'description') {
+               $data = strip_tags($data);
+               if (strlen($data)>200)
+                  $data = substr($data,0,200).'&#133;';
+            }else if ($column == 'taxa_kind_id') {
                $data=$taxa->getRawData('taxa_kind_initials');
             } else if ($column == 'actions') {
                $data = '<a class="actions modify" title="Modifica" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a><a class="actions delete" title="Cancella" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>';
@@ -59,7 +63,9 @@ case 'edit':
             $taxa->loadFromId($_REQUEST['id']);
          }
          $taxa->setData($_REQUEST);
-         $taxa->setRegions($_REQUEST['regions']);
+         if (key_exists('region', $_REQUEST)) {
+            $taxa->setRegions($_REQUEST['regions']);
+         }
          
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxa->update();

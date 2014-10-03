@@ -194,12 +194,19 @@ abstract class ContentColl {
         }
         return $item;
     }
+     /**
+     * Prepend an item
+     * @param Content $item
+     */
+    public function prependItem(& $item) {
+       array_unshift($this->items, $item);
+    }
     /**
      * Append an item
      * @param Content $item
      */
     public function appendItem(& $item) {
-       $this->items[]=$item;
+       array_push($this->items, $item);
     }
     /**
    * Return the first item of the collection

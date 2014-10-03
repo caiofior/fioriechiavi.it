@@ -189,5 +189,34 @@ class Taxa extends \Content
        $taxaAttributeColl->loadAll(array('taxa_id'=>$this->data['id']));
        return $taxaAttributeColl;
     }
+    /**
+     * Returns a colleciont of the parents of a taxa
+     * @return \flora\taxa\TaxaColl
+     */
+    public function getParentColl() {
+       $parentTaxaColl = new \flora\taxa\TaxaColl($this->db);
+       
+       $taxa_id = $this->data['id'];
+       while (true) {
+         $dico_id = $this->db->query('SELECT `id_dico` FROM `dico_item` 
+           WHERE `taxa_id` = '.intval($taxa_id)
+           , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+         $dico_id = $dico_id->id_dico;
+
+         $taxa_id = $this->db->query('SELECT `id` FROM `taxa` 
+           WHERE `dico_id` = '.intval($dico_id)
+           , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+         if (!is_object($taxa_id)) {
+            break;
+         }
+         $taxa_id = $taxa_id->id;
+
+         $taxa = new \flora\taxa\Taxa($this->db);
+         $taxa->loadFromId($taxa_id);
+         $parentTaxaColl->prependItem($taxa);
+       }
+       
+       return $parentTaxaColl;
+    }
 
 }

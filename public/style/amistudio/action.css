@@ -1,7 +1,10 @@
 .ui-buttonset .ui-button {
    margin-right: 0em !important;
 }
-a.actions {
+a.actions.ui-widget-content {
+   display: none !important;
+}
+a.actions:not(.ui-widget-content) {
    display:inline-block;
    height: 16px;
    width: 16px;

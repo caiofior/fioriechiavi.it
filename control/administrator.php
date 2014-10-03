@@ -18,6 +18,9 @@ switch ($_REQUEST['task']) {
    case 'region':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'region.php';       
       break;
+   case 'attribute':
+      require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'attribute.php';       
+      break;
    default:
       $this->getTemplate()->setBlock('middle','administrator/dashboard.phtml');
       break;

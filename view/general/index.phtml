@@ -1,12 +1,21 @@
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/index.css">
 <?php
 $title = $GLOBALS['db']->config->siteName;
 $dico = $this->object['dico'];
 $taxa = $this->object['taxa'];
 if ($taxa->getData('name') != '') {
+   $taxaParentColl = $taxa->getParentColl();
+   foreach($taxaParentColl->getItems() as $key => $taxaParent) : 
+      $taxaKind = $taxaParent->getTaxaKind(); ?>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxaParent->getData('id');?>">
+      <h<?php echo 1+$taxaParentColl->count()-$key;?>><?php echo $taxaKind->getData('initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
+   </a>
+   <?php
+   endforeach;
    $taxaKind = $taxa->getTaxaKind(); 
    $title = $taxaKind->getData('initials').' '.$taxa->getData('name');
 }
-?><link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/index.css">
+?>
 <h1><?php echo $title; ?></h1>
 <?php
 if ($taxa->getData('description') != '') :
