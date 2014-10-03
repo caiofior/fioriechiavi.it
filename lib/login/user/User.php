@@ -59,5 +59,34 @@ class User extends \Content
       }
       return $userRole;
     }
+    /**
+     * Resets user password
+     */
+    public function resetPassword() {
+        $n = 6;
+        $password = '';
+        for ($c = 0; $c < 6 ; $c++)
+        $password .= ((rand(1,4) != 1) ? chr(rand(97, 122)) : rand(0, 9));
+        
+         ob_start();
+         require $this->db->baseDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'recover.php';
+         $html = new \Zend\Mime\Part(ob_get_clean());
+         $html->type = 'text/html';
+
+         $body = new \Zend\Mime\Message();
+         $body->setParts(array($html));
+
+         $message = new \Zend\Mail\Message();
+         $message
+            ->addTo($this->data['username'])
+            ->addFrom($GLOBALS['config']->mail_from)
+            ->setSubject('Recupero password del sito '.$GLOBALS['config']->siteName)
+            ->setBody($body);
+         $GLOBALS['transport']->send($message);
+
+        $this->data['password']=md5($password);
+        $this->update();
+       
+    }
 
 }

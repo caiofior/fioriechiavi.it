@@ -11,6 +11,15 @@
    </div>
    <input type="submit" name="login" value="Accedi">
 </form>
+<h2>Dimenticato le credenziali? Crea una nuova password.</h2>
+<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
+   <input type="hidden" name="task" value="recover" />
+   <div>
+   <label for="recover_login">Email</label>
+   <input type=text" name="recover_login" id="recover_login" value="" />
+   </div>
+   <input type="submit" name="submit" value="Recupera">
+</form>
 <h2>Non sei registrato, iscriviti.</h2>
 <p>Potrai raccogliere le tue osservazioni botaniche, segnalare eventuali errori e collaborare a la chiave della Flora d'Italia</p>
 <form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
@@ -29,4 +38,4 @@
    </div>
    <input type="submit" name="register" value="Registrati">
 </form>
-<p>Per attivare il tuo utente troverai le istruzioni nella mail che ti verrà inviata</p>
+<p>Attiva il tuo utente, segui istruzioni nella mail che ti verrà inviata</p>
