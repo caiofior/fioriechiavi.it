@@ -1,18 +1,17 @@
 <?php
 namespace login\user;
 /**
- * User class
+ * User Role class
  *
  * @author caiofior
  */
-class Profile extends \Content
+class UserRole extends \Content
 {
-    /**
+   /**
     * Associates the database table
     * @param \Zend\Db\Adapter\Adapter $db
     */
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
-      parent::__construct($db, 'profile');
+      parent::__construct($db, 'user_role');
    }
-
 }

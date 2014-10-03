@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $("#users").dataTable({
+    us = $("#users").dataTable({
         "oLanguage":  {
                 "sUrl": "js/common/datatables/lang/it.json"
          },
@@ -12,6 +12,21 @@ $(document).ready(function() {
         "fnServerParams": function ( aoData ) {
             aoData.push({ "name": "task", "value": "user" });  
          },
-        "aoColumnDefs":  getDatatableMetadata(this)
+        "aoColumnDefs":  getDatatableMetadata(this) ,
+        "drawCallback": function( ) {
+            $("td.isactive input").click(function (e) {
+               aPos = us.fnGetPosition( $(this).parent()[0] );
+               aData = us.fnGetData( aPos[0] );
+               $.ajax({
+                  data: {
+                    "action":"isactive",
+                    "user_id":aData[0],
+                    "checked":($(this).is(':checked') ? 1 : 0)
+                  },
+                  async : false
+               });
+               us.dataTable().fnDraw();
+            });
+        }
     });
 });

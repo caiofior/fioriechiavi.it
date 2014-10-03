@@ -28,9 +28,10 @@ class UserInstantiator {
     */
    public static function createUserInstance(\Zend\Db\Adapter\Adapter $db ,$login,$password) {
       $user = self::getUserInstance($db, $login);
-      if ($user->getData('username') != '') {
+      if (is_object ($user) && $user->getData('username') != '') {
          throw new \Exception('Username already used '.$login,1409011238);
       }
+      $user = new \login\user\User($db);
       $user->setData(array(
               'username'=>$login,
               'password'=>md5($password),

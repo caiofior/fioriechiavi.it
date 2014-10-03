@@ -29,7 +29,7 @@ else if (
       if (!filter_var($_REQUEST['username'], FILTER_VALIDATE_EMAIL)) {
          $control->addValidationMessage('username_register','Inserisci una mail valida');
       }
-      if (sizeof($_REQUEST['password'])< 3) {
+      if (strlen($_REQUEST['password'])< 3) {
          $control->addValidationMessage('password_register','La password deve avere almeno tre caratteri');
       }
       if ($_REQUEST['password'] !== $_REQUEST['passwordr']) {
@@ -37,7 +37,7 @@ else if (
       }
       if ($control->formIsValid()) {
          $user = \login\user\UserInstantiator::getUserInstance($db, $_REQUEST['username']);
-         if($user->getData('username') != '') {
+         if(is_object($user) && $user->getData('username') != '') {
             $control->addValidationMessage('username_register','Utente già registrato');
          }
       }

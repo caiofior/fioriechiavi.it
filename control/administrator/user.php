@@ -26,5 +26,17 @@ if (array_key_exists('sEcho', $_REQUEST)) {
       echo json_encode($result);
       exit;
 }
+if (!array_key_exists('action',$_REQUEST)) {
+   $_REQUEST['action']=null;
+}
+switch ($_REQUEST['action']) {
+   case 'isactive' :
+      $user = new \login\user\User($GLOBALS['db']);
+      $user->loadFromId($_REQUEST['user_id']);
+      $user->setData($_REQUEST['checked'], 'active');
+      $user->update();
+      exit;
+      break;
+}
 $this->getTemplate()->setBlock('middle','administrator/user/list.phtml');
 $this->getTemplate()->setBlock('footer','administrator/user/footer.phtml');  

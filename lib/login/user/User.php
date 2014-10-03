@@ -27,7 +27,7 @@ class User extends \Content
     * Create the profile before saving the user
     */
    public function insert() {
-      $profile = new \flora\user\Profile($this->db);
+      $profile = new \login\user\Profile($this->db);
       $profile->setData(array(
          'email'=>$this->data['username'] 
       ));
@@ -35,45 +35,29 @@ class User extends \Content
       $this->setData($profile->getData('id'), 'profile_id');
       parent::insert();
    }
-   // --- ASSOCIATIONS ---
-    // generateAssociationEnd :     // generateAssociationEnd : 
-
-    // --- ATTRIBUTES ---
-
-    // --- OPERATIONS ---
-
-    /**
-     * Short description of method getProfile
-     *
-     * @access public
-     * @author firstname and lastname of author, <author@example.org>
-     * @return flora_user_Profile
-     */
+   /**
+    * Gets the associated Profile
+    * @return \login\user\Profile
+    */
     public function getProfile()
     {
-        $returnValue = null;
-
-        // section 127-0-1-1-651afd3b:147fc7005b0:-8000:0000000000000884 begin
-        // section 127-0-1-1-651afd3b:147fc7005b0:-8000:0000000000000884 end
-
-        return $returnValue;
+      $profile = new \login\user\Profile($this->db);
+      if (array_key_exists('role_id', $this->data)) {
+          $profile->loadFromId($this->data['profile_id']);
+      }
+      return $profile;
     }
-
     /**
-     * Short description of method getRule
-     *
-     * @access public
-     * @author firstname and lastname of author, <author@example.org>
-     * @return flora_user_UserRole
+     * Gets the user role object
+     * @return \login\user\UserRole
      */
-    public function getRule()
+    public function getRole()
     {
-        $returnValue = null;
-
-        // section 127-0-1-1-651afd3b:147fc7005b0:-8000:0000000000000886 begin
-        // section 127-0-1-1-651afd3b:147fc7005b0:-8000:0000000000000886 end
-
-        return $returnValue;
+      $userRole = new \login\user\UserRole($this->db);
+      if (array_key_exists('role_id', $this->data)) {
+          $userRole->loadFromId($this->data['role_id']);
+      }
+      return $userRole;
     }
 
 }
