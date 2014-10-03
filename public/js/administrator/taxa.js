@@ -96,7 +96,7 @@ $(document).ready(function() {
       });
    }
    deleteAttribute ();
-   $("#uploader").plupload({
+   up = $("#uploader").plupload({
         // General settings
         runtimes : 'html5,flash,silverlight,html4',
         url : "administrator.php?task=taxa&action=imageupload&taxa_id="+$("#id").val(),
@@ -110,6 +110,12 @@ $(document).ready(function() {
         filters : [
             {title : "Image files", extensions : "jpg,gif,png"}
         ],
+        
+        init : {
+            FilesAdded: function(up, files) {
+              up.start();
+            }
+          },
  
         // Rename files by clicking on their titles
         rename: true,

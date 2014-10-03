@@ -1,0 +1,8 @@
+<?php 
+      $imageColl = $taxa->getTaxaImgeColl(); 
+      foreach ($imageColl->getItems() as $image): ?>
+         <div>
+            <img src="<?php echo $image->getUrl();?>"/>
+            <a class="attribute actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=delete_image&amp;id=<?php echo $taxa->getData('id')?>&amp;attribute_id=<?php echo $image->getData('id')?>">Cancella</a>
+         </div>
+      <?php endforeach;
