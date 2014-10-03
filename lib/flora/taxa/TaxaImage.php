@@ -7,6 +7,9 @@ namespace flora\taxa;
  */
 class TaxaImage extends \Content
 {
+   /**
+    * Base directory
+    */
    const imageBaseDir = 'images/taxa';
    /**
     * Associates the database table
@@ -55,6 +58,13 @@ class TaxaImage extends \Content
       return self::imageBaseDir.$this->data['filename'];
    }
    /**
+    * Return the image path
+    * @return string
+    */
+   public function getPath() {
+      return $this->getBaseFileName().$this->data['filename'];
+   }
+   /**
     * Gets the base part of a file name
     * @return string
     */
@@ -97,5 +107,15 @@ class TaxaImage extends \Content
       $destinationUrl .= DIRECTORY_SEPARATOR.substr($fullId, -2).'.'.$ext;
       rename($inputFile, $destFileName.$destinationUrl);
       return $destinationUrl;
+   }
+   /**
+    * Removes alto the file
+    */
+   public function delete() {
+      $filePath = $this->getPath();
+      if (is_file($filePath) && is_writable($filePath)) {
+         unlink($filePath);
+      }
+      parent::delete();
    }
 }

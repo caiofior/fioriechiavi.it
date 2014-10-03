@@ -4,8 +4,8 @@ if (array_key_exists('sEcho', $_REQUEST)) {
       $userColl = new \login\user\UserColl($GLOBALS['db']);
       $userColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
-      $result['iTotalRecords']=$userColl->countAll();
-      $result['iTotalDisplayRecords']=$userColl->count();
+      $result['iTotalRecords']=$userColl->count();
+      $result['iTotalDisplayRecords']=$userColl->countAll();
       $result['aaData']=array();
       $columns = $userColl->getColumns();
       foreach($userColl->getItems() as $key => $user) {

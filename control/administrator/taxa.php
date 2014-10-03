@@ -4,8 +4,8 @@ if (array_key_exists('sEcho', $_REQUEST)) {
       $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
       $taxaColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
-      $result['iTotalRecords']=$taxaColl->countAll();
-      $result['iTotalDisplayRecords']=$taxaColl->count();
+      $result['iTotalRecords']=$taxaColl->count();
+      $result['iTotalDisplayRecords']=$taxaColl->countAll();
       $result['aaData']=array();
       $columns = $taxaColl->getColumns();
       foreach($taxaColl->getItems() as $key => $taxa) {
@@ -290,6 +290,30 @@ case 'imageupload':
    $m->result = '';
    $m->id = 'id';
    echo json_encode($m);
+   exit;
+   break;
+case 'delete_image':
+   if (
+           array_key_exists('id', $_REQUEST) && 
+           $_REQUEST['id'] != '' &&
+           array_key_exists('image_id', $_REQUEST) && 
+           $_REQUEST['image_id'] != ''
+           ) {
+            $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+            $taxa->loadFromId($_REQUEST['id']);
+            $taxaImageColl = $taxa->getTaxaImgeColl();
+            $taxaImageColl->filterByAttributeValue($_REQUEST['image_id'], 'id');
+            $taxaImage = $taxaImageColl->getFirst();
+            $taxaImage->delete();
+            exit();
+           }
+   break;
+case 'reloadimage' :
+   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+   if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+      $taxa->loadFromId($_REQUEST['id']);
+   }
+   require __DIR__.'/../../view/administrator/taxa/imageBlock.phtml';
    exit;
    break;
 default:

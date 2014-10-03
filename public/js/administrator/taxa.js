@@ -114,7 +114,11 @@ $(document).ready(function() {
         init : {
             FilesAdded: function(up, files) {
               up.start();
-            }
+            },
+            UploadComplete: function(up, files) {
+                updateImages();
+                up.splice();
+            },
           },
  
         // Rename files by clicking on their titles
@@ -139,4 +143,26 @@ $(document).ready(function() {
         // Silverlight settings
         silverlight_xap_url : 'js/plupload/js/Moxie.xap'
     });
+    function updateImages() {
+      $("#image_list").load("?task=taxa&action=reloadimage&id="+$("#id").val());
+      deleteImage ();
+    }
+    function deleteImage () {
+      $(".image.actions.delete").click(function (e) {
+      e.preventDefault();
+      $(this).dialog({
+         buttons: {
+            "Confermi la cancellazione dell'immagine?": function() {
+               $.ajax({
+                  url: $(this).attr("href"),
+                  async : false
+               });
+               updateImages()
+               $( this ).dialog( "close" );
+            }
+         }
+      });
+      });
+   }
+   deleteImage ();
 });

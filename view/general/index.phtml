@@ -32,6 +32,17 @@ $attributeColl = $taxa->getTaxaAttributeColl();
       <?php endforeach; ?>
 </div>
    <?php endif;
+   $imageColl = $taxa->getTaxaImgeColl();
+   if ($imageColl->count() > 0) : ?>
+<div class="image_list">
+      <?php foreach($imageColl->getItems() as $image) : ?>
+      <div>
+            <img src="<?php echo $image->getUrl();?>"/>
+      </div>
+      <?php endforeach; ?>
+</div>
+   <?php endif;
+   
 endif;
 $dicoItemColl = $dico->getDicoItemColl();
 foreach ($dicoItemColl->getItems() as $dicoItem): 

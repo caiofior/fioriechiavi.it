@@ -1,3 +1,6 @@
+.ui-buttonset .ui-button {
+   margin-right: 0em !important;
+}
 a.actions {
    display:inline-block;
    height: 16px;
