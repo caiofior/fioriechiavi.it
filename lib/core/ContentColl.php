@@ -70,8 +70,9 @@ abstract class ContentColl {
         if (is_null($criteria))
             $criteria = array();
         $select = $this->customSelect($this->content->getTable()->getSql()->select(),$criteria);
-        if (array_key_exists('sColumns', $criteria))
-            $this->columns= explode(',', $criteria['sColumns']);
+        if (array_key_exists('sColumns', $criteria) && $criteria['sColumns'] != '') {
+           $this->columns= explode(',', $criteria['sColumns']);
+        } 
         if (array_key_exists('iSortingCols', $criteria) && is_array($this->columns)) {
             for ($c =0; $c < $criteria['iSortingCols'];$c++) {
                 $sort = ' ASC';
@@ -88,9 +89,12 @@ abstract class ContentColl {
                          $criteria['sSortDir_'.$c]='DESC';
                       break;
                    }
-                    $sort = ' '.$criteria['sSortDir_'.$c];
+                   $sort = ' '.$criteria['sSortDir_'.$c];
                 }
-                if (array_key_exists($criteria['iSortCol_'.$c], $this->columns) && $this->columns[$criteria['iSortCol_'.$c]] != '') {
+                if (
+                        array_key_exists('iSortCol_'.$c,$criteria) &&
+                        array_key_exists($criteria['iSortCol_'.$c], $this->columns) &&
+                        $this->columns[$criteria['iSortCol_'.$c]] != '') {
                    if (strpos($this->columns[$criteria['iSortCol_'.$c]],'.') === false)
                      $select->order($this->content->getTable()->getTable().'.'.$this->columns[$criteria['iSortCol_'.$c]].$sort);
                    else
@@ -253,5 +257,11 @@ abstract class ContentColl {
     public function sort(array $criteria) {
        self::$sortCriteria = $criteria;
        usort($this->items, array(get_class($this),'customSort'));
+    }
+    /**
+     * Shuffles the items
+     */
+    public function shuffle () {
+       shuffle($this->items);
     }
 }
