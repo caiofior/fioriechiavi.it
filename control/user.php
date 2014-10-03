@@ -30,6 +30,29 @@ switch ($_REQUEST['task']) {
    case 'confirm' :
       $this->getTemplate()->setBlock('middle','user/confirm.phtml');      
    break;
+   case 'changepassword':
+      $this->getTemplate()->setBlock('middle','user/changepassword.phtml');
+      if (
+            array_key_exists('xhrValidate', $_REQUEST) ||
+            array_key_exists('submit', $_REQUEST)
+      ) {
+         $user = $GLOBALS['user'];
+         if (!$user->checkPassword($_REQUEST['old_password'])) {
+            $this->addValidationMessage('old_password','La vecchia password è errata');
+         }     
+         if (strlen($_REQUEST['new_password'])< 3) {
+            $this->addValidationMessage('new_password','La password deve avere almeno tre caratteri');
+         }
+         if ($_REQUEST['new_password'] !== $_REQUEST['new_passwordr']) {
+            $this->addValidationMessage('new_passwordr','Le due password non coincidono');
+         }
+         
+      }
+      if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
+         $user->setPassword($_REQUEST['new_password']);
+         $this->getTemplate()->setBlock('middle','user/changepasswordconfirm.phtml');
+      }
+      break;
    default :
       if ($GLOBALS['user'] instanceof \login\user\User) {
          switch ($GLOBALS['user']->getData('role_id')) {

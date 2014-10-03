@@ -88,5 +88,21 @@ class User extends \Content
         $this->update();
        
     }
+    /**
+     * Sets a new password
+     * @param string $password
+     */
+    public function setPassword ($password) {
+       $this->data['password']=md5($password);
+       $this->update();
+    }
+    /**
+     * Check if the password is right
+     * @param string $password
+     * @return bool
+     */
+    public function checkPassword ($password) {
+       return $this->data['password']===md5($password);
+    }
 
 }
