@@ -1,19 +1,22 @@
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/index.css">
+<form method="post" action="#">
+   <label for="taxasearch">Cerca: </label>
+   <input id="taxasearch" name="taxasearch" value="">
+</form>
 <?php
 $title = $GLOBALS['db']->config->siteName;
-$dico = $this->object['dico'];
-$taxa = $this->object['taxa'];
+$taxa = $this->object;
+$dico = $taxa->dico;
+
 if ($taxa->getData('name') != '') {
    $taxaParentColl = $taxa->getParentColl();
-   foreach($taxaParentColl->getItems() as $key => $taxaParent) : 
-      $taxaKind = $taxaParent->getTaxaKind(); ?>
+   foreach($taxaParentColl->getItems() as $key => $taxaParent) : ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxaParent->getData('id');?>">
-      <h<?php echo 1+$taxaParentColl->count()-$key;?>><?php echo $taxaKind->getData('initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
+      <h<?php echo 1+$taxaParentColl->count()-$key;?>><?php echo $taxa->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
    </a>
    <?php
    endforeach;
-   $taxaKind = $taxa->getTaxaKind(); 
-   $title = $taxaKind->getData('initials').' '.$taxa->getData('name');
+   $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name');
 }
 ?>
 <h1><?php echo $title; ?></h1>

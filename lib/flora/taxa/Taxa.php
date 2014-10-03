@@ -19,7 +19,6 @@ class Taxa extends \Content
       * @param int $id
       */
     public function loadFromId($id) {
-       
          if (
          !is_object($this->table) ||
          !$this->table instanceof \Zend\Db\TableGateway\TableGateway
@@ -30,9 +29,10 @@ class Taxa extends \Content
         ->where('`taxa`.`id` = '.intval($id))
         ->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array('taxa_kind_initials'=>'initials','taxa_kind_id_name'=>'name'), \Zend\Db\Sql\Select::JOIN_LEFT);
         $data = $this->table->selectWith($select)->current();
-        if (is_object($data))
+        if (is_object($data)) {
             $this->data = $data->getArrayCopy();
-        
+            $this->rawData = $this->data;
+        }
  
     }
     /**
