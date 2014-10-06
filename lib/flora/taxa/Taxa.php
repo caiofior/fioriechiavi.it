@@ -50,14 +50,16 @@ class Taxa extends \Content
     public function getRegionColl()
     {
        $regionColl = new \flora\region\RegionColl($this->db);
-       $regionColl->loadAll();
-       $resultSet = $this->db->query('SELECT `id_region` FROM `taxa_region` 
-              WHERE `id_taxa`='.intval($this->data['id'])
-              , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-       foreach ( $resultSet->toArray() as $region) {
-          $filteredRegionColl = $regionColl->filterByAttributeValue($region['id_region'],'id');
-          $filteredRegion = $filteredRegionColl->getFirst();
-          $filteredRegion->setData('1','selected');
+       if (array_key_exists('id', $this->data)&& $this->data['id'] != '') {
+         $regionColl->loadAll();
+         $resultSet = $this->db->query('SELECT `id_region` FROM `taxa_region` 
+                WHERE `id_taxa`='.intval($this->data['id'])
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         foreach ( $resultSet->toArray() as $region) {
+            $filteredRegionColl = $regionColl->filterByAttributeValue($region['id_region'],'id');
+            $filteredRegion = $filteredRegionColl->getFirst();
+            $filteredRegion->setData('1','selected');
+         }
        }
        return $regionColl;
     }
@@ -168,15 +170,14 @@ class Taxa extends \Content
     /**
      * Geths the associated taxa image collection
      * @return \flora\taxa\TaxaImageColl
-     * @throws \Exception
      */
     public function getTaxaImgeColl()
     {
-        if (!key_exists('id', $this->data))
-           throw new \Exception('Load the taxa first',1410021622);
-        $taxaImageColl = new \flora\taxa\TaxaImageColl($this->db);
+       $taxaImageColl = new \flora\taxa\TaxaImageColl($this->db);
+       if (array_key_exists('id', $this->data) && $this->data['id'] != ''){
         $taxaImageColl->loadAll(array('taxa_id'=>$this->data['id']));
-        return $taxaImageColl;
+       }
+       return $taxaImageColl;
     }
 
     /**
@@ -186,7 +187,9 @@ class Taxa extends \Content
     public function getTaxaAttributeColl()
     {
        $taxaAttributeColl = new \flora\taxa\TaxaAttributeColl($this->db);
-       $taxaAttributeColl->loadAll(array('taxa_id'=>$this->data['id']));
+       if (array_key_exists('id', $this->data) && $this->data['id']!= '') {
+         $taxaAttributeColl->loadAll(array('taxa_id'=>$this->data['id']));
+       }
        return $taxaAttributeColl;
     }
     /**

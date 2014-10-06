@@ -21,6 +21,12 @@ $regionColl = $taxa->getRegionColl();
    <input type="hidden" id="children_dico_item_id" name="children_dico_item_id" value="<?php echo $_REQUEST['children_dico_item_id'];?>">
    <?php endif; ?>
    <div>
+      <input type="submit" name="submit" value="Salva">
+      <?php if ($taxa->getData('dico_id') == '') : ?>
+      <input type="submit" name="submit_create_key" value="Salva e crea chiave dicotomica">
+      <?php endif; ?>
+   </div>
+   <div>
    <label for="taxa_kind_id_name">Categoria</label>
    <input id="taxa_kind_id_name" name="taxa_kind_id_name" value="<?php echo $taxa->getData('taxa_kind_id_name')?>">
    </div>

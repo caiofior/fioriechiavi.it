@@ -47,4 +47,16 @@ $(document).ready(function() {
    $( ".taxaName" ).autocomplete({
     source: "?task=dico&action=taxalist"
    });
+    $( ".update" ).click(function (e){
+       window.location.reload();
+       e.preventDefault();
+    });
+    $(".deleteTaxaItem").click(function (e){
+        $(this).dialog({
+           buttons: {
+              "Confermi la cancellazione della voce?": function() {
+              }
+           }
+        });
+    });
 });

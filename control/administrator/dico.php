@@ -28,12 +28,25 @@ if (!array_key_exists('action',$_REQUEST)) {
 }
 switch ($_REQUEST['action']) {
 case 'edit':
+case 'deletetaxaassociation':
    $dico = new \flora\dico\Dico($GLOBALS['db']);
    $dico->loadFromId($_REQUEST['id']);
+   if ($_REQUEST['action'] == 'deletetaxaassociation') {
+      $dicoItemColl = $dico->getDicoItemColl(); 
+      $dicoItemColl = $dicoItemColl->filterByAttributeValue($_REQUEST['children_dico_item_id'], 'id');
+      $dicoItemColl->getFirst()->removesTaxaAssociation();
+   }
    $this->getTemplate()->setObjectData($dico);
    $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
    break; 
+case 'deletetaxaitem':  
+   $dicoItemColl = $dico->getDicoItemColl(); 
+   $dicoItemColl = $dicoItemColl->filterByAttributeValue($_REQUEST['children_dico_item_id'], 'id');
+   $dicoItemColl->getFirst()->delete();
+   header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
+   exit;
+break;
 case 'delete' :
    $dico = new \flora\dico\Dico($GLOBALS['db']);
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {

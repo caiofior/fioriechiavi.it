@@ -81,7 +81,11 @@ case 'edit':
              $dicoItem->setData($taxa->getData('id'), 'taxa_id');
              $dicoItem->replace();
          }
-         header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa');
+         if (array_key_exists('children_dico_id', $_REQUEST)) {
+            header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
+         } else {
+            header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa');
+         }
          exit(); 
       }
    } else if (

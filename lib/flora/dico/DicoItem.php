@@ -82,15 +82,31 @@ class DicoItem extends \Content
          $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
               (id,id_dico,text,taxa_id)
               VALUES
-              ('.intval($this->rawData['id']).','.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
+              ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
               ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
       } else {
          $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
               (id,id_dico,text)
               VALUES
-              ('.intval($this->rawData['id']).','.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'")
+              ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'")
               ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
       }
+   }
+   /**
+    * Deletes a dico item
+    */
+   public function delete() {
+       if (
+               array_key_exists('id', $this->rawData) && 
+               $this->rawData['id'] != '' &&
+               array_key_exists('id_dico', $this->rawData) && 
+               $this->rawData['id_dico'] != ''
+           ) {
+            $this->db->query('DELETE FROM `'.$this->table->getTable().'` 
+              WHERE id = "'.addslashes($this->rawData['id']).'"
+              AND id_dico='.intval($this->rawData['id_dico']),
+            \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+           }
    }
    /**
     * Returns the sibling code
@@ -124,5 +140,12 @@ class DicoItem extends \Content
          $taxa->loadFromId($this->rawData['taxa_id']);
       }
       return $taxa;
+   }
+    /**
+    * Removes the association with taxa
+    */
+   public function removesTaxaAssociation() {
+      unset($this->rawData['taxa_id']);
+      $this->replace();
    }
 }

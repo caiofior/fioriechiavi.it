@@ -20,8 +20,10 @@ class User extends \Content
     */
    public function loadFromId($id) {
       parent::loadFromId($id);
-      $this->data['last_login_datetime']=date('Y-m-d H:i:s');
-      $this->update();
+      if (array_key_exists('id', $this->data) && $this->data['id'] != '')  {
+         $this->data['last_login_datetime']=date('Y-m-d H:i:s');
+         $this->update();
+      }
    }
 
    /**
