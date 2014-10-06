@@ -25,7 +25,12 @@ class Autoload {
            \login\Autoload::getInstance();
 
        }
-
+       
+       if (!class_exists('content\Autoload')) {
+           require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'content'.DIRECTORY_SEPARATOR.'Autoload.php';
+           \content\Autoload::getInstance();
+       }
+       
       if (!class_exists('FirePHP') && array_key_exists('config', $GLOBALS) && $GLOBALS['config']->firePHPpath != '') {
          require $GLOBALS['config']->firePHPpath.DIRECTORY_SEPARATOR.'FirePHP.class.php';
          require $GLOBALS['config']->firePHPpath.DIRECTORY_SEPARATOR.'fb.php';

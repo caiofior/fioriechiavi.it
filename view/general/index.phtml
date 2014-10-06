@@ -54,7 +54,6 @@ $attributeColl = $taxa->getTaxaAttributeColl();
       <?php endforeach; ?>
 </div>
    <?php endif;
-   
 endif;
 $dicoItemColl = $dico->getDicoItemColl();
 foreach ($dicoItemColl->getItems() as $dicoItem): 
@@ -104,4 +103,20 @@ if($newTaxaColl->count() > 0): ?>
    <?php endforeach;?>
    </div>
 </div>
-<?php endif; ?>
+<?php endif; 
+if ($taxa->getData('description') == '') :
+      $content = new \content\content\Content($GLOBALS['db']);
+   $content->loadFromLabel('root_category'); ?>
+   <div>
+   <h2>
+      <a class="more_info" href="#"><?php echo $content->getData('title');?></a>
+   </h2>
+   <p>
+      <a class="more_info" href="#"><?php echo $content->getData('abstract');?></a>
+   </p>
+   <div style="display:none;">
+      <?php echo $content->getData('content');?>
+   </div>
+   </div>
+
+<?php endif;?>

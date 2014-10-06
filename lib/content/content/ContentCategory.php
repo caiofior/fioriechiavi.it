@@ -1,18 +1,18 @@
 <?php
-namespace flora\region;
+namespace content\content;
 /**
- * Region class
+ * Content category class
  *
  * @author caiofior
  */
-class Region extends \Content
+class ContentCategory extends \Content
 {
    /**
     * Associates the database table
     * @param \Zend\Db\Adapter\Adapter $db
     */
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
-      parent::__construct($db, 'region');
+      parent::__construct($db, 'content_category');
    }
   
 }

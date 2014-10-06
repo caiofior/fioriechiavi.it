@@ -1,0 +1,29 @@
+<?php
+$content = new \content\content\Content($GLOBALS['db']);
+if (array_key_exists('id', $_REQUEST)) {
+   $content->loadFromId($_REQUEST['id']);
+} else {
+   $content->setData($_REQUEST);
+}
+?>
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=content">Elenco dei contenuti</a></p> &gt; <h2>Modifica contenuto</h2>
+</div>
+<form method="post" action="#">
+   <input type="hidden" id="id" name="id" value="<?php echo $content->getData('id')?>">
+   <div>
+   <label for="title">Titolo</label>
+   <input id="title" name="title" value="<?php echo $content->getData('title')?>">
+   </div>
+   <div>
+   <label for="abstract">Sommario</label>
+   <input id="abstract" name="abstract" value="<?php echo $content->getData('abstract')?>">
+   </div>
+   <div>
+   <label for="content">Contenuto</label>
+   <textarea id="content" name="content"><?php echo $content->getData('content')?></textarea>
+   </div>
+   <div>
+      <input type="submit" name="submit" value="Salva">
+   </div>
+</form>

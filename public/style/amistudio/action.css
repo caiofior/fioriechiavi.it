@@ -22,3 +22,6 @@ a.actions.add {
 a.actions.sort {
    background-position: -48px 0px;
 }
+a.actions.view {
+   background-position: -64px 0px;
+}

@@ -10,4 +10,8 @@ $(document).ready(function() {
               $(this).val("");
       }
     });
+    $(".more_info").click (function (e){
+       $(this).parent().siblings("div").show();
+       e.preventDefault();
+    });
 });

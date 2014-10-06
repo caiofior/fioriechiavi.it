@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/js/datatables/media/css/jquery.dataTables.css">
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <h2>Contenuti Dinamici</h2>
+</div>
+<table id="contentT">
+   	<thead>
+		<tr>
+			<th data-bSortable="false" data-sName="id" data-bVisible="false">Id</th>
+			<th data-sName="title" data-sClass="editable">Titolo</th>
+                        <th data-sName="abstract" data-sClass="editable">Sommario</th>
+                        <th data-sName="content" data-sClass="editable">Contenuto</th>
+                        <th data-bSortable="false" data-sName="actions" >Azioni</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+                        <th>Id</th>
+			<th>Titolo</th>
+			<th>Sommario</th>
+                        <th>Contenuto</th>
+                        <th>Azioni</th>
+		</tr>
+	</tfoot>
+</table>
