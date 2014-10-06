@@ -16,7 +16,10 @@ class UserColl extends \ContentColl {
       * @return Zend_Db_Select Select is expected
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
-       $select->join('profile', 'profile.id=user.profile_id', \Zend\Db\Sql\Select::SQL_STAR, \Zend\Db\Sql\Select::JOIN_LEFT);
+       $select->join('profile', 'profile.id=user.profile_id', array('profile.first_name'=>'first_name','profile.last_name'=>'last_name'), \Zend\Db\Sql\Select::JOIN_LEFT);
+       if (array_key_exists('role_id', $criteria) && $criteria['role_id'] != '') {
+          $select->where('`role_id` = '.intval($criteria['role_id']));
+       }
        return $select;
     }
 }

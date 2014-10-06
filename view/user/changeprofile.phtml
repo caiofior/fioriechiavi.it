@@ -1,0 +1,36 @@
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/user.php">Home</a></p> &gt; <h2>Modifica profilo</h2>
+</div>
+<form method="post" action="#">
+   <div>
+   <label for="first_name">Nome</label>
+   <input id="first_name" name="first_name" value="<?php echo $this->object->getData('first_name'); ?>" >
+   </div>
+   <div>
+   <label for="last_name">Cognome</label>
+   <input id="last_name" name="last_name" value="<?php echo $this->object->getData('last_name'); ?>" >
+   </div>
+   <div>
+   <label for="address">Indirizzo</label>
+   <input id="address" name="address" value="<?php echo $this->object->getData('address'); ?>" >
+   </div>
+   <div>
+   <label for="city">Città</label>
+   <input id="city" name="city" value="<?php echo $this->object->getData('city'); ?>" >
+   </div>
+   <div>
+   <label for="province">Provincia</label>
+   <input id="province" name="province" value="<?php echo $this->object->getData('province'); ?>" >
+   </div>
+   <div>
+   <label for="state">Stato</label>
+   <input id="state" name="state" value="<?php echo $this->object->getData('state'); ?>" >
+   </div>
+   <div>
+   <label for="phone">Telefono</label>
+   <input id="phone" name="phone" value="<?php echo $this->object->getData('phone'); ?>" >
+   </div>
+   <div>
+      <input type="submit" name="submit" value="Salva">
+   </div>
+</form>

@@ -1,6 +1,9 @@
 <?php
 if (!array_key_exists('task', $_REQUEST))
    $_REQUEST['task']=null;
+if (array_key_exists('changeLoginConfirmCode', $_REQUEST)) {
+   $_REQUEST['task']='changelogin';
+}
 switch ($_REQUEST['task']) {
    case 'register' :
       $this->getTemplate()->setBlock('middle','user/register.phtml');      
@@ -51,6 +54,62 @@ switch ($_REQUEST['task']) {
       if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
          $user->setPassword($_REQUEST['new_password']);
          $this->getTemplate()->setBlock('middle','user/changepasswordconfirm.phtml');
+      }
+      break;
+    case 'changelogin':
+      $this->getTemplate()->setBlock('middle','user/changelogin.phtml');
+      if (array_key_exists('changeLoginConfirmCode', $_REQUEST)) {
+            $user = new \login\user\User($GLOBALS['db']);
+            $user->loadFromConfirmCode($_REQUEST['changeLoginConfirmCode']);
+            if($user->getData('username') == '') {
+                $this->addValidationMessage('username','Utente non valido');
+            }
+            if($user->getData('new_username') == '') {
+               $this->addValidationMessage('username','Non c\'è un\'email da modificare');
+            }
+            $user->newLoginConfirmed();
+         $this->getTemplate()->setBlock('middle','user/changeloginconfirmed.phtml');
+      }
+      if (
+            array_key_exists('xhrValidate', $_REQUEST) ||
+            array_key_exists('submit', $_REQUEST)
+      ) {
+         
+         if (!array_key_exists('new_login', $_REQUEST) ||$_REQUEST['new_login']=='') {
+             $this->addValidationMessage('new_login','La mail è obbligatoria');
+         }
+         if (!filter_var($_REQUEST['new_login'], FILTER_VALIDATE_EMAIL)) {
+            $this->addValidationMessage('new_login','Inserisci una mail valida');
+         }
+         if ($_REQUEST['new_login']==$GLOBALS['user']->getData('login')) {
+            $this->addValidationMessage('new_login','La mail è uguale a quella già esistente');
+         }
+         if ($GLOBALS['user']->checkPassword($_REQUEST['old_password'])) {
+            $this->addValidationMessage('old_password','Password errata');
+         }                  
+      }
+      if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
+         $GLOBALS['user']->setNewLogin($_REQUEST['new_login']);
+         $this->getTemplate()->setBlock('middle','user/changeloginwaiting.phtml');
+      }
+      break;
+   case 'changeprofile':
+      $this->getTemplate()->setBlock('middle','user/changeprofile.phtml');
+      $profile = $GLOBALS['user']->getProfile();
+      $this->getTemplate()->setObjectData($profile);
+      if (
+            array_key_exists('xhrValidate', $_REQUEST) ||
+            array_key_exists('submit', $_REQUEST)
+      ) {
+         if ($_REQUEST['phone'] != '' && preg_match('/[^0-9 +]/', $_REQUEST['phone'])) {
+            $this->addValidationMessage('phone','Il teleefono può contenere numeri, spazio e "+"');
+         }
+      }
+      if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
+         $profile->setData($_REQUEST);
+         $profile->update();
+         header('Location: '.$GLOBALS['db']->config->baseUrl.'user.php');
+         exit;
       }
       break;
    default :

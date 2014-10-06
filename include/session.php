@@ -12,7 +12,7 @@ if (
         array_key_exists('password', $_REQUEST)
         ) {
    if (is_numeric(session_id())) session_destroy();
-   $authAdapter = new login\Auth($db,$_REQUEST['username'], $_REQUEST['password']);
+   $authAdapter = new \login\Auth($db,$_REQUEST['username'], $_REQUEST['password']);
    $authResult = $auth->authenticate($authAdapter);
    if ($authResult->getCode() != \Zend\Authentication\Result::SUCCESS)
       $control->addValidationMessage('username_login','Credenziali errate');

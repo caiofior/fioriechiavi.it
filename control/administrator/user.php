@@ -17,6 +17,11 @@ if (array_key_exists('sEcho', $_REQUEST)) {
                if ($data ==1)
                   $checked='checked="checked" ';
                $data = '<input '.$checked.'type="checkbox" name="active">';
+            } else if ($column == 'actions') {
+               $data = '';
+               if ($user->getData('username') !== $GLOBALS['user']->getData('username')) {
+                  $data = '<a class="actions view" title="Vedi dettagli" href="?task=user&amp;action=view&amp;id='.$user->getData('username').'">Vedi dettagli</a><a class="actions delete" title="Cancella" href="?task=user&amp;action=delete&amp;id='.$user->getData('username').'">Cancella</a>';
+               }
             } 
             $row[] = $data;     
          }
@@ -29,7 +34,15 @@ if (array_key_exists('sEcho', $_REQUEST)) {
 if (!array_key_exists('action',$_REQUEST)) {
    $_REQUEST['action']=null;
 }
+$this->getTemplate()->setBlock('middle','administrator/user/list.phtml');
+$this->getTemplate()->setBlock('footer','administrator/user/footer.phtml'); 
 switch ($_REQUEST['action']) {
+   case 'view':
+      $user = new \login\user\User($GLOBALS['db']);
+      $user->loadFromId($_REQUEST['id']);
+      $this->getTemplate()->setObjectData($user->getProfile());
+      $this->getTemplate()->setBlock('middle','administrator/user/view.phtml');
+      break;
    case 'isactive' :
       $user = new \login\user\User($GLOBALS['db']);
       $user->loadFromId($_REQUEST['user_id']);
@@ -37,6 +50,12 @@ switch ($_REQUEST['action']) {
       $user->update();
       exit;
       break;
+   case 'delete' :
+      $user = new \login\user\User($GLOBALS['db']);
+      if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+         $user->loadFromId($_REQUEST['id']);
+         $user->delete();
+      }
+      exit;
+   break;
 }
-$this->getTemplate()->setBlock('middle','administrator/user/list.phtml');
-$this->getTemplate()->setBlock('footer','administrator/user/footer.phtml');  

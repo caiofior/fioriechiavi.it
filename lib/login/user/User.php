@@ -15,6 +15,16 @@ class User extends \Content
       parent::__construct($db, 'user');
    }
    /**
+    * Saves las login datetime
+    * @param string $id
+    */
+   public function loadFromId($id) {
+      parent::loadFromId($id);
+      $this->data['last_login_datetime']=date('Y-m-d H:i:s');
+      $this->update();
+   }
+
+   /**
     * Loads user from confirm code
     * @param string $confirmCode
     */
@@ -104,5 +114,42 @@ class User extends \Content
     public function checkPassword ($password) {
        return $this->data['password']===md5($password);
     }
+    /**
+     * Sets the new login
+     * @param string $newLogin
+     */
+    public function setNewLogin ($newLogin) {
+      $this->data['new_username']=$newLogin;
+      $this->data['confirm_code']=md5(serialize($_SERVER).time());
+      $this->update();
+      ob_start();
+      require $this->db->baseDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'changelogin.php';
+      $html = new \Zend\Mime\Part(ob_get_clean());
+      $html->type = 'text/html';
 
+      $body = new \Zend\Mime\Message();
+      $body->setParts(array($html));
+
+      $message = new \Zend\Mail\Message();
+      $message
+         ->addTo($this->data['username'])
+         ->addFrom($GLOBALS['config']->mail_from)
+         ->setSubject('Conferma modifica email/username per accedere al sito '.$GLOBALS['config']->siteName)
+         ->setBody($body);
+      $GLOBALS['transport']->send($message);
+    }
+    /**
+     * Confirms the new login
+     */
+    public function newLoginConfirmed() {
+       if ($this->data['new_username'] == '') {
+          throw new Exception('There is no new mail to confirm',1410061044);
+       }
+       $this->data['username']=$this->data['new_username'];
+       $this->data['new_username']='';
+       $this->update();
+       $profile = $this->getProfile();
+       $profile->setData($this->data['username'], 'email');
+       $profile->update();
+    }
 }

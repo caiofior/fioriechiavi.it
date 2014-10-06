@@ -31,13 +31,21 @@ class UserInstantiator {
       if (is_object ($user) && $user->getData('username') != '') {
          throw new \Exception('Username already used '.$login,1409011238);
       }
+      $adminColl = new \login\user\UserColl($db);
+      $adminColl->loadAll(array('role_id'=>3));
+      $role_id = 1;
+      $active = 0;
+      if ($adminColl->count() == 0 ) {
+         $role_id = 3;
+         $active = 1;
+      }
       $user = new \login\user\User($db);
       $user->setData(array(
               'username'=>$login,
               'password'=>md5($password),
-              'active'=>0,
+              'active'=>$active,
               'creation_datetime'=>date('Y-m-d H:i:s'),
-              'role_id'=>3,
+              'role_id'=>$role_id,
               'confirm_code'=>md5(serialize($_SERVER).time())
               ));
       $user->insert();
@@ -56,6 +64,26 @@ class UserInstantiator {
          ->setSubject('Registrazione sul sito '.$GLOBALS['config']->siteName)
          ->setBody($body);
       $GLOBALS['transport']->send($message);
+      
+      if ($adminColl->count() > 0 ) {
+         ob_start();
+         require $db->baseDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'register.php';
+         $html = new \Zend\Mime\Part(ob_get_clean());
+         $html->type = 'text/html';
+
+         $body = new \Zend\Mime\Message();
+         $body->setParts(array($html));
+
+         $message = new \Zend\Mail\Message();
+         foreach($adminColl->getItems() as $admin) {
+            $message->addTo($admin->getData('username'));
+         }
+                 
+         $message->addFrom($GLOBALS['config']->mail_from)
+            ->setSubject('Registrazione sul sito '.$GLOBALS['config']->siteName)
+            ->setBody($body);
+         $GLOBALS['transport']->send($message);
+      }
       return $user;
    }
    /**

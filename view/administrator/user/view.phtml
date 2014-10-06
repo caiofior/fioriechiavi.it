@@ -1,0 +1,26 @@
+<h2>Utente</h2>
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=user">Lista utenti</a></p> &gt; <h2>Dettaglio utente</h2>
+</div>
+   <div>
+   Nome: <?php echo $this->object->getData('first_name'); ?>
+   </div>
+   <div>
+   Cognome: <?php echo $this->object->getData('last_name'); ?>
+   </div>
+   <div>
+   Indirizzo: <?php echo $this->object->getData('address'); ?>
+   </div>
+   <div>
+   Città: <?php echo $this->object->getData('city'); ?>
+   </div>
+   <div>
+   Provincia: <?php echo $this->object->getData('province'); ?>
+   </div>
+   <div>
+   Stato: <?php echo $this->object->getData('state'); ?>
+   </div>
+   <div>
+   Telefono: <?php echo $this->object->getData('phone'); ?>
+   </div>
+

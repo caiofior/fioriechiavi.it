@@ -1,0 +1,17 @@
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/user.php">Home</a></p> &gt; <h2>Modifica username/email</h2>
+</div>
+<p>La login deve essere un'email valida. La modifica verrà effettuata dopo aver ricevuto conferma di ricevuta di una mail inviata al nuovo indirizzo.</p>
+<form method="post" action="#">
+   <div>
+   <label for="new_login">nuova email/login</label>
+   <input id="new_login" autocomplete="off" name="new_login" value="" type="email">
+   </div>
+   <div>
+   <label for="old_password">password</label>
+   <input id="old_password" autocomplete="off" name="old_password" value="" type="password">
+   </div>
+   <div>
+      <input type="submit" name="submit" value="Salva">
+   </div>
+</form>

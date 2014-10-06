@@ -27,6 +27,21 @@ $(document).ready(function() {
                });
                us.dataTable().fnDraw();
             });
+            $(".actions.delete").click(function (e) {
+               e.preventDefault();
+               $(this).dialog({
+                  buttons: {
+                     "Confermi la cancellazione dell'utente?": function() {
+                        $.ajax({
+                           url: $(this).attr("href"),
+                           async : false
+                           });
+                        ct.dataTable().fnDraw();
+                        $( this ).dialog( "close" );
+                     }
+                  }
+               });
+            });
         }
     });
 });
