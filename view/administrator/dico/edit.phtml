@@ -44,7 +44,7 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    <?php else: 
       $taxa = $dicoItem->getTaxa();
       if ($taxa->getData('name') != ''):  ?>
-   <a class="restoreTaxaButton" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $taxa->getData('id');?>"><?php echo $taxa->getData('taxa_kind_initials');?> <?php echo $taxa->getData('name');?></a>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $taxa->getData('id');?>"><?php echo $taxa->getData('taxa_kind_initials');?> <?php echo $taxa->getData('name');?></a>
    <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $dico->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
       <?php endif; 
       endif; ?>
