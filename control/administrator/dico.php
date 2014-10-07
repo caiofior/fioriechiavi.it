@@ -46,7 +46,7 @@ case 'deletetaxaitem':
    $dicoItemColl = $dico->getDicoItemColl(); 
    $dicoItemColl = $dicoItemColl->filterByAttributeValue($_REQUEST['children_dico_item_id'], 'id');
    $dicoItemColl->getFirst()->delete();
-   header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
+   header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['id']);
    exit;
 break;
 case 'createtaxaassociation':

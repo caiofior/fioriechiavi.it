@@ -37,11 +37,13 @@ $(document).ready(function() {
          "tooltip"   : "Click per modificare...",
          "placeholder" : "Clicca per modificare"
     });
-    $(".addTaxaButton").click(function() {
+    $(".addTaxaButton").click(function(e) {
       $(this).hide().siblings(".addTaxa").show();
+      e.preventDefault();
     });
-    $(".restoreTaxaButton").click(function () {
-       $(this).parent("form").hide().siblings(".addTaxaButton").show();      
+    $(".restoreTaxaButton").click(function (e) {
+       $(this).parent("form").hide().siblings(".addTaxaButton").show();
+       e.preventDefault();
     });
     $("input:submit").unbind("click");
    $( ".taxaName" ).autocomplete({
