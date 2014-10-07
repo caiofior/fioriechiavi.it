@@ -1,6 +1,7 @@
 <?php
 require __DIR__.'/../config/config.php';
 ini_set('include_path','.:'.__DIR__.'/../lib/zendframework/library');
+ini_set('display_errors',1);
 ini_set('error_reporting',E_ALL);
 require 'Zend/Loader/StandardAutoloader.php';
 $loader = new Zend\Loader\StandardAutoloader(array(
@@ -11,7 +12,10 @@ $loader->register();
 
 $config = new Zend\Config\Config($configArray);
 $db = new Zend\Db\Adapter\Adapter($config->database->toArray());
-$db->baseDir = realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public').DIRECTORY_SEPARATOR;
+$baktrace = debug_backtrace();
+if (sizeof($baktrace) < 1)
+   throw new Exception ('No backtrace available to create base path', 0710141057);
+$db->baseDir = dirname($baktrace[0]['file']).DIRECTORY_SEPARATOR;
 $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
 $db->config = $config;
 

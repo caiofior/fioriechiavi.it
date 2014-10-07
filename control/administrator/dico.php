@@ -41,12 +41,21 @@ case 'deletetaxaassociation':
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
    break; 
 case 'deletetaxaitem':  
+   $dico = new \flora\dico\Dico($GLOBALS['db']);
+   $dico->loadFromId($_REQUEST['id']);
    $dicoItemColl = $dico->getDicoItemColl(); 
    $dicoItemColl = $dicoItemColl->filterByAttributeValue($_REQUEST['children_dico_item_id'], 'id');
    $dicoItemColl->getFirst()->delete();
    header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
    exit;
 break;
+case 'createtaxaassociation':
+      $dicoItem = new \flora\dico\DicoItem($GLOBALS['db']);
+      $dicoItem->loadFromIdAndDico($_REQUEST['id'],$_REQUEST['id_dico']);
+      $dicoItem->setData($_REQUEST['taxa_id'], 'taxa_id');
+      $dicoItem->replace();
+   exit;
+   break;
 case 'delete' :
    $dico = new \flora\dico\Dico($GLOBALS['db']);
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {

@@ -45,7 +45,19 @@ $(document).ready(function() {
     });
     $("input:submit").unbind("click");
    $( ".taxaName" ).autocomplete({
-    source: "?task=dico&action=taxalist"
+    source: "?task=dico&action=taxalist",
+    select: function( e, ui ) {
+         $.ajax({
+            url: "?task=dico&action=createtaxaassociation",
+            data: {
+               "id":$('#id').val(),
+               "id_dico":$(this).siblings("input[name='children_dico_item_id']").val(),
+               "taxa_id":ui.item.value
+            },
+            async : false
+          });
+         window.location.reload();
+      }
    });
     $( ".update" ).click(function (e){
        window.location.reload();
@@ -58,5 +70,9 @@ $(document).ready(function() {
               }
            }
         });
+    });
+    $( ".editDicoItem" ).click(function (e){
+        $(this).prev().trigger("click");
+       e.preventDefault();
     });
 });

@@ -19,12 +19,12 @@ class Autoload {
          \Autoload::getInstance();
       
       }
- 
-      if (!class_exists('FirePHP') && array_key_exists('config', $GLOBALS) && $GLOBALS['config']->firePHPpath != '') {
-         require $GLOBALS['config']->firePHPpath.DIRECTORY_SEPARATOR.'FirePHP.class.php';
-         require $GLOBALS['config']->firePHPpath.DIRECTORY_SEPARATOR.'fb.php';
+      $firePhpDir = $GLOBALS['db']->baseDir.'/lib/firephp/firephp-core/lib/FirePHPCore';
+      if (!class_exists('FirePHP') && is_dir($firePhpDir)) {
+         require $firePhpDir.'/FirePHP.class.php';
+         require $firePhpDir.'/fb.php';
          $GLOBALS['firephp'] = \FirePHP::getInstance(true);
-      } 
+      }
    }
    public static function getInstance()
    {

@@ -12,7 +12,7 @@ if ($taxa->getData('name') != '') {
    $taxaParentColl = $taxa->getParentColl();
    foreach($taxaParentColl->getItems() as $key => $taxaParent) : ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxaParent->getData('id');?>">
-      <h<?php echo 1+$taxaParentColl->count()-$key;?>><?php echo $taxa->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
+      <h<?php echo 1+$taxaParentColl->count()-$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
    </a>
    <?php
    endforeach;
@@ -64,10 +64,9 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    <?php echo strlen($dicoItem->getData('id')); ?>
    <span id="d<?php echo $dicoItem->getData('id'); ?>">
       <?php echo $label;
-      $taxa = $dicoItem->getTaxa();
-      if (is_numeric($taxa->getData('id'))) : 
-         $taxaKind = $taxa->getTaxaKind(); ?>
-      <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id'); ?>"><?php echo $taxaKind->getData('initials'); ?> <?php echo $taxa->getData('name'); ?></a>
+      $taxaChildren = $dicoItem->getTaxa();
+      if (is_numeric($taxaChildren->getData('id'))) : ?>
+      <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxaChildren->getData('id'); ?>"><?php echo $taxaChildren->getRawData('taxa_kind_initials'); ?> <?php echo $taxaChildren->getData('name'); ?></a>
       <?php endif; ?>
    </span>
 </div>
