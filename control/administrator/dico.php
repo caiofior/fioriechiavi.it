@@ -92,6 +92,15 @@ case 'taxalist':
    echo json_encode($result);
    exit;
    break;
+case 'download':
+   header('Content-Description: File Transfer'); 
+   header('Content-Type: text/csv; charset=utf-8'); 
+   header('Content-Disposition: attachment; filename="'.$_REQUEST['id'].'.csv"'); 
+   $dico = new \flora\dico\Dico($GLOBALS['db']);
+   $dico->loadFromId($_REQUEST['id']);
+   $dico->export($_REQUEST['download_format'], fopen('php://output', 'w+'));
+   exit;
+   break;
 default:
    $this->getTemplate()->setBlock('middle','administrator/dico/list.phtml');
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  

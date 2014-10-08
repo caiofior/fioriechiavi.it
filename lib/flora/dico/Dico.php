@@ -111,4 +111,30 @@ class Dico extends \Content
       $dicoItem->loadFromIdAndDico($this->data['id'],$id_dico_item);
       return $value;
    }
+   /**
+    * Export the dicotomy to 
+    * @param string $format
+    * @param resource $stream
+    */
+   public function export ($format,$stream) {
+      if (gettype($stream) != 'resource') {
+         throw new \Exception('Stream resource must be provided',1410081107);
+      }
+      if(!interface_exists('flora\dico\export\Export')) {
+               require __DIR__.'/export/Export.php';
+      }
+      switch ($format) {
+         case 'internal':
+            if(!class_exists('flora\dico\export\Internal')) {
+               require __DIR__.'/export/Internal.php';
+            }
+            $exportClass = new \flora\dico\export\Internal();
+            break;
+         default :
+            throw new \Exception('No output format is provided',1410081107);
+         break;
+      }
+      $dicoItemColl = $this->getDicoItemColl();
+      $exportClass->export($dicoItemColl,$stream);
+   }
 }

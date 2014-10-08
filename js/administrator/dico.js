@@ -77,4 +77,12 @@ $(document).ready(function() {
         $(this).prev().trigger("click");
        e.preventDefault();
     });
+    $(".hideMissing").click (function (e){
+       $(".editable.missing").parent("div").toggle();
+       e.preventDefault();
+    });
+    $(".downloadButton").click (function (e){
+       $("form.downloadForm").toggle();
+       e.preventDefault();
+    });
 });

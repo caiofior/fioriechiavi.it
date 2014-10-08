@@ -28,3 +28,15 @@ a.actions.view {
 a.actions.close {
    background-position: -80px 0px;
 }
+a.actions.update {
+   background-position: -96px 0px;
+}
+a.actions.hide {
+   background-position: -112px 0px;
+}
+a.actions.download {
+   background-position: -128px 0px;
+}
+a.actions.upload {
+   background-position: -144px 0px;
+}

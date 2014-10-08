@@ -44,9 +44,10 @@ class DicoColl extends \ContentColl {
        } 
        $select->columns(array(
            'id',
-           'taxa.name'=>new \Zend\Db\Sql\Predicate\Expression('IF(ISNULL(`taxa`.`name`),"Radice",`taxa`.`name`)')
+           'taxa.name'=>new \Zend\Db\Sql\Predicate\Expression('IF(ISNULL(`taxa`.`name`),"Radice",CONCAT(`taxa_kind`.`initials`," ",`taxa`.`name`))')
            ));
        $select->join('taxa', 'dico.id=taxa.dico_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
+       $select->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
        if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
           $select->where('`taxa`.`name` LIKE "%'.addslashes($criteria['sSearch']).'%"');
        }

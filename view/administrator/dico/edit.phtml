@@ -8,7 +8,17 @@ $dico = $this->object;
 <form method="post" action="#">
    <input type="hidden" name="id" id="id" value="<?php echo $dico->getData('id');?>">
 </form>
-<a class="update" href="#">Aggiorna</a>
+<a class="actions update" href="#" title="Aggiorna">Aggiorna</a>
+<a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
+<a class="downloadButton actions download" href="#" title="Download">Download</a>
+<form class="downloadForm" style="display:none;" method="post" action="?task=dico&amp;action=download&amp;id=<?php echo $dico->getData('id');?>">
+   <label for="download_format">Formato</label>
+   <select id="download_format" name="download_format">
+      <option value="internal">Tal quale</option>
+   </select>
+   <input id="downloadDico" type="submit" name="dowload" value="Scarica"/>
+</form>
+<div>
 <?php
 $dicoItemColl = $dico->getDicoItemColl(true);
 $positions = array();
@@ -50,4 +60,5 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
       endif; ?>
 </div>
 <?php endforeach; ?>
-<a class="update" href="#">Aggiorna</a>
+</div>
+<a class="actions update" href="#" title="Aggiorna">Aggiorna</a><a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
