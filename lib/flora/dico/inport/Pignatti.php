@@ -1,9 +1,9 @@
 <?php
-namespace flora\dico\export;
+namespace flora\dico\inport;
 /**
  * Exports the data in the Pignatti flora Italica Format
  */
-class Pignatti implements \flora\dico\export\Export{
+class Pignatti implements \flora\dico\inport\Inport {
    /**
     * Collection of positions
     * @var array
@@ -19,7 +19,7 @@ class Pignatti implements \flora\dico\export\Export{
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
-   public function export (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
+   public function inport (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
       foreach ($dicoItemColl->getItems() as $dicoItem) {
          
          $lastCharacter = substr($dicoItem->getData('id'),-1);

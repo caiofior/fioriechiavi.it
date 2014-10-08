@@ -16,6 +16,8 @@ class DicoItemColl extends \ContentColl {
       * @return Zend_Db_Select Select is expected
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
+       $select->join('taxa', 'dico_item.taxa_id=taxa.id',array('name'), \Zend\Db\Sql\Select::JOIN_LEFT);
+       $select->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array('initials'), \Zend\Db\Sql\Select::JOIN_LEFT);
        if (
                array_key_exists('id_dico', $criteria) &&
                $criteria['id_dico'] != '') {

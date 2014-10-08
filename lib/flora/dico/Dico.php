@@ -121,7 +121,7 @@ class Dico extends \Content
          throw new \Exception('Stream resource must be provided',1410081107);
       }
       if(!interface_exists('flora\dico\export\Export')) {
-               require __DIR__.'/export/Export.php';
+         require __DIR__.'/export/Export.php';
       }
       switch ($format) {
          case 'internal':
@@ -142,5 +142,38 @@ class Dico extends \Content
       }
       $dicoItemColl = $this->getDicoItemColl();
       $exportClass->export($dicoItemColl,$stream);
+   }
+   /**
+    * Imports Dico Item from data stream
+    * 
+    * @param type $stream
+    * @throws \Exception
+    */
+   public function import ($format,$stream) {
+      if (gettype($stream) != 'resource') {
+         throw new \Exception('Stream resource must be provided',1410081107);
+      }
+      if(!interface_exists('flora\dico\inport\Inport')) {
+         require __DIR__.'/inport/Inport.php';
+      }
+      switch ($format) {
+         case 'internal':
+            if(!class_exists('flora\dico\inport\Internal')) {
+               require __DIR__.'/inport/Internal.php';
+            }
+            $inportClass = new \flora\dico\inport\Internal();
+            break;
+         case 'pignatti':
+            if(!class_exists('flora\dico\inport\Pignatti')) {
+               require __DIR__.'/inport/Pignatti.php';
+            }
+            $inportClass = new \flora\dico\import\Pignatti();
+            break;
+         default :
+            throw new \Exception('No input format is provided',1410081107);
+         break;
+      }
+      $dicoItemColl = new \flora\dico\DicoItemColl($this->db);
+      $inportClass->inport($dicoItemColl,$stream);
    }
 }

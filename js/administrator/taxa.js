@@ -116,7 +116,7 @@ $(document).ready(function() {
               up.start();
             },
             UploadComplete: function(up, files) {
-                updateImages();
+               updateImages();
                 up.splice();
             },
           },

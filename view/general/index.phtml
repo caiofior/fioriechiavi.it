@@ -72,9 +72,8 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    <?php echo $positions[$dicoItem->getData('id')]; ?>
    <span id="d<?php echo $dicoItem->getData('id'); ?>">
       <?php echo $label;
-      $taxaChildren = $dicoItem->getTaxa();
-      if (is_numeric($taxaChildren->getData('id'))) : ?>
-      <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxaChildren->getData('id'); ?>"><?php echo $taxaChildren->getRawData('taxa_kind_initials'); ?> <?php echo $taxaChildren->getData('name'); ?></a>
+      if (is_numeric($dicoItem->getData('taxa_id'))) : ?>
+      <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $dicoItem->getData('taxa_id'); ?>"><?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?></a>
       <?php endif; ?>
    </span>
 </div>
