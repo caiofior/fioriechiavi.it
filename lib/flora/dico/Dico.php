@@ -130,6 +130,12 @@ class Dico extends \Content
             }
             $exportClass = new \flora\dico\export\Internal();
             break;
+         case 'pignatti':
+            if(!class_exists('flora\dico\export\Pignatti')) {
+               require __DIR__.'/export/Pignatti.php';
+            }
+            $exportClass = new \flora\dico\export\Pignatti();
+            break;
          default :
             throw new \Exception('No output format is provided',1410081107);
          break;

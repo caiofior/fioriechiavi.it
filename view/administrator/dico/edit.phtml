@@ -15,6 +15,7 @@ $dico = $this->object;
    <label for="download_format">Formato</label>
    <select id="download_format" name="download_format">
       <option value="internal">Tal quale</option>
+      <option value="pignatti">Pignatti</option>
    </select>
    <input id="downloadDico" type="submit" name="dowload" value="Scarica"/>
 </form>
@@ -25,13 +26,13 @@ $positions = array();
 $lastPosition = 0;
 foreach ($dicoItemColl->getItems() as $dicoItem): 
    $label = $dicoItem->getData('text');
-   $missing='';
    $lastCharacter = substr($dicoItem->getData('id'),-1);
    if ($lastCharacter == 0) {
       $lastPosition++;
       $positions[substr($dicoItem->getData('id'),0,-1).'0']= $lastPosition;
       $positions[substr($dicoItem->getData('id'),0,-1).'1']= $lastPosition;
    }
+   $missing='';
    if ($dicoItem->getRawData('incomplete') == 1)
       $missing=' missing';
 ?>
