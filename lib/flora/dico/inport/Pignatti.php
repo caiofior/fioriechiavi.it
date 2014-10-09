@@ -1,41 +1,55 @@
 <?php
 namespace flora\dico\inport;
 /**
- * Exports the data in the Pignatti flora Italica Format
+ * Imports the data in the Pignatti flora Italica Format
  */
 class Pignatti implements \flora\dico\inport\Inport {
    /**
-    * Collection of positions
-    * @var array
-    */
-   private $positions = array();
-   /**
-    * Last position
-    * @var int
-    */
-   private $lastPosition = 0;
-   /**
-    * Exports the data in the stream
+    * imports the data in the stream
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
    public function inport (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
-      foreach ($dicoItemColl->getItems() as $dicoItem) {
-         
-         $lastCharacter = substr($dicoItem->getData('id'),-1);
-         if ($lastCharacter == 0) {
-            $this->lastPosition++;
-            $this->positions[substr($dicoItem->getData('id'),0,-1).'0']= $this->lastPosition;
-            $this->positions[substr($dicoItem->getData('id'),0,-1).'1']= $this->lastPosition;
+      
+      stream_filter_register('pignatti_input', 'flora\dico\inport\pignatti_input_filter');
+      stream_filter_append($stream, 'pignatti_input');
+      $dicoItemColl->emptyColl();
+      $positions = array();
+      $lastPosition = '';
+      $cols = array('id','text','taxa_id');
+      while($row = fgetcsv($stream,1000,"\t")) {
+         while (sizeof($row)<sizeof($cols)) {
+            $row[]='';
          }
-         fwrite($stream,str_repeat(' ',strlen($dicoItem->getData('id'))-1));
-         fwrite($stream,$this->positions[$dicoItem->getData('id')]);
-         fwrite($stream,"\t");
-         fwrite($stream,str_replace("\t",'',$dicoItem->getData('text')));
-         fwrite($stream,"\t");
-         fwrite($stream,str_replace("\t",'',$dicoItem->getRawData('initials').' '.$dicoItem->getRawData('name')));
-         fwrite($stream,PHP_EOL);
+         $row = array_combine($cols, $row);
+         $row['id']=trim($row['id']);
+         if (!array_key_exists($row['id'], $positions)) {
+            $positions[$row['id']]=array();
+            $positions[$row['id']][]=$lastPosition.'0';
+            $positions[$row['id']][]=$lastPosition.'1';
+         }
+         $row['id'] = $lastPosition = array_shift($positions[$row['id']]);
+         if (!is_numeric($row['taxa_id'])) {
+            $row['taxa_id']=null;
+         }
+         $dicoItem = $dicoItemColl->addItem();
+         $dicoItem->setData($row);
       }
+      return $dicoItemColl;
    }
+}
+
+class pignatti_input_filter extends \php_user_filter {
+  function filter($in, $out, &$consumed, $closing)
+  {
+    while ($bucket = stream_bucket_make_writeable($in)) {
+      $data = preg_replace('/^[ ]*([0-9]*)[ ]*/m',"$0\t",$bucket->data);
+      $data = preg_replace('/[ ]*[\.]{3,}[ ]*/m',"\t",$data);
+      $bucket->data = $data;
+      $consumed += $bucket->datalen;
+      stream_bucket_append($out, $bucket);
+    }
+    return PSFS_PASS_ON;
+  }
 }
 

@@ -1,0 +1,34 @@
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico">Elenco delle chiavi dicotomiche</a></p> &gt; <h2>Modifica una chiave dicotomica</h2>
+</div>
+<?php
+$dico = $this->object;
+?>
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/administrator/taxa.css">
+<form method="post" action="?task=dico&amp;action=update">
+   <input type="hidden" name="id" id="id" value="<?php echo  $_REQUEST['id'];?>"/>
+   <input type="hidden" name="upload_format" id="upload_format" value="<?php echo $_REQUEST['upload_format'];?>"/>
+   <input type="hidden" name="filename" id="filename" value="<?php echo $_REQUEST['filename'];?>"/>
+<div>
+<?php
+$dicoItemColl = $dico->dicoItemColl;
+$positions = array();
+$lastPosition = 0;
+foreach ($dicoItemColl->getItems() as $dicoItem): 
+   $label = $dicoItem->getData('text');
+   $lastCharacter = substr($dicoItem->getData('id'),-1);
+   if ($lastCharacter == 0) {
+      $lastPosition++;
+      $positions[substr($dicoItem->getData('id'),0,-1).'0']= $lastPosition;
+      $positions[substr($dicoItem->getData('id'),0,-1).'1']= $lastPosition;
+   }
+?>
+<div>
+   <?php echo str_repeat('&#160;', strlen($dicoItem->getData('id'))-1); ?>
+   <?php echo $positions[$dicoItem->getData('id')]; ?>
+   <span><?php echo $label;?></span>
+</div>
+<?php endforeach; ?>
+</div>
+   <input type="submit" value="Aggiorna la chiave con questi valori" />
+</form>

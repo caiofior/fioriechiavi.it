@@ -48,7 +48,6 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    if ($dicoItem->getRawData('incomplete') == 1)
       $missing=' missing';
 ?>
-
 <div>
    <?php echo str_repeat('&#160;', strlen($dicoItem->getData('id'))-1); ?>
    <?php echo $positions[$dicoItem->getData('id')]; ?>

@@ -1,7 +1,7 @@
 <?php
 namespace flora\dico\inport;
 /**
- * Exports the data in the internal format
+ * Imports the data from the internal format
  */
 class Internal implements \flora\dico\inport\Inport {
    /**
@@ -9,15 +9,16 @@ class Internal implements \flora\dico\inport\Inport {
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
-   public function inport (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
-      foreach ($dicoItemColl->getItems() as $dicoItem) {
-         fwrite($stream,$dicoItem->getData('id'));
-         fwrite($stream,"\t");
-         fwrite($stream,str_replace("\t",'',$dicoItem->getData('text')));
-         fwrite($stream,"\t");
-         fwrite($stream,str_replace("\t",'',$dicoItem->getRawData('initials').' '.$dicoItem->getRawData('name')));
-         fwrite($stream,PHP_EOL);
+   public function inport  (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
+      $dicoItemColl->emptyColl();
+      $cols = array('id','text','taxa_id');
+      while($row = fgetcsv($stream,1000,"\t")) {
+         $row = array_combine($cols, $row);
+         $row['id']=trim($row['id']);
+         $dicoItem = $dicoItemColl->addItem();
+         $dicoItem->setData($row);
       }
+      return $dicoItemColl;
    }
 }
 

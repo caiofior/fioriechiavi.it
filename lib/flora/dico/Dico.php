@@ -167,13 +167,26 @@ class Dico extends \Content
             if(!class_exists('flora\dico\inport\Pignatti')) {
                require __DIR__.'/inport/Pignatti.php';
             }
-            $inportClass = new \flora\dico\import\Pignatti();
+            $inportClass = new \flora\dico\inport\Pignatti();
             break;
          default :
             throw new \Exception('No input format is provided',1410081107);
          break;
       }
-      $dicoItemColl = new \flora\dico\DicoItemColl($this->db);
-      $inportClass->inport($dicoItemColl,$stream);
+      $dicoItemColl =  $inportClass->inport($this->getDicoItemColl(),$stream);
+      $dicoItemColl->setDicoId($this->data['id']);
+      return $dicoItemColl;
+   }
+   /**
+    * Imports Dico Item from data stream and saves it
+    * 
+    * @param type $stream
+    * @throws \Exception
+    */
+   public function importAndSave( $format,$stream) {
+      $dicoItemColl = $this->import($format, $stream);
+      foreach($dicoItemColl->getItems() as $dicoItem) {
+         $dicoItem->replace();
+      } 
    }
 }

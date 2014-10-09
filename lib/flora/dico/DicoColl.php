@@ -6,6 +6,10 @@ namespace flora\dico;
  * @author caiofior
  */
 class DicoColl extends \ContentColl {
+       /**
+       * Associates the object
+       * @param \Zend\Db\Adapter\Adapter $db
+       */
       public function __construct($db) {
          parent::__construct(new \flora\dico\Dico($db));
       }

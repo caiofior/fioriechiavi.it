@@ -33,6 +33,8 @@ class Pignatti implements \flora\dico\export\Export{
          fwrite($stream,"\t");
          fwrite($stream,str_replace("\t",'',$dicoItem->getData('text')));
          fwrite($stream,"\t");
+         fwrite($stream,str_replace("\t",'',$dicoItem->getData('taxa_id')));
+         fwrite($stream,"\t");
          fwrite($stream,str_replace("\t",'',$dicoItem->getRawData('initials').' '.$dicoItem->getRawData('name')));
          fwrite($stream,PHP_EOL);
       }

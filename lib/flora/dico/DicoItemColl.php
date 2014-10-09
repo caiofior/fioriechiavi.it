@@ -6,6 +6,15 @@ namespace flora\dico;
  * @author caiofior
  */
 class DicoItemColl extends \ContentColl {
+      /**
+       * Id of the dico
+       * @var $dico_id
+       */
+      private $dico_id = null;
+      /**
+       * Associates the object
+       * @param \Zend\Db\Adapter\Adapter $db
+       */
       public function __construct($db) {
          parent::__construct(new \flora\dico\DicoItem($db));
       }
@@ -21,6 +30,7 @@ class DicoItemColl extends \ContentColl {
        if (
                array_key_exists('id_dico', $criteria) &&
                $criteria['id_dico'] != '') {
+          $this->dico_id = $criteria['id_dico'];
           $select->where('id_dico = '.intval($criteria['id_dico']));
        }
        $select->order('id_dico asc, id asc');
@@ -50,7 +60,7 @@ class DicoItemColl extends \ContentColl {
      * Filter collection by attribute and value
      * @param mixed $value
      * @param mixed $field
-     * @return \ContentColl
+     * @return \flora\dico\DicoItemColl
      */
     public function filterByAttributeValue($value,$field) {
        $filteredColl = clone $this;
@@ -60,5 +70,23 @@ class DicoItemColl extends \ContentColl {
              $filteredColl->appendItem ($item);
        }
        return $filteredColl;
+    }
+    /**
+     * Sets dico_id reference
+     * @param int $dico_id
+     */
+    public function setDicoId($dico_id) {
+       $this->dico_id = $dico_id;
+    }
+    /**
+   * Add new item to the collection
+   * @return \flora\dico\DicoItem
+   */
+    public function addItem($key = null) {
+       $dicoItem = parent::addItem($key);
+       if (!is_null($this->dico_id)) {
+         $dicoItem->setData($this->dico_id, 'id_dico');
+       }
+       return $dicoItem; 
     }
 }

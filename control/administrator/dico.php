@@ -29,12 +29,16 @@ if (!array_key_exists('action',$_REQUEST)) {
 switch ($_REQUEST['action']) {
 case 'edit':
 case 'deletetaxaassociation':
+case 'update':
    $dico = new \flora\dico\Dico($GLOBALS['db']);
    $dico->loadFromId($_REQUEST['id']);
    if ($_REQUEST['action'] == 'deletetaxaassociation') {
       $dicoItemColl = $dico->getDicoItemColl(); 
       $dicoItemColl = $dicoItemColl->filterByAttributeValue($_REQUEST['children_dico_item_id'], 'id');
       $dicoItemColl->getFirst()->removesTaxaAssociation();
+   } else if ($_REQUEST['action'] == 'update') {
+         $inputFile = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload'.DIRECTORY_SEPARATOR.$_REQUEST['filename'];
+         $dico->dicoItemColl = $dico->importAndSave($_REQUEST['upload_format'],fopen($inputFile,'r'));  
    }
    $this->getTemplate()->setObjectData($dico);
    $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
@@ -223,10 +227,13 @@ case 'upload':
    exit;
    break;
 case 'preview' :
-   $inputFile = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload'.DIRECTORY_SEPARATOR.$_REQUEST['filename'];
    $dico = new \flora\dico\Dico($GLOBALS['db']);
-   $dico->import($_REQUEST['upload_format'],fopen($inputFile,'r'));
-   exit;
+   $dico->loadFromId($_REQUEST['id']);
+   $inputFile = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload'.DIRECTORY_SEPARATOR.$_REQUEST['filename'];
+   $dico->dicoItemColl = $dico->import($_REQUEST['upload_format'],fopen($inputFile,'r'));
+   $this->getTemplate()->setObjectData($dico);
+   $this->getTemplate()->setBlock('middle','administrator/dico/preview.phtml');
+   $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
    break;
 default:
    $this->getTemplate()->setBlock('middle','administrator/dico/list.phtml');
