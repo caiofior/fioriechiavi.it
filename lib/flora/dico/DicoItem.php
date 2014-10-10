@@ -78,7 +78,7 @@ class DicoItem extends \Content
      * Replaces dico item data
      */
    public function replace() {
-      if (array_key_exists('taxa_id', $this->rawData)) {
+      if (array_key_exists('taxa_id', $this->rawData) && $this->rawData['taxa_id']!= '') {
          $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
               (id,id_dico,text,taxa_id)
               VALUES

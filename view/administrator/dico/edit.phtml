@@ -20,7 +20,7 @@ $dico = $this->object;
    </select>
    <input id="downloadDico" type="submit" name="dowload" value="Scarica"/>
 </form>
-<form class="uploadForm" sstyle="display:none;" method="post" action="?task=dico&amp;action=preview&amp;id=<?php echo $dico->getData('id');?>">
+<form class="uploadForm" style="display:none;" method="post" action="?task=dico&amp;action=preview&amp;id=<?php echo $dico->getData('id');?>">
    <label for="upload_format">Formato</label>
    <select id="upload_format" name="upload_format">
       <option value="internal">Tal quale</option>
@@ -64,7 +64,7 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
       <a class="restoreTaxaButton actions close" href="#" title="Chiudi">Chiudi</a>
    </form>
    <?php else: 
-      if ($dicoItem->getData('name') != ''):  ?>
+      if ($dicoItem->getRawData('name') != ''):  ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $dicoItem->getData('taxa_id');?>"><?php echo $dicoItem->getRawData('initials');?> <?php echo $dicoItem->getRawData('name');?></a>
    <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $dico->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
       <?php endif; 

@@ -98,20 +98,6 @@ class Dico extends \Content
       return $dicoItemColl;
    }
    /**
-    * Sets dico Item value
-    * @param int $id_dico_item
-    * @param string $value
-    * @return string
-    */
-   public function setDicoItemValue($id_dico_item,$value) {
-      $dicoItem = new \flora\dico\DicoItem($this->db);
-      $dicoItem->loadFromIdAndDico($this->data['id'],$id_dico_item);
-      $dicoItem->setData($value,'text');
-      $dicoItem->replace();
-      $dicoItem->loadFromIdAndDico($this->data['id'],$id_dico_item);
-      return $value;
-   }
-   /**
     * Export the dicotomy to 
     * @param string $format
     * @param resource $stream
@@ -184,9 +170,20 @@ class Dico extends \Content
     * @throws \Exception
     */
    public function importAndSave( $format,$stream) {
+      $this->emptyDicoItems();
       $dicoItemColl = $this->import($format, $stream);
       foreach($dicoItemColl->getItems() as $dicoItem) {
          $dicoItem->replace();
       } 
+   }
+   /**
+    * Deletes all dico item associated
+    */
+   public function emptyDicoItems() {
+      if (array_key_exists('id', $this->data)) {
+         $this->db->query('DELETE FROM `dico_item` 
+         WHERE id_dico = '.addslashes($this->data['id'])
+         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+      }
    }
 }
