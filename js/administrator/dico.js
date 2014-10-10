@@ -85,6 +85,10 @@ $(document).ready(function() {
        $("form.downloadForm").toggle();
        e.preventDefault();
     });
+    $(".uploadButton").click (function (e){
+       $("form.uploadForm").toggle();
+       e.preventDefault();
+    });
     up = new plupload.Uploader({
         browse_button: 'pickfiles',
         container: $("#uploader")[0],
