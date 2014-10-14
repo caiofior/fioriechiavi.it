@@ -36,11 +36,22 @@ class Taxa extends \Content
  
     }
     /**
+     * Adds creation datetime
+     */
+    public function insert() {
+       unset($this->data['taxa_kind_initials']);
+       unset($this->data['taxa_kind_id_name']);
+       $this->data['creation_datetime']=date('Y-m-d H:i:s');
+       $this->data['change_datetime']=date('Y-m-d H:i:s');
+       parent::insert();
+    }
+    /**
      * Updates the data
      */
     public function update() {
        unset($this->data['taxa_kind_initials']);
        unset($this->data['taxa_kind_id_name']);
+       $this->data['change_datetime']=date('Y-m-d H:i:s');
        parent::update();
     }
     /**
@@ -50,8 +61,8 @@ class Taxa extends \Content
     public function getRegionColl()
     {
        $regionColl = new \flora\region\RegionColl($this->db);
+       $regionColl->loadAll();
        if (array_key_exists('id', $this->data)&& $this->data['id'] != '') {
-         $regionColl->loadAll();
          $resultSet = $this->db->query('SELECT `id_region` FROM `taxa_region` 
                 WHERE `id_taxa`='.intval($this->data['id'])
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);

@@ -108,7 +108,12 @@ $(document).ready(function() {
         
         init : {
             FilesAdded: function(up, files) {
-              up.start();
+              $("#uploadFormatChoose").hide();
+              if ($("#upload_format").val() =="") {
+                 $("#uploadFormatChoose").show();
+              } else {
+                 up.start();
+              }
             },
             UploadComplete: function(up, files) {
               $("#filename").val(files[0]['name']);

@@ -1,3 +1,10 @@
 form.addTaxa {
    display: inline;
 }
+.attributeTable > label {
+   margin: 3px;
+}
+.attributeTable > * {
+   display: inline-block;
+   width: 200px;
+}

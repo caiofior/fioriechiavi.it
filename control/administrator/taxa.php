@@ -88,33 +88,8 @@ case 'edit':
          }
          exit(); 
       }
-   } else if (
-           array_key_exists('id', $_REQUEST) && 
-           $_REQUEST['id'] != '' &&
-           array_key_exists('attribute_name', $_REQUEST) && 
-           $_REQUEST['attribute_name'] != '' &&
-           array_key_exists('attribute_value', $_REQUEST) && 
-           $_REQUEST['attribute_value'] != ''
-           ) {
-            $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-            $taxa->loadFromId($_REQUEST['id']);
-            $taxa->addAttribute($_REQUEST['attribute_name'],$_REQUEST['attribute_value']);
-            exit();
-           }
+   }
    break; 
-case 'delete_attribute':
-   if (
-           array_key_exists('id', $_REQUEST) && 
-           $_REQUEST['id'] != '' &&
-           array_key_exists('attribute_id', $_REQUEST) && 
-           $_REQUEST['attribute_id'] != ''
-           ) {
-            $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-            $taxa->loadFromId($_REQUEST['id']);
-            $taxa->deleteAttributeById($_REQUEST['attribute_id']);
-            exit();
-           }
-   break;
 case 'delete' :
    $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {

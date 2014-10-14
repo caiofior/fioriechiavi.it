@@ -15,7 +15,7 @@ $dicoItemColl = $dico->dicoItemColl;
 if (property_exists($dicoItemColl,'errors')) {
    switch ($dicoItemColl->errors->code) {
       case 1410141230 : ?>
-   <p class="error">Ci sono delle voci non correttamente appariate</p>
+   <p class="error">Ci sono delle voci non correttamente appariate <?php echo $dicoItemColl->errors->items; ?></p>
 <?php break;
    }
 }

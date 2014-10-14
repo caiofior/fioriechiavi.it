@@ -49,15 +49,11 @@ $(document).ready(function() {
     $("#attribute_name, #attribute_value").change(function (e){
        $("#attribute_error").hide();
        if ($("#attribute_name").val() != "" && $("#attribute_value").val() != "") {
-          $.ajax({
-            url: $("form").attr("href"),
-            data: {
-               "attribute_name":$("#attribute_name").val(),
-               "attribute_value":$("#attribute_value").val()
-            },
-            async : false
-          });
-          updateAttributes();
+          el = $("#attribute_template div").clone(true);
+          el.find("[name='attribute_name_list[]']").val($("#attribute_name").val());
+          el.find("[name='attribute_value_list[]']").val($("#attribute_value").val());
+          el.show();
+          $("#attribute_list").append(el);
           $("#attribute_name").val("");
           $("#attribute_value").val("");
        } else {
@@ -69,33 +65,18 @@ $(document).ready(function() {
    $( "#attribute_name" ).autocomplete({
       source: "?task=taxa&action=taxaattributelist&exclude_taxa_id="+$("#id").val()
    });
-   function updateAttributes() {
-      $("#attribute_list").load("?task=taxa&action=reloadattribute&id="+$("#id").val());
-      deleteAttribute ();
-   }
-   function deleteAttribute () {
-      $(".attribute.actions.delete").click(function (e) {
-      e.preventDefault();
+   $(".attribute.actions.delete").click(function (e) {
+      el =  $(this).parent("div.attContainer");
       $(this).dialog({
          buttons: {
-            "Confermi la cancellazione dell'attributo?": function() {
-               $.ajax({
-                  url: $(this).attr("href"),
-                  async : false
-               });
-               updateAttributes()
-               $( this ).dialog( "close" );
+            "Confermi la cancellazione dell' attributo?": function() {
+               $(this).dialog('destroy');
+               el.remove();
             }
          }
       });
-      });
-      $('.editable').editable("?task=taxa&action=jeditable&taxa_id="+$("#id").val(), {
-         "indicator" : "Salvataggio in corso...",
-         "tooltip"   : "Click per modificare...",
-         "placeholder" : "Clicca per modificare"
-      });
-   }
-   deleteAttribute ();
+      e.preventDefault();
+   });
    up = $("#uploader").plupload({
         // General settings
         runtimes : 'html5,flash,silverlight,html4',

@@ -7,6 +7,7 @@ if (array_key_exists('id', $_REQUEST)) {
 }
 $regionColl = $taxa->getRegionColl();
 ?><link rel="stylesheet" href="js/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css">
+<link rel="stylesheet" href="style/administrator/taxa.css">
 <div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica un taxa</h2>
 </div>
@@ -39,7 +40,10 @@ $regionColl = $taxa->getRegionColl();
    <textarea id="description" name="description"><?php echo $taxa->getData('description')?></textarea>
    </div>
    <div>
-   <label for="regions">Regioni</label>
+      <div>
+         <label for="regions">Regioni</label>
+      </div>
+      <div>
    <select id="regions" name="regions[]" size="15" multiple="multiple">
       <?php
       $regionColl = $taxa->getRegionColl();
@@ -52,16 +56,32 @@ $regionColl = $taxa->getRegionColl();
       <option <?php echo $selected; ?> value="<?php echo $region->getData('id');?>"><?php echo $region->getData('name');?></option>
       <?php endforeach; ?>
    </select>
+         </div>
    </div>
    <div>
       <p>Aggiungi attibuto:</p>
-      <label for="attribute_name" >Attributo</label>
-      <input id="attribute_name" name="attribute_name">
-      <label for="attribute_value" >Valore</label>
-      <input id="attribute_value" name="attribute_value">
+      <div class="attributeTable">
+         <label for="attribute_name" >Attributo</label>
+         <label for="attribute_value" >Valore</label>
+      </div>
+      <div class="attributeTable">
+         <input id="attribute_name" name="attribute_name">
+         <input id="attribute_value" name="attribute_value">
+      </div>
       <p id="attribute_error" style="display: none;">Indicare nome dell'attibuto e valore</p>
+      <div id="attribute_template">
+      <?php 
+      $attribute =new \flora\taxa\TaxaAttribute($GLOBALS['db']);
+         require __DIR__.'/attributeBlock.phtml'; 
+      ?>
+      </div>
       <div id="attribute_list">
-      <?php require __DIR__.'/attributeBlock.phtml'; ?>
+      <?php 
+      $attributeColl = $taxa->getTaxaAttributeColl(); 
+      foreach ($attributeColl->getItems() as $attribute) {
+         require __DIR__.'/attributeBlock.phtml'; 
+      }
+      ?>
       </div>
    </div>
    <div>

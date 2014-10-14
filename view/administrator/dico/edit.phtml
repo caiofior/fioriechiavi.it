@@ -21,8 +21,10 @@ $dico = $this->object;
    <input id="downloadDico" type="submit" name="dowload" value="Scarica"/>
 </form>
 <form class="uploadForm" style="display:none;" method="post" action="?task=dico&amp;action=preview&amp;id=<?php echo $dico->getData('id');?>">
+   <div id="uploadFormatChoose" style="display:none;"> Seleziona un formato</div>
    <label for="upload_format">Formato</label>
    <select id="upload_format" name="upload_format">
+      <option value="">--</option>
       <option value="internal">Tal quale</option>
       <option value="pignatti">Pignatti</option>
    </select>

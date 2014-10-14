@@ -42,6 +42,8 @@ class Pignatti implements \flora\dico\inport\Inport {
          $dicoItemColl->errors = new \stdClass();
          $dicoItemColl->errors->message = 'There are some dico items not well coupled';
          $dicoItemColl->errors->code = 1410141230;
+         $dicoItemColl->errors->items = implode(', ', array_filter(array_keys(array_filter($positions))));
+         
       }
       return $dicoItemColl;
    }
