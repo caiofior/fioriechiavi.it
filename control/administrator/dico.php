@@ -43,6 +43,13 @@ case 'update':
    $this->getTemplate()->setObjectData($dico);
    $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
+   if (
+           $_REQUEST['action'] == 'deletetaxaassociation' ||
+           $_REQUEST['action'] == 'update'
+      ) {
+      header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['id']);
+      exit;
+   }
    break; 
 case 'deletetaxaitem':  
    $dico = new \flora\dico\Dico($GLOBALS['db']);

@@ -21,6 +21,9 @@ class Pignatti implements \flora\dico\inport\Inport {
          while (sizeof($row)<sizeof($cols)) {
             $row[]='';
          }
+         while (sizeof($row)>sizeof($cols)) {
+            array_pop($row);
+         }
          $row = array_combine($cols, $row);
          $row['id']=trim($row['id']);
          if (!array_key_exists($row['id'], $positions)) {
@@ -34,6 +37,11 @@ class Pignatti implements \flora\dico\inport\Inport {
          }
          $dicoItem = $dicoItemColl->addItem();
          $dicoItem->setData($row);
+      }
+      if (sizeof(array_filter($positions))>0) {
+         $dicoItemColl->errors = new \stdClass();
+         $dicoItemColl->errors->message = 'There are some dico items not well coupled';
+         $dicoItemColl->errors->code = 1410141230;
       }
       return $dicoItemColl;
    }

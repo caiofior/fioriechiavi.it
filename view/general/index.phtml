@@ -4,22 +4,28 @@
    <input id="taxasearch" name="taxasearch" value="">
 </form>
 <?php
-$title = $GLOBALS['db']->config->siteName;
 $taxa = $this->object;
 $dico = $taxa->dico;
+$title = $GLOBALS['db']->config->siteName;
+if ($taxa->getData('name') != '') {
+    $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name');
+}
+?>
+<h1><?php echo $title; ?></h1>
+<?php
+
+
 
 if ($taxa->getData('name') != '') {
    $taxaParentColl = $taxa->getParentColl();
-   foreach($taxaParentColl->getItems() as $key => $taxaParent) : ?>
+   foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) : ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxaParent->getData('id');?>">
       <h<?php echo 1+$taxaParentColl->count()-$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
    </a>
    <?php
    endforeach;
-   $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name');
 }
 ?>
-<h1><?php echo $title; ?></h1>
 <?php
 if ($taxa->getData('description') != '') :
 echo $taxa->getData('description');

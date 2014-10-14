@@ -12,6 +12,13 @@ $dico = $this->object;
 <div>
 <?php
 $dicoItemColl = $dico->dicoItemColl;
+if (property_exists($dicoItemColl,'errors')) {
+   switch ($dicoItemColl->errors->code) {
+      case 1410141230 : ?>
+   <p class="error">Ci sono delle voci non correttamente appariate</p>
+<?php break;
+   }
+}
 $positions = array();
 $lastPosition = 0;
 foreach ($dicoItemColl->getItems() as $dicoItem): 

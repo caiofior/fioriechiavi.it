@@ -29,7 +29,6 @@ class DicoColl extends \ContentColl {
           $dico = $this->addItem();
           $dico->insert();
        } elseif ($dico_count > 1) {
-         trigger_error ('Multiple root dicotomic key items found ',E_USER_WARNING);
          $count = 0;
          $dicoStmt = $this->content->getDb()->query('
          SELECT `dico`.`id` as dico_root_id FROM `dico`
@@ -37,14 +36,16 @@ class DicoColl extends \ContentColl {
          WHERE ISNULL(`taxa`.`name`)
          ORDER BY `dico`.`id` ASC
          ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-         while ($dico_root_id = $dicoStmt->next()->getArrayCopy()) {
+         do{
+            $dicoData = $dicoStmt->current()->getArrayCopy();
+            extract($dicoData);
             if (++$count>1 && is_numeric($dico_root_id)) {
                $this->content->getDb()->query('
                DELETE FROM `dico`
                WHERE `dico`.`id` = '.$dico_root_id.'
                ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
             }
-         }
+         } while ($dicoStmt->next());
        } 
        $select->columns(array(
            'id',
