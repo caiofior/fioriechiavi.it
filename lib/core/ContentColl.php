@@ -130,7 +130,7 @@ abstract class ContentColl {
             }
             catch (\Exception $e) {
                $mysqli = $this->content->getTable()->getAdapter()->getDriver()->getConnection()->getResource();  
-               if (array_key_exists('firephp', $GLOBALS))
+               if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
                    $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
                throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
             }

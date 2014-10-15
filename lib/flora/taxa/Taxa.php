@@ -240,5 +240,4 @@ class Taxa extends \Content
        
        return $parentTaxaColl;
     }
-
 }

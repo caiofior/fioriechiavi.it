@@ -64,14 +64,15 @@ case 'edit':
             $taxa->loadFromId($_REQUEST['id']);
          }
          $taxa->setData($_REQUEST);
-         if (key_exists('region', $_REQUEST)) {
-            $taxa->setRegions($_REQUEST['regions']);
-         }
+
          
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxa->update();
          } else {
             $taxa->insert();
+         }
+         if (key_exists('regions', $_REQUEST)) {
+            $taxa->setRegions($_REQUEST['regions']);
          }
          
          $taxa->deleteAllTaxaAttributes();
@@ -137,10 +138,9 @@ case 'edit':
          }
          if (array_key_exists('children_dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
-         } if (array_key_exists('submit_create_key', $_REQUEST) && array_key_exists('dico_id', $_REQUEST)) {
+         } else if (array_key_exists('submit_create_key', $_REQUEST) && array_key_exists('dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['dico_id']);
-         }
-         else {
+         } else {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'));
          }
          exit(); 

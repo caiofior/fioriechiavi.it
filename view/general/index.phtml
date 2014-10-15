@@ -13,9 +13,6 @@ if ($taxa->getData('name') != '') {
 ?>
 <h1><?php echo $title; ?></h1>
 <?php
-
-
-
 if ($taxa->getData('name') != '') {
    $taxaParentColl = $taxa->getParentColl();
    foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) : ?>
@@ -88,7 +85,7 @@ $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
 $newTaxaColl->loadAll(array(
     'iDisplayStart'=>0,
     'iDisplayLength'=>2,
-    'sColumns'=>'id',
+    'sColumns'=>'change_datetime',
     'iSortingCols'=>'1',
     'iSortCol_0'=>'0',
     'sSortDir_0'=>'DESC'
@@ -97,7 +94,7 @@ $newTaxaColl->shuffle();
 if($newTaxaColl->count() > 0): ?>
 <div id="newtaxa">
    <h2> Ultime novità </h2>
-   <div>
+   <div class="latestTaxa">
    <?php foreach($newTaxaColl->getItems() as $newTaxa) : 
       $image = null;
       $imageColl = $newTaxa->getTaxaImgeColl();
@@ -110,11 +107,14 @@ if($newTaxaColl->count() > 0): ?>
          <?php if (is_object($image)) : ?>
             <img src="<?php echo $image->getUrl();?>"/>
          <?php endif; ?>
+         <br/>
          <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $newTaxa->getData('id');?>"><?php echo $newTaxa->getRawData('taxa_kind_initials').' '.$newTaxa->getData('name') ?></a>
+
       </div>
    <?php endforeach;?>
    </div>
 </div>
+<div class="clear"/>
 <?php endif;
 if ($taxa->getData('id') == '') :
       $content = new \content\content\Content($GLOBALS['db']);

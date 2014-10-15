@@ -20,9 +20,9 @@ class TaxaAttributeColl extends \ContentColl {
       * @return Zend_Db_Select Select is expected
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
-       $select->join('taxa_attribute_value', 'taxa_attribute.id=taxa_attribute_value.id_taxa_attribute',array('value'), \Zend\Db\Sql\Select::JOIN_LEFT);
+       $select->columns(array('*','value'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `value` FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`id_taxa_attribute`=`taxa_attribute`.`id` LIMIT 1)')));
        if (array_key_exists('taxa_id', $criteria)) {
-          $select->where('`taxa_attribute_value`.`id_taxa` = '.intval($criteria['taxa_id']));
+          $select->where(' `taxa_attribute`.`id` IN (SELECT `id_taxa_attribute` FROM `taxa_attribute_value` WHERE `id_taxa` = '.intval($criteria['taxa_id']).')');
        } else if (array_key_exists('exclude_taxa_id', $criteria)) {
           $select->where(' `taxa_attribute`.`id` NOT IN (SELECT `id_taxa_attribute` FROM `taxa_attribute_value` WHERE `id_taxa` = '.intval($criteria['exclude_taxa_id']).')');
        }
