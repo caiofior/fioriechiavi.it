@@ -264,4 +264,16 @@ abstract class ContentColl {
     public function shuffle () {
        shuffle($this->items);
     }
+    /**
+     * Get fields as array
+     * @param string $field
+     * @return array
+     */
+    public function getFieldsAsArray($field) {
+       $values = array();
+       foreach ($this->items as $item) {
+          $values[] = $item->getRawData($field);
+       }
+       return $values;  
+    }
 }

@@ -120,7 +120,7 @@ class Taxa extends \Content
      * @param string $name
      * @param string $value
      */
-    public function addAttribute ($name,$value) {
+    public function addTaxaAttribute ($name,$value) {
          $attibute = new \flora\taxa\TaxaAttribute($this->db);
          $attibute->loadFromName($name);
          if ($attibute->getData('id')== '') {
@@ -139,7 +139,7 @@ class Taxa extends \Content
      * @param int $id
      * @param string $value
      */
-    public function addAttributeById ($id,$value) {
+    public function addTaxaAttributeById ($id,$value) {
          $attibute = new \flora\taxa\TaxaAttribute($this->db);
          $attibute->loadFromId($id);
          if ($attibute->getData('id')== '') {
@@ -169,11 +169,19 @@ class Taxa extends \Content
          $value = $value->value;
          return $value;
     }
+     /**
+     * Deletes all taxa attributes
+     */
+    public function deleteAllTaxaAttributes() {
+         $this->db->query('DELETE FROM  `taxa_attribute_value` 
+         WHERE `id_taxa`='.intval($this->data['id'])
+         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+    }
     /**
      * Deletes an attribute by id
      * @param int $id
      */
-    public function deleteAttributeById($id) {
+    public function deleteTaxaAttributeById($id) {
          $this->db->query('DELETE FROM  `taxa_attribute_value` 
          WHERE `id_taxa`='.intval($this->data['id']).' AND `id_taxa_attribute` = '.intval($id)
          , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);

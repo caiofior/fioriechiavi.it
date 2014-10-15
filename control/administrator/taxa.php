@@ -52,6 +52,7 @@ case 'edit':
               array_key_exists('submit', $_REQUEST) ||
               array_key_exists('submit_create_key', $_REQUEST) 
               ) && $this->formIsValid()) {
+         
          if (array_key_exists('submit_create_key', $_REQUEST)) {
             $dico = new \flora\dico\Dico($GLOBALS['db']);
             $dico->insert();
@@ -72,6 +73,59 @@ case 'edit':
          } else {
             $taxa->insert();
          }
+         
+         $taxa->deleteAllTaxaAttributes();
+         
+         if (
+                 array_key_exists('attribute_name_list', $_REQUEST) &&
+                 is_array($_REQUEST['attribute_name_list']) &&
+                 array_key_exists('attribute_value_list', $_REQUEST) &&
+                 is_array($_REQUEST['attribute_value_list'])
+                 ) {
+            foreach ($_REQUEST['attribute_value_list'] as $attributeKey => $attributeValue) {
+               if (
+                     $attributeValue == '' ||
+                     !array_key_exists($attributeKey, $_REQUEST['attribute_name_list']) ||
+                     $_REQUEST['attribute_name_list'][$attributeKey] == ''
+                  ) continue;
+               $attributeName = $_REQUEST['attribute_name_list'][$attributeKey];
+               $taxa->addTaxaAttribute($attributeName, $attributeValue);
+               
+            }   
+         }
+         $taxaImageColl = $taxa->getTaxaImgeColl();
+         if (
+               array_key_exists('image_id_list', $_REQUEST) &&
+               is_array($_REQUEST['image_id_list'])
+            ) {
+               
+            $idc = $taxaImageColl->getFieldsAsArray('id');
+            $taxaImage = new \flora\taxa\TaxaImage($GLOBALS['db']);
+            foreach(array_diff($idc,$_REQUEST['image_id_list']) as $id) {
+               $taxaImage->loadFromId($id);
+               $taxaImage->delete();
+            }
+
+         }
+        $taxaImageColl = $taxa->getTaxaImgeColl();
+         
+         
+         if (
+            array_key_exists('image_name_list', $_REQUEST) &&
+            is_array($_REQUEST['image_name_list'])
+            ) {
+                foreach ($_REQUEST['image_name_list'] as $imageName) {
+                   if (
+                           $imageName == '' ||
+                           !is_file($GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$imageName)
+                           ) continue;
+                   $taxaImage = $taxaImageColl->addItem();
+                   $taxaImage->moveInsert($GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$imageName);
+                }
+            }
+         
+         
+         
          if (
                  array_key_exists('children_dico_item_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_item_id']) &&
                  array_key_exists('children_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_id'])
@@ -83,8 +137,11 @@ case 'edit':
          }
          if (array_key_exists('children_dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
-         } else {
-            header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa');
+         } if (array_key_exists('submit_create_key', $_REQUEST) && array_key_exists('dico_id', $_REQUEST)) {
+            header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['dico_id']);
+         }
+         else {
+            header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'));
          }
          exit(); 
       }
@@ -109,14 +166,6 @@ case 'taxaattributelist' :
    } 
    header('Content-Type: application/json');
    echo json_encode($result);
-   exit;
-   break;
-case 'reloadattribute' :
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-   if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
-      $taxa->loadFromId($_REQUEST['id']);
-   }
-   require __DIR__.'/../../view/administrator/taxa/attributeBlock.phtml';
    exit;
    break;
 case 'jeditable':
@@ -167,11 +216,21 @@ case 'imageupload':
    // Uncomment this one to fake upload time
    // usleep(5000);
 
-   $targetDir = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload';
+   $targetDir = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp';
+   
+   if (!is_dir($targetDir)) {
+      mkdir($targetDir);
+   }
    $cleanupTargetDir = true; // Remove old files
    $maxFileAge = 5 * 3600; // Temp file age in seconds
    if (!file_exists($targetDir)) {
            @mkdir($targetDir);
+   }
+   if (!is_dir($targetDir)) {
+      $m->error->code = 105;
+      $m->error->message = 'Directory temporanea non accessibile in scrittura '.$targetDir;
+      echo json_encode($m);
+      exit;
    }
    if (isset($_REQUEST['name'])) {
            $fileName = $_REQUEST['name'];
@@ -263,42 +322,11 @@ case 'imageupload':
    if (!$chunks || $chunk == $chunks - 1) {
            // Strip the temp .part suffix off 
            rename($filePath.'.part', $filePath);
-   }
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-   $taxa->loadFromId($_REQUEST['taxa_id']);
-   $taxaImageColl = $taxa->getTaxaImgeColl();
-   $taxaImage = $taxaImageColl->addItem();
-   $taxaImage->moveInsert($filePath);
-   
+   }  
    $m = new stdClass();
    $m->jsonrpc = 2.0;
-   $m->result = '';
-   $m->id = 'id';
+   $m->result = $fileName;
    echo json_encode($m);
-   exit;
-   break;
-case 'delete_image':
-   if (
-           array_key_exists('id', $_REQUEST) && 
-           $_REQUEST['id'] != '' &&
-           array_key_exists('image_id', $_REQUEST) && 
-           $_REQUEST['image_id'] != ''
-           ) {
-            $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-            $taxa->loadFromId($_REQUEST['id']);
-            $taxaImageColl = $taxa->getTaxaImgeColl();
-            $taxaImageColl->filterByAttributeValue($_REQUEST['image_id'], 'id');
-            $taxaImage = $taxaImageColl->getFirst();
-            $taxaImage->delete();
-            exit();
-           }
-   break;
-case 'reloadimage' :
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-   if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
-      $taxa->loadFromId($_REQUEST['id']);
-   }
-   require __DIR__.'/../../view/administrator/taxa/imageBlock.phtml';
    exit;
    break;
 default:

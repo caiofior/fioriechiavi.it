@@ -44,8 +44,12 @@ class TaxaImage extends \Content
          parent::update();
       } catch (\Exception $e) {
          $this->db->getDriver()->getConnection()->rollback();
-         if (is_file(getBaseFileName ().$destinationUrl) && is_writable(getBaseFileName ().$destinationUrl))
-         unlink(getBaseFileName ().$destinationUrl);
+         if (
+                 isset($destinationUrl) &&
+                 is_file($this->getBaseFileName().$destinationUrl) &&
+                 is_writable(getBaseFileName ().$destinationUrl)
+            )
+         unlink($this->getBaseFileName().$destinationUrl);
          throw $e;
       }
       $this->db->getDriver()->getConnection()->commit();
@@ -55,7 +59,9 @@ class TaxaImage extends \Content
     * @return string
     */
    public function getUrl() {
-      return self::imageBaseDir.$this->data['filename'];
+      if (array_key_exists('filename', $this->data)) {
+         return self::imageBaseDir.$this->data['filename'];
+      }
    }
    /**
     * Return the image path
@@ -81,9 +87,9 @@ class TaxaImage extends \Content
          throw new \Exception('File does not exists '.$inputFile,1410030922);
       }
       if (!is_writable($inputFile)) {
-         throw new \Exception('File could not be movend '.$inputFile,1410030922);
+         throw new \Exception('File could not be movend '.$inputFile,1410030923);
       }
-      set_error_handler(create_function('', 'throw new \Exception("The file is not an image '.$destFileName.'",1410021647);'),E_WARNING);
+      set_error_handler(create_function('', 'throw new \Exception("The file is not an image '.$inputFile.'",1410021647);'),E_WARNING);
       getimagesize($inputFile);
       restore_error_handler();
       $ext = strtolower(pathinfo($inputFile, PATHINFO_EXTENSION));

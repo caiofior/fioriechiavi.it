@@ -97,7 +97,13 @@ $(document).ready(function() {
               up.start();
             },
             UploadComplete: function(up, files) {
-                updateImages();
+                $.each(files,function (id,value) {
+                  el = $("#image_template div").clone(true);
+                  el.find("img").attr("src","tmp/"+value["name"]);
+                  el.find("[name='image_name_list[]']").val(value["name"]);
+                  el.show();
+                  $("#image_list").append(el);
+                });
                 up.splice();
             },
           },
@@ -124,22 +130,15 @@ $(document).ready(function() {
         // Silverlight settings
         silverlight_xap_url : 'js/plupload/js/Moxie.xap'
     });
-    function updateImages() {
-      $("#image_list").load("?task=taxa&action=reloadimage&id="+$("#id").val());
-      deleteImage ();
-    }
     function deleteImage () {
       $(".image.actions.delete").click(function (e) {
+      el =  $(this).parent("div.imgContainer");
       e.preventDefault();
       $(this).dialog({
          buttons: {
             "Confermi la cancellazione dell'immagine?": function() {
-               $.ajax({
-                  url: $(this).attr("href"),
-                  async : false
-               });
-               updateImages()
-               $( this ).dialog( "close" );
+               $(this).dialog('destroy');
+               el.remove();
             }
          }
       });
