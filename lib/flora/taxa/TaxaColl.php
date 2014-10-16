@@ -25,8 +25,7 @@ class TaxaColl extends \ContentColl {
           $criteria['sSearch']=$criteria['term'];
        }
        if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-          $select->where('`taxa`.`name` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
-          $select->where('`taxa`.`description` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
+          $select->where(' ( `taxa`.`name` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `taxa`.`description` LIKE "%'.addslashes($criteria['sSearch']).'%" ) ');
        }
        return $select;
     }

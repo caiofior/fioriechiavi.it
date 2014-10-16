@@ -26,6 +26,14 @@ class TaxaAttributeColl extends \ContentColl {
        } else if (array_key_exists('exclude_taxa_id', $criteria)) {
           $select->where(' `taxa_attribute`.`id` NOT IN (SELECT `id_taxa_attribute` FROM `taxa_attribute_value` WHERE `id_taxa` = '.intval($criteria['exclude_taxa_id']).')');
        }
+       
+       if (array_key_exists('term', $criteria) && $criteria['term'] != '') {
+          $criteria['sSearch']=$criteria['term'];
+       }
+       if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
+          $select->where(' ( `name` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `description` LIKE "%'.addslashes($criteria['sSearch']).'%" ) ');
+       }
+       
        return $select;
     }
 }

@@ -16,10 +16,11 @@ class TaxaKindColl extends \ContentColl {
       * @return Zend_Db_Select Select is expected
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
+       if (array_key_exists('term', $criteria) && $criteria['term'] != '') {
+          $criteria['sSearch']=$criteria['term'];
+       }
        if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-          $select->where('`initials` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
-          $select->where('`name` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
-          $select->where('`description` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
+          $select->where(' ( `initials` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `name` LIKE "%'.addslashes($criteria['sSearch']).'%" ) ');
        }
        $select->order('ord');
        return $select;

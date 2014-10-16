@@ -17,9 +17,7 @@ class ContentColl extends \ContentColl {
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
        if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-          $select->where('`name` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
-          $select->where('`abstract` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
-          $select->where('`content` LIKE "%'.addslashes($criteria['sSearch']).'%"', \Zend\Db\Sql\Predicate\PredicateSet::OP_OR);
+          $select->where(' ( `name` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `abstract` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `content` LIKE "%'.addslashes($criteria['sSearch']).'%" ) ');
        }
        return $select;
     }
