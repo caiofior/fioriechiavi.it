@@ -40,10 +40,10 @@ $attributeColl = $taxa->getTaxaAttributeColl();
    if ($attributeColl->count() > 0) : ?>
 <div class="attribute_list">
       <?php foreach($attributeColl->getItems() as $attribute) : ?>
-      <div>
+      <p>
             <?php echo $attribute->getData('name');?> :
             <span><?php echo $attribute->getRawData('value');?></span>
-      </div>
+      </p>
       <?php endforeach; ?>
 </div>
    <?php endif;
@@ -80,8 +80,21 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
       <?php endif; ?>
    </span>
 </div>
-<?php endforeach;
-$newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
+<?php endforeach; 
+$searchTerm = 'flora italiana';
+if (is_numeric($taxa->getData('id'))) {
+   $searchTerm = $taxa->getData('name');
+}
+?>
+<script>
+var searchTerm = "<?php echo $searchTerm; ?>";
+var cx = "<?php echo $GLOBALS['db']->config->search->cx; ?>";
+var key = "<?php echo $GLOBALS['db']->config->search->key; ?>";
+</script>
+<h2>Immagini dal web</h2>
+<div id="imageSnipets"></div>
+<div class="clear"/>
+<? $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
 $newTaxaColl->loadAll(array(
     'iDisplayStart'=>0,
     'iDisplayLength'=>2,
@@ -115,8 +128,9 @@ if($newTaxaColl->count() > 0): ?>
    </div>
 </div>
 <div class="clear"/>
-<?php endif;
-if ($taxa->getData('id') == '') :
+<?php endif; ?>
+<?php 
+   if ($taxa->getData('id') == '') :
       $content = new \content\content\Content($GLOBALS['db']);
    $content->loadFromLabel('root_category'); ?>
    <div>

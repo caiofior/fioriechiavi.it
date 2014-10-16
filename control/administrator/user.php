@@ -52,7 +52,7 @@ switch ($_REQUEST['action']) {
       break;
    case 'delete' :
       $user = new \login\user\User($GLOBALS['db']);
-      if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+      if (array_key_exists('id', $_REQUEST) && $_REQUEST['id'] != '') {
          $user->loadFromId($_REQUEST['id']);
          $user->delete();
       }

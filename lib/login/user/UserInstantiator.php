@@ -50,7 +50,7 @@ class UserInstantiator {
               ));
       $user->insert();
       ob_start();
-      require $db->baseDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'register.php';
+      require $db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'register.php';
       $html = new \Zend\Mime\Part(ob_get_clean());
       $html->type = 'text/html';
 
@@ -67,7 +67,7 @@ class UserInstantiator {
       
       if ($adminColl->count() > 0 ) {
          ob_start();
-         require $db->baseDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'register.php';
+         require $db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'register.php';
          $html = new \Zend\Mime\Part(ob_get_clean());
          $html->type = 'text/html';
 

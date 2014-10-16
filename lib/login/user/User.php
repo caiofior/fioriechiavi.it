@@ -81,7 +81,7 @@ class User extends \Content
         $password .= ((rand(1,4) != 1) ? chr(rand(97, 122)) : rand(0, 9));
         
          ob_start();
-         require $this->db->baseDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'recover.php';
+         require $this->db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'recover.php';
          $html = new \Zend\Mime\Part(ob_get_clean());
          $html->type = 'text/html';
 
@@ -125,7 +125,7 @@ class User extends \Content
       $this->data['confirm_code']=md5(serialize($_SERVER).time());
       $this->update();
       ob_start();
-      require $this->db->baseDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'changelogin.php';
+      require $this->db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'changelogin.php';
       $html = new \Zend\Mime\Part(ob_get_clean());
       $html->type = 'text/html';
 

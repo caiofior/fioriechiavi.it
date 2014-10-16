@@ -36,7 +36,7 @@ $(document).ready(function() {
                            url: $(this).attr("href"),
                            async : false
                            });
-                        ct.dataTable().fnDraw();
+                        us.dataTable().fnDraw();
                         $( this ).dialog( "close" );
                      }
                   }

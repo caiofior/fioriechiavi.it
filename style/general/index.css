@@ -7,3 +7,9 @@
 .clear {
    clear: both;
 }
+#imageSnipets span {
+   float:left;
+}
+#imageSnipets span div{
+   width:300px;
+}
