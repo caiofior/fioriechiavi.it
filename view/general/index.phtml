@@ -81,7 +81,7 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    </span>
 </div>
 <?php endforeach; 
-$searchTerm = 'flora italiana';
+$searchTerm = '';
 if (is_numeric($taxa->getData('id'))) {
    $searchTerm = $taxa->getData('name');
 }
