@@ -26,6 +26,16 @@ class Pignatti implements \flora\dico\inport\Inport {
          }
          $row = array_combine($cols, $row);
          $row['id']=trim($row['id']);
+         if (!is_numeric($row['id'])) {
+            $dicoItemColl->errors = new \stdClass();
+            $dicoItemColl->errors->message = 'There is one item without id';
+            $dicoItemColl->errors->code = 1410141231;
+         }
+         if ($row['text']=='') {
+            $dicoItemColl->errors = new \stdClass();
+            $dicoItemColl->errors->message = 'There is one item without text';
+            $dicoItemColl->errors->code = 1410141231;
+         }
          if (!array_key_exists($row['id'], $positions)) {
             $positions[$row['id']]=array();
             $positions[$row['id']][]=$lastPosition.'0';
@@ -43,7 +53,6 @@ class Pignatti implements \flora\dico\inport\Inport {
          $dicoItemColl->errors->message = 'There are some dico items not well coupled';
          $dicoItemColl->errors->code = 1410141230;
          $dicoItemColl->errors->items = implode(', ', array_filter(array_keys(array_filter($positions))));
-         
       }
       return $dicoItemColl;
    }
