@@ -1,5 +1,9 @@
 <?php
 namespace flora\dico;
+if (!class_exists('\Content')) {
+   require __DIR__.'/../../core/Autoload.php';
+   \Autoload::getInstance();
+}
 /**
  * Taka dicotomic key class
  *
