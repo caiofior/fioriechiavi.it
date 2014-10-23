@@ -156,10 +156,17 @@ case 'delete' :
    exit;
    break;
 case 'taxaattributelist' :
+   $excludeAttributes = array();
+   if (is_array($_REQUEST['attribute_name_list'])) {
+      $excludeAttributes = $_REQUEST['attribute_name_list'];
+   }
    $taxaAttributeColl = new \flora\taxa\TaxaAttributeColl($GLOBALS['db']);
    $taxaAttributeColl->loadAll($_REQUEST);
    $result = array();
    foreach ($taxaAttributeColl->getItems() as $taxaAttribute) {
+      if (in_array($taxaAttribute->getData('name'), $excludeAttributes)) {
+         continue;
+      }
       $result[] = array(
           'label'=>$taxaAttribute->getData('name')
       );

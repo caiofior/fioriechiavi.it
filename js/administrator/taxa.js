@@ -61,9 +61,8 @@ $(document).ready(function() {
        }
        
     }); 
-
    $( "#attribute_name" ).autocomplete({
-      source: "?task=taxa&action=taxaattributelist&exclude_taxa_id="+$("#id").val()
+      source: "?task=taxa&action=taxaattributelist&"+$("#attribute_name").parents("form").find("#attribute_list [name=attribute_name_list\\[\\]]").serialize()
    });
    $(".attribute.actions.delete").click(function (e) {
       el =  $(this).parent("div.attContainer");
