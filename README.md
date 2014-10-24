@@ -25,7 +25,7 @@ Caratteristiche
 ---------------
 
 * Sono economica, per funzionare basta una giornata di lavoro per il primo avvio e l'acquisto di un servizio di hosting da 10€/anno;
-* Sono personalizzabile, il codice è liberamente disponibile e personalizzabile a patto di continuare ad utilizzare [github.com]http://github.com per tenere traccia delle tue modifiche (*fork on github*). Se non hai le competenze per farlo puoi contattarmi per proporre sviluppi ed implementazioni, mi piace parlare con biologi e botanici;
+* Sono personalizzabile, il codice è liberamente disponibile e personalizzabile a patto di continuare ad utilizzare http://github.com per tenere traccia delle tue modifiche (*fork on github*). Se non hai le competenze per farlo puoi contattarmi per proporre sviluppi ed implementazioni, mi piace parlare con biologi e botanici;
 * Sono brutta ma mi puoi truccare a piacere; la grafica del sito si trova è racchiusa in tre cartelle, un grafico dovrebbe riuscire a modificare e personalizzare a tuo piacere la grafica basta avere dimestichezza con PHP, HTML5, JQuery, JQuery UI e JQuery datatables.
 
 Intro
