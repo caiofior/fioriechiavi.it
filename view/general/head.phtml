@@ -3,8 +3,16 @@ $title = $GLOBALS['db']->config->siteName;
 $taxa = $this->object;
 if (
         is_object($taxa) &&
-        $taxa->getData('name') != '') {
-   $title .= ' :: '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name');
-}
-?>
+        $taxa->getData('name') != '') :
+   $title .= ' :: '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>
+   <meta property="og:title" content="<?php echo $title; ?>" />
+   <meta property="og:type" content="article" />
+   <meta property="og:url" content="<?php echo $GLOBALS['db']->config->baseUrl;?>?<?php echo $taxa->getData('id');?>" />
+<?php
+   $imageColl = $taxa->getTaxaImgeColl();
+   if ($imageColl->count() > 0) : ?>
+   <meta property="og:image" content="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $imageColl->getFirst()->getUrl()?>" />
+<?php 
+      endif;
+   endif; ?>
 <title><?php echo $title;?></title>

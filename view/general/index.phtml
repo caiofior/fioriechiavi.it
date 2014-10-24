@@ -1,3 +1,4 @@
+<div id="fb-root"></div>
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/index.css">
 <form method="post" action="#">
    <label for="taxasearch">Cerca: </label>
@@ -7,13 +8,16 @@
 $taxa = $this->object;
 $dico = $taxa->dico;
 $title = $GLOBALS['db']->config->siteName;
-if ($taxa->getData('name') != '') {
-    $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name');
-}
-?>
+if ($taxa->getData('name') != '') :
+    $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>
+<div class="socialContainer">
+<div class="fb-share-button" data-href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id'); ?>"></div>
+<div class="g-plusone" data-size="small" data-annotation="inline" data-width="300"></div>
+</div><div class="clear"/>
+<?php endif; ?>
 <h1><?php echo $title; ?></h1>
 <?php
-if ($taxa->getData('name') != '') {
+if ($taxa->getData('name') != '') : 
    $taxaParentColl = $taxa->getParentColl();
    foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) : ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxaParent->getData('id');?>">
@@ -21,7 +25,7 @@ if ($taxa->getData('name') != '') {
    </a>
    <?php
    endforeach;
-}
+endif;
 ?>
 <?php
 if ($taxa->getData('description') != '') :
@@ -50,14 +54,18 @@ $attributeColl = $taxa->getTaxaAttributeColl();
    $imageColl = $taxa->getTaxaImgeColl();
    if ($imageColl->count() > 0) : ?>
 <div class="image_list">
-      <?php foreach($imageColl->getItems() as $image) : ?>
+      <?php foreach($imageColl->getItems() as $key=>$image) : ?>
       <div>
             <img src="<?php echo $image->getUrl();?>"/>
       </div>
       <?php endforeach; ?>
 </div>
-   <?php endif;
-endif;
+   <?php endif; ?>
+<div>
+<a class="blank" rel="nofollow" href="http://it.wikipedia.org/wiki/<?php echo urlencode(str_replace(' ', '_', $taxa->getData('name')));?>">Cerca su Wikipedia</a>
+<a class="blank" rel="nofollow" href="https://www.google.it/#q=site:www.actaplantarum.org+<?php echo urlencode($taxa->getData('name'));?>">Cerca scheda su Acta plantorum</a>
+</div>
+<?php endif;
 $dicoItemColl = $dico->getDicoItemColl();
 $positions = array();
 $lastPosition = 0;

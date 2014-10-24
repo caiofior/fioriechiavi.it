@@ -157,7 +157,7 @@ case 'delete' :
    break;
 case 'taxaattributelist' :
    $excludeAttributes = array();
-   if (is_array($_REQUEST['attribute_name_list'])) {
+   if (array_key_exists('attribute_name_list',$_REQUEST) && is_array($_REQUEST['attribute_name_list'])) {
       $excludeAttributes = $_REQUEST['attribute_name_list'];
    }
    $taxaAttributeColl = new \flora\taxa\TaxaAttributeColl($GLOBALS['db']);

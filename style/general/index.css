@@ -13,3 +13,6 @@
 #imageSnipets span div{
    width:300px;
 }
+.socialContainer {
+   float: left;
+}
