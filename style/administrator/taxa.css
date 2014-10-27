@@ -1,6 +1,9 @@
 form.addTaxa {
    display: inline;
 }
+a.selectAllRegions {
+   font-size: smaller;
+}
 .attributeTable > label {
    margin: 3px;
 }

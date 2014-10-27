@@ -46,6 +46,14 @@ $(document).ready(function() {
               $(this).val("");
       }
     });
+    $("a.selectAllRegions").click(function (e) {
+       if($("#regions option:selected").length == 0) {
+          $("#regions option").prop("selected",true);
+       } else {
+          $("#regions option").prop("selected",false);
+       }
+       e.preventDefault();
+    });
     $("#attribute_name, #attribute_value").change(function (e){
        $("#attribute_error").hide();
        if ($("#attribute_name").val() != "" && $("#attribute_value").val() != "") {
@@ -62,7 +70,16 @@ $(document).ready(function() {
        
     }); 
    $( "#attribute_name" ).autocomplete({
-      source: "?task=taxa&action=taxaattributelist&"+$("#attribute_name").parents("form").find("#attribute_list [name=attribute_name_list\\[\\]]").serialize()
+      source: function (request, response) {
+         $.getJSON("#", {
+            task: "taxa",
+            action:"taxaattributelist",
+            term:$( "#attribute_name" ).val(),
+            attribute_name_list: $( "#attribute_name" ).parents("form").find("#attribute_list input[name=attribute_name_list\\[\\]]").serialize(),
+
+         }, 
+         response);
+      }
    });
    $(".attribute.actions.delete").click(function (e) {
       el =  $(this).parent("div.attContainer");

@@ -12,7 +12,8 @@ if ($taxa->getData('name') != '') :
     $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>
 <div class="socialContainer">
 <div class="fb-share-button" data-href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id'); ?>"></div>
-<div class="g-plusone" data-size="small" data-annotation="inline" data-width="300"></div>
+<a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+<div class="g-plusone" data-size="small" data-annotation="inline" data-width="150"></div>
 </div><div class="clear"/>
 <?php endif; ?>
 <h1><?php echo $title; ?></h1>
