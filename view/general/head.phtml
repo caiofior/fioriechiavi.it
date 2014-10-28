@@ -5,9 +5,10 @@ if (
         is_object($taxa) &&
         $taxa->getData('name') != '') :
    $title .= ' :: '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>
-   <meta property="og:title" content="<?php echo $title; ?>" />
+   <meta property="og:site_name" content="<?php echo $GLOBALS['db']->config->siteName;?>"/>
+   <meta property="og:title" content="<?php echo $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>" />
    <meta property="og:type" content="article" />
-   <meta property="og:url" content="<?php echo $GLOBALS['db']->config->baseUrl;?>?<?php echo $taxa->getData('id');?>" />
+   <meta property="og:url" content="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxa->getData('id');?>" />
 <?php
    $imageColl = $taxa->getTaxaImgeColl();
    if ($imageColl->count() > 0) : ?>

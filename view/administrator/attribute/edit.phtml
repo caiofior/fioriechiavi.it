@@ -1,0 +1,26 @@
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/js/datatables/media/css/jquery.dataTables.css">
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=attribute">Attributi</a></p> &gt; <h2>Valori</h2>
+</div>
+<form method="post" action="#">
+   <input type="hidden" id="id" name="id" value="<?php echo $_REQUEST['id'];?>" />
+</form>
+<table id="values">
+   	<thead>
+		<tr>
+			<th data-sName="value" >Valore</th>
+                        <th data-bSortable="false" data-sName="actions" >Azioni</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>Valore</th>
+                        <th>Azioni</th>
+		</tr>
+	</tfoot>
+</table>
