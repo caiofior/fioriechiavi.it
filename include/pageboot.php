@@ -16,7 +16,16 @@ $baktrace = debug_backtrace();
 if (sizeof($baktrace) < 1)
    throw new Exception ('No backtrace available to create base path', 0710141057);
 $db->baseDir = dirname($baktrace[0]['file']).DIRECTORY_SEPARATOR;
+try{  
 $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
+} catch (\Exception  $e) {
+   if(preg_match('/Cache directory \'(.*)\' not found or not a directory/',$e->getMessage(),$catches)){
+      mkdir($catches[1]);
+      $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
+   } else {
+      throw $e;
+   }   
+}
 $db->config = $config;
 
 require __DIR__.'/../lib/flora/Autoload.php';
