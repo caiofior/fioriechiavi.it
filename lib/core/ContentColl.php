@@ -134,7 +134,9 @@ abstract class ContentColl {
                    $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
                throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
             }
-            //$GLOBALS['firephp']->log($select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()));
+            if(!headers_sent()) {
+               //$GLOBALS['firephp']->log($select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()));
+            }
             $this->items=array();
             foreach($data as $dataitem) {
                 $item = clone $this->content;

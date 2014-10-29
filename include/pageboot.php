@@ -30,7 +30,25 @@ $template->setBlock('navigation','general/navigation.phtml');
 $template->setBlock('footer','general/footer.phtml');
 $control = $template->createControl();
 $control->setBaseDir(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'control');
-
+$connected = true;
+set_error_handler(create_function('', ''));
+try{
+$db->getDriver()->getConnection()->connect();
+} catch (\Exception $e) {
+   $connected = false;
+}
+restore_error_handler();
+if (!$connected) {
+   header('HTTP/1.1 503 Service Temporarily Unavailable');
+   header('Status: 503 Service Temporarily Unavailable');
+   header('Retry-After: 300');
+   $GLOBALS['user']=null;
+   $control->addValidationMessage('error','errore nelle nostre macchine');
+   $template->setBlock('middle','error/middle.phtml');
+   $template->setBlock('navigation','error/navigation.phtml');
+   $template->render();
+   exit;
+}
 if ($config->mail_from == '') {
    throw new \Exception('Sender email is required',1409011411);
 }
