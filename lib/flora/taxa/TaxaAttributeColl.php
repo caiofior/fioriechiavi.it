@@ -28,7 +28,7 @@ class TaxaAttributeColl extends \ContentColl {
           $criteria['sSearch']=$criteria['term'];
        }
        if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-          $select->where(' ( `name` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `description` LIKE "%'.addslashes($criteria['sSearch']).'%" ) ');
+          $select->where(' `name` LIKE "'.addslashes($criteria['sSearch']).'%" ');
        }
        
        return $select;

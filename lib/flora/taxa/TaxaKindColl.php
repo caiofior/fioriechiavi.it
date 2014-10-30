@@ -20,7 +20,7 @@ class TaxaKindColl extends \ContentColl {
           $criteria['sSearch']=$criteria['term'];
        }
        if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-          $select->where(' ( `initials` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `name` LIKE "%'.addslashes($criteria['sSearch']).'%" ) ');
+          $select->where(' ( `initials` LIKE "'.addslashes($criteria['sSearch']).'%" OR `name` LIKE "'.addslashes($criteria['sSearch']).'%" ) ');
        }
        $select->order('ord');
        return $select;

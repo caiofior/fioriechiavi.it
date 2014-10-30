@@ -35,7 +35,7 @@ class TaxaAttribute extends \Content
                 array_key_exists('sSearch', $criteria) &&
                 $criteria['sSearch'] != ''
             )
-        $sql .= ' AND `value` LIKE "%'.  addslashes($criteria['sSearch']).'%"';
+        $sql .= ' AND `value` LIKE "'.  addslashes($criteria['sSearch']).'%"';
         $sql .= ' AND `id_taxa_attribute`='.intval($this->data['id']);
 	$sql .= ' GROUP BY `value`';
         if (

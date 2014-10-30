@@ -1,3 +1,4 @@
+ $.ajaxSetup({ cache: true});
 /**
  * Async update of element
  */
