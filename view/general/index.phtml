@@ -1,5 +1,5 @@
 <div id="fb-root"></div>
-<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/index.css">
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/general/index.css');?>">
 <form method="post" action="#">
    <label for="taxasearch">Cerca: </label>
    <input id="taxasearch" name="taxasearch" value="">

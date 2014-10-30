@@ -4,7 +4,7 @@
 <?php
 $dico = $this->object;
 ?>
-<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/administrator/taxa.css">
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/administrator/taxa.css');?>">
 <form method="post" action="#">
    <input type="hidden" name="id" id="id" value="<?php echo $dico->getData('id');?>">
 </form>

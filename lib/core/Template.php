@@ -162,5 +162,16 @@ class Template {
     */
    public static function decodeId ($code) {
       return trim(mcrypt_decrypt($GLOBALS['config']->crypt->cipher,$GLOBALS['user']->getData('login'),$code,$GLOBALS['config']->crypt->mode,$GLOBALS['config']->crypt->iv ));
-   }       
+   }
+   /**
+    * Add modify timestamp to file url
+    * @param string $relativePath
+    * @return string
+    */
+   public function getUrlModifyTimestamp ($relativePath) {
+      if(is_file($this->baseDir.$relativePath)) {
+         $relativePath .= '?t='.filemtime($this->baseDir.$relativePath);
+      }
+      return $relativePath;
+   }
 }
