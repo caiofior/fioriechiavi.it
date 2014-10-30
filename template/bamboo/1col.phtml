@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="style/bamboo/1.css" />
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+<!--
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>js/jqueryui/themes/base/all.css">
+-->
 <?php $GLOBALS['template']->renderBlock('head'); ?>
 </head>
 <body>
@@ -24,8 +27,12 @@
 
 
 <div id="footer">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+<!--
 <script src="<?php echo $GLOBALS['db']->config->baseUrl;?>js/jquery/jquery.min.js"></script>
 <script src="<?php echo $GLOBALS['db']->config->baseUrl;?>js/jqueryui/jquery-ui.min.js"></script>
+!-->
 <script src="<?php echo $GLOBALS['db']->config->baseUrl;?>js/common/common.js"></script>
 <?php $GLOBALS['template']->renderBlock('footer'); ?>
 </div>

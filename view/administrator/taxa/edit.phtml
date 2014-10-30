@@ -6,7 +6,10 @@ if (array_key_exists('id', $_REQUEST)) {
    $taxa->setData($_REQUEST);
 }
 $regionColl = $taxa->getRegionColl();
-?><link rel="stylesheet" href="js/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css">
+?><link rel="stylesheet" href="//cdn.jsdelivr.net/plupload/2.1.1/jquery.ui.plupload/css/jquery.ui.plupload.css">
+<!--
+<link rel="stylesheet" href="js/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css">
+-->
 <link rel="stylesheet" href="style/administrator/taxa.css">
 <div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica un taxa</h2>
