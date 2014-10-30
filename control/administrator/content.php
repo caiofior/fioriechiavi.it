@@ -4,8 +4,10 @@ if (array_key_exists('sEcho', $_REQUEST)) {
       $contentColl = new \content\content\ContentColl($GLOBALS['db']);
       $contentColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
-      $result['iTotalRecords']=$contentColl->count();
-      $result['iTotalDisplayRecords']=$contentColl->countAll();
+      $request = $_REQUEST;
+      unset($request['sSearch']);
+      $result['iTotalRecords']=$contentColl->countAll($request);
+      $result['iTotalDisplayRecords']=$contentColl->countAll($_REQUEST);
       $result['aaData']=array();
       $columns = $contentColl->getColumns();
       foreach($contentColl->getItems() as $key => $content) {

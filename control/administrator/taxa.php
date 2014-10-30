@@ -4,8 +4,10 @@ if (array_key_exists('sEcho', $_REQUEST)) {
       $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
       $taxaColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
-      $result['iTotalRecords']=$taxaColl->count();
-      $result['iTotalDisplayRecords']=$taxaColl->countAll();
+      $request = $_REQUEST;
+      unset($request['sSearch']);
+      $result['iTotalRecords']=$taxaColl->countAll($request);
+      $result['iTotalDisplayRecords']=$taxaColl->countAll($_REQUEST);
       $result['aaData']=array();
       $columns = $taxaColl->getColumns();
       foreach($taxaColl->getItems() as $key => $taxa) {

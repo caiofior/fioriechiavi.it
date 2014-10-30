@@ -4,8 +4,10 @@ if (array_key_exists('sEcho', $_REQUEST)) {
       $dicoColl = new \flora\dico\DicoColl($GLOBALS['db']);
       $dicoColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
-      $result['iTotalRecords']=$dicoColl->countAll();
-      $result['iTotalDisplayRecords']=$dicoColl->count();
+      $request = $_REQUEST;
+      unset($request['sSearch']);
+      $result['iTotalRecords']=$dicoColl->countAll($request);
+      $result['iTotalDisplayRecords']=$dicoColl->countAll($_REQUEST);
       $result['aaData']=array();
       $columns = $dicoColl->getColumns();
       foreach($dicoColl->getItems() as $key => $dico) {

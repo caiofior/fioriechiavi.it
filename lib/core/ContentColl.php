@@ -170,7 +170,7 @@ abstract class ContentColl {
     /**
 * Returns all contents without any filter
 */
-    public function countAll() {
+    public function countAll($criteria = array()) {
       $select = $this->content->getTable()->getSql()->select()->columns(array(new \Zend\Db\Sql\Expression('COUNT(*)')));
       $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
       $results = $statement->execute();

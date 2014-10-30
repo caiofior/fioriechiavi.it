@@ -10,8 +10,10 @@ if (array_key_exists('sEcho', $_REQUEST)) {
          $attribute->loadFromId($_REQUEST['id']);
          $values = $attribute->getAllValues($_REQUEST);
          $result['sEcho']=intval($_REQUEST['sEcho']);
-         $result['iTotalRecords']=sizeof($values);
-         $result['iTotalDisplayRecords']=sizeof($values);
+         $request = $_REQUEST;
+         unset($request['sSearch']);
+         $result['iTotalRecords']=$attribute->countAllValues($request);
+         $result['iTotalDisplayRecords']=$attribute->countAllValues($_REQUEST);
          $result['aaData']=array();
          foreach($values as $value) {
             $result['aaData'][]=array(
@@ -25,8 +27,10 @@ if (array_key_exists('sEcho', $_REQUEST)) {
          $attributeColl = new \flora\taxa\TaxaAttributeColl($GLOBALS['db']);
          $attributeColl->loadAll($_REQUEST);
          $result['sEcho']=intval($_REQUEST['sEcho']);
-         $result['iTotalRecords']=$attributeColl->count();
-         $result['iTotalDisplayRecords']=$attributeColl->countAll();
+         $request = $_REQUEST;
+         unset($request['sSearch']);
+         $result['iTotalRecords']=$attributeColl->countAll($request);
+         $result['iTotalDisplayRecords']=$attributeColl->countAll($_REQUEST);
          $result['aaData']=array();
          $columns = $attributeColl->getColumns();
          foreach($attributeColl->getItems() as $key => $attribute) {

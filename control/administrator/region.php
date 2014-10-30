@@ -4,8 +4,10 @@ if (array_key_exists('sEcho', $_REQUEST)) {
       $regionColl = new \flora\region\RegionColl($GLOBALS['db']);
       $regionColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
-      $result['iTotalRecords']=$regionColl->count();
-      $result['iTotalDisplayRecords']=$regionColl->countAll();
+      $request = $_REQUEST;
+      unset($request['sSearch']);
+      $result['iTotalRecords']=$regionColl->countAll($request);
+      $result['iTotalDisplayRecords']=$regionColl->countAll($_REQUEST);
       $result['aaData']=array();
       $columns = $regionColl->getColumns();
       foreach($regionColl->getItems() as $key => $region) {

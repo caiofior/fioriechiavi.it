@@ -30,14 +30,7 @@ class TaxaAttribute extends \Content
     */
    public function getAllValues($criteria)  {
         $sql = 'SELECT `value` FROM `taxa_attribute_value` WHERE TRUE ';
-
-        if (
-                array_key_exists('sSearch', $criteria) &&
-                $criteria['sSearch'] != ''
-            )
-        $sql .= ' AND `value` LIKE "'.  addslashes($criteria['sSearch']).'%"';
-        $sql .= ' AND `id_taxa_attribute`='.intval($this->data['id']);
-	$sql .= ' GROUP BY `value`';
+        $sql .= $this->setFilter ($criteria);
         if (
              array_key_exists('iDisplayStart',$criteria ) &&
              array_key_exists('iDisplayLength',$criteria )
@@ -45,6 +38,36 @@ class TaxaAttribute extends \Content
             $sql .= ' LIMIT '.intval($criteria['iDisplayStart']).','.intval($criteria['iDisplayLength']);
         $resultSet =  $this->db->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         return $resultSet->toArray();
+   }
+   /**
+    * Count the values of an attribute
+    * @param array $criteria
+    * @return int
+    */
+   public function countAllValues($criteria) {
+      $sql = 'SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE TRUE ';
+      $sql .= $this->setFilter ($criteria);
+      $resultSet =  $this->db->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+      $result = $resultSet->toArray();
+      $result = array_shift($result);
+      return intval(array_shift($result));
+   }
+   /**
+    * Sets query filter
+    * @param array $criteria
+    * @return string
+    */
+   private function setFilter ($criteria) {
+      $sql = '';
+      if (
+                array_key_exists('sSearch', $criteria) &&
+                $criteria['sSearch'] != ''
+            ) {
+                  $sql .= ' AND `value` LIKE "'.  addslashes($criteria['sSearch']).'%"';
+            }
+      $sql .= ' AND `id_taxa_attribute`='.intval($this->data['id']);
+      $sql .= ' GROUP BY `value`';
+      return $sql;
    }
    /**
     * Deletes a single value
