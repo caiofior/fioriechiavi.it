@@ -35,9 +35,9 @@ $regionColl = $taxa->getRegionColl();
 $regionColl = $regionColl->filterByAttributeValue('1','selected');
 if ($regionColl->count() >0) : ?>
 <div class="mapContainer">
-   <img class="baseMap" src="<?php echo $GLOBALS['db']->config->baseUrl;?>/images/map/italia.png">
+   <img class="baseMap" src="<?php echo $GLOBALS['db']->config->staticUrl;?>/images/map/italia.png">
    <?php foreach($regionColl->getItems() as $region) : ?>
-   <img class="mapRegion" src="<?php echo $GLOBALS['db']->config->baseUrl;?>/images/map/<?php echo $region->getData('id');?>.png">
+   <img class="mapRegion" src="<?php echo $GLOBALS['db']->config->staticUrl;?>/images/map/<?php echo $region->getData('id');?>.png">
    <?php endforeach; ?>
 </div>
 <?php endif;
@@ -57,7 +57,7 @@ $attributeColl = $taxa->getTaxaAttributeColl();
 <div class="image_list">
       <?php foreach($imageColl->getItems() as $key=>$image) : ?>
       <div>
-            <img src="<?php echo $image->getUrl();?>"/>
+            <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>"/>
       </div>
       <?php endforeach; ?>
 </div>
@@ -127,7 +127,7 @@ if($newTaxaColl->count() > 0): ?>
       ?>
       <div>
          <?php if (is_object($image)) : ?>
-            <img src="<?php echo $image->getUrl();?>"/>
+            <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>"/>
          <?php endif; ?>
          <br/>
          <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $newTaxa->getData('id');?>"><?php echo $newTaxa->getRawData('taxa_kind_initials').' '.$newTaxa->getData('name') ?></a>
