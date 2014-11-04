@@ -33,7 +33,7 @@
 <script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/jquery/jquery.min.js"></script>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/jqueryui/jquery-ui.min.js"></script>
 !-->
-<script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/common/common.js"></script>
+<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/common/common.min.js.gz');?>"></script>
 <?php $GLOBALS['template']->renderBlock('footer'); ?>
 </div>
 </body>
