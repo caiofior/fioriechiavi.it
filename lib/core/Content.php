@@ -64,7 +64,7 @@ abstract class Content {
            self::$metadata=array();
            $cacheData = '';
            if (
-                   method_exists($this->db,'cache') && 
+                   property_exists($this->db,'cache') && 
                    $this->db->cache instanceof Zend\Cache\Storage\Adapter\AbstractAdapter
                )
               $cacheData = $this->db->cache->getItem('metadata');

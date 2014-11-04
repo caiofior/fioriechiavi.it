@@ -32,7 +32,8 @@ $("*[data-update]").click(function (e) {
 /**
  * Async form validation
  */
-$("input:submit").click(function (e) {
+$("input:submit").click(function (e,mode) {
+   mode = typeof mode !== "undefined" ? mode : "dufault";
    $("#ajaxLoader").show();
    $(".notValid").removeClass("notValid");
    $(".errorMessage").remove();
@@ -47,7 +48,6 @@ $("input:submit").click(function (e) {
       async: false,
       dataType: "json",
       success: function (data) {
-         
           objectData = Object.keys(data);
           if (objectData.length == 1 && objectData[0] == "validMessage") {
              message = data.validMessage;
@@ -74,7 +74,7 @@ $("input:submit").click(function (e) {
          console.error(textStatus+" "+errorThrown);
       }
    });
-   if (status == "false") e.preventDefault();
+   if (status == "false" || mode == "onlyCheck") e.preventDefault();
 });
 /**
  * Class blank redirect to blank page

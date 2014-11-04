@@ -101,6 +101,8 @@ require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Platform/Mysql/Mysql.
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/AbstractSql.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Select.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Update.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Insert.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Delete.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Platform/Mysql/SelectDecorator.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/ExpressionInterface.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/PredicateInterface.php';
