@@ -1,3 +1,3 @@
 User-agent: *
 Disallow: 
-Sitemap: http://www.fioriechiavi.it/sitemap.php
+Sitemap: http://www.fioriechiavi.it/sitemap.xml

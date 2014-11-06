@@ -43,6 +43,7 @@ class Taxa extends \Content
        unset($this->data['taxa_kind_id_name']);
        $this->data['creation_datetime']=date('Y-m-d H:i:s');
        $this->data['change_datetime']=date('Y-m-d H:i:s');
+       pclose(popen('php '.$this->db->baseDir.'/shell/sitemap.php  > /dev/null &','r'));
        parent::insert();
     }
     /**
@@ -52,6 +53,7 @@ class Taxa extends \Content
        unset($this->data['taxa_kind_initials']);
        unset($this->data['taxa_kind_id_name']);
        $this->data['change_datetime']=date('Y-m-d H:i:s');
+       pclose(popen('php '.$this->db->baseDir.'/shell/sitemap.php  > /dev/null &','r'));
        parent::update();
     }
     /**

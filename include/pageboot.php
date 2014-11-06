@@ -3,17 +3,13 @@ require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
 ini_set('display_errors',1);
 ini_set('error_reporting',E_ALL);
-if (is_file(__DIR__.'/zendRequire.php')) {
-   require __DIR__.'/zendRequire.php';
-} else {
-   ini_set('include_path','.:'.__DIR__.'/../lib/zendframework/library');
-   require 'Zend/Loader/StandardAutoloader.php';
-   $loader = new Zend\Loader\StandardAutoloader(array(
-       'autoregister_zf' => true,
-       'fallback_autoloader' => true
-   ));
-   $loader->register();
-}
+ini_set('include_path','.:'.__DIR__.'/../lib/zendframework/library');
+require 'Zend/Loader/StandardAutoloader.php';
+$loader = new Zend\Loader\StandardAutoloader(array(
+    'autoregister_zf' => true,
+    'fallback_autoloader' => true
+));
+$loader->register();
 $config = new Zend\Config\Config($configArray);
 $db = new Zend\Db\Adapter\Adapter($config->database->toArray());
 $baktrace = debug_backtrace();
@@ -24,7 +20,7 @@ try{
 $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
 } catch (\Exception  $e) {
    if(preg_match('/Cache directory \'(.*)\' not found or not a directory/',$e->getMessage(),$catches)){
-      mkdir($catches[1]);
+      mkdir($catches[1],0777);
       $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
    } else {
       throw $e;
@@ -71,7 +67,9 @@ if(!is_null($config->smtp)) {
 } else {
    $transport = new Zend\Mail\Transport\Sendmail();
 }
-require 'session.php';
+if (PHP_SAPI != 'cli') {
+   require 'session.php';
+}
 if (array_key_exists('autocomplete', $_GET) && array_key_exists('domain', $_GET)) {
    if (!array_key_exists('term', $_GET))
       $_GET['term']=null;     
