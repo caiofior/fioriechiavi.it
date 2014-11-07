@@ -62,19 +62,19 @@ abstract class Content {
         $this->table = new \Zend\Db\TableGateway\TableGateway($table,$this->db);
         if (!is_array(self::$metadata)) {
            self::$metadata=array();
+        }
+        if (!array_key_exists($table, self::$metadata)) {
            $cacheData = '';
            if (
                    property_exists($this->db,'cache') && 
                    $this->db->cache instanceof Zend\Cache\Storage\Adapter\AbstractAdapter
                )
-              $cacheData = $this->db->cache->getItem('metadata');
+           $cacheData = $this->db->cache->getItem('metadata_'.$table);
            if ($cacheData != '') {
-               self::$metadata=$cacheData;
+               self::$metadata['table']=$cacheData;
            }
         }
-        
         if (!array_key_exists($table, self::$metadata)) {
-           
             self::$metadata[$table]=array(
                 'columns'=>array(),
                 'primaryKey'=>array()
@@ -106,7 +106,7 @@ abstract class Content {
                 property_exists($this->db,'cache') &&
 		$this->db->cache instanceof Zend\Cache\Storage\Adapter\AbstractAdapter
             ) 
-            $this->db->cache->setItem('metadata',self::$metadata);
+            $this->db->cache->setItem('metadata_'.$table,self::$metadata[$table]);
             }
       if (array_key_exists($table, self::$metadata)) {
          $this->primary = self::$metadata[$table]['primaryKey'];

@@ -38,6 +38,11 @@ class Template {
     */
    private $object;
    /**
+    * Caches the file
+    * @var bool 
+    */
+   private $cache=false;
+   /**
     * Instantaite the template
     * @param string $baseDir
     * @param string $templateFileName
@@ -116,6 +121,9 @@ class Template {
          if (!is_file($fileName))
             throw new \Exception('Template file is missing '.$fileName);
          require($fileName);
+         if ($this->cache === true) {
+            $GLOBALS['db']->cache->setItem($this->createCacheKey(),  ob_get_flush());
+         }
       }
    }
    /**
@@ -173,5 +181,33 @@ class Template {
          $relativePath .= '?t='.filemtime($this->baseDir.$relativePath);
       }
       return $relativePath;
+   }
+   /**
+    * Saves in cache all page content
+    */
+   public function cache() {
+      if (
+            !array_key_exists('db',$GLOBALS) ||
+            !property_exists($GLOBALS['db'],'cache') ||
+            !$GLOBALS['db']->cache instanceof Zend\Cache\Storage\Adapter\AbstractAdapter ||
+            sizeof($_POST) > 0
+         ) {
+         return;
+      }
+      $cacheData = $GLOBALS['db']->cache->getItem($this->createCacheKey());
+      if ($cacheData != '') {
+         echo $cacheData;
+         exit;
+      } else {
+         ob_start();
+         $this->cache = true;
+      }
+   }
+   /**
+    * Generates the cache key
+    * @return type
+    */
+   private function createCacheKey () {
+      return preg_replace('/[^a-zA-Z0-9_\+\-]/','','url_cache'.$_SERVER['REQUEST_URI']);
    }
 }

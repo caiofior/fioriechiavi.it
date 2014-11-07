@@ -3,6 +3,11 @@ require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
 ini_set('display_errors',1);
 ini_set('error_reporting',E_ALL);
+if (is_file(__DIR__.'/zendRequireCompiled.php')) {
+   require __DIR__.'/zendRequireCompiled.php';
+} else if (is_file(__DIR__.'/zendRequire.php')) {
+   require __DIR__.'/zendRequire.php';
+} else {
 ini_set('include_path','.:'.__DIR__.'/../lib/zendframework/library');
 require 'Zend/Loader/StandardAutoloader.php';
 $loader = new Zend\Loader\StandardAutoloader(array(
@@ -10,6 +15,7 @@ $loader = new Zend\Loader\StandardAutoloader(array(
     'fallback_autoloader' => true
 ));
 $loader->register();
+}
 $config = new Zend\Config\Config($configArray);
 $db = new Zend\Db\Adapter\Adapter($config->database->toArray());
 $baktrace = debug_backtrace();
