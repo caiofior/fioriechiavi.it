@@ -57,6 +57,24 @@ class Taxa extends \Content
        parent::update();
     }
     /**
+     * Delets also the associated data
+     */
+    public function delete() {
+       foreach ($this->getTaxaImgeColl() as $image) {
+          $image->delete();
+       }
+       foreach ($this->getTaxaAttributeColl() as $attribute) {
+          $attribute->delete();
+       }
+       $this->db->query('DELETE FROM `taxa_region` 
+         WHERE `id_taxa`='.intval($this->data['id'])
+         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+       $this->db->query('UPDATE `dico_item` SET `taxa_id`=NULL 
+         WHERE `taxa_id`='.intval($this->data['id'])
+         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+       parent::delete();
+    }
+    /**
      * Returns the associated collection of regions
      * @return \flora\region\RegionColl
      */

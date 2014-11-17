@@ -1,4 +1,5 @@
 <?php
+$this->getTemplate()->setBlock('head','user/head.phtml');
 if (!array_key_exists('task', $_REQUEST))
    $_REQUEST['task']=null;
 if (array_key_exists('changeLoginConfirmCode', $_REQUEST)) {

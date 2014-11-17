@@ -197,6 +197,9 @@ class Dico extends \Content
       $this->db->query('UPDATE `taxa` SET `dico_id` = NULL
           WHERE `dico_id` = '.$this->data['id']
           , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+      $this->db->query('DELETE FROM `dico_item`
+          WHERE `id_dico` = '.$this->data['id']
+          , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
       parent::delete();
    }
 }

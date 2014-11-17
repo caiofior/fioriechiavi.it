@@ -87,6 +87,12 @@ require __DIR__.'/../lib/zendframework/library/Zend/Authentication/Storage/Stora
 require __DIR__.'/../lib/zendframework/library/Zend/Authentication/Storage/Session.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Authentication/Result.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Session/ValidatorChain.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Exception/ExceptionInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Exception/ErrorException.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Exception/RuntimeException.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Exception/ExceptionInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Exception/ErrorException.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Exception/RuntimeException.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/TableGateway/TableGatewayInterface.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/TableGateway/AbstractTableGateway.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/TableGateway/TableGateway.php';

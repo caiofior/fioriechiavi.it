@@ -64,6 +64,7 @@ $(document).ready(function() {
           $("#attribute_list").append(el);
           $("#attribute_name").val("");
           $("#attribute_value").val("");
+          $("#attribute_name").focus();
        } else {
           $("#attribute_error").show();
        }

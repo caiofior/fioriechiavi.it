@@ -71,7 +71,7 @@ abstract class Content {
                )
            $cacheData = $this->db->cache->getItem('metadata_'.$table);
            if ($cacheData != '') {
-               self::$metadata['table']=$cacheData;
+               self::$metadata[$table]=$cacheData;
            }
         }
         if (!array_key_exists($table, self::$metadata)) {
