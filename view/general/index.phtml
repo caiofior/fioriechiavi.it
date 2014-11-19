@@ -103,14 +103,15 @@ var key = "<?php echo $GLOBALS['db']->config->search->key; ?>";
 <h2>Immagini dal web</h2>
 <div id="imageSnipets"></div>
 <div class="clear"/>
-<? $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
+<?php $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
 $newTaxaColl->loadAll(array(
     'iDisplayStart'=>0,
     'iDisplayLength'=>2,
     'sColumns'=>'change_datetime',
     'iSortingCols'=>'1',
     'iSortCol_0'=>'0',
-    'sSortDir_0'=>'DESC'
+    'sSortDir_0'=>'DESC',
+    'images'=>1
 ));
 $newTaxaColl->shuffle();
 if($newTaxaColl->count() > 0): ?>

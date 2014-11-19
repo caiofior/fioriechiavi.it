@@ -51,6 +51,13 @@ class TaxaColl extends \ContentColl {
       if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
          $select->where(' ( `taxa`.`name` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `taxa`.`description` LIKE "%'.addslashes($criteria['sSearch']).'%" ) ');
       }
+      if (array_key_exists('images', $criteria) && $criteria['images'] != '') {
+         if ($criteria['images'] == 0 ) {
+            $select->where(' (SELECT COUNT(`taxa_image`.`id`) FROM `taxa_image` WHERE `taxa_image`.`id_taxa`=`taxa`.`id`) = 0 ');
+         } else {
+            $select->where(' (SELECT COUNT(`taxa_image`.`id`) FROM `taxa_image` WHERE `taxa_image`.`id_taxa`=`taxa`.`id`) = 1 ');
+         }
+      }
       return $select;
     }
 }

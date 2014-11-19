@@ -9,6 +9,5 @@ if(!preg_match('/http(s)?:\\/\\/'.$_SERVER['SERVER_NAME'].'/', $GLOBALS['db']->c
    header('Location :'.$GLOBALS['db']->config->baseUrl);
    exit;
 }
-$template->cache();
 $control->setPage(__FILE__);
 $template->render();
