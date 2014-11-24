@@ -23,6 +23,9 @@ $regionColl = $taxa->getRegionColl();
    <?php endif; ?>
    <?php if (array_key_exists('children_dico_item_id', $_REQUEST)): ?>
    <input type="hidden" id="children_dico_item_id" name="children_dico_item_id" value="<?php echo $_REQUEST['children_dico_item_id'];?>">
+   <?php endif;
+   if (is_numeric($taxa->getData('id'))) : ?>
+   <a class="blank" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id')?>">Guarda pagina</a>
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
@@ -106,6 +109,9 @@ $regionColl = $taxa->getRegionColl();
       require __DIR__.'/imageBlock.phtml'; }
       ?>
       </div>
+   <?php if (is_numeric($taxa->getData('id'))) : ?>
+   <a class="blank" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id')?>">Guarda pagina</a>
+   <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
       <?php if ($taxa->getData('dico_id') == '') : ?>

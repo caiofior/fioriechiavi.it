@@ -32,7 +32,9 @@ $(document).ready(function() {
         }
     });
     tinymce.init({
-      selector: "textarea"
+         plugins: ["table","code"],
+         tools: ["inserttable","code"],
+         selector: "textarea"
     });
     $( "#taxa_kind_id_name" ).autocomplete({
       source: "?task=taxa&action=taxakindlist",
