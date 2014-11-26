@@ -42,8 +42,14 @@ $regionColl = $taxa->getRegionColl();
    <input id="name" name="name" value="<?php echo $taxa->getData('name')?>">
    </div>
    <div>
-   <label for="description">Descrizione</label>
-   <textarea id="description" name="description"><?php echo $taxa->getData('description')?></textarea>
+      <label for="description">Descrizione</label> <a class="loadMarkup" href="#">Carica Markup</a>
+      <div style="display: none;" id="description_markup_container">
+         <label for="description">Incolla il codice di markup</label><br/>
+         <textarea cols="80" rows="20" class="notEditable" id="description_markup" name="description_markup"></textarea><br/>
+         <a class="confirmLoad" href="#">Carica</a>
+         <a class="cancelLoad" href="#">Annulla</a>
+      </div>
+      <textarea id="description" name="description"><?php echo $taxa->getData('description')?></textarea>
    </div>
    <div>
       <div>

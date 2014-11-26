@@ -34,7 +34,7 @@ $(document).ready(function() {
     tinymce.init({
          plugins: ["table","code"],
          tools: ["inserttable","code"],
-         selector: "textarea"
+         selector: "textarea:not(.notEditable)"
     });
     $( "#taxa_kind_id_name" ).autocomplete({
       source: "?task=taxa&action=taxakindlist",
@@ -47,6 +47,28 @@ $(document).ready(function() {
           if (!ui.item)
               $(this).val("");
       }
+    });
+    $("a.loadMarkup").click(function (e){
+       $("div.mce-tinymce").hide();
+       $("#description_markup_container").show();
+    });
+    $("a.confirmLoad").click(function (e){
+         $.ajax({
+            url: "#",
+            data: {
+               "task":"taxa",
+               "action":"parse_markup",
+               "description_markup":$("#description_markup").val()
+            },
+            success : function (data, textStatus, jqXHR ) {
+               tinyMCE.get("description").setContent(data);
+               $("a.cancelLoad").click();
+            }    
+         });
+    });
+    $("a.cancelLoad").click(function (e){
+         $("div.mce-tinymce").show();
+         $("#description_markup_container").hide();
     });
     $("a.selectAllRegions").click(function (e) {
        if($("#regions option:selected").length == 0) {

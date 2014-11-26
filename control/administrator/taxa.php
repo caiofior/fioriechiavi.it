@@ -214,6 +214,11 @@ case 'taxakindlist':
    echo json_encode($result);
    exit;
    break;
+case 'parse_markup':
+   require $GLOBALS['db']->baseDir.'lib/parsedown/Parsedown.php';
+   echo Parsedown::instance()->parse($_REQUEST['description_markup']);
+   exit;
+   break;
 case 'imageupload':
    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
    header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
