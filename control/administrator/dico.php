@@ -244,8 +244,14 @@ case 'upload':
 case 'preview' :
    $dico = new \flora\dico\Dico($GLOBALS['db']);
    $dico->loadFromId($_REQUEST['id']);
-   $inputFile = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload'.DIRECTORY_SEPARATOR.$_REQUEST['filename'];
-   $dico->dicoItemColl = $dico->import($_REQUEST['upload_format'],fopen($inputFile,'r'));
+   if (array_key_exists('filename',$_REQUEST) && $_REQUEST['filename'] != '') {
+      $inputFile = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload'.DIRECTORY_SEPARATOR.$_REQUEST['filename'];
+      $resouce = fopen($inputFile,'r');
+   } else if (array_key_exists('dicotext',$_REQUEST)) {
+      $resouce = fopen('php://memory', 'rw+');
+      fwrite($resouce, $_REQUEST['dicotext']);
+   }
+   $dico->dicoItemColl = $dico->import($_REQUEST['upload_format'],$resouce);
    $this->getTemplate()->setObjectData($dico);
    $this->getTemplate()->setBlock('middle','administrator/dico/preview.phtml');
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
