@@ -39,8 +39,16 @@ case 'update':
       $dicoItemColl = $dicoItemColl->filterByAttributeValue($_REQUEST['children_dico_item_id'], 'id');
       $dicoItemColl->getFirst()->removesTaxaAssociation();
    } else if ($_REQUEST['action'] == 'update') {
-         $inputFile = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload'.DIRECTORY_SEPARATOR.$_REQUEST['filename'];
-         $dico->dicoItemColl = $dico->importAndSave($_REQUEST['upload_format'],fopen($inputFile,'r'));  
+         
+         if (array_key_exists('filename',$_REQUEST) && $_REQUEST['filename'] != '') {
+            $inputFile = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload'.DIRECTORY_SEPARATOR.$_REQUEST['filename'];
+            $dico->dicoItemColl = $dico->importAndSave($_REQUEST['upload_format'],fopen($inputFile,'r'));  
+         } else if (array_key_exists('dicotext',$_REQUEST)) {
+            $resouce = fopen('php://memory', 'rw+');
+            fwrite($resouce, $_REQUEST['dicotext']);
+            rewind($resouce);
+            $dico->dicoItemColl = $dico->importAndSave($_REQUEST['upload_format'],$resouce);  
+         }
    }
    $this->getTemplate()->setObjectData($dico);
    $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
@@ -250,6 +258,7 @@ case 'preview' :
    } else if (array_key_exists('dicotext',$_REQUEST)) {
       $resouce = fopen('php://memory', 'rw+');
       fwrite($resouce, $_REQUEST['dicotext']);
+      rewind($resouce);
    }
    $dico->dicoItemColl = $dico->import($_REQUEST['upload_format'],$resouce);
    $this->getTemplate()->setObjectData($dico);

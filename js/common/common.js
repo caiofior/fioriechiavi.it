@@ -33,7 +33,7 @@ $("*[data-update]").click(function (e) {
  * Async form validation
  */
 $("input:submit").click(function (e,mode) {
-   mode = typeof mode !== "undefined" ? mode : "dufault";
+   mode = typeof mode !== "undefined" ? mode : "default";
    $("#ajaxLoader").show();
    $(".notValid").removeClass("notValid");
    $(".errorMessage").remove();
