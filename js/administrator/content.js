@@ -27,7 +27,7 @@ $(document).ready(function() {
         }
     });
     tinymce.init({
-       plugins: "link",
+      plugins: "link",
       selector: "textarea"
     });
 });

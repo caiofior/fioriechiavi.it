@@ -79,6 +79,7 @@ $(document).ready(function() {
        e.preventDefault();
     });
     $("#attribute_name, #attribute_value").change(function (e){
+       $("#attribute_missing_name").hide();
        $("#attribute_error").hide();
        if ($("#attribute_name").val() != "" && $("#attribute_value").val() != "") {
           el = $("#attribute_template div").clone(true);
@@ -96,6 +97,7 @@ $(document).ready(function() {
     }); 
    $( "#attribute_name" ).autocomplete({
       source: function (request, response) {
+         $("#attribute_missing_name").hide();
          $.getJSON("#", {
             task: "taxa",
             action:"taxaattributelist",
@@ -106,6 +108,26 @@ $(document).ready(function() {
          response);
       }
    });
+   $( "#attribute_value" ).autocomplete({
+      source: function (request, response) {
+         $("#attribute_missing_name").hide();
+         $.getJSON("#", {
+            task: "taxa",
+            action:"taxaattributelistvalue",
+            name:$( "#attribute_name" ).val(),
+            term:$( "#attribute_value" ).val()
+         }, 
+         response);
+      },
+      search: function( event, ui ) {
+         if ($( "#attribute_name" ).val() == "") {
+            $("#attribute_missing_name").show();
+            event.preventDefault();
+         } else {
+            $("#attribute_missing_name").hide();   
+         }
+      }
+    });
    $(".attribute.actions.delete").click(function (e) {
       el =  $(this).parent("div.attContainer");
       $(this).dialog({

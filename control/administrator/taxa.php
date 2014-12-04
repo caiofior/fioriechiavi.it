@@ -182,6 +182,24 @@ case 'taxaattributelist' :
    echo json_encode($result);
    exit;
    break;
+case 'taxaattributelistvalue' :
+   $result = array();
+   if (array_key_exists('name', $_REQUEST) && $_REQUEST['name'] != '') {
+      $taxaAttribute = new \flora\taxa\TaxaAttribute($GLOBALS['db']);
+      $taxaAttribute->loadFromName($_REQUEST['name']);
+      foreach ($taxaAttribute->getValues($_REQUEST) as $taxaAttributeValue) {
+         $result[] = array(
+             'label'=>$taxaAttributeValue['value']
+         );
+      } 
+   }
+   header('Content-Type: application/json');
+   header('Pragma: cache');
+   header('Expires: '.gmdate('D, d M Y H:i:s', time() + 3600).' GMT');
+   header('Cache-Control: max-age=3600, must-revalidate, public ');
+   echo json_encode($result);
+   exit;
+   break;
 case 'jeditable':
    
    if (

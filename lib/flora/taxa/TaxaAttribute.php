@@ -95,4 +95,19 @@ class TaxaAttribute extends \Content
           ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
           return $value;
    }
+   /**
+    * Gets analogous values
+    * @param array $request
+    * @return type
+    */
+   public function getValues(array $request=array()) {
+      $sql = 'SELECT DISTINCT `value` FROM `taxa_attribute_value` WHERE
+         `id_taxa_attribute`='.intval($this->data['id']);
+      if (is_array($request) && array_key_exists('term', $request)) {
+         $sql .= ' AND `value` LIKE "'.addslashes($request['term']).'%"';
+      }
+      $sql .= ' LIMIT 10';
+      $resultSet =  $this->db->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+      return $resultSet->toArray();
+   }
 }
