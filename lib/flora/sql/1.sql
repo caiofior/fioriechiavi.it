@@ -1,8 +1,8 @@
 -- MySQL dump 10.13  Distrib 5.5.40, for debian-linux-gnu (i686)
 --
--- Host: localhost    Database: flora
+-- Host: localhost    Database: fioriech65618
 -- ------------------------------------------------------
--- Server version	5.5.40-0ubuntu0.14.04.1
+-- Server version	5.5.40-0ubuntu1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -82,8 +82,7 @@ CREATE TABLE `dico_item` (
   PRIMARY KEY (`id_dico`,`id`),
   KEY `fk_dico_item_idx` (`id_dico`),
   KEY `fk_dico_item_taxa_idx` (`taxa_id`),
-  CONSTRAINT `fk_dico_item` FOREIGN KEY (`id_dico`) REFERENCES `dico` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_dico_item_taxa` FOREIGN KEY (`taxa_id`) REFERENCES `taxa` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `fk_dico_item` FOREIGN KEY (`id_dico`) REFERENCES `dico` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Dicotomy item';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -141,7 +140,6 @@ CREATE TABLE `taxa` (
   KEY `fk_taxonomy_kind_idx` (`taxa_kind_id`),
   KEY `modidy_datetime` (`change_datetime`),
   KEY `fk_dico_idx` (`dico_id`),
-  CONSTRAINT `fk_dico` FOREIGN KEY (`dico_id`) REFERENCES `dico` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_taxonomy_kind` FOREIGN KEY (`taxa_kind_id`) REFERENCES `taxa_kind` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -176,6 +174,7 @@ CREATE TABLE `taxa_attribute_value` (
   PRIMARY KEY (`id_taxa`,`id_taxa_attribute`),
   KEY `fk_taxa_attribute_value_taxa_id` (`id_taxa`),
   KEY `fk_taxa_attribute_value_taxa_attribute` (`id_taxa_attribute`),
+  KEY `taxa_attribute_value` (`value`),
   CONSTRAINT `fk_taxa_attribute_value_taxa` FOREIGN KEY (`id_taxa`) REFERENCES `taxa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_taxa_attribute_value_taxa_attribute` FOREIGN KEY (`id_taxa_attribute`) REFERENCES `taxa_attribute` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa attribute value';
@@ -282,4 +281,4 @@ CREATE TABLE `user_role` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-24 10:20:59
+-- Dump completed on 2014-12-04 17:11:33

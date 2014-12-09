@@ -1,6 +1,11 @@
 .mapContainer {position: relative; left: 0; top: 0; width:300px;}
 .baseMap { float: left; position: relative; } 
 .mapRegion { position: absolute; top: 0; right: 0; } 
+
+.floweringContainer {position: relative; left: 0; top: 0; width:360px; height: 100px;}
+.baseFlower { float: left; position: relative; } 
+.flowerMonth { position: absolute; top: 0; right: 0; } 
+
 .latestTaxa div {
    float:left;
 }

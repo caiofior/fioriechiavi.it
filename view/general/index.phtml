@@ -1,5 +1,4 @@
 <div id="fb-root"></div>
-<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/general/index.css');?>">
 <form method="post" action="#">
    <label for="taxasearch">Cerca: </label>
    <input id="taxasearch" name="taxasearch" value="">
@@ -9,13 +8,9 @@ $taxa = $this->object;
 $dico = $taxa->dico;
 $title = $GLOBALS['db']->config->siteName;
 if ($taxa->getData('name') != '') :
-    $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>
-<div class="socialContainer">
-<div class="fb-share-button" data-href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id'); ?>"></div>
-<a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
-<div class="g-plusone" data-size="small" data-annotation="inline" data-width="150"></div>
-</div><div class="clear"/>
-<?php endif; ?>
+    $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); 
+require (__DIR__.DIRECTORY_SEPARATOR.'social.php');
+endif; ?>
 <h1><?php echo $title; ?></h1>
 <?php
 if ($taxa->getData('name') != '') : 
@@ -31,21 +26,16 @@ endif;
 <?php
 if ($taxa->getData('description') != '') :
 echo $taxa->getData('description');
-$regionColl = $taxa->getRegionColl();
-$regionColl = $regionColl->filterByAttributeValue('1','selected');
-if ($regionColl->count() >0) : ?>
-<div class="mapContainer">
-   <img class="baseMap" src="<?php echo $GLOBALS['db']->config->staticUrl;?>/images/map/italia.png">
-   <?php foreach($regionColl->getItems() as $region) : ?>
-   <img class="mapRegion" src="<?php echo $GLOBALS['db']->config->staticUrl;?>/images/map/<?php echo $region->getData('id');?>.png">
-   <?php endforeach; ?>
-</div>
-<?php endif;
+require (__DIR__.DIRECTORY_SEPARATOR.'map.php'); 
 $attributeColl = $taxa->getTaxaAttributeColl();
    if ($attributeColl->count() > 0) : ?>
 <div class="attribute_list">
       <?php foreach($attributeColl->getItems() as $attribute) :
          switch ($attribute->getData('name')) : 
+            case 'Inizio fioritura' :
+            break;
+            case 'Fine fioritura' :
+            break;
             case 'Diffusione' : ?>
       <p>
             <?php echo $attribute->getData('name');?> :
@@ -91,13 +81,15 @@ $attributeColl = $taxa->getTaxaAttributeColl();
          endswitch;
       endforeach; ?>
 </div>
+<div class="clear"></div>
+<?php  require (__DIR__.DIRECTORY_SEPARATOR.'flowering.php'); ?>
    <?php endif;
    $imageColl = $taxa->getTaxaImgeColl();
    if ($imageColl->count() > 0) : ?>
 <div class="image_list">
       <?php foreach($imageColl->getItems() as $key=>$image) : ?>
       <div>
-            <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>"/>
+            <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>" alt="Immagine <?php echo $key; ?>"/>
       </div>
       <?php endforeach; ?>
 </div>
@@ -136,13 +128,15 @@ if (is_numeric($taxa->getData('id'))) {
 }
 ?>
 <script>
+//<![CDATA[
 var searchTerm = "<?php echo $searchTerm; ?>";
 var cx = "<?php echo $GLOBALS['db']->config->search->cx; ?>";
 var key = "<?php echo $GLOBALS['db']->config->search->key; ?>";
+//]]>
 </script>
 <h2>Immagini dal web</h2>
 <div id="imageSnipets"></div>
-<div class="clear"/>
+<div class="clear"></div>
 <?php $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
 $newTaxaColl->loadAll(array(
     'iDisplayStart'=>0,
@@ -168,7 +162,7 @@ if($newTaxaColl->count() > 0): ?>
       ?>
       <div>
          <?php if (is_object($image)) : ?>
-            <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>"/>
+            <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>" alt="<?php echo $newTaxa->getData('name');?>"/>
          <?php endif; ?>
          <br/>
          <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $newTaxa->getData('id');?>"><?php echo $newTaxa->getRawData('taxa_kind_initials').' '.$newTaxa->getData('name') ?></a>
@@ -177,7 +171,7 @@ if($newTaxaColl->count() > 0): ?>
    <?php endforeach;?>
    </div>
 </div>
-<div class="clear"/>
+<div class="clear"></div>
 <?php endif; ?>
 <?php 
    if ($taxa->getData('id') == '') :
