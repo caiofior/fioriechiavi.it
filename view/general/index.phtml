@@ -70,6 +70,29 @@ $attributeColl = $taxa->getTaxaAttributeColl();
       </p>
             <?php 
             break;
+            case 'Portamento' : ?>
+      <p>
+            <?php echo $attribute->getData('name');?> :
+            <span>
+               <?php switch($attribute->getRawData('value')) :
+                  case 'Pianta perenne erbacea':?>
+               ↓
+               <?php
+                  break;
+                  case 'Cespuglio':?>
+               ⏉
+               <?php
+                  break;
+                  case 'Albero':?>
+               ☨
+               <?php
+                  break;
+               endswitch;
+               echo $attribute->getRawData('value');?>
+            </span>
+      </p>
+            <?php 
+            break;
             default:
             ?>
       <p>
