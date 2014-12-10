@@ -36,6 +36,10 @@ $attributeColl = $taxa->getTaxaAttributeColl();
             break;
             case 'Fine fioritura' :
             break;
+            case 'Limite altitudinale inferiore' :
+            break;
+            case 'Limite altitudinale superiore' :
+            break;
             case 'Diffusione' : ?>
       <p>
             <?php echo $attribute->getData('name');?> :
@@ -105,7 +109,19 @@ $attributeColl = $taxa->getTaxaAttributeColl();
       endforeach; ?>
 </div>
 <div class="clear"></div>
-<?php  require (__DIR__.DIRECTORY_SEPARATOR.'flowering.php'); ?>
+<?php  
+if (
+        $attributeColl->filterByAttributeValue('Limite altitudinale inferiore','name')->getFirst()->getRawData('value') != '' &&
+        $attributeColl->filterByAttributeValue('Limite altitudinale superiore','name')->getFirst()->getRawData('value') != ''
+    ) {
+      require (__DIR__.DIRECTORY_SEPARATOR.'altitude.php');
+   }
+if (
+        $attributeColl->filterByAttributeValue('Inizio fioritura','name')->getFirst()->getRawData('value') != '' &&
+        $attributeColl->filterByAttributeValue('Fine fioritura','name')->getFirst()->getRawData('value') != ''
+    ) {
+      require (__DIR__.DIRECTORY_SEPARATOR.'flowering.php');
+   } ?>
    <?php endif;
    $imageColl = $taxa->getTaxaImgeColl();
    if ($imageColl->count() > 0) : ?>
