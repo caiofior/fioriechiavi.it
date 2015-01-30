@@ -140,6 +140,10 @@ $(document).ready(function() {
       });
       e.preventDefault();
    });
+   $("input, select").change(function (e){
+      $(".saved").hide();
+      $(".tosave").show();
+   });
    up = $("#uploader").plupload({
         // General settings
         runtimes : 'html5,flash,silverlight,html4',

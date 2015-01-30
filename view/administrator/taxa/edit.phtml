@@ -25,7 +25,14 @@ $regionColl = $taxa->getRegionColl();
    <input type="hidden" id="children_dico_item_id" name="children_dico_item_id" value="<?php echo $_REQUEST['children_dico_item_id'];?>">
    <?php endif;
    if (is_numeric($taxa->getData('id'))) : ?>
-   <a class="blank" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id')?>">Guarda pagina</a>
+   <div>
+      <div class="saved">
+         <a class="blank" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id')?>">Guarda pagina</a>
+      </div>
+      <div class="tosave" style="display: none;">
+         <p>Salva la pagina per vederne l'anteprima</p>
+      </div>
+   <div>
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
@@ -117,7 +124,14 @@ $regionColl = $taxa->getRegionColl();
       ?>
       </div>
    <?php if (is_numeric($taxa->getData('id'))) : ?>
-   <a class="blank" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id')?>">Guarda pagina</a>
+   <div>
+      <div class="saved">
+         <a class="blank" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $taxa->getData('id')?>">Guarda pagina</a>
+      </div>
+      <div class="tosave" style="display: none;">
+         <p>Salva la pagina per vederne l'anteprima</p>
+      </div>
+   <div>
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
