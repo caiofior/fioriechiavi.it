@@ -5,13 +5,15 @@
 <div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category">Elenco delle categorie</a></p> &gt; <h2>Categorie taxa</h2>
 </div>
+<p>Trascia i ragruppamenti sistematici nella posizione desiderata</p>
+<div id="saved" style="display: none;">I dati sono stati salvati</div>
 <a id="addCategoryTaxa" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category&amp;action=edit">Aggiungi una categoria</a>
 <ul id="sortCategoryTaxaList">
 <?php
 $taxaKindColl = new \flora\taxa\TaxaKindColl($GLOBALS['db']);
 $taxaKindColl->loadAll();
 foreach($taxaKindColl->getItems() as $taxaKind) : ?>
-   <li id="o<?php echo $taxaKind->getData('id'); ?>"><?php echo $taxaKind->getData('name'); ?></li>
+   <li id="o<?php echo $taxaKind->getData('id'); ?>"><a href="#"><?php echo $taxaKind->getData('name'); ?></a></li>
 <?php endforeach; ?>
 </ul>
-<a id="saveCategoryTaxaOrder" href="?task=taxa_category&amp;action=save_sort">Salva</a>
+<a id="saveCategoryTaxaOrder" style="display: none;" href="?task=taxa_category&amp;action=save_sort">Salva</a>

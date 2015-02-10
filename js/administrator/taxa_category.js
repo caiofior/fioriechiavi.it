@@ -34,14 +34,23 @@ $(document).ready(function() {
     tinymce.init({
       selector: "textarea"
     });
-    $("#sortCategoryTaxaList" ).sortable();
+    $("#sortCategoryTaxaList" ).sortable({
+       change: function( event, ui ) {
+          $("#saved").hide();
+          $("#saveCategoryTaxaOrder").show();
+       }
+    });
     $("#saveCategoryTaxaOrder").click(function (e) {
       e.preventDefault();
       $.ajax({
          url: $(this).attr("href"),
          type:"POST",
          data: $.extend({},$("#sortCategoryTaxaList" ).sortable("toArray")),
-         async : false
+         async : false,
+         success : function (data, textStatus, jqXHR ) {
+            $("#saved").show();
+            $("#saveCategoryTaxaOrder").hide();
+         }  
       });
    });
 });

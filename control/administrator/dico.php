@@ -260,10 +260,15 @@ case 'preview' :
       fwrite($resouce, $_REQUEST['dicotext']);
       rewind($resouce);
    }
-   $dico->dicoItemColl = $dico->import($_REQUEST['upload_format'],$resouce);
    $this->getTemplate()->setObjectData($dico);
    $this->getTemplate()->setBlock('middle','administrator/dico/preview.phtml');
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
+   try{
+   $dico->dicoItemColl = $dico->import($_REQUEST['upload_format'],$resouce);
+   } catch (\Exception $e) {
+      $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');   
+   }
+   
    break;
 default:
    $this->getTemplate()->setBlock('middle','administrator/dico/list.phtml');

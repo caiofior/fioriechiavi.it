@@ -20,15 +20,18 @@ $dico = $this->object;
    </select>
    <input id="downloadDico" type="submit" name="dowload" value="Scarica"/>
 </form>
-<form class="uploadForm" style="display:none;" method="post" action="?task=dico&amp;action=preview&amp;id=<?php echo $dico->getData('id');?>">
-   <div id="uploadFormatChoose" style="display:none;"> Seleziona un formato</div>
+<form class="uploadForm" <?php if (!array_key_exists('dicotext', $_REQUEST)) : ?>style="display:none;"<?php endif;?> method="post" action="?task=dico&amp;action=preview&amp;id=<?php echo $dico->getData('id');?>">
+   <?php if (array_key_exists('dicotext', $_REQUEST)) : ?>
+   <div class="errorMessage">Il formato in input è obbligatorio</div>
+   <?php endif;?>
+   <div id="uploadFormatChoose" <?php if (!array_key_exists('dicotext', $_REQUEST)) : ?>style="display:none;"<?php endif;?>> Seleziona un formato</div>
    <label for="upload_format">Formato</label>
    <select id="upload_format" name="upload_format">
       <option value="">--</option>
       <option value="internal">Tal quale</option>
       <option value="pignatti">Pignatti</option>
    </select><br/>
-   <textarea cols="80" rows="20" id="dicotext" name="dicotext"></textarea><br/>
+   <textarea cols="80" rows="20" id="dicotext" name="dicotext"><?php if (array_key_exists('dicotext', $_REQUEST)) echo $_REQUEST['dicotext']; ?></textarea><br/>
    <input id="uploadDico" type="submit" value="Carica"/>
    <div id="container">
        <a id="pickfiles" href="#">Seleziona il file</a>
