@@ -2,6 +2,14 @@
 if (!array_key_exists('task', $_REQUEST)) {
    $_REQUEST['task']=null;
 }
+if (
+      !isset($GLOBALS['user']) ||
+      !is_object($GLOBALS['user']) ||
+      !$GLOBALS['user'] instanceof \login\user\User
+      ) {
+   header('Location: '.$GLOBALS['db']->config->baseUrl.'user.php');
+   exit;
+}
 switch ($_REQUEST['task']) {
    case 'user':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'user.php';    
