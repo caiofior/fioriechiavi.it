@@ -14,7 +14,7 @@ if (is_file(__DIR__.'/../include/zendRequire.php')) {
       $content = preg_replace('/^[ ]*\<\?php/m', '', $content);
       $content = preg_replace('/\?\>[ ]*$/m', '', $content);
       $content = str_replace('if (interface_exists(\'Zend\Loader\SplAutoloader\'))', 'if (false)', $content);
-      
+      $content = str_replace('$regexChars += include __DIR__ . \'/\' . $this->validIdns[$this->tld];', 'true;', $content);
       
       fwrite($outputFileHandler, $content);
    }

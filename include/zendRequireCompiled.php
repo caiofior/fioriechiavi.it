@@ -72,6 +72,306 @@ interface SplAutoloader
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
+namespace Zend\Loader;
+
+/**
+ * Short name locator interface
+ */
+interface ShortNameLocator
+{
+    /**
+     * Whether or not a Helper by a specific name
+     *
+     * @param  string $name
+     * @return bool
+     */
+    public function isLoaded($name);
+
+    /**
+     * Return full class name for a named helper
+     *
+     * @param  string $name
+     * @return string
+     */
+    public function getClassName($name);
+
+    /**
+     * Load a helper via the name provided
+     *
+     * @param  string $name
+     * @return string
+     */
+    public function load($name);
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Loader;
+
+use IteratorAggregate;
+use Traversable;
+
+/**
+ * Plugin class locator interface
+ */
+interface PluginClassLocator extends ShortNameLocator, IteratorAggregate
+{
+    /**
+     * Register a class to a given short name
+     *
+     * @param  string $shortName
+     * @param  string $className
+     * @return PluginClassLocator
+     */
+    public function registerPlugin($shortName, $className);
+
+    /**
+     * Unregister a short name lookup
+     *
+     * @param  mixed $shortName
+     * @return void
+     */
+    public function unregisterPlugin($shortName);
+
+    /**
+     * Get a list of all registered plugins
+     *
+     * @return array|Traversable
+     */
+    public function getRegisteredPlugins();
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Loader;
+
+use ArrayIterator;
+use IteratorAggregate;
+use Traversable;
+
+/**
+ * Plugin class locator interface
+ */
+class PluginClassLoader implements PluginClassLocator
+{
+    /**
+     * List of plugin name => class name pairs
+     * @var array
+     */
+    protected $plugins = array();
+
+    /**
+     * Static map allow global seeding of plugin loader
+     * @var array
+     */
+    protected static $staticMap = array();
+
+    /**
+     * Constructor
+     *
+     * @param  null|array|Traversable $map If provided, seeds the loader with a map
+     */
+    public function __construct($map = null)
+    {
+        // Merge in static overrides
+        if (!empty(static::$staticMap)) {
+            $this->registerPlugins(static::$staticMap);
+        }
+
+        // Merge in constructor arguments
+        if ($map !== null) {
+            $this->registerPlugins($map);
+        }
+    }
+
+    /**
+     * Add a static map of plugins
+     *
+     * A null value will clear the static map.
+     *
+     * @param  null|array|Traversable $map
+     * @throws Exception\InvalidArgumentException
+     * @return void
+     */
+    public static function addStaticMap($map)
+    {
+        if (null === $map) {
+            static::$staticMap = array();
+            return;
+        }
+
+        if (!is_array($map) && !$map instanceof Traversable) {
+            throw new Exception\InvalidArgumentException('Expects an array or Traversable object');
+        }
+        foreach ($map as $key => $value) {
+            static::$staticMap[$key] = $value;
+        }
+    }
+
+    /**
+     * Register a class to a given short name
+     *
+     * @param  string $shortName
+     * @param  string $className
+     * @return PluginClassLoader
+     */
+    public function registerPlugin($shortName, $className)
+    {
+        $this->plugins[strtolower($shortName)] = $className;
+        return $this;
+    }
+
+    /**
+     * Register many plugins at once
+     *
+     * If $map is a string, assumes that the map is the class name of a
+     * Traversable object (likely a ShortNameLocator); it will then instantiate
+     * this class and use it to register plugins.
+     *
+     * If $map is an array or Traversable object, it will iterate it to
+     * register plugin names/classes.
+     *
+     * For all other arguments, or if the string $map is not a class or not a
+     * Traversable class, an exception will be raised.
+     *
+     * @param  string|array|Traversable $map
+     * @return PluginClassLoader
+     * @throws Exception\InvalidArgumentException
+     */
+    public function registerPlugins($map)
+    {
+        if (is_string($map)) {
+            if (!class_exists($map)) {
+                throw new Exception\InvalidArgumentException('Map class provided is invalid');
+            }
+            $map = new $map;
+        }
+        if (is_array($map)) {
+            $map = new ArrayIterator($map);
+        }
+        if (!$map instanceof Traversable) {
+            throw new Exception\InvalidArgumentException('Map provided is invalid; must be traversable');
+        }
+
+        // iterator_apply doesn't work as expected with IteratorAggregate
+        if ($map instanceof IteratorAggregate) {
+            $map = $map->getIterator();
+        }
+
+        foreach ($map as $name => $class) {
+            if (is_int($name) || is_numeric($name)) {
+                if (!is_object($class) && class_exists($class)) {
+                    $class = new $class();
+                }
+
+                if ($class instanceof Traversable) {
+                    $this->registerPlugins($class);
+                    continue;
+                }
+            }
+
+            $this->registerPlugin($name, $class);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Unregister a short name lookup
+     *
+     * @param  mixed $shortName
+     * @return PluginClassLoader
+     */
+    public function unregisterPlugin($shortName)
+    {
+        $lookup = strtolower($shortName);
+        if (array_key_exists($lookup, $this->plugins)) {
+            unset($this->plugins[$lookup]);
+        }
+        return $this;
+    }
+
+    /**
+     * Get a list of all registered plugins
+     *
+     * @return array|Traversable
+     */
+    public function getRegisteredPlugins()
+    {
+        return $this->plugins;
+    }
+
+    /**
+     * Whether or not a plugin by a specific name has been registered
+     *
+     * @param  string $name
+     * @return bool
+     */
+    public function isLoaded($name)
+    {
+        $lookup = strtolower($name);
+        return isset($this->plugins[$lookup]);
+    }
+
+    /**
+     * Return full class name for a named helper
+     *
+     * @param  string $name
+     * @return string|false
+     */
+    public function getClassName($name)
+    {
+        return $this->load($name);
+    }
+
+    /**
+     * Load a helper via the name provided
+     *
+     * @param  string $name
+     * @return string|false
+     */
+    public function load($name)
+    {
+        if (!$this->isLoaded($name)) {
+            return false;
+        }
+        return $this->plugins[strtolower($name)];
+    }
+
+    /**
+     * Defined by IteratorAggregate
+     *
+     * Returns an instance of ArrayIterator, containing a map of
+     * all plugins
+     *
+     * @return ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->plugins);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
 namespace Zend\Config;
 
 use ArrayAccess;
@@ -12577,578 +12877,6 @@ class CallbackHandler
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Authentication\Adapter;
-
-interface AdapterInterface
-{
-    /**
-     * Performs an authentication attempt
-     *
-     * @return \Zend\Authentication\Result
-     * @throws \Zend\Authentication\Adapter\Exception\ExceptionInterface If authentication cannot be performed
-     */
-    public function authenticate();
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Mail\Transport;
-
-use Zend\Mail;
-
-/**
- * Interface for mail transports
- */
-interface TransportInterface
-{
-    /**
-     * Send a mail message
-     *
-     * @param \Zend\Mail\Message $message
-     * @return
-     */
-    public function send(Mail\Message $message);
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Mail\Transport;
-
-use Zend\Mail\Address;
-use Zend\Mail\Headers;
-use Zend\Mail\Message;
-use Zend\Mail\Protocol;
-use Zend\Mail\Protocol\Exception as ProtocolException;
-
-/**
- * SMTP connection object
- *
- * Loads an instance of Zend\Mail\Protocol\Smtp and forwards smtp transactions
- */
-class Smtp implements TransportInterface
-{
-    /**
-     * @var SmtpOptions
-     */
-    protected $options;
-
-    /**
-     * @var Protocol\Smtp
-     */
-    protected $connection;
-
-    /**
-     * @var bool
-     */
-    protected $autoDisconnect = true;
-
-    /**
-     * @var Protocol\SmtpPluginManager
-     */
-    protected $plugins;
-
-    /**
-     * Constructor.
-     *
-     * @param  SmtpOptions $options Optional
-     */
-    public function __construct(SmtpOptions $options = null)
-    {
-        if (!$options instanceof SmtpOptions) {
-            $options = new SmtpOptions();
-        }
-        $this->setOptions($options);
-    }
-
-    /**
-     * Set options
-     *
-     * @param  SmtpOptions $options
-     * @return Smtp
-     */
-    public function setOptions(SmtpOptions $options)
-    {
-        $this->options = $options;
-        return $this;
-    }
-
-    /**
-     * Get options
-     *
-     * @return SmtpOptions
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Set plugin manager for obtaining SMTP protocol connection
-     *
-     * @param  Protocol\SmtpPluginManager $plugins
-     * @throws Exception\InvalidArgumentException
-     * @return Smtp
-     */
-    public function setPluginManager(Protocol\SmtpPluginManager $plugins)
-    {
-        $this->plugins = $plugins;
-        return $this;
-    }
-
-    /**
-     * Get plugin manager for loading SMTP protocol connection
-     *
-     * @return Protocol\SmtpPluginManager
-     */
-    public function getPluginManager()
-    {
-        if (null === $this->plugins) {
-            $this->setPluginManager(new Protocol\SmtpPluginManager());
-        }
-        return $this->plugins;
-    }
-
-    /**
-     * Set the automatic disconnection when destruct
-     *
-     * @param  bool $flag
-     * @return Smtp
-     */
-    public function setAutoDisconnect($flag)
-    {
-        $this->autoDisconnect = (bool) $flag;
-        return $this;
-    }
-
-    /**
-     * Get the automatic disconnection value
-     *
-     * @return bool
-     */
-    public function getAutoDisconnect()
-    {
-        return $this->autoDisconnect;
-    }
-
-    /**
-     * Return an SMTP connection
-     *
-     * @param  string $name
-     * @param  array|null $options
-     * @return Protocol\Smtp
-     */
-    public function plugin($name, array $options = null)
-    {
-        return $this->getPluginManager()->get($name, $options);
-    }
-
-    /**
-     * Class destructor to ensure all open connections are closed
-     */
-    public function __destruct()
-    {
-        if ($this->connection instanceof Protocol\Smtp) {
-            try {
-                $this->connection->quit();
-            } catch (ProtocolException\ExceptionInterface $e) {
-                // ignore
-            }
-            if ($this->autoDisconnect) {
-                $this->connection->disconnect();
-            }
-        }
-    }
-
-    /**
-     * Sets the connection protocol instance
-     *
-     * @param Protocol\AbstractProtocol $connection
-     */
-    public function setConnection(Protocol\AbstractProtocol $connection)
-    {
-        $this->connection = $connection;
-    }
-
-
-    /**
-     * Gets the connection protocol instance
-     *
-     * @return Protocol\Smtp
-     */
-    public function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
-     * Disconnect the connection protocol instance
-     *
-     * @return void
-     */
-    public function disconnect()
-    {
-        if (!empty($this->connection) && ($this->connection instanceof Protocol\Smtp)) {
-            $this->connection->disconnect();
-        }
-    }
-
-    /**
-     * Send an email via the SMTP connection protocol
-     *
-     * The connection via the protocol adapter is made just-in-time to allow a
-     * developer to add a custom adapter if required before mail is sent.
-     *
-     * @param Message $message
-     * @throws Exception\RuntimeException
-     */
-    public function send(Message $message)
-    {
-        // If sending multiple messages per session use existing adapter
-        $connection = $this->getConnection();
-
-        if (!($connection instanceof Protocol\Smtp) || !$connection->hasSession()) {
-            $connection = $this->connect();
-        } else {
-            // Reset connection to ensure reliable transaction
-            $connection->rset();
-        }
-
-        // Prepare message
-        $from       = $this->prepareFromAddress($message);
-        $recipients = $this->prepareRecipients($message);
-        $headers    = $this->prepareHeaders($message);
-        $body       = $this->prepareBody($message);
-
-        if ((count($recipients) == 0) && (!empty($headers) || !empty($body))) {
-            throw new Exception\RuntimeException(  // Per RFC 2821 3.3 (page 18)
-                sprintf(
-                    '%s transport expects at least one recipient if the message has at least one header or body',
-                    __CLASS__
-                ));
-        }
-
-        // Set sender email address
-        $connection->mail($from);
-
-        // Set recipient forward paths
-        foreach ($recipients as $recipient) {
-            $connection->rcpt($recipient);
-        }
-
-        // Issue DATA command to client
-        $connection->data($headers . Headers::EOL . $body);
-    }
-
-    /**
-     * Retrieve email address for envelope FROM
-     *
-     * @param  Message $message
-     * @throws Exception\RuntimeException
-     * @return string
-     */
-    protected function prepareFromAddress(Message $message)
-    {
-        $sender = $message->getSender();
-        if ($sender instanceof Address\AddressInterface) {
-            return $sender->getEmail();
-        }
-
-        $from = $message->getFrom();
-        if (!count($from)) { // Per RFC 2822 3.6
-            throw new Exception\RuntimeException(sprintf(
-                '%s transport expects either a Sender or at least one From address in the Message; none provided',
-                __CLASS__
-            ));
-        }
-
-        $from->rewind();
-        $sender = $from->current();
-        return $sender->getEmail();
-    }
-
-    /**
-     * Prepare array of email address recipients
-     *
-     * @param  Message $message
-     * @return array
-     */
-    protected function prepareRecipients(Message $message)
-    {
-        $recipients = array();
-        foreach ($message->getTo() as $address) {
-            $recipients[] = $address->getEmail();
-        }
-        foreach ($message->getCc() as $address) {
-            $recipients[] = $address->getEmail();
-        }
-        foreach ($message->getBcc() as $address) {
-            $recipients[] = $address->getEmail();
-        }
-        $recipients = array_unique($recipients);
-        return $recipients;
-    }
-
-    /**
-     * Prepare header string from message
-     *
-     * @param  Message $message
-     * @return string
-     */
-    protected function prepareHeaders(Message $message)
-    {
-        $headers = clone $message->getHeaders();
-        $headers->removeHeader('Bcc');
-        return $headers->toString();
-    }
-
-    /**
-     * Prepare body string from message
-     *
-     * @param  Message $message
-     * @return string
-     */
-    protected function prepareBody(Message $message)
-    {
-        return $message->getBodyText();
-    }
-
-    /**
-     * Lazy load the connection
-     *
-     * @return Protocol\Smtp
-     */
-    protected function lazyLoadConnection()
-    {
-        // Check if authentication is required and determine required class
-        $options          = $this->getOptions();
-        $config           = $options->getConnectionConfig();
-        $config['host']   = $options->getHost();
-        $config['port']   = $options->getPort();
-        $connection       = $this->plugin($options->getConnectionClass(), $config);
-        $this->connection = $connection;
-
-        return $this->connect();
-    }
-
-    /**
-     * Connect the connection, and pass it helo
-     *
-     * @return Protocol\Smtp
-     */
-    protected function connect()
-    {
-        if (!$this->connection instanceof Protocol\Smtp) {
-            return $this->lazyLoadConnection();
-        }
-
-        $this->connection->connect();
-        $this->connection->helo($this->getOptions()->getName());
-
-        return $this->connection;
-    }
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Mail\Transport;
-
-use Zend\Mail\Exception;
-use Zend\Stdlib\AbstractOptions;
-
-class SmtpOptions extends AbstractOptions
-{
-    /**
-     * @var string Local client hostname
-     */
-    protected $name = 'localhost';
-
-    /**
-     * @var string
-     */
-    protected $connectionClass = 'smtp';
-
-    /**
-     * Connection configuration (passed to the underlying Protocol class)
-     *
-     * @var array
-     */
-    protected $connectionConfig = array();
-
-    /**
-     * @var string Remote SMTP hostname or IP
-     */
-    protected $host = '127.0.0.1';
-
-    /**
-     * @var int
-     */
-    protected $port = 25;
-
-    /**
-     * Return the local client hostname
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the local client hostname or IP
-     *
-     * @todo   hostname/IP validation
-     * @param  string $name
-     * @throws \Zend\Mail\Exception\InvalidArgumentException
-     * @return SmtpOptions
-     */
-    public function setName($name)
-    {
-        if (!is_string($name) && $name !== null) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Name must be a string or null; argument of type "%s" provided',
-                (is_object($name) ? get_class($name) : gettype($name))
-            ));
-        }
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * Get connection class
-     *
-     * This should be either the class Zend\Mail\Protocol\Smtp or a class
-     * extending it -- typically a class in the Zend\Mail\Protocol\Smtp\Auth
-     * namespace.
-     *
-     * @return string
-     */
-    public function getConnectionClass()
-    {
-        return $this->connectionClass;
-    }
-
-    /**
-     * Set connection class
-     *
-     * @param  string $connectionClass the value to be set
-     * @throws \Zend\Mail\Exception\InvalidArgumentException
-     * @return SmtpOptions
-     */
-    public function setConnectionClass($connectionClass)
-    {
-        if (!is_string($connectionClass) && $connectionClass !== null) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Connection class must be a string or null; argument of type "%s" provided',
-                (is_object($connectionClass) ? get_class($connectionClass) : gettype($connectionClass))
-            ));
-        }
-        $this->connectionClass = $connectionClass;
-        return $this;
-    }
-
-    /**
-     * Get connection configuration array
-     *
-     * @return array
-     */
-    public function getConnectionConfig()
-    {
-        return $this->connectionConfig;
-    }
-
-    /**
-     * Set connection configuration array
-     *
-     * @param  array $connectionConfig
-     * @return SmtpOptions
-     */
-    public function setConnectionConfig(array $connectionConfig)
-    {
-        $this->connectionConfig = $connectionConfig;
-        return $this;
-    }
-
-    /**
-     * Get the host name
-     *
-     * @return string
-     */
-    public function getHost()
-    {
-        return $this->host;
-    }
-
-    /**
-     * Set the SMTP host
-     *
-     * @todo   hostname/IP validation
-     * @param  string $host
-     * @return SmtpOptions
-     */
-    public function setHost($host)
-    {
-        $this->host = (string) $host;
-        return $this;
-    }
-
-    /**
-     * Get the port the SMTP server runs on
-     *
-     * @return int
-     */
-    public function getPort()
-    {
-        return $this->port;
-    }
-
-    /**
-     * Set the port the SMTP server runs on
-     *
-     * @param  int $port
-     * @throws \Zend\Mail\Exception\InvalidArgumentException
-     * @return SmtpOptions
-     */
-    public function setPort($port)
-    {
-        $port = (int) $port;
-        if ($port < 1) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Port must be greater than 1; received "%d"',
-                $port
-            ));
-        }
-        $this->port = $port;
-        return $this;
-    }
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
 namespace Zend\Session;
 
 use Zend\EventManager\EventManagerInterface;
@@ -17497,6 +17225,20 @@ class RuntimeException extends \RuntimeException implements ExceptionInterface
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
+namespace Zend\Db\Exception;
+
+class UnexpectedValueException extends \UnexpectedValueException implements ExceptionInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
 namespace Zend\Db\Adapter\Exception;
 
 use Zend\Db\Exception;
@@ -17535,6 +17277,443 @@ use Zend\Db\Exception;
 
 class RuntimeException extends Exception\RuntimeException implements ExceptionInterface
 {
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Adapter\Exception;
+
+use Zend\Db\Exception;
+
+class UnexpectedValueException extends Exception\UnexpectedValueException implements ExceptionInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Adapter\Exception;
+
+class InvalidQueryException extends UnexpectedValueException implements ExceptionInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Adapter;
+
+use ArrayAccess;
+use Countable;
+use Iterator;
+
+class ParameterContainer implements Iterator, ArrayAccess, Countable
+{
+
+    const TYPE_AUTO    = 'auto';
+    const TYPE_NULL    = 'null';
+    const TYPE_DOUBLE  = 'double';
+    const TYPE_INTEGER = 'integer';
+    const TYPE_BINARY  = 'binary';
+    const TYPE_STRING  = 'string';
+    const TYPE_LOB     = 'lob';
+
+    /**
+     * Data
+     *
+     * @var array
+     */
+    protected $data = array();
+
+    /**
+     * @var array
+     */
+    protected $positions = array();
+
+    /**
+     * Errata
+     *
+     * @var array
+     */
+    protected $errata = array();
+
+    /**
+     * Constructor
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = array())
+    {
+        if ($data) {
+            $this->setFromArray($data);
+        }
+    }
+
+    /**
+     * Offset exists
+     *
+     * @param  string $name
+     * @return bool
+     */
+    public function offsetExists($name)
+    {
+        return (isset($this->data[$name]));
+    }
+
+    /**
+     * Offset get
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function offsetGet($name)
+    {
+        return (isset($this->data[$name])) ? $this->data[$name] : null;
+    }
+
+    /**
+     * @param $name
+     * @param $from
+     */
+    public function offsetSetReference($name, $from)
+    {
+        $this->data[$name] =& $this->data[$from];
+    }
+
+    /**
+     * Offset set
+     *
+     * @param string|int $name
+     * @param mixed $value
+     * @param mixed $errata
+     */
+    public function offsetSet($name, $value, $errata = null)
+    {
+        $position = false;
+
+        // if integer, get name for this position
+        if (is_int($name)) {
+            if (isset($this->positions[$name])) {
+                $position = $name;
+                $name = $this->positions[$name];
+            } else {
+                $name = (string) $name;
+            }
+        } elseif (is_string($name)) {
+            // is a string:
+            $position = array_key_exists($name, $this->data);
+        } elseif ($name === null) {
+            $name = (string) count($this->data);
+        } else {
+            throw new Exception\InvalidArgumentException('Keys must be string, integer or null');
+        }
+
+        if ($position === false) {
+            $this->positions[] = $name;
+        }
+
+        $this->data[$name] = $value;
+
+        if ($errata) {
+            $this->offsetSetErrata($name, $errata);
+        }
+    }
+
+    /**
+     * Offset unset
+     *
+     * @param  string $name
+     * @return ParameterContainer
+     */
+    public function offsetUnset($name)
+    {
+        if (is_int($name) && isset($this->positions[$name])) {
+            $name = $this->positions[$name];
+        }
+        unset($this->data[$name]);
+        return $this;
+    }
+
+    /**
+     * Set from array
+     *
+     * @param  array $data
+     * @return ParameterContainer
+     */
+    public function setFromArray(Array $data)
+    {
+        foreach ($data as $n => $v) {
+            $this->offsetSet($n, $v);
+        }
+        return $this;
+    }
+
+    /**
+     * Offset set errata
+     *
+     * @param string|int $name
+     * @param mixed $errata
+     */
+    public function offsetSetErrata($name, $errata)
+    {
+        if (is_int($name)) {
+            $name = $this->positions[$name];
+        }
+        $this->errata[$name] = $errata;
+    }
+
+    /**
+     * Offset get errata
+     *
+     * @param  string|int $name
+     * @throws Exception\InvalidArgumentException
+     * @return mixed
+     */
+    public function offsetGetErrata($name)
+    {
+        if (is_int($name)) {
+            $name = $this->positions[$name];
+        }
+        if (!array_key_exists($name, $this->data)) {
+            throw new Exception\InvalidArgumentException('Data does not exist for this name/position');
+        }
+        return $this->errata[$name];
+    }
+
+    /**
+     * Offset has errata
+     *
+     * @param  string|int $name
+     * @return bool
+     */
+    public function offsetHasErrata($name)
+    {
+        if (is_int($name)) {
+            $name = $this->positions[$name];
+        }
+        return (isset($this->errata[$name]));
+    }
+
+    /**
+     * Offset unset errata
+     *
+     * @param string|int $name
+     * @throws Exception\InvalidArgumentException
+     */
+    public function offsetUnsetErrata($name)
+    {
+        if (is_int($name)) {
+            $name = $this->positions[$name];
+        }
+        if (!array_key_exists($name, $this->errata)) {
+            throw new Exception\InvalidArgumentException('Data does not exist for this name/position');
+        }
+        $this->errata[$name] = null;
+    }
+
+    /**
+     * Get errata iterator
+     *
+     * @return \ArrayIterator
+     */
+    public function getErrataIterator()
+    {
+        return new \ArrayIterator($this->errata);
+    }
+
+    /**
+     * getNamedArray
+     *
+     * @return array
+     */
+    public function getNamedArray()
+    {
+        return $this->data;
+    }
+
+    /**
+     * getNamedArray
+     *
+     * @return array
+     */
+    public function getPositionalArray()
+    {
+        return array_values($this->data);
+    }
+
+    /**
+     * count
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->data);
+    }
+
+    /**
+     * Current
+     *
+     * @return mixed
+     */
+    public function current()
+    {
+        return current($this->data);
+    }
+
+    /**
+     * Next
+     *
+     * @return mixed
+     */
+    public function next()
+    {
+        return next($this->data);
+    }
+
+    /**
+     * Key
+     *
+     * @return mixed
+     */
+    public function key()
+    {
+        return key($this->data);
+    }
+
+    /**
+     * Valid
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        return (current($this->data) !== false);
+    }
+
+    /**
+     * Rewind
+     */
+    public function rewind()
+    {
+        reset($this->data);
+    }
+
+    /**
+     * @param array|ParameterContainer $parameters
+     * @throws Exception\InvalidArgumentException
+     * @return ParameterContainer
+     */
+    public function merge($parameters)
+    {
+        if (!is_array($parameters) && !$parameters instanceof ParameterContainer) {
+            throw new Exception\InvalidArgumentException('$parameters must be an array or an instance of ParameterContainer');
+        }
+
+        if (count($parameters) == 0) {
+            return $this;
+        }
+
+        if ($parameters instanceof ParameterContainer) {
+            $parameters = $parameters->getNamedArray();
+        }
+
+        foreach ($parameters as $key => $value) {
+            if (is_int($key)) {
+                $key = null;
+            }
+            $this->offsetSet($key, $value);
+        }
+        return $this;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Adapter;
+
+class StatementContainer implements StatementContainerInterface
+{
+
+    /**
+     * @var string
+     */
+    protected $sql = '';
+
+    /**
+     * @var ParameterContainer
+     */
+    protected $parameterContainer = null;
+
+    /**
+     * @param string|null $sql
+     * @param ParameterContainer|null $parameterContainer
+     */
+    public function __construct($sql = null, ParameterContainer $parameterContainer = null)
+    {
+        if ($sql) {
+            $this->setSql($sql);
+        }
+        $this->parameterContainer = ($parameterContainer) ?: new ParameterContainer;
+    }
+
+    /**
+     * @param $sql
+     * @return StatementContainer
+     */
+    public function setSql($sql)
+    {
+        $this->sql = $sql;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSql()
+    {
+        return $this->sql;
+    }
+
+    /**
+     * @param ParameterContainer $parameterContainer
+     * @return StatementContainer
+     */
+    public function setParameterContainer(ParameterContainer $parameterContainer)
+    {
+        $this->parameterContainer = $parameterContainer;
+        return $this;
+    }
+
+    /**
+     * @return null|ParameterContainer
+     */
+    public function getParameterContainer()
+    {
+        return $this->parameterContainer;
+    }
 }
 
 /**
@@ -21391,6 +21570,586 @@ class Predicate extends PredicateSet
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
+namespace Zend\Db\Sql\Predicate;
+
+class IsNull implements PredicateInterface
+{
+
+    /**
+     * @var string
+     */
+    protected $specification = '%1$s IS NULL';
+
+    /**
+     * @var
+     */
+    protected $identifier;
+
+    /**
+     * Constructor
+     *
+     * @param  string $identifier
+     */
+    public function __construct($identifier = null)
+    {
+        if ($identifier) {
+            $this->setIdentifier($identifier);
+        }
+    }
+
+    /**
+     * Set identifier for comparison
+     *
+     * @param  string $identifier
+     * @return IsNull
+     */
+    public function setIdentifier($identifier)
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+
+    /**
+     * Get identifier of comparison
+     *
+     * @return null|string
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * Set specification string to use in forming SQL predicate
+     *
+     * @param  string $specification
+     * @return IsNull
+     */
+    public function setSpecification($specification)
+    {
+        $this->specification = $specification;
+        return $this;
+    }
+
+    /**
+     * Get specification string to use in forming SQL predicate
+     *
+     * @return string
+     */
+    public function getSpecification()
+    {
+        return $this->specification;
+    }
+
+    /**
+     * Get parts for where statement
+     *
+     * @return array
+     */
+    public function getExpressionData()
+    {
+        return array(array(
+            $this->getSpecification(),
+            array($this->identifier),
+            array(self::TYPE_IDENTIFIER),
+        ));
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Predicate;
+
+use Zend\Db\Sql\Exception;
+
+class Operator implements PredicateInterface
+{
+    const OPERATOR_EQUAL_TO                  = '=';
+    const OP_EQ                              = '=';
+
+    const OPERATOR_NOT_EQUAL_TO              = '!=';
+    const OP_NE                              = '!=';
+
+    const OPERATOR_LESS_THAN                 = '<';
+    const OP_LT                              = '<';
+
+    const OPERATOR_LESS_THAN_OR_EQUAL_TO     = '<=';
+    const OP_LTE                             = '<=';
+
+    const OPERATOR_GREATER_THAN              = '>';
+    const OP_GT                              = '>';
+
+    const OPERATOR_GREATER_THAN_OR_EQUAL_TO  = '>=';
+    const OP_GTE                             = '>=';
+
+    protected $allowedTypes  = array(
+        self::TYPE_IDENTIFIER,
+        self::TYPE_VALUE,
+    );
+
+    protected $left          = null;
+    protected $leftType      = self::TYPE_IDENTIFIER;
+    protected $operator      = self::OPERATOR_EQUAL_TO;
+    protected $right         = null;
+    protected $rightType     = self::TYPE_VALUE;
+
+    /**
+     * Constructor
+     *
+     * @param  int|float|bool|string $left
+     * @param  string $operator
+     * @param  int|float|bool|string $right
+     * @param  string $leftType TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
+     * @param  string $rightType TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
+     */
+    public function __construct($left = null, $operator = self::OPERATOR_EQUAL_TO, $right = null, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE)
+    {
+        if ($left !== null) {
+            $this->setLeft($left);
+        }
+
+        if ($operator !== self::OPERATOR_EQUAL_TO) {
+            $this->setOperator($operator);
+        }
+
+        if ($right !== null) {
+            $this->setRight($right);
+        }
+
+        if ($leftType !== self::TYPE_IDENTIFIER) {
+            $this->setLeftType($leftType);
+        }
+
+        if ($rightType !== self::TYPE_VALUE) {
+            $this->setRightType($rightType);
+        }
+    }
+
+    /**
+     * Set left side of operator
+     *
+     * @param  int|float|bool|string $left
+     * @return Operator
+     */
+    public function setLeft($left)
+    {
+        $this->left = $left;
+        return $this;
+    }
+
+    /**
+     * Get left side of operator
+     *
+     * @return int|float|bool|string
+     */
+    public function getLeft()
+    {
+        return $this->left;
+    }
+
+    /**
+     * Set parameter type for left side of operator
+     *
+     * @param  string $type TYPE_IDENTIFIER or TYPE_VALUE {@see allowedTypes}
+     * @throws Exception\InvalidArgumentException
+     * @return Operator
+     */
+    public function setLeftType($type)
+    {
+        if (!in_array($type, $this->allowedTypes)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Invalid type "%s" provided; must be of type "%s" or "%s"',
+                $type,
+                __CLASS__ . '::TYPE_IDENTIFIER',
+                __CLASS__ . '::TYPE_VALUE'
+            ));
+        }
+        $this->leftType = $type;
+        return $this;
+    }
+
+    /**
+     * Get parameter type on left side of operator
+     *
+     * @return string
+     */
+    public function getLeftType()
+    {
+        return $this->leftType;
+    }
+
+    /**
+     * Set operator string
+     *
+     * @param  string $operator
+     * @return Operator
+     */
+    public function setOperator($operator)
+    {
+        $this->operator = $operator;
+        return $this;
+    }
+
+    /**
+     * Get operator string
+     *
+     * @return string
+     */
+    public function getOperator()
+    {
+        return $this->operator;
+    }
+
+    /**
+     * Set right side of operator
+     *
+     * @param  int|float|bool|string $value
+     * @return Operator
+     */
+    public function setRight($value)
+    {
+        $this->right = $value;
+        return $this;
+    }
+
+    /**
+     * Get right side of operator
+     *
+     * @return int|float|bool|string
+     */
+    public function getRight()
+    {
+        return $this->right;
+    }
+
+    /**
+     * Set parameter type for right side of operator
+     *
+     * @param  string $type TYPE_IDENTIFIER or TYPE_VALUE {@see allowedTypes}
+     * @throws Exception\InvalidArgumentException
+     * @return Operator
+     */
+    public function setRightType($type)
+    {
+        if (!in_array($type, $this->allowedTypes)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Invalid type "%s" provided; must be of type "%s" or "%s"',
+                $type,
+                __CLASS__ . '::TYPE_IDENTIFIER',
+                __CLASS__ . '::TYPE_VALUE'
+            ));
+        }
+        $this->rightType = $type;
+        return $this;
+    }
+
+    /**
+     * Get parameter type on right side of operator
+     *
+     * @return string
+     */
+    public function getRightType()
+    {
+        return $this->rightType;
+    }
+
+    /**
+     * Get predicate parts for where statement
+     *
+     * @return array
+     */
+    public function getExpressionData()
+    {
+        return array(array(
+            '%s ' . $this->operator . ' %s',
+            array($this->left, $this->right),
+            array($this->leftType, $this->rightType)
+        ));
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql;
+
+class Literal implements ExpressionInterface
+{
+    /**
+     * @var string
+     */
+    protected $literal = '';
+
+    /**
+     * @param $literal
+     */
+    public function __construct($literal = '')
+    {
+        $this->literal = $literal;
+    }
+
+    /**
+     * @param string $literal
+     * @return Literal
+     */
+    public function setLiteral($literal)
+    {
+        $this->literal = $literal;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLiteral()
+    {
+        return $this->literal;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExpressionData()
+    {
+        return array(array(
+            str_replace('%', '%%', $this->literal),
+            array(),
+            array()
+        ));
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Predicate;
+
+use Zend\Db\Sql\Literal as BaseLiteral;
+
+class Literal extends BaseLiteral implements PredicateInterface
+{
+
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql;
+
+class Expression implements ExpressionInterface
+{
+    /**
+     * @const
+     */
+    const PLACEHOLDER = '?';
+
+    /**
+     * @var string
+     */
+    protected $expression = '';
+
+    /**
+     * @var array
+     */
+    protected $parameters = array();
+
+    /**
+     * @var array
+     */
+    protected $types = array();
+
+    /**
+     * @param string $expression
+     * @param string|array $parameters
+     * @param array $types
+     */
+    public function __construct($expression = '', $parameters = null, array $types = array())
+    {
+        if ($expression) {
+            $this->setExpression($expression);
+        }
+        if ($parameters) {
+            $this->setParameters($parameters);
+        }
+        if ($types) {
+            $this->setTypes($types);
+        }
+    }
+
+    /**
+     * @param $expression
+     * @return Expression
+     * @throws Exception\InvalidArgumentException
+     */
+    public function setExpression($expression)
+    {
+        if (!is_string($expression) || $expression == '') {
+            throw new Exception\InvalidArgumentException('Supplied expression must be a string.');
+        }
+        $this->expression = $expression;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExpression()
+    {
+        return $this->expression;
+    }
+
+    /**
+     * @param $parameters
+     * @return Expression
+     * @throws Exception\InvalidArgumentException
+     */
+    public function setParameters($parameters)
+    {
+        if (!is_scalar($parameters) && !is_array($parameters)) {
+            throw new Exception\InvalidArgumentException('Expression parameters must be a scalar or array.');
+        }
+        $this->parameters = $parameters;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $types
+     * @return Expression
+     */
+    public function setTypes(array $types)
+    {
+        $this->types = $types;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
+    /**
+     * @return array
+     * @throws Exception\RuntimeException
+     */
+    public function getExpressionData()
+    {
+        $parameters = (is_scalar($this->parameters)) ? array($this->parameters) : $this->parameters;
+
+        $types = array();
+        $parametersCount = count($parameters);
+
+        if ($parametersCount == 0 && strpos($this->expression, self::PLACEHOLDER) !== false) {
+            // if there are no parameters, but there is a placeholder
+            $parametersCount = substr_count($this->expression, self::PLACEHOLDER);
+            $parameters = array_fill(0, $parametersCount, null);
+        }
+
+        for ($i = 0; $i < $parametersCount; $i++) {
+            $types[$i] = (isset($this->types[$i]) && ($this->types[$i] == self::TYPE_IDENTIFIER || $this->types[$i] == self::TYPE_LITERAL))
+                ? $this->types[$i] : self::TYPE_VALUE;
+        }
+
+        // assign locally, escaping % signs
+        $expression = str_replace('%', '%%', $this->expression);
+
+        if ($parametersCount > 0) {
+            $count = 0;
+            $expression = str_replace(self::PLACEHOLDER, '%s', $expression, $count);
+            if ($count !== $parametersCount) {
+                throw new Exception\RuntimeException('The number of replacements in the expression does not match the number of parameters');
+            }
+        }
+
+        return array(array(
+            $expression,
+            $parameters,
+            $types
+        ));
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Predicate;
+
+use Zend\Db\Sql\Expression as BaseExpression;
+
+class Expression extends BaseExpression implements PredicateInterface
+{
+
+    /**
+     * Constructor
+     *
+     * @param string $expression
+     * @param int|float|bool|string|array $valueParameter
+     */
+    public function __construct($expression = null, $valueParameter = null /*[, $valueParameter, ... ]*/)
+    {
+        if ($expression) {
+            $this->setExpression($expression);
+        }
+
+        if (is_array($valueParameter)) {
+            $this->setParameters($valueParameter);
+        } else {
+            $argNum = func_num_args();
+            if ($argNum > 2 || is_scalar($valueParameter)) {
+                $parameters = array();
+                for ($i = 1; $i < $argNum; $i++) {
+                    $parameters[] = func_get_arg($i);
+                }
+                $this->setParameters($parameters);
+            }
+        }
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
 namespace Zend\Db\Sql;
 
 class Where extends Predicate\Predicate
@@ -22301,89 +23060,570 @@ class PostEvent extends Event
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Db\Sql\Predicate;
+namespace Zend\Authentication\Adapter;
 
-class IsNull implements PredicateInterface
+interface AdapterInterface
 {
+    /**
+     * Performs an authentication attempt
+     *
+     * @return \Zend\Authentication\Result
+     * @throws \Zend\Authentication\Adapter\Exception\ExceptionInterface If authentication cannot be performed
+     */
+    public function authenticate();
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail;
+
+use Traversable;
+use Zend\Mime;
+
+class Message
+{
+    /**
+     * Content of the message
+     *
+     * @var string|object
+     */
+    protected $body;
 
     /**
+     * @var Headers
+     */
+    protected $headers;
+
+    /**
+     * Message encoding
+     *
+     * Used to determine whether or not to encode headers; defaults to ASCII.
+     *
      * @var string
      */
-    protected $specification = '%1$s IS NULL';
+    protected $encoding = 'ASCII';
 
     /**
-     * @var
-     */
-    protected $identifier;
-
-    /**
-     * Constructor
+     * Is the message valid?
      *
-     * @param  string $identifier
+     * If we don't any From addresses, we're invalid, according to RFC2822.
+     *
+     * @return bool
      */
-    public function __construct($identifier = null)
+    public function isValid()
     {
-        if ($identifier) {
-            $this->setIdentifier($identifier);
+        $from = $this->getFrom();
+        if (!$from instanceof AddressList) {
+            return false;
         }
+        return (bool) count($from);
     }
 
     /**
-     * Set identifier for comparison
+     * Set the message encoding
      *
-     * @param  string $identifier
-     * @return IsNull
+     * @param  string $encoding
+     * @return Message
      */
-    public function setIdentifier($identifier)
+    public function setEncoding($encoding)
     {
-        $this->identifier = $identifier;
+        $this->encoding = $encoding;
+        $this->getHeaders()->setEncoding($encoding);
         return $this;
     }
 
     /**
-     * Get identifier of comparison
-     *
-     * @return null|string
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * Set specification string to use in forming SQL predicate
-     *
-     * @param  string $specification
-     * @return IsNull
-     */
-    public function setSpecification($specification)
-    {
-        $this->specification = $specification;
-        return $this;
-    }
-
-    /**
-     * Get specification string to use in forming SQL predicate
+     * Get the message encoding
      *
      * @return string
      */
-    public function getSpecification()
+    public function getEncoding()
     {
-        return $this->specification;
+        return $this->encoding;
     }
 
     /**
-     * Get parts for where statement
+     * Compose headers
      *
-     * @return array
+     * @param  Headers $headers
+     * @return Message
      */
-    public function getExpressionData()
+    public function setHeaders(Headers $headers)
     {
-        return array(array(
-            $this->getSpecification(),
-            array($this->identifier),
-            array(self::TYPE_IDENTIFIER),
-        ));
+        $this->headers = $headers;
+        $headers->setEncoding($this->getEncoding());
+        return $this;
+    }
+
+    /**
+     * Access headers collection
+     *
+     * Lazy-loads if not already attached.
+     *
+     * @return Headers
+     */
+    public function getHeaders()
+    {
+        if (null === $this->headers) {
+            $this->setHeaders(new Headers());
+            $date = Header\Date::fromString('Date: ' . date('r'));
+            $this->headers->addHeader($date);
+        }
+        return $this->headers;
+    }
+
+    /**
+     * Set (overwrite) From addresses
+     *
+     * @param  string|Address\AddressInterface|array|AddressList|Traversable $emailOrAddressList
+     * @param  string|null $name
+     * @return Message
+     */
+    public function setFrom($emailOrAddressList, $name = null)
+    {
+        $this->clearHeaderByName('from');
+        return $this->addFrom($emailOrAddressList, $name);
+    }
+
+    /**
+     * Add a "From" address
+     *
+     * @param  string|Address|array|AddressList|Traversable $emailOrAddressOrList
+     * @param  string|null $name
+     * @return Message
+     */
+    public function addFrom($emailOrAddressOrList, $name = null)
+    {
+        $addressList = $this->getFrom();
+        $this->updateAddressList($addressList, $emailOrAddressOrList, $name, __METHOD__);
+        return $this;
+    }
+
+    /**
+     * Retrieve list of From senders
+     *
+     * @return AddressList
+     */
+    public function getFrom()
+    {
+        return $this->getAddressListFromHeader('from', __NAMESPACE__ . '\Header\From');
+    }
+
+    /**
+     * Overwrite the address list in the To recipients
+     *
+     * @param  string|Address\AddressInterface|array|AddressList|Traversable $emailOrAddressList
+     * @param  null|string $name
+     * @return Message
+     */
+    public function setTo($emailOrAddressList, $name = null)
+    {
+        $this->clearHeaderByName('to');
+        return $this->addTo($emailOrAddressList, $name);
+    }
+
+    /**
+     * Add one or more addresses to the To recipients
+     *
+     * Appends to the list.
+     *
+     * @param  string|Address\AddressInterface|array|AddressList|Traversable $emailOrAddressOrList
+     * @param  null|string $name
+     * @return Message
+     */
+    public function addTo($emailOrAddressOrList, $name = null)
+    {
+        $addressList = $this->getTo();
+        $this->updateAddressList($addressList, $emailOrAddressOrList, $name, __METHOD__);
+        return $this;
+    }
+
+    /**
+     * Access the address list of the To header
+     *
+     * @return AddressList
+     */
+    public function getTo()
+    {
+        return $this->getAddressListFromHeader('to', __NAMESPACE__ . '\Header\To');
+    }
+
+    /**
+     * Set (overwrite) CC addresses
+     *
+     * @param  string|Address\AddressInterface|array|AddressList|Traversable $emailOrAddressList
+     * @param  string|null $name
+     * @return Message
+     */
+    public function setCc($emailOrAddressList, $name = null)
+    {
+        $this->clearHeaderByName('cc');
+        return $this->addCc($emailOrAddressList, $name);
+    }
+
+    /**
+     * Add a "Cc" address
+     *
+     * @param  string|Address|array|AddressList|Traversable $emailOrAddressOrList
+     * @param  string|null $name
+     * @return Message
+     */
+    public function addCc($emailOrAddressOrList, $name = null)
+    {
+        $addressList = $this->getCc();
+        $this->updateAddressList($addressList, $emailOrAddressOrList, $name, __METHOD__);
+        return $this;
+    }
+
+    /**
+     * Retrieve list of CC recipients
+     *
+     * @return AddressList
+     */
+    public function getCc()
+    {
+        return $this->getAddressListFromHeader('cc', __NAMESPACE__ . '\Header\Cc');
+    }
+
+    /**
+     * Set (overwrite) BCC addresses
+     *
+     * @param  string|Address\AddressInterface|array|AddressList|Traversable $emailOrAddressList
+     * @param  string|null $name
+     * @return Message
+     */
+    public function setBcc($emailOrAddressList, $name = null)
+    {
+        $this->clearHeaderByName('bcc');
+        return $this->addBcc($emailOrAddressList, $name);
+    }
+
+    /**
+     * Add a "Bcc" address
+     *
+     * @param  string|Address|array|AddressList|Traversable $emailOrAddressOrList
+     * @param  string|null $name
+     * @return Message
+     */
+    public function addBcc($emailOrAddressOrList, $name = null)
+    {
+        $addressList = $this->getBcc();
+        $this->updateAddressList($addressList, $emailOrAddressOrList, $name, __METHOD__);
+        return $this;
+    }
+
+    /**
+     * Retrieve list of BCC recipients
+     *
+     * @return AddressList
+     */
+    public function getBcc()
+    {
+        return $this->getAddressListFromHeader('bcc', __NAMESPACE__ . '\Header\Bcc');
+    }
+
+    /**
+     * Overwrite the address list in the Reply-To recipients
+     *
+     * @param  string|Address\AddressInterface|array|AddressList|Traversable $emailOrAddressList
+     * @param  null|string $name
+     * @return Message
+     */
+    public function setReplyTo($emailOrAddressList, $name = null)
+    {
+        $this->clearHeaderByName('reply-to');
+        return $this->addReplyTo($emailOrAddressList, $name);
+    }
+
+    /**
+     * Add one or more addresses to the Reply-To recipients
+     *
+     * Appends to the list.
+     *
+     * @param  string|Address\AddressInterface|array|AddressList|Traversable $emailOrAddressOrList
+     * @param  null|string $name
+     * @return Message
+     */
+    public function addReplyTo($emailOrAddressOrList, $name = null)
+    {
+        $addressList = $this->getReplyTo();
+        $this->updateAddressList($addressList, $emailOrAddressOrList, $name, __METHOD__);
+        return $this;
+    }
+
+    /**
+     * Access the address list of the Reply-To header
+     *
+     * @return AddressList
+     */
+    public function getReplyTo()
+    {
+        return $this->getAddressListFromHeader('reply-to', __NAMESPACE__ . '\Header\ReplyTo');
+    }
+
+    /**
+     * setSender
+     *
+     * @param mixed $emailOrAddress
+     * @param mixed $name
+     * @return Message
+     */
+    public function setSender($emailOrAddress, $name = null)
+    {
+        $header = $this->getHeaderByName('sender', __NAMESPACE__ . '\Header\Sender');
+        $header->setAddress($emailOrAddress, $name);
+        return $this;
+    }
+
+    /**
+     * Retrieve the sender address, if any
+     *
+     * @return null|Address\AddressInterface
+     */
+    public function getSender()
+    {
+        $header = $this->getHeaderByName('sender', __NAMESPACE__ . '\Header\Sender');
+        return $header->getAddress();
+    }
+
+    /**
+     * Set the message subject header value
+     *
+     * @param  string $subject
+     * @return Message
+     */
+    public function setSubject($subject)
+    {
+        $headers = $this->getHeaders();
+        if (!$headers->has('subject')) {
+            $header = new Header\Subject();
+            $headers->addHeader($header);
+        } else {
+            $header = $headers->get('subject');
+        }
+        $header->setSubject($subject);
+        return $this;
+    }
+
+    /**
+     * Get the message subject header value
+     *
+     * @return null|string
+     */
+    public function getSubject()
+    {
+        $headers = $this->getHeaders();
+        if (!$headers->has('subject')) {
+            return null;
+        }
+        $header = $headers->get('subject');
+        return $header->getFieldValue();
+    }
+
+    /**
+     * Set the message body
+     *
+     * @param  null|string|\Zend\Mime\Message|object $body
+     * @throws Exception\InvalidArgumentException
+     * @return Message
+     */
+    public function setBody($body)
+    {
+        if (!is_string($body) && $body !== null) {
+            if (!is_object($body)) {
+                throw new Exception\InvalidArgumentException(sprintf(
+                    '%s expects a string or object argument; received "%s"',
+                    __METHOD__,
+                    gettype($body)
+                ));
+            }
+            if (!$body instanceof Mime\Message) {
+                if (!method_exists($body, '__toString')) {
+                    throw new Exception\InvalidArgumentException(sprintf(
+                        '%s expects object arguments of type Zend\Mime\Message or implementing __toString(); object of type "%s" received',
+                        __METHOD__,
+                        get_class($body)
+                    ));
+                }
+            }
+        }
+        $this->body = $body;
+
+        if (!$this->body instanceof Mime\Message) {
+            return $this;
+        }
+
+        // Get headers, and set Mime-Version header
+        $headers = $this->getHeaders();
+        $this->getHeaderByName('mime-version', __NAMESPACE__ . '\Header\MimeVersion');
+
+        // Multipart content headers
+        if ($this->body->isMultiPart()) {
+            $mime   = $this->body->getMime();
+            $header = $this->getHeaderByName('content-type', __NAMESPACE__ . '\Header\ContentType');
+            $header->setType('multipart/mixed');
+            $header->addParameter('boundary', $mime->boundary());
+            return $this;
+        }
+
+        // MIME single part headers
+        $parts = $this->body->getParts();
+        if (!empty($parts)) {
+            $part = array_shift($parts);
+            $headers->addHeaders($part->getHeadersArray());
+        }
+        return $this;
+    }
+
+    /**
+     * Return the currently set message body
+     *
+     * @return object
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * Get the string-serialized message body text
+     *
+     * @return string
+     */
+    public function getBodyText()
+    {
+        if ($this->body instanceof Mime\Message) {
+            return $this->body->generateMessage(Headers::EOL);
+        }
+
+        return (string) $this->body;
+    }
+
+    /**
+     * Retrieve a header by name
+     *
+     * If not found, instantiates one based on $headerClass.
+     *
+     * @param  string $headerName
+     * @param  string $headerClass
+     * @return Header\HeaderInterface|\ArrayIterator header instance or collection of headers
+     */
+    protected function getHeaderByName($headerName, $headerClass)
+    {
+        $headers = $this->getHeaders();
+        if ($headers->has($headerName)) {
+            $header = $headers->get($headerName);
+        } else {
+            $header = new $headerClass();
+            $headers->addHeader($header);
+        }
+        return $header;
+    }
+
+    /**
+     * Clear a header by name
+     *
+     * @param  string $headerName
+     */
+    protected function clearHeaderByName($headerName)
+    {
+        $this->getHeaders()->removeHeader($headerName);
+    }
+
+    /**
+     * Retrieve the AddressList from a named header
+     *
+     * Used with To, From, Cc, Bcc, and ReplyTo headers. If the header does not
+     * exist, instantiates it.
+     *
+     * @param  string $headerName
+     * @param  string $headerClass
+     * @throws Exception\DomainException
+     * @return AddressList
+     */
+    protected function getAddressListFromHeader($headerName, $headerClass)
+    {
+        $header = $this->getHeaderByName($headerName, $headerClass);
+        if (!$header instanceof Header\AbstractAddressList) {
+            throw new Exception\DomainException(sprintf(
+                'Cannot grab address list from header of type "%s"; not an AbstractAddressList implementation',
+                get_class($header)
+            ));
+        }
+        return $header->getAddressList();
+    }
+
+    /**
+     * Update an address list
+     *
+     * Proxied to this from addFrom, addTo, addCc, addBcc, and addReplyTo.
+     *
+     * @param  AddressList $addressList
+     * @param  string|Address\AddressInterface|array|AddressList|Traversable $emailOrAddressOrList
+     * @param  null|string $name
+     * @param  string $callingMethod
+     * @throws Exception\InvalidArgumentException
+     */
+    protected function updateAddressList(AddressList $addressList, $emailOrAddressOrList, $name, $callingMethod)
+    {
+        if ($emailOrAddressOrList instanceof Traversable) {
+            foreach ($emailOrAddressOrList as $address) {
+                $addressList->add($address);
+            }
+            return;
+        }
+        if (is_array($emailOrAddressOrList)) {
+            $addressList->addMany($emailOrAddressOrList);
+            return;
+        }
+        if (!is_string($emailOrAddressOrList) && !$emailOrAddressOrList instanceof Address\AddressInterface) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s expects a string, AddressInterface, array, AddressList, or Traversable as its first argument; received "%s"',
+                $callingMethod,
+                (is_object($emailOrAddressOrList) ? get_class($emailOrAddressOrList) : gettype($emailOrAddressOrList))
+            ));
+        }
+        $addressList->add($emailOrAddressOrList, $name);
+    }
+
+    /**
+     * Serialize to string
+     *
+     * @return string
+     */
+    public function toString()
+    {
+        $headers = $this->getHeaders();
+        return $headers->toString()
+               . Headers::EOL
+               . $this->getBodyText();
+    }
+
+    /**
+     * Instantiate from raw message string
+     *
+     * @todo   Restore body to Mime\Message
+     * @param  string $rawMessage
+     * @return Message
+     */
+    public static function fromString($rawMessage)
+    {
+        $message = new static();
+        $headers = null;
+        $content = null;
+        Mime\Decode::splitMessage($rawMessage, $headers, $content);
+        if ($headers->has('mime-version')) {
+            // todo - restore body to mime\message
+        }
+        $message->setHeaders($headers);
+        $message->setBody($content);
+        return $message;
     }
 }
 
@@ -22395,330 +23635,480 @@ class IsNull implements PredicateInterface
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Db\Adapter;
+namespace Zend\Mail;
 
-use ArrayAccess;
+use ArrayIterator;
 use Countable;
 use Iterator;
+use Traversable;
+use Zend\Loader\PluginClassLocator;
 
-class ParameterContainer implements Iterator, ArrayAccess, Countable
+/**
+ * Basic mail headers collection functionality
+ *
+ * Handles aggregation of headers
+ */
+class Headers implements Countable, Iterator
 {
+    /** @var string End of Line for fields */
+    const EOL = "\r\n";
 
-    const TYPE_AUTO    = 'auto';
-    const TYPE_NULL    = 'null';
-    const TYPE_DOUBLE  = 'double';
-    const TYPE_INTEGER = 'integer';
-    const TYPE_BINARY  = 'binary';
-    const TYPE_STRING  = 'string';
-    const TYPE_LOB     = 'lob';
+    /** @var string Start of Line when folding */
+    const FOLDING = "\r\n ";
 
     /**
-     * Data
+     * @var \Zend\Loader\PluginClassLoader
+     */
+    protected $pluginClassLoader = null;
+
+    /**
+     * @var array key names for $headers array
+     */
+    protected $headersKeys = array();
+
+    /**
+     * @var  Header\HeaderInterface[] instances
+     */
+    protected $headers = array();
+
+    /**
+     * Header encoding; defaults to ASCII
      *
-     * @var array
+     * @var string
      */
-    protected $data = array();
+    protected $encoding = 'ASCII';
 
     /**
-     * @var array
-     */
-    protected $positions = array();
-
-    /**
-     * Errata
+     * Populates headers from string representation
      *
-     * @var array
-     */
-    protected $errata = array();
-
-    /**
-     * Constructor
+     * Parses a string for headers, and aggregates them, in order, in the
+     * current instance, primarily as strings until they are needed (they
+     * will be lazy loaded)
      *
-     * @param array $data
+     * @param  string $string
+     * @param  string $EOL EOL string; defaults to {@link EOL}
+     * @throws Exception\RuntimeException
+     * @return Headers
      */
-    public function __construct(array $data = array())
+    public static function fromString($string, $EOL = self::EOL)
     {
-        if ($data) {
-            $this->setFromArray($data);
-        }
-    }
+        $headers     = new static();
+        $currentLine = '';
 
-    /**
-     * Offset exists
-     *
-     * @param  string $name
-     * @return bool
-     */
-    public function offsetExists($name)
-    {
-        return (isset($this->data[$name]));
-    }
-
-    /**
-     * Offset get
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function offsetGet($name)
-    {
-        return (isset($this->data[$name])) ? $this->data[$name] : null;
-    }
-
-    /**
-     * @param $name
-     * @param $from
-     */
-    public function offsetSetReference($name, $from)
-    {
-        $this->data[$name] =& $this->data[$from];
-    }
-
-    /**
-     * Offset set
-     *
-     * @param string|int $name
-     * @param mixed $value
-     * @param mixed $errata
-     */
-    public function offsetSet($name, $value, $errata = null)
-    {
-        $position = false;
-
-        // if integer, get name for this position
-        if (is_int($name)) {
-            if (isset($this->positions[$name])) {
-                $position = $name;
-                $name = $this->positions[$name];
+        // iterate the header lines, some might be continuations
+        foreach (explode($EOL, $string) as $line) {
+            // check if a header name is present
+            if (preg_match('/^(?P<name>[\x21-\x39\x3B-\x7E]+):.*$/', $line, $matches)) {
+                if ($currentLine) {
+                    // a header name was present, then store the current complete line
+                    $headers->addHeaderLine($currentLine);
+                }
+                $currentLine = trim($line);
+            } elseif (preg_match('/^\s+.*$/', $line, $matches)) {
+                // continuation: append to current line
+                $currentLine .= trim($line);
+            } elseif (preg_match('/^\s*$/', $line)) {
+                // empty line indicates end of headers
+                break;
             } else {
-                $name = (string) $name;
+                // Line does not match header format!
+                throw new Exception\RuntimeException(sprintf(
+                    'Line "%s"does not match header format!',
+                    $line
+                ));
             }
-        } elseif (is_string($name)) {
-            // is a string:
-            $position = array_key_exists($name, $this->data);
-        } elseif ($name === null) {
-            $name = (string) count($this->data);
-        } else {
-            throw new Exception\InvalidArgumentException('Keys must be string, integer or null');
         }
-
-        if ($position === false) {
-            $this->positions[] = $name;
+        if ($currentLine) {
+            $headers->addHeaderLine($currentLine);
         }
-
-        $this->data[$name] = $value;
-
-        if ($errata) {
-            $this->offsetSetErrata($name, $errata);
-        }
+        return $headers;
     }
 
     /**
-     * Offset unset
+     * Set an alternate implementation for the PluginClassLoader
      *
-     * @param  string $name
-     * @return ParameterContainer
+     * @param  PluginClassLocator $pluginClassLoader
+     * @return Headers
      */
-    public function offsetUnset($name)
+    public function setPluginClassLoader(PluginClassLocator $pluginClassLoader)
     {
-        if (is_int($name) && isset($this->positions[$name])) {
-            $name = $this->positions[$name];
-        }
-        unset($this->data[$name]);
+        $this->pluginClassLoader = $pluginClassLoader;
         return $this;
     }
 
     /**
-     * Set from array
+     * Return an instance of a PluginClassLocator, lazyload and inject map if necessary
      *
-     * @param  array $data
-     * @return ParameterContainer
+     * @return PluginClassLocator
      */
-    public function setFromArray(Array $data)
+    public function getPluginClassLoader()
     {
-        foreach ($data as $n => $v) {
-            $this->offsetSet($n, $v);
+        if ($this->pluginClassLoader === null) {
+            $this->pluginClassLoader = new Header\HeaderLoader();
+        }
+        return $this->pluginClassLoader;
+    }
+
+    /**
+     * Set the header encoding
+     *
+     * @param  string $encoding
+     * @return Headers
+     */
+    public function setEncoding($encoding)
+    {
+        $this->encoding = $encoding;
+        foreach ($this as $header) {
+            $header->setEncoding($encoding);
         }
         return $this;
     }
 
     /**
-     * Offset set errata
+     * Get the header encoding
      *
-     * @param string|int $name
-     * @param mixed $errata
+     * @return string
      */
-    public function offsetSetErrata($name, $errata)
+    public function getEncoding()
     {
-        if (is_int($name)) {
-            $name = $this->positions[$name];
-        }
-        $this->errata[$name] = $errata;
+        return $this->encoding;
     }
 
     /**
-     * Offset get errata
+     * Add many headers at once
      *
-     * @param  string|int $name
+     * Expects an array (or Traversable object) of type/value pairs.
+     *
+     * @param  array|Traversable $headers
      * @throws Exception\InvalidArgumentException
-     * @return mixed
+     * @return Headers
      */
-    public function offsetGetErrata($name)
+    public function addHeaders($headers)
     {
-        if (is_int($name)) {
-            $name = $this->positions[$name];
+        if (!is_array($headers) && !$headers instanceof Traversable) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Expected array or Traversable; received "%s"',
+                (is_object($headers) ? get_class($headers) : gettype($headers))
+            ));
         }
-        if (!array_key_exists($name, $this->data)) {
-            throw new Exception\InvalidArgumentException('Data does not exist for this name/position');
+
+        foreach ($headers as $name => $value) {
+            if (is_int($name)) {
+                if (is_string($value)) {
+                    $this->addHeaderLine($value);
+                } elseif (is_array($value) && count($value) == 1) {
+                    $this->addHeaderLine(key($value), current($value));
+                } elseif (is_array($value) && count($value) == 2) {
+                    $this->addHeaderLine($value[0], $value[1]);
+                } elseif ($value instanceof Header\HeaderInterface) {
+                    $this->addHeader($value);
+                }
+            } elseif (is_string($name)) {
+                $this->addHeaderLine($name, $value);
+            }
+
         }
-        return $this->errata[$name];
+
+        return $this;
     }
 
     /**
-     * Offset has errata
+     * Add a raw header line, either in name => value, or as a single string 'name: value'
      *
-     * @param  string|int $name
+     * This method allows for lazy-loading in that the parsing and instantiation of HeaderInterface object
+     * will be delayed until they are retrieved by either get() or current()
+     *
+     * @throws Exception\InvalidArgumentException
+     * @param  string $headerFieldNameOrLine
+     * @param  string $fieldValue optional
+     * @return Headers
+     */
+    public function addHeaderLine($headerFieldNameOrLine, $fieldValue = null)
+    {
+        if (!is_string($headerFieldNameOrLine)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s expects its first argument to be a string; received "%s"',
+                (is_object($headerFieldNameOrLine) ? get_class($headerFieldNameOrLine) : gettype($headerFieldNameOrLine))
+            ));
+        }
+
+        if ($fieldValue === null) {
+            $this->addHeader(Header\GenericHeader::fromString($headerFieldNameOrLine));
+        } elseif (is_array($fieldValue)) {
+            foreach ($fieldValue as $i) {
+                $this->addHeader(new Header\GenericMultiHeader($headerFieldNameOrLine, $i));
+            }
+        } else {
+            $this->addHeader(new Header\GenericHeader($headerFieldNameOrLine, $fieldValue));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a Header\Interface to this container, for raw values see {@link addHeaderLine()} and {@link addHeaders()}
+     *
+     * @param  Header\HeaderInterface $header
+     * @return Headers
+     */
+    public function addHeader(Header\HeaderInterface $header)
+    {
+        $key = $this->normalizeFieldName($header->getFieldName());
+        $this->headersKeys[] = $key;
+        $this->headers[] = $header;
+        if ($this->getEncoding() !== 'ASCII') {
+            $header->setEncoding($this->getEncoding());
+        }
+        return $this;
+    }
+
+    /**
+     * Remove a Header from the container
+     *
+     * @param  string|Header\HeaderInterface field name or specific header instance to remove
      * @return bool
      */
-    public function offsetHasErrata($name)
+    public function removeHeader($instanceOrFieldName)
     {
-        if (is_int($name)) {
-            $name = $this->positions[$name];
+        if ($instanceOrFieldName instanceof Header\HeaderInterface) {
+            $indexes = array_keys($this->headers, $instanceOrFieldName, true);
+        } else {
+            $key = $this->normalizeFieldName($instanceOrFieldName);
+            $indexes = array_keys($this->headersKeys, $key, true);
         }
-        return (isset($this->errata[$name]));
-    }
 
-    /**
-     * Offset unset errata
-     *
-     * @param string|int $name
-     * @throws Exception\InvalidArgumentException
-     */
-    public function offsetUnsetErrata($name)
-    {
-        if (is_int($name)) {
-            $name = $this->positions[$name];
+        if (!empty($indexes)) {
+            foreach ($indexes as $index) {
+                unset ($this->headersKeys[$index]);
+                unset ($this->headers[$index]);
+            }
+            return true;
         }
-        if (!array_key_exists($name, $this->errata)) {
-            throw new Exception\InvalidArgumentException('Data does not exist for this name/position');
+
+        return false;
+    }
+
+    /**
+     * Clear all headers
+     *
+     * Removes all headers from queue
+     *
+     * @return Headers
+     */
+    public function clearHeaders()
+    {
+        $this->headers = $this->headersKeys = array();
+        return $this;
+    }
+
+    /**
+     * Get all headers of a certain name/type
+     *
+     * @param  string $name
+     * @return bool|ArrayIterator|Header\HeaderInterface Returns false if there is no headers with $name in this
+     * contain, an ArrayIterator if the header is a MultipleHeadersInterface instance and finally returns
+     * HeaderInterface for the rest of cases.
+     */
+    public function get($name)
+    {
+        $key = $this->normalizeFieldName($name);
+        $results = array();
+
+        foreach (array_keys($this->headersKeys, $key) as $index) {
+            if ($this->headers[$index] instanceof Header\GenericHeader) {
+                $results[] = $this->lazyLoadHeader($index);
+            } else {
+                $results[] = $this->headers[$index];
+            }
         }
-        $this->errata[$name] = null;
+
+        switch (count($results)) {
+            case 0:
+                return false;
+            case 1:
+                if ($results[0] instanceof Header\MultipleHeadersInterface) {
+                    return new ArrayIterator($results);
+                } else {
+                    return $results[0];
+                }
+            default:
+                return new ArrayIterator($results);
+        }
     }
 
     /**
-     * Get errata iterator
+     * Test for existence of a type of header
      *
-     * @return \ArrayIterator
+     * @param  string $name
+     * @return bool
      */
-    public function getErrataIterator()
+    public function has($name)
     {
-        return new \ArrayIterator($this->errata);
+        $name = $this->normalizeFieldName($name);
+        return in_array($name, $this->headersKeys);
     }
 
     /**
-     * getNamedArray
+     * Advance the pointer for this object as an iterator
      *
-     * @return array
-     */
-    public function getNamedArray()
-    {
-        return $this->data;
-    }
-
-    /**
-     * getNamedArray
-     *
-     * @return array
-     */
-    public function getPositionalArray()
-    {
-        return array_values($this->data);
-    }
-
-    /**
-     * count
-     *
-     * @return int
-     */
-    public function count()
-    {
-        return count($this->data);
-    }
-
-    /**
-     * Current
-     *
-     * @return mixed
-     */
-    public function current()
-    {
-        return current($this->data);
-    }
-
-    /**
-     * Next
-     *
-     * @return mixed
      */
     public function next()
     {
-        return next($this->data);
+        next($this->headers);
     }
 
     /**
-     * Key
+     * Return the current key for this object as an iterator
      *
      * @return mixed
      */
     public function key()
     {
-        return key($this->data);
+        return key($this->headers);
     }
 
     /**
-     * Valid
+     * Is this iterator still valid?
      *
      * @return bool
      */
     public function valid()
     {
-        return (current($this->data) !== false);
+        return (current($this->headers) !== false);
     }
 
     /**
-     * Rewind
+     * Reset the internal pointer for this object as an iterator
+     *
      */
     public function rewind()
     {
-        reset($this->data);
+        reset($this->headers);
     }
 
     /**
-     * @param array|ParameterContainer $parameters
-     * @throws Exception\InvalidArgumentException
-     * @return ParameterContainer
+     * Return the current value for this iterator, lazy loading it if need be
+     *
+     * @return Header\HeaderInterface
      */
-    public function merge($parameters)
+    public function current()
     {
-        if (!is_array($parameters) && !$parameters instanceof ParameterContainer) {
-            throw new Exception\InvalidArgumentException('$parameters must be an array or an instance of ParameterContainer');
+        $current = current($this->headers);
+        if ($current instanceof Header\GenericHeader) {
+            $current = $this->lazyLoadHeader(key($this->headers));
         }
+        return $current;
+    }
 
-        if (count($parameters) == 0) {
-            return $this;
-        }
+    /**
+     * Return the number of headers in this contain, if all headers have not been parsed, actual count could
+     * increase if MultipleHeader objects exist in the Request/Response.  If you need an exact count, iterate
+     *
+     * @return int count of currently known headers
+     */
+    public function count()
+    {
+        return count($this->headers);
+    }
 
-        if ($parameters instanceof ParameterContainer) {
-            $parameters = $parameters->getNamedArray();
-        }
-
-        foreach ($parameters as $key => $value) {
-            if (is_int($key)) {
-                $key = null;
+    /**
+     * Render all headers at once
+     *
+     * This method handles the normal iteration of headers; it is up to the
+     * concrete classes to prepend with the appropriate status/request line.
+     *
+     * @return string
+     */
+    public function toString()
+    {
+        $headers = '';
+        foreach ($this as $header) {
+            if ($str = $header->toString()) {
+                $headers .= $str . self::EOL;
             }
-            $this->offsetSet($key, $value);
         }
-        return $this;
+
+        return $headers;
+    }
+
+    /**
+     * Return the headers container as an array
+     *
+     * @todo determine how to produce single line headers, if they are supported
+     * @return array
+     */
+    public function toArray()
+    {
+        $headers = array();
+        /* @var $header Header\HeaderInterface */
+        foreach ($this->headers as $header) {
+            if ($header instanceof Header\MultipleHeadersInterface) {
+                $name = $header->getFieldName();
+                if (!isset($headers[$name])) {
+                    $headers[$name] = array();
+                }
+                $headers[$name][] = $header->getFieldValue();
+            } else {
+                $headers[$header->getFieldName()] = $header->getFieldValue();
+            }
+        }
+        return $headers;
+    }
+
+    /**
+     * By calling this, it will force parsing and loading of all headers, after this count() will be accurate
+     *
+     * @return bool
+     */
+    public function forceLoading()
+    {
+        foreach ($this as $item) {
+            // $item should now be loaded
+        }
+        return true;
+    }
+
+    /**
+     * @param $index
+     * @return mixed
+     */
+    protected function lazyLoadHeader($index)
+    {
+        $current = $this->headers[$index];
+
+        $key = $this->headersKeys[$index];
+        /* @var $class Header\HeaderInterface */
+        $class = ($this->getPluginClassLoader()->load($key)) ?: 'Zend\Mail\Header\GenericHeader';
+
+        $encoding = $current->getEncoding();
+        $headers  = $class::fromString($current->toString());
+        if (is_array($headers)) {
+            $current = array_shift($headers);
+            $current->setEncoding($encoding);
+            $this->headers[$index] = $current;
+            foreach ($headers as $header) {
+                $header->setEncoding($encoding);
+                $this->headersKeys[] = $key;
+                $this->headers[]     = $header;
+            }
+            return $current;
+        }
+
+        $current = $headers;
+        $current->setEncoding($encoding);
+        $this->headers[$index] = $current;
+        return $current;
+    }
+
+    /**
+     * Normalize a field name
+     *
+     * @param  string $fieldName
+     * @return string
+     */
+    protected function normalizeFieldName($fieldName)
+    {
+        return str_replace(array('-', '_', ' ', '.'), '', strtolower($fieldName));
     }
 }
 
@@ -22730,285 +24120,244 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Db\Adapter;
+namespace Zend\Mail\Header;
 
-class StatementContainer implements StatementContainerInterface
+interface HeaderInterface
 {
+    /**
+     * Format value in Mime-Encoding if not US-ASCII encoding is used
+     *
+     * @var bool
+     */
+    const FORMAT_ENCODED = true;
+
+    /**
+     * Return value with the interval ZF2 value (UTF-8 non-encoded)
+     *
+     * @var bool
+     */
+    const FORMAT_RAW     = false;
+
+
+    /**
+     * Factory to generate a header object from a string
+     *
+     * @param string $headerLine
+     * @return self
+     * @throws Exception\InvalidArgumentException If the header does not match with RFC 2822 definition.
+     * @see http://tools.ietf.org/html/rfc2822#section-2.2
+     */
+    public static function fromString($headerLine);
+
+    /**
+     * Retrieve header name
+     *
+     * @return string
+     */
+    public function getFieldName();
+
+    /**
+     * Retrieve header value
+     *
+     * @param  bool $format Return the value in Mime::Encoded or in Raw format
+     * @return string
+     */
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW);
+
+    /**
+     * Set header encoding
+     *
+     * @param  string $encoding
+     * @return self
+     */
+    public function setEncoding($encoding);
+
+    /**
+     * Get header encoding
+     *
+     * @return string
+     */
+    public function getEncoding();
+
+    /**
+     * Cast to string
+     *
+     * Returns in form of "NAME: VALUE"
+     *
+     * @return string
+     */
+    public function toString();
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+/**
+ * Marker interface for unstructured headers.
+ */
+interface UnstructuredInterface extends HeaderInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+class GenericHeader implements HeaderInterface, UnstructuredInterface
+{
+    /**
+     * @var string
+     */
+    protected $fieldName = null;
 
     /**
      * @var string
      */
-    protected $sql = '';
+    protected $fieldValue = null;
 
     /**
-     * @var ParameterContainer
+     * Header encoding
+     *
+     * @var string
      */
-    protected $parameterContainer = null;
+    protected $encoding = 'ASCII';
 
-    /**
-     * @param string|null $sql
-     * @param ParameterContainer|null $parameterContainer
-     */
-    public function __construct($sql = null, ParameterContainer $parameterContainer = null)
+    public static function fromString($headerLine)
     {
-        if ($sql) {
-            $this->setSql($sql);
+        $decodedLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+        list($name, $value) = GenericHeader::splitHeaderLine($decodedLine);
+        $header = new static($name, $value);
+        if ($decodedLine != $headerLine) {
+            $header->setEncoding('UTF-8');
         }
-        $this->parameterContainer = ($parameterContainer) ?: new ParameterContainer;
+        return $header;
     }
 
     /**
-     * @param $sql
-     * @return StatementContainer
+     * Splits the header line in `name` and `value` parts.
+     *
+     * @param string $headerLine
+     * @return string[] `name` in the first index and `value` in the second.
+     * @throws Exception\InvalidArgumentException If header does not match with the format ``name:value``
      */
-    public function setSql($sql)
+    public static function splitHeaderLine($headerLine)
     {
-        $this->sql = $sql;
-        return $this;
+        $parts = explode(':', $headerLine, 2);
+        if (count($parts) !== 2) {
+            throw new Exception\InvalidArgumentException('Header must match with the format "name:value"');
+        }
+
+        $parts[1] = ltrim($parts[1]);
+
+        return $parts;
     }
-
-    /**
-     * @return string
-     */
-    public function getSql()
-    {
-        return $this->sql;
-    }
-
-    /**
-     * @param ParameterContainer $parameterContainer
-     * @return StatementContainer
-     */
-    public function setParameterContainer(ParameterContainer $parameterContainer)
-    {
-        $this->parameterContainer = $parameterContainer;
-        return $this;
-    }
-
-    /**
-     * @return null|ParameterContainer
-     */
-    public function getParameterContainer()
-    {
-        return $this->parameterContainer;
-    }
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Db\Sql\Predicate;
-
-use Zend\Db\Sql\Exception;
-
-class Operator implements PredicateInterface
-{
-    const OPERATOR_EQUAL_TO                  = '=';
-    const OP_EQ                              = '=';
-
-    const OPERATOR_NOT_EQUAL_TO              = '!=';
-    const OP_NE                              = '!=';
-
-    const OPERATOR_LESS_THAN                 = '<';
-    const OP_LT                              = '<';
-
-    const OPERATOR_LESS_THAN_OR_EQUAL_TO     = '<=';
-    const OP_LTE                             = '<=';
-
-    const OPERATOR_GREATER_THAN              = '>';
-    const OP_GT                              = '>';
-
-    const OPERATOR_GREATER_THAN_OR_EQUAL_TO  = '>=';
-    const OP_GTE                             = '>=';
-
-    protected $allowedTypes  = array(
-        self::TYPE_IDENTIFIER,
-        self::TYPE_VALUE,
-    );
-
-    protected $left          = null;
-    protected $leftType      = self::TYPE_IDENTIFIER;
-    protected $operator      = self::OPERATOR_EQUAL_TO;
-    protected $right         = null;
-    protected $rightType     = self::TYPE_VALUE;
 
     /**
      * Constructor
      *
-     * @param  int|float|bool|string $left
-     * @param  string $operator
-     * @param  int|float|bool|string $right
-     * @param  string $leftType TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
-     * @param  string $rightType TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
+     * @param string $fieldName  Optional
+     * @param string $fieldValue Optional
      */
-    public function __construct($left = null, $operator = self::OPERATOR_EQUAL_TO, $right = null, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE)
+    public function __construct($fieldName = null, $fieldValue = null)
     {
-        if ($left !== null) {
-            $this->setLeft($left);
+        if ($fieldName) {
+            $this->setFieldName($fieldName);
         }
 
-        if ($operator !== self::OPERATOR_EQUAL_TO) {
-            $this->setOperator($operator);
-        }
-
-        if ($right !== null) {
-            $this->setRight($right);
-        }
-
-        if ($leftType !== self::TYPE_IDENTIFIER) {
-            $this->setLeftType($leftType);
-        }
-
-        if ($rightType !== self::TYPE_VALUE) {
-            $this->setRightType($rightType);
+        if ($fieldValue) {
+            $this->setFieldValue($fieldValue);
         }
     }
 
     /**
-     * Set left side of operator
+     * Set header name
      *
-     * @param  int|float|bool|string $left
-     * @return Operator
-     */
-    public function setLeft($left)
-    {
-        $this->left = $left;
-        return $this;
-    }
-
-    /**
-     * Get left side of operator
-     *
-     * @return int|float|bool|string
-     */
-    public function getLeft()
-    {
-        return $this->left;
-    }
-
-    /**
-     * Set parameter type for left side of operator
-     *
-     * @param  string $type TYPE_IDENTIFIER or TYPE_VALUE {@see allowedTypes}
+     * @param  string $fieldName
      * @throws Exception\InvalidArgumentException
-     * @return Operator
+     * @return GenericHeader
      */
-    public function setLeftType($type)
+    public function setFieldName($fieldName)
     {
-        if (!in_array($type, $this->allowedTypes)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Invalid type "%s" provided; must be of type "%s" or "%s"',
-                $type,
-                __CLASS__ . '::TYPE_IDENTIFIER',
-                __CLASS__ . '::TYPE_VALUE'
-            ));
+        if (!is_string($fieldName) || empty($fieldName)) {
+            throw new Exception\InvalidArgumentException('Header name must be a string');
         }
-        $this->leftType = $type;
-        return $this;
-    }
 
-    /**
-     * Get parameter type on left side of operator
-     *
-     * @return string
-     */
-    public function getLeftType()
-    {
-        return $this->leftType;
-    }
+        // Pre-filter to normalize valid characters, change underscore to dash
+        $fieldName = str_replace(' ', '-', ucwords(str_replace(array('_', '-'), ' ', $fieldName)));
 
-    /**
-     * Set operator string
-     *
-     * @param  string $operator
-     * @return Operator
-     */
-    public function setOperator($operator)
-    {
-        $this->operator = $operator;
-        return $this;
-    }
-
-    /**
-     * Get operator string
-     *
-     * @return string
-     */
-    public function getOperator()
-    {
-        return $this->operator;
-    }
-
-    /**
-     * Set right side of operator
-     *
-     * @param  int|float|bool|string $value
-     * @return Operator
-     */
-    public function setRight($value)
-    {
-        $this->right = $value;
-        return $this;
-    }
-
-    /**
-     * Get right side of operator
-     *
-     * @return int|float|bool|string
-     */
-    public function getRight()
-    {
-        return $this->right;
-    }
-
-    /**
-     * Set parameter type for right side of operator
-     *
-     * @param  string $type TYPE_IDENTIFIER or TYPE_VALUE {@see allowedTypes}
-     * @throws Exception\InvalidArgumentException
-     * @return Operator
-     */
-    public function setRightType($type)
-    {
-        if (!in_array($type, $this->allowedTypes)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Invalid type "%s" provided; must be of type "%s" or "%s"',
-                $type,
-                __CLASS__ . '::TYPE_IDENTIFIER',
-                __CLASS__ . '::TYPE_VALUE'
-            ));
+        // Validate what we have
+        if (!preg_match('/^[\x21-\x39\x3B-\x7E]*$/', $fieldName)) {
+            throw new Exception\InvalidArgumentException(
+                'Header name must be composed of printable US-ASCII characters, except colon.'
+            );
         }
-        $this->rightType = $type;
+
+        $this->fieldName = $fieldName;
         return $this;
     }
 
-    /**
-     * Get parameter type on right side of operator
-     *
-     * @return string
-     */
-    public function getRightType()
+    public function getFieldName()
     {
-        return $this->rightType;
+        return $this->fieldName;
     }
 
     /**
-     * Get predicate parts for where statement
+     * Set header value
      *
-     * @return array
+     * @param  string $fieldValue
+     * @return GenericHeader
      */
-    public function getExpressionData()
+    public function setFieldValue($fieldValue)
     {
-        return array(array(
-            '%s ' . $this->operator . ' %s',
-            array($this->left, $this->right),
-            array($this->leftType, $this->rightType)
-        ));
+        $fieldValue = (string) $fieldValue;
+
+        if (empty($fieldValue) || preg_match('/^\s+$/', $fieldValue)) {
+            $fieldValue = '';
+        }
+
+        $this->fieldValue = $fieldValue;
+        return $this;
+    }
+
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
+    {
+        if (HeaderInterface::FORMAT_ENCODED === $format) {
+            return HeaderWrap::wrap($this->fieldValue, $this);
+        }
+
+        return $this->fieldValue;
+    }
+
+    public function setEncoding($encoding)
+    {
+        $this->encoding = $encoding;
+        return $this;
+    }
+
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    public function toString()
+    {
+        $name  = $this->getFieldName();
+        $value = $this->getFieldValue(HeaderInterface::FORMAT_ENCODED);
+
+        return $name . ': ' . $value;
     }
 }
 
@@ -23020,85 +24369,868 @@ class Operator implements PredicateInterface
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Db\Sql;
+namespace Zend\Mail\Header;
 
-class Expression implements ExpressionInterface
+use Zend\Mail\Headers;
+use Zend\Mime\Mime;
+
+/**
+ * Utility class used for creating wrapped or MIME-encoded versions of header
+ * values.
+ */
+abstract class HeaderWrap
 {
     /**
-     * @const
+     * Wrap a long header line
+     *
+     * @param  string          $value
+     * @param  HeaderInterface $header
+     * @return string
      */
-    const PLACEHOLDER = '?';
+    public static function wrap($value, HeaderInterface $header)
+    {
+        if ($header instanceof UnstructuredInterface) {
+            return static::wrapUnstructuredHeader($value, $header);
+        } elseif ($header instanceof StructuredInterface) {
+            return static::wrapStructuredHeader($value, $header);
+        }
+        return $value;
+    }
 
+    /**
+     * Wrap an unstructured header line
+     *
+     * Wrap at 78 characters or before, based on whitespace.
+     *
+     * @param string          $value
+     * @param HeaderInterface $header
+     * @return string
+     */
+    protected static function wrapUnstructuredHeader($value, HeaderInterface $header)
+    {
+        $encoding = $header->getEncoding();
+        if ($encoding == 'ASCII') {
+            return wordwrap($value, 78, Headers::FOLDING);
+        }
+        return static::mimeEncodeValue($value, $encoding, 78);
+    }
+
+    /**
+     * Wrap a structured header line
+     *
+     * @param  string              $value
+     * @param  StructuredInterface $header
+     * @return string
+     */
+    protected static function wrapStructuredHeader($value, StructuredInterface $header)
+    {
+        $delimiter = $header->getDelimiter();
+
+        $length = strlen($value);
+        $lines  = array();
+        $temp   = '';
+        for ($i = 0; $i < $length; $i++) {
+            $temp .= $value[$i];
+            if ($value[$i] == $delimiter) {
+                $lines[] = $temp;
+                $temp    = '';
+            }
+        }
+        return implode(Headers::FOLDING, $lines);
+    }
+
+    /**
+     * MIME-encode a value
+     *
+     * Performs quoted-printable encoding on a value, setting maximum
+     * line-length to 998.
+     *
+     * @param  string $value
+     * @param  string $encoding
+     * @param  int    $lineLength maximum line-length, by default 998
+     * @return string Returns the mime encode value without the last line ending
+     */
+    public static function mimeEncodeValue($value, $encoding, $lineLength = 998)
+    {
+        return Mime::encodeQuotedPrintableHeader($value, $encoding, $lineLength, Headers::EOL);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+use Zend\Loader\PluginClassLoader;
+
+/**
+ * Plugin Class Loader implementation for HTTP headers
+ */
+class HeaderLoader extends PluginClassLoader
+{
+    /**
+     * @var array Pre-aliased Header plugins
+     */
+    protected $plugins = array(
+        'bcc'                       => 'Zend\Mail\Header\Bcc',
+        'cc'                        => 'Zend\Mail\Header\Cc',
+        'contenttype'               => 'Zend\Mail\Header\ContentType',
+        'content_type'              => 'Zend\Mail\Header\ContentType',
+        'content-type'              => 'Zend\Mail\Header\ContentType',
+        'contenttransferencoding'   => 'Zend\Mail\Header\ContentTransferEncoding',
+        'content_transfer_encoding' => 'Zend\Mail\Header\ContentTransferEncoding',
+        'content-transfer-encoding' => 'Zend\Mail\Header\ContentTransferEncoding',
+        'date'                      => 'Zend\Mail\Header\Date',
+        'from'                      => 'Zend\Mail\Header\From',
+        'message-id'                => 'Zend\Mail\Header\MessageId',
+        'mimeversion'               => 'Zend\Mail\Header\MimeVersion',
+        'mime_version'              => 'Zend\Mail\Header\MimeVersion',
+        'mime-version'              => 'Zend\Mail\Header\MimeVersion',
+        'received'                  => 'Zend\Mail\Header\Received',
+        'replyto'                   => 'Zend\Mail\Header\ReplyTo',
+        'reply_to'                  => 'Zend\Mail\Header\ReplyTo',
+        'reply-to'                  => 'Zend\Mail\Header\ReplyTo',
+        'sender'                    => 'Zend\Mail\Header\Sender',
+        'subject'                   => 'Zend\Mail\Header\Subject',
+        'to'                        => 'Zend\Mail\Header\To',
+    );
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+/**
+ * @todo       Add accessors for setting date from DateTime, Zend\Date, or a string
+ */
+class Date implements HeaderInterface
+{
     /**
      * @var string
      */
-    protected $expression = '';
+    protected $value;
+
+    public static function fromString($headerLine)
+    {
+        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+
+        // check to ensure proper header type for this factory
+        if (strtolower($name) !== 'date') {
+            throw new Exception\InvalidArgumentException('Invalid header line for Date string');
+        }
+
+        $header = new static($value);
+
+        return $header;
+    }
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function getFieldName()
+    {
+        return 'Date';
+    }
+
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
+    {
+        return $this->value;
+    }
+
+    public function setEncoding($encoding)
+    {
+        // This header must be always in US-ASCII
+        return $this;
+    }
+
+    public function getEncoding()
+    {
+        return 'ASCII';
+    }
+
+    public function toString()
+    {
+        return 'Date: ' . $this->getFieldValue();
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+use Zend\Mail\AddressList;
+use Zend\Mail\Headers;
+
+/**
+ * Base class for headers composing address lists (to, from, cc, bcc, reply-to)
+ */
+abstract class AbstractAddressList implements HeaderInterface
+{
+    /**
+     * @var AddressList
+     */
+    protected $addressList;
+
+    /**
+     * @var string Normalized field name
+     */
+    protected $fieldName;
+
+    /**
+     * Header encoding
+     *
+     * @var string
+     */
+    protected $encoding = 'ASCII';
+
+    /**
+     * @var string lower case field name
+     */
+    protected static $type;
+
+    public static function fromString($headerLine)
+    {
+        $decodedLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+        // split into name/value
+        list($fieldName, $fieldValue) = GenericHeader::splitHeaderLine($decodedLine);
+
+        if (strtolower($fieldName) !== static::$type) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Invalid header line for "%s" string',
+                __CLASS__
+            ));
+        }
+        $header = new static();
+        if ($decodedLine != $headerLine) {
+            $header->setEncoding('UTF-8');
+        }
+        // split value on ","
+        $fieldValue = str_replace(Headers::FOLDING, ' ', $fieldValue);
+        $values     = explode(',', $fieldValue);
+        array_walk(
+            $values,
+            function (&$value) {
+                $value = trim($value);
+            }
+        );
+
+        $addressList = $header->getAddressList();
+        foreach ($values as $address) {
+            // split values into name/email
+            if (!preg_match('/^((?P<name>.*?)<(?P<namedEmail>[^>]+)>|(?P<email>.+))$/', $address, $matches)) {
+                // Should we raise an exception here?
+                continue;
+            }
+            $name = null;
+            if (isset($matches['name'])) {
+                $name  = trim($matches['name']);
+            }
+            if (empty($name)) {
+                $name = null;
+            }
+
+            if (isset($matches['namedEmail'])) {
+                $email = $matches['namedEmail'];
+            }
+            if (isset($matches['email'])) {
+                $email = $matches['email'];
+            }
+            $email = trim($email); // we may have leading whitespace
+
+            // populate address list
+            $addressList->add($email, $name);
+        }
+        return $header;
+    }
+
+    public function getFieldName()
+    {
+        return $this->fieldName;
+    }
+
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
+    {
+        $emails   = array();
+        $encoding = $this->getEncoding();
+        foreach ($this->getAddressList() as $address) {
+            $email = $address->getEmail();
+            $name  = $address->getName();
+            if (empty($name)) {
+                $emails[] = $email;
+            } else {
+                if (false !== strstr($name, ',')) {
+                    $name = sprintf('"%s"', $name);
+                }
+
+                if ($format == HeaderInterface::FORMAT_ENCODED
+                    && 'ASCII' !== $encoding
+                ) {
+                    $name = HeaderWrap::mimeEncodeValue($name, $encoding);
+                }
+                $emails[] = sprintf('%s <%s>', $name, $email);
+            }
+        }
+
+        return implode(',' . Headers::FOLDING, $emails);
+    }
+
+    public function setEncoding($encoding)
+    {
+        $this->encoding = $encoding;
+        return $this;
+    }
+
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * Set address list for this header
+     *
+     * @param  AddressList $addressList
+     */
+    public function setAddressList(AddressList $addressList)
+    {
+        $this->addressList = $addressList;
+    }
+
+    /**
+     * Get address list managed by this header
+     *
+     * @return AddressList
+     */
+    public function getAddressList()
+    {
+        if (null === $this->addressList) {
+            $this->setAddressList(new AddressList());
+        }
+        return $this->addressList;
+    }
+
+    public function toString()
+    {
+        $name  = $this->getFieldName();
+        $value = $this->getFieldValue(HeaderInterface::FORMAT_ENCODED);
+        return (empty($value)) ? '' : sprintf('%s: %s', $name, $value);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+class To extends AbstractAddressList
+{
+    protected $fieldName = 'To';
+    protected static $type = 'to';
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+class From extends AbstractAddressList
+{
+    protected $fieldName = 'From';
+    protected static $type = 'from';
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+class Bcc extends AbstractAddressList
+{
+    protected $fieldName = 'Bcc';
+    protected static $type = 'bcc';
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+class Cc extends AbstractAddressList
+{
+    protected $fieldName = 'Cc';
+    protected static $type = 'cc';
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+use Zend\Mail;
+
+class Sender implements HeaderInterface
+{
+    /**
+     * @var \Zend\Mail\Address\AddressInterface
+     */
+    protected $address;
+
+    /**
+     * Header encoding
+     *
+     * @var string
+     */
+    protected $encoding = 'ASCII';
+
+    public static function fromString($headerLine)
+    {
+        $decodedLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+        list($name, $value) = GenericHeader::splitHeaderLine($decodedLine);
+
+        // check to ensure proper header type for this factory
+        if (strtolower($name) !== 'sender') {
+            throw new Exception\InvalidArgumentException('Invalid header line for Sender string');
+        }
+
+        $header = new static();
+        if ($decodedLine != $headerLine) {
+            $header->setEncoding('UTF-8');
+        }
+
+        // Check for address, and set if found
+        if (preg_match('/^(?P<name>.*?)<(?P<email>[^>]+)>$/', $value, $matches)) {
+            $name = $matches['name'];
+            if (empty($name)) {
+                $name = null;
+            } else {
+                $name = iconv_mime_decode($name, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+            }
+            $header->setAddress($matches['email'], $name);
+        }
+
+        return $header;
+    }
+
+    public function getFieldName()
+    {
+        return 'Sender';
+    }
+
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
+    {
+        if (!$this->address instanceof Mail\Address\AddressInterface) {
+            return '';
+        }
+
+        $email = sprintf('<%s>', $this->address->getEmail());
+        $name  = $this->address->getName();
+        if (!empty($name)) {
+            $encoding = $this->getEncoding();
+            if ($format == HeaderInterface::FORMAT_ENCODED
+                && 'ASCII' !== $encoding
+            ) {
+                $name  = HeaderWrap::mimeEncodeValue($name, $encoding);
+            }
+            $email = sprintf('%s %s', $name, $email);
+        }
+        return $email;
+    }
+
+    public function setEncoding($encoding)
+    {
+        $this->encoding = $encoding;
+        return $this;
+    }
+
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    public function toString()
+    {
+        return 'Sender: ' . $this->getFieldValue(HeaderInterface::FORMAT_ENCODED);
+    }
+
+    /**
+     * Set the address used in this header
+     *
+     * @param  string|\Zend\Mail\Address\AddressInterface $emailOrAddress
+     * @param  null|string $name
+     * @throws Exception\InvalidArgumentException
+     * @return Sender
+     */
+    public function setAddress($emailOrAddress, $name = null)
+    {
+        if (is_string($emailOrAddress)) {
+            $emailOrAddress = new Mail\Address($emailOrAddress, $name);
+        } elseif (!$emailOrAddress instanceof Mail\Address\AddressInterface) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s expects a string or AddressInterface object; received "%s"',
+                __METHOD__,
+                (is_object($emailOrAddress) ? get_class($emailOrAddress) : gettype($emailOrAddress))
+            ));
+        }
+        $this->address = $emailOrAddress;
+        return $this;
+    }
+
+    /**
+     * Retrieve the internal address from this header
+     *
+     * @return \Zend\Mail\Address\AddressInterface|null
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+class Subject implements UnstructuredInterface
+{
+    /**
+     * @var string
+     */
+    protected $subject = '';
+
+    /**
+     * Header encoding
+     *
+     * @var string
+     */
+    protected $encoding = 'ASCII';
+
+    public static function fromString($headerLine)
+    {
+        $decodedLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+        list($name, $value) = GenericHeader::splitHeaderLine($decodedLine);
+
+        // check to ensure proper header type for this factory
+        if (strtolower($name) !== 'subject') {
+            throw new Exception\InvalidArgumentException('Invalid header line for Subject string');
+        }
+
+        $header = new static();
+        if ($decodedLine != $headerLine) {
+            $header->setEncoding('UTF-8');
+        }
+        $header->setSubject($value);
+
+        return $header;
+    }
+
+    public function getFieldName()
+    {
+        return 'Subject';
+    }
+
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
+    {
+        if (HeaderInterface::FORMAT_ENCODED === $format) {
+            return HeaderWrap::wrap($this->subject, $this);
+        }
+
+        return $this->subject;
+    }
+
+    public function setEncoding($encoding)
+    {
+        $this->encoding = $encoding;
+        return $this;
+    }
+
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    public function setSubject($subject)
+    {
+        $this->subject = (string) $subject;
+        return $this;
+    }
+
+    public function toString()
+    {
+        return 'Subject: ' . $this->getFieldValue(HeaderInterface::FORMAT_ENCODED);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+class MimeVersion implements HeaderInterface
+{
+    /**
+     * @var string Version string
+     */
+    protected $version = '1.0';
+
+    public static function fromString($headerLine)
+    {
+        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+
+        // check to ensure proper header type for this factory
+        if (strtolower($name) !== 'mime-version') {
+            throw new Exception\InvalidArgumentException('Invalid header line for MIME-Version string');
+        }
+
+        // Check for version, and set if found
+        $header = new static();
+        if (preg_match('/^(?P<version>\d+\.\d+)$/', $value, $matches)) {
+            $header->setVersion($matches['version']);
+        }
+
+        return $header;
+    }
+
+    public function getFieldName()
+    {
+        return 'MIME-Version';
+    }
+
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
+    {
+        return $this->version;
+    }
+
+    public function setEncoding($encoding)
+    {
+        // This header must be always in US-ASCII
+        return $this;
+    }
+
+    public function getEncoding()
+    {
+        return 'ASCII';
+    }
+
+    public function toString()
+    {
+        return 'MIME-Version: ' . $this->getFieldValue();
+    }
+
+    /**
+     * Set the version string used in this header
+     *
+     * @param  string $version
+     * @return MimeVersion
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
+        return $this;
+    }
+
+    /**
+     * Retrieve the version string for this header
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Header;
+
+use Zend\Mail\Headers;
+
+class ContentType implements HeaderInterface
+{
+    /**
+     * @var string
+     */
+    protected $type;
 
     /**
      * @var array
      */
     protected $parameters = array();
 
-    /**
-     * @var array
-     */
-    protected $types = array();
-
-    /**
-     * @param string $expression
-     * @param string|array $parameters
-     * @param array $types
-     */
-    public function __construct($expression = '', $parameters = null, array $types = array())
+    public static function fromString($headerLine)
     {
-        if ($expression) {
-            $this->setExpression($expression);
+        $headerLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+
+        // check to ensure proper header type for this factory
+        if (strtolower($name) !== 'content-type') {
+            throw new Exception\InvalidArgumentException('Invalid header line for Content-Type string');
         }
-        if ($parameters) {
-            $this->setParameters($parameters);
+
+        $value  = str_replace(Headers::FOLDING, " ", $value);
+        $values = preg_split('#\s*;\s*#', $value);
+        $type   = array_shift($values);
+
+        //Remove empty values
+        $values = array_filter($values);
+
+        $header = new static();
+        $header->setType($type);
+
+        if (count($values)) {
+            foreach ($values as $keyValuePair) {
+                list($key, $value) = explode('=', $keyValuePair, 2);
+                $value = trim($value, "'\" \t\n\r\0\x0B");
+                $header->addParameter($key, $value);
+            }
         }
-        if ($types) {
-            $this->setTypes($types);
+
+        return $header;
+    }
+
+    public function getFieldName()
+    {
+        return 'Content-Type';
+    }
+
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
+    {
+        $prepared = $this->type;
+        if (empty($this->parameters)) {
+            return $prepared;
         }
+
+        $values = array($prepared);
+        foreach ($this->parameters as $attribute => $value) {
+            $values[] = sprintf('%s="%s"', $attribute, $value);
+        }
+
+        return implode(';' . Headers::FOLDING, $values);
+    }
+
+    public function setEncoding($encoding)
+    {
+        // This header must be always in US-ASCII
+        return $this;
+    }
+
+    public function getEncoding()
+    {
+        return 'ASCII';
+    }
+
+    public function toString()
+    {
+        return 'Content-Type: ' . $this->getFieldValue();
     }
 
     /**
-     * @param $expression
-     * @return Expression
+     * Set the content type
+     *
+     * @param  string $type
      * @throws Exception\InvalidArgumentException
+     * @return ContentType
      */
-    public function setExpression($expression)
+    public function setType($type)
     {
-        if (!is_string($expression) || $expression == '') {
-            throw new Exception\InvalidArgumentException('Supplied expression must be a string.');
+        if (!preg_match('/^[a-z-]+\/[a-z0-9.+-]+$/i', $type)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s expects a value in the format "type/subtype"; received "%s"',
+                __METHOD__,
+                (string) $type
+            ));
         }
-        $this->expression = $expression;
+        $this->type = $type;
         return $this;
     }
 
     /**
+     * Retrieve the content type
+     *
      * @return string
      */
-    public function getExpression()
+    public function getType()
     {
-        return $this->expression;
+        return $this->type;
     }
 
     /**
-     * @param $parameters
-     * @return Expression
-     * @throws Exception\InvalidArgumentException
+     * Add a parameter pair
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return ContentType
      */
-    public function setParameters($parameters)
+    public function addParameter($name, $value)
     {
-        if (!is_scalar($parameters) && !is_array($parameters)) {
-            throw new Exception\InvalidArgumentException('Expression parameters must be a scalar or array.');
-        }
-        $this->parameters = $parameters;
+        $name = strtolower($name);
+        $this->parameters[$name] = (string) $value;
         return $this;
     }
 
     /**
+     * Get all parameters
+     *
      * @return array
      */
     public function getParameters()
@@ -23107,61 +25239,34 @@ class Expression implements ExpressionInterface
     }
 
     /**
-     * @param array $types
-     * @return Expression
+     * Get a parameter by name
+     *
+     * @param  string $name
+     * @return null|string
      */
-    public function setTypes(array $types)
+    public function getParameter($name)
     {
-        $this->types = $types;
-        return $this;
+        $name = strtolower($name);
+        if (isset($this->parameters[$name])) {
+            return $this->parameters[$name];
+        }
+        return null;
     }
 
     /**
-     * @return array
+     * Remove a named parameter
+     *
+     * @param  string $name
+     * @return bool
      */
-    public function getTypes()
+    public function removeParameter($name)
     {
-        return $this->types;
-    }
-
-    /**
-     * @return array
-     * @throws Exception\RuntimeException
-     */
-    public function getExpressionData()
-    {
-        $parameters = (is_scalar($this->parameters)) ? array($this->parameters) : $this->parameters;
-
-        $types = array();
-        $parametersCount = count($parameters);
-
-        if ($parametersCount == 0 && strpos($this->expression, self::PLACEHOLDER) !== false) {
-            // if there are no parameters, but there is a placeholder
-            $parametersCount = substr_count($this->expression, self::PLACEHOLDER);
-            $parameters = array_fill(0, $parametersCount, null);
+        $name = strtolower($name);
+        if (isset($this->parameters[$name])) {
+            unset($this->parameters[$name]);
+            return true;
         }
-
-        for ($i = 0; $i < $parametersCount; $i++) {
-            $types[$i] = (isset($this->types[$i]) && ($this->types[$i] == self::TYPE_IDENTIFIER || $this->types[$i] == self::TYPE_LITERAL))
-                ? $this->types[$i] : self::TYPE_VALUE;
-        }
-
-        // assign locally, escaping % signs
-        $expression = str_replace('%', '%%', $this->expression);
-
-        if ($parametersCount > 0) {
-            $count = 0;
-            $expression = str_replace(self::PLACEHOLDER, '%s', $expression, $count);
-            if ($count !== $parametersCount) {
-                throw new Exception\RuntimeException('The number of replacements in the expression does not match the number of parameters');
-            }
-        }
-
-        return array(array(
-            $expression,
-            $parameters,
-            $types
-        ));
+        return false;
     }
 }
 
@@ -23173,37 +25278,203 @@ class Expression implements ExpressionInterface
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Db\Sql\Predicate;
+namespace Zend\Mail\Header;
 
-use Zend\Db\Sql\Expression as BaseExpression;
 
-class Expression extends BaseExpression implements PredicateInterface
+class ContentTransferEncoding implements HeaderInterface
 {
+    /**
+     * Allowed Content-Transfer-Encoding parameters specified by RFC 1521
+     * (reduced set)
+     * @var array
+     */
+    protected static $allowedTransferEncodings = array(
+        '7bit',
+        '8bit',
+        'quoted-printable',
+        'base64',
+        /*
+         * not implemented:
+         * 'binary',
+         * x-token: 'X-'
+         */
+    );
+
+
+    /**
+     * @var string
+     */
+    protected $transferEncoding;
+
+    /**
+     * @var array
+     */
+    protected $parameters = array();
+
+    public static function fromString($headerLine)
+    {
+        $headerLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+
+        // check to ensure proper header type for this factory
+        if (strtolower($name) !== 'content-transfer-encoding') {
+            throw new Exception\InvalidArgumentException('Invalid header line for Content-Transfer-Encoding string');
+        }
+
+        $header = new static();
+        $header->setTransferEncoding($value);
+
+        return $header;
+    }
+
+    public function getFieldName()
+    {
+        return 'Content-Transfer-Encoding';
+    }
+
+    public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
+    {
+        return $this->transferEncoding;
+    }
+
+    public function setEncoding($encoding)
+    {
+        // Header must be always in US-ASCII
+        return $this;
+    }
+
+    public function getEncoding()
+    {
+        return 'ASCII';
+    }
+
+    public function toString()
+    {
+        return 'Content-Transfer-Encoding: ' . $this->getFieldValue();
+    }
+
+    /**
+     * Set the content transfer encoding
+     *
+     * @param  string $transferEncoding
+     * @throws Exception\InvalidArgumentException
+     * @return self
+     */
+    public function setTransferEncoding($transferEncoding)
+    {
+        // Per RFC 1521, the value of the header is not case sensitive
+        $transferEncoding = strtolower($transferEncoding);
+
+        if (!in_array($transferEncoding, static::$allowedTransferEncodings)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s expects one of "'. implode(', ', static::$allowedTransferEncodings) . '"; received "%s"',
+                __METHOD__,
+                (string) $transferEncoding
+            ));
+        }
+        $this->transferEncoding = $transferEncoding;
+        return $this;
+    }
+
+    /**
+     * Retrieve the content transfer encoding
+     *
+     * @return string
+     */
+    public function getTransferEncoding()
+    {
+        return $this->transferEncoding;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Address;
+
+interface AddressInterface
+{
+    public function getEmail();
+    public function getName();
+    public function toString();
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail;
+
+class Address implements Address\AddressInterface
+{
+    protected $email;
+    protected $name;
 
     /**
      * Constructor
      *
-     * @param string $expression
-     * @param int|float|bool|string|array $valueParameter
+     * @param  string $email
+     * @param  null|string $name
+     * @throws Exception\InvalidArgumentException
+     * @return Address
      */
-    public function __construct($expression = null, $valueParameter = null /*[, $valueParameter, ... ]*/)
+    public function __construct($email, $name = null)
     {
-        if ($expression) {
-            $this->setExpression($expression);
+        if (!is_string($email)) {
+            throw new Exception\InvalidArgumentException('Email must be a string');
+        }
+        if (null !== $name && !is_string($name)) {
+            throw new Exception\InvalidArgumentException('Name must be a string');
         }
 
-        if (is_array($valueParameter)) {
-            $this->setParameters($valueParameter);
-        } else {
-            $argNum = func_num_args();
-            if ($argNum > 2 || is_scalar($valueParameter)) {
-                $parameters = array();
-                for ($i = 1; $i < $argNum; $i++) {
-                    $parameters[] = func_get_arg($i);
-                }
-                $this->setParameters($parameters);
-            }
+        $this->email = $email;
+        $this->name  = $name;
+    }
+
+    /**
+     * Retrieve email
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Retrieve name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * String representation of address
+     *
+     * @return string
+     */
+    public function toString()
+    {
+        $string = '<' . $this->getEmail() . '>';
+        $name   = $this->getName();
+        if (null === $name) {
+            return $string;
         }
+
+        $string = $name . ' ' . $string;
+        return $string;
     }
 }
 
@@ -23215,50 +25486,818 @@ class Expression extends BaseExpression implements PredicateInterface
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Db\Sql;
+namespace Zend\Mail;
 
-class Literal implements ExpressionInterface
+use Countable;
+use Iterator;
+
+class AddressList implements Countable, Iterator
 {
     /**
-     * @var string
+     * List of Address objects we're managing
+     *
+     * @var array
      */
-    protected $literal = '';
+    protected $addresses = array();
 
     /**
-     * @param $literal
+     * Add an address to the list
+     *
+     * @param  string|Address\AddressInterface $emailOrAddress
+     * @param  null|string $name
+     * @throws Exception\InvalidArgumentException
+     * @return AddressList
      */
-    public function __construct($literal = '')
+    public function add($emailOrAddress, $name = null)
     {
-        $this->literal = $literal;
-    }
+        if (is_string($emailOrAddress)) {
+            $emailOrAddress = $this->createAddress($emailOrAddress, $name);
+        } elseif (!$emailOrAddress instanceof Address\AddressInterface) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s expects an email address or %s\Address object as its first argument; received "%s"',
+                __METHOD__,
+                __NAMESPACE__,
+                (is_object($emailOrAddress) ? get_class($emailOrAddress) : gettype($emailOrAddress))
+            ));
+        }
 
-    /**
-     * @param string $literal
-     * @return Literal
-     */
-    public function setLiteral($literal)
-    {
-        $this->literal = $literal;
+        $email = strtolower($emailOrAddress->getEmail());
+        if ($this->has($email)) {
+            return $this;
+        }
+
+        $this->addresses[$email] = $emailOrAddress;
         return $this;
     }
 
     /**
-     * @return string
+     * Add many addresses at once
+     *
+     * If an email key is provided, it will be used as the email, and the value
+     * as the name. Otherwise, the value is passed as the sole argument to add(),
+     * and, as such, can be either email strings or Address\AddressInterface objects.
+     *
+     * @param  array $addresses
+     * @throws Exception\RuntimeException
+     * @return AddressList
      */
-    public function getLiteral()
+    public function addMany(array $addresses)
     {
-        return $this->literal;
+        foreach ($addresses as $key => $value) {
+            if (is_int($key) || is_numeric($key)) {
+                $this->add($value);
+            } elseif (is_string($key)) {
+                $this->add($key, $value);
+            } else {
+                throw new Exception\RuntimeException(sprintf(
+                    'Invalid key type in provided addresses array ("%s")',
+                    (is_object($key) ? get_class($key) : var_export($key, 1))
+                ));
+            }
+        }
+        return $this;
     }
 
     /**
+     * Merge another address list into this one
+     *
+     * @param  AddressList $addressList
+     * @return AddressList
+     */
+    public function merge(AddressList $addressList)
+    {
+        foreach ($addressList as $address) {
+            $this->add($address);
+        }
+        return $this;
+    }
+
+    /**
+     * Does the email exist in this list?
+     *
+     * @param  string $email
+     * @return bool
+     */
+    public function has($email)
+    {
+        $email = strtolower($email);
+        return isset($this->addresses[$email]);
+    }
+
+    /**
+     * Get an address by email
+     *
+     * @param  string $email
+     * @return bool|Address\AddressInterface
+     */
+    public function get($email)
+    {
+        $email = strtolower($email);
+        if (!isset($this->addresses[$email])) {
+            return false;
+        }
+
+        return $this->addresses[$email];
+    }
+
+    /**
+     * Delete an address from the list
+     *
+     * @param  string $email
+     * @return bool
+     */
+    public function delete($email)
+    {
+        $email = strtolower($email);
+        if (!isset($this->addresses[$email])) {
+            return false;
+        }
+
+        unset($this->addresses[$email]);
+        return true;
+    }
+
+    /**
+     * Return count of addresses
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->addresses);
+    }
+
+    /**
+     * Rewind iterator
+     *
+     * @return mixed the value of the first addresses element, or false if the addresses is
+     * empty.
+     * @see addresses
+     */
+    public function rewind()
+    {
+        return reset($this->addresses);
+    }
+
+    /**
+     * Return current item in iteration
+     *
+     * @return Address
+     */
+    public function current()
+    {
+        return current($this->addresses);
+    }
+
+    /**
+     * Return key of current item of iteration
+     *
+     * @return string
+     */
+    public function key()
+    {
+        return key($this->addresses);
+    }
+
+    /**
+     * Move to next item
+     *
+     * @return mixed the addresses value in the next place that's pointed to by the
+     * internal array pointer, or false if there are no more elements.
+     * @see addresses
+     */
+    public function next()
+    {
+        return next($this->addresses);
+    }
+
+    /**
+     * Is the current item of iteration valid?
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        $key = key($this->addresses);
+        return ($key !== null && $key !== false);
+    }
+
+    /**
+     * Create an address object
+     *
+     * @param  string $email
+     * @param  string|null $name
+     * @return Address
+     */
+    protected function createAddress($email, $name)
+    {
+        return new Address($email, $name);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Transport;
+
+use Zend\Mail;
+
+/**
+ * Interface for mail transports
+ */
+interface TransportInterface
+{
+    /**
+     * Send a mail message
+     *
+     * @param \Zend\Mail\Message $message
+     * @return
+     */
+    public function send(Mail\Message $message);
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Transport;
+
+use Zend\Mail\Address;
+use Zend\Mail\Headers;
+use Zend\Mail\Message;
+use Zend\Mail\Protocol;
+use Zend\Mail\Protocol\Exception as ProtocolException;
+
+/**
+ * SMTP connection object
+ *
+ * Loads an instance of Zend\Mail\Protocol\Smtp and forwards smtp transactions
+ */
+class Smtp implements TransportInterface
+{
+    /**
+     * @var SmtpOptions
+     */
+    protected $options;
+
+    /**
+     * @var Protocol\Smtp
+     */
+    protected $connection;
+
+    /**
+     * @var bool
+     */
+    protected $autoDisconnect = true;
+
+    /**
+     * @var Protocol\SmtpPluginManager
+     */
+    protected $plugins;
+
+    /**
+     * Constructor.
+     *
+     * @param  SmtpOptions $options Optional
+     */
+    public function __construct(SmtpOptions $options = null)
+    {
+        if (!$options instanceof SmtpOptions) {
+            $options = new SmtpOptions();
+        }
+        $this->setOptions($options);
+    }
+
+    /**
+     * Set options
+     *
+     * @param  SmtpOptions $options
+     * @return Smtp
+     */
+    public function setOptions(SmtpOptions $options)
+    {
+        $this->options = $options;
+        return $this;
+    }
+
+    /**
+     * Get options
+     *
+     * @return SmtpOptions
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Set plugin manager for obtaining SMTP protocol connection
+     *
+     * @param  Protocol\SmtpPluginManager $plugins
+     * @throws Exception\InvalidArgumentException
+     * @return Smtp
+     */
+    public function setPluginManager(Protocol\SmtpPluginManager $plugins)
+    {
+        $this->plugins = $plugins;
+        return $this;
+    }
+
+    /**
+     * Get plugin manager for loading SMTP protocol connection
+     *
+     * @return Protocol\SmtpPluginManager
+     */
+    public function getPluginManager()
+    {
+        if (null === $this->plugins) {
+            $this->setPluginManager(new Protocol\SmtpPluginManager());
+        }
+        return $this->plugins;
+    }
+
+    /**
+     * Set the automatic disconnection when destruct
+     *
+     * @param  bool $flag
+     * @return Smtp
+     */
+    public function setAutoDisconnect($flag)
+    {
+        $this->autoDisconnect = (bool) $flag;
+        return $this;
+    }
+
+    /**
+     * Get the automatic disconnection value
+     *
+     * @return bool
+     */
+    public function getAutoDisconnect()
+    {
+        return $this->autoDisconnect;
+    }
+
+    /**
+     * Return an SMTP connection
+     *
+     * @param  string $name
+     * @param  array|null $options
+     * @return Protocol\Smtp
+     */
+    public function plugin($name, array $options = null)
+    {
+        return $this->getPluginManager()->get($name, $options);
+    }
+
+    /**
+     * Class destructor to ensure all open connections are closed
+     */
+    public function __destruct()
+    {
+        if ($this->connection instanceof Protocol\Smtp) {
+            try {
+                $this->connection->quit();
+            } catch (ProtocolException\ExceptionInterface $e) {
+                // ignore
+            }
+            if ($this->autoDisconnect) {
+                $this->connection->disconnect();
+            }
+        }
+    }
+
+    /**
+     * Sets the connection protocol instance
+     *
+     * @param Protocol\AbstractProtocol $connection
+     */
+    public function setConnection(Protocol\AbstractProtocol $connection)
+    {
+        $this->connection = $connection;
+    }
+
+
+    /**
+     * Gets the connection protocol instance
+     *
+     * @return Protocol\Smtp
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
+     * Disconnect the connection protocol instance
+     *
+     * @return void
+     */
+    public function disconnect()
+    {
+        if (!empty($this->connection) && ($this->connection instanceof Protocol\Smtp)) {
+            $this->connection->disconnect();
+        }
+    }
+
+    /**
+     * Send an email via the SMTP connection protocol
+     *
+     * The connection via the protocol adapter is made just-in-time to allow a
+     * developer to add a custom adapter if required before mail is sent.
+     *
+     * @param Message $message
+     * @throws Exception\RuntimeException
+     */
+    public function send(Message $message)
+    {
+        // If sending multiple messages per session use existing adapter
+        $connection = $this->getConnection();
+
+        if (!($connection instanceof Protocol\Smtp) || !$connection->hasSession()) {
+            $connection = $this->connect();
+        } else {
+            // Reset connection to ensure reliable transaction
+            $connection->rset();
+        }
+
+        // Prepare message
+        $from       = $this->prepareFromAddress($message);
+        $recipients = $this->prepareRecipients($message);
+        $headers    = $this->prepareHeaders($message);
+        $body       = $this->prepareBody($message);
+
+        if ((count($recipients) == 0) && (!empty($headers) || !empty($body))) {
+            throw new Exception\RuntimeException(  // Per RFC 2821 3.3 (page 18)
+                sprintf(
+                    '%s transport expects at least one recipient if the message has at least one header or body',
+                    __CLASS__
+                ));
+        }
+
+        // Set sender email address
+        $connection->mail($from);
+
+        // Set recipient forward paths
+        foreach ($recipients as $recipient) {
+            $connection->rcpt($recipient);
+        }
+
+        // Issue DATA command to client
+        $connection->data($headers . Headers::EOL . $body);
+    }
+
+    /**
+     * Retrieve email address for envelope FROM
+     *
+     * @param  Message $message
+     * @throws Exception\RuntimeException
+     * @return string
+     */
+    protected function prepareFromAddress(Message $message)
+    {
+        $sender = $message->getSender();
+        if ($sender instanceof Address\AddressInterface) {
+            return $sender->getEmail();
+        }
+
+        $from = $message->getFrom();
+        if (!count($from)) { // Per RFC 2822 3.6
+            throw new Exception\RuntimeException(sprintf(
+                '%s transport expects either a Sender or at least one From address in the Message; none provided',
+                __CLASS__
+            ));
+        }
+
+        $from->rewind();
+        $sender = $from->current();
+        return $sender->getEmail();
+    }
+
+    /**
+     * Prepare array of email address recipients
+     *
+     * @param  Message $message
      * @return array
      */
-    public function getExpressionData()
+    protected function prepareRecipients(Message $message)
     {
-        return array(array(
-            str_replace('%', '%%', $this->literal),
-            array(),
-            array()
+        $recipients = array();
+        foreach ($message->getTo() as $address) {
+            $recipients[] = $address->getEmail();
+        }
+        foreach ($message->getCc() as $address) {
+            $recipients[] = $address->getEmail();
+        }
+        foreach ($message->getBcc() as $address) {
+            $recipients[] = $address->getEmail();
+        }
+        $recipients = array_unique($recipients);
+        return $recipients;
+    }
+
+    /**
+     * Prepare header string from message
+     *
+     * @param  Message $message
+     * @return string
+     */
+    protected function prepareHeaders(Message $message)
+    {
+        $headers = clone $message->getHeaders();
+        $headers->removeHeader('Bcc');
+        return $headers->toString();
+    }
+
+    /**
+     * Prepare body string from message
+     *
+     * @param  Message $message
+     * @return string
+     */
+    protected function prepareBody(Message $message)
+    {
+        return $message->getBodyText();
+    }
+
+    /**
+     * Lazy load the connection
+     *
+     * @return Protocol\Smtp
+     */
+    protected function lazyLoadConnection()
+    {
+        // Check if authentication is required and determine required class
+        $options          = $this->getOptions();
+        $config           = $options->getConnectionConfig();
+        $config['host']   = $options->getHost();
+        $config['port']   = $options->getPort();
+        $connection       = $this->plugin($options->getConnectionClass(), $config);
+        $this->connection = $connection;
+
+        return $this->connect();
+    }
+
+    /**
+     * Connect the connection, and pass it helo
+     *
+     * @return Protocol\Smtp
+     */
+    protected function connect()
+    {
+        if (!$this->connection instanceof Protocol\Smtp) {
+            return $this->lazyLoadConnection();
+        }
+
+        $this->connection->connect();
+        $this->connection->helo($this->getOptions()->getName());
+
+        return $this->connection;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Transport;
+
+use Zend\Mail\Exception;
+use Zend\Stdlib\AbstractOptions;
+
+class SmtpOptions extends AbstractOptions
+{
+    /**
+     * @var string Local client hostname
+     */
+    protected $name = 'localhost';
+
+    /**
+     * @var string
+     */
+    protected $connectionClass = 'smtp';
+
+    /**
+     * Connection configuration (passed to the underlying Protocol class)
+     *
+     * @var array
+     */
+    protected $connectionConfig = array();
+
+    /**
+     * @var string Remote SMTP hostname or IP
+     */
+    protected $host = '127.0.0.1';
+
+    /**
+     * @var int
+     */
+    protected $port = 25;
+
+    /**
+     * Return the local client hostname
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set the local client hostname or IP
+     *
+     * @todo   hostname/IP validation
+     * @param  string $name
+     * @throws \Zend\Mail\Exception\InvalidArgumentException
+     * @return SmtpOptions
+     */
+    public function setName($name)
+    {
+        if (!is_string($name) && $name !== null) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Name must be a string or null; argument of type "%s" provided',
+                (is_object($name) ? get_class($name) : gettype($name))
+            ));
+        }
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Get connection class
+     *
+     * This should be either the class Zend\Mail\Protocol\Smtp or a class
+     * extending it -- typically a class in the Zend\Mail\Protocol\Smtp\Auth
+     * namespace.
+     *
+     * @return string
+     */
+    public function getConnectionClass()
+    {
+        return $this->connectionClass;
+    }
+
+    /**
+     * Set connection class
+     *
+     * @param  string $connectionClass the value to be set
+     * @throws \Zend\Mail\Exception\InvalidArgumentException
+     * @return SmtpOptions
+     */
+    public function setConnectionClass($connectionClass)
+    {
+        if (!is_string($connectionClass) && $connectionClass !== null) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Connection class must be a string or null; argument of type "%s" provided',
+                (is_object($connectionClass) ? get_class($connectionClass) : gettype($connectionClass))
+            ));
+        }
+        $this->connectionClass = $connectionClass;
+        return $this;
+    }
+
+    /**
+     * Get connection configuration array
+     *
+     * @return array
+     */
+    public function getConnectionConfig()
+    {
+        return $this->connectionConfig;
+    }
+
+    /**
+     * Set connection configuration array
+     *
+     * @param  array $connectionConfig
+     * @return SmtpOptions
+     */
+    public function setConnectionConfig(array $connectionConfig)
+    {
+        $this->connectionConfig = $connectionConfig;
+        return $this;
+    }
+
+    /**
+     * Get the host name
+     *
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * Set the SMTP host
+     *
+     * @todo   hostname/IP validation
+     * @param  string $host
+     * @return SmtpOptions
+     */
+    public function setHost($host)
+    {
+        $this->host = (string) $host;
+        return $this;
+    }
+
+    /**
+     * Get the port the SMTP server runs on
+     *
+     * @return int
+     */
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    /**
+     * Set the port the SMTP server runs on
+     *
+     * @param  int $port
+     * @throws \Zend\Mail\Exception\InvalidArgumentException
+     * @return SmtpOptions
+     */
+    public function setPort($port)
+    {
+        $port = (int) $port;
+        if ($port < 1) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Port must be greater than 1; received "%d"',
+                $port
+            ));
+        }
+        $this->port = $port;
+        return $this;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Protocol;
+
+use Zend\ServiceManager\AbstractPluginManager;
+
+/**
+ * Plugin manager implementation for SMTP extensions.
+ *
+ * Enforces that SMTP extensions retrieved are instances of Smtp. Additionally,
+ * it registers a number of default extensions available.
+ */
+class SmtpPluginManager extends AbstractPluginManager
+{
+    /**
+     * Default set of extensions
+     *
+     * @var array
+     */
+    protected $invokableClasses = array(
+        'crammd5' => 'Zend\Mail\Protocol\Smtp\Auth\Crammd5',
+        'login'   => 'Zend\Mail\Protocol\Smtp\Auth\Login',
+        'plain'   => 'Zend\Mail\Protocol\Smtp\Auth\Plain',
+        'smtp'    => 'Zend\Mail\Protocol\Smtp',
+    );
+
+    /**
+     * Validate the plugin
+     *
+     * Checks that the extension loaded is an instance of Smtp.
+     *
+     * @param  mixed $plugin
+     * @return void
+     * @throws Exception\InvalidArgumentException if invalid
+     */
+    public function validatePlugin($plugin)
+    {
+        if ($plugin instanceof Smtp) {
+            // we're okay
+            return;
+        }
+
+        throw new Exception\InvalidArgumentException(sprintf(
+            'Plugin of type %s is invalid; must extend %s\Smtp',
+            (is_object($plugin) ? get_class($plugin) : gettype($plugin)),
+            __NAMESPACE__
         ));
     }
 }
@@ -23271,11 +26310,4542 @@ class Literal implements ExpressionInterface
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Db\Sql\Predicate;
+namespace Zend\Mail\Protocol;
 
-use Zend\Db\Sql\Literal as BaseLiteral;
+use Zend\Validator;
 
-class Literal extends BaseLiteral implements PredicateInterface
+/**
+ * Provides low-level methods for concrete adapters to communicate with a remote mail server and track requests and responses.
+ *
+ * @todo Implement proxy settings
+ */
+abstract class AbstractProtocol
+{
+    /**
+     * Mail default EOL string
+     */
+    const EOL = "\r\n";
+
+
+    /**
+     * Default timeout in seconds for initiating session
+     */
+    const TIMEOUT_CONNECTION = 30;
+
+    /**
+     * Maximum of the transaction log
+     * @var int
+     */
+    protected $maximumLog = 64;
+
+
+    /**
+     * Hostname or IP address of remote server
+     * @var string
+     */
+    protected $host;
+
+
+    /**
+     * Port number of connection
+     * @var int
+     */
+    protected $port;
+
+
+    /**
+     * Instance of Zend\Validator\ValidatorChain to check hostnames
+     * @var \Zend\Validator\ValidatorChain
+     */
+    protected $validHost;
+
+
+    /**
+     * Socket connection resource
+     * @var resource
+     */
+    protected $socket;
+
+
+    /**
+     * Last request sent to server
+     * @var string
+     */
+    protected $request;
+
+
+    /**
+     * Array of server responses to last request
+     * @var array
+     */
+    protected $response;
+
+
+    /**
+     * Log of mail requests and server responses for a session
+     * @var array
+     */
+    private $log = array();
+
+
+    /**
+     * Constructor.
+     *
+     * @param  string  $host OPTIONAL Hostname of remote connection (default: 127.0.0.1)
+     * @param  int $port OPTIONAL Port number (default: null)
+     * @throws Exception\RuntimeException
+     */
+    public function __construct($host = '127.0.0.1', $port = null)
+    {
+        $this->validHost = new Validator\ValidatorChain();
+        $this->validHost->attach(new Validator\Hostname(Validator\Hostname::ALLOW_ALL));
+
+        if (!$this->validHost->isValid($host)) {
+            throw new Exception\RuntimeException(implode(', ', $this->validHost->getMessages()));
+        }
+
+        $this->host = $host;
+        $this->port = $port;
+    }
+
+
+    /**
+     * Class destructor to cleanup open resources
+     *
+     */
+    public function __destruct()
+    {
+        $this->_disconnect();
+    }
+
+    /**
+     * Set the maximum log size
+     *
+     * @param int $maximumLog Maximum log size
+     */
+    public function setMaximumLog($maximumLog)
+    {
+        $this->maximumLog = (int) $maximumLog;
+    }
+
+
+    /**
+     * Get the maximum log size
+     *
+     * @return int the maximum log size
+     */
+    public function getMaximumLog()
+    {
+        return $this->maximumLog;
+    }
+
+
+    /**
+     * Create a connection to the remote host
+     *
+     * Concrete adapters for this class will implement their own unique connect scripts, using the _connect() method to create the socket resource.
+     */
+    abstract public function connect();
+
+
+    /**
+     * Retrieve the last client request
+     *
+     * @return string
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+
+    /**
+     * Retrieve the last server response
+     *
+     * @return array
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+
+    /**
+     * Retrieve the transaction log
+     *
+     * @return string
+     */
+    public function getLog()
+    {
+        return implode('', $this->log);
+    }
+
+
+    /**
+     * Reset the transaction log
+     *
+     */
+    public function resetLog()
+    {
+        $this->log = array();
+    }
+
+    /**
+     * Add the transaction log
+     *
+     * @param  string $value new transaction
+     */
+    protected function _addLog($value)
+    {
+        if ($this->maximumLog >= 0 && count($this->log) >= $this->maximumLog) {
+            array_shift($this->log);
+        }
+
+        $this->log[] = $value;
+    }
+
+    /**
+     * Connect to the server using the supplied transport and target
+     *
+     * An example $remote string may be 'tcp://mail.example.com:25' or 'ssh://hostname.com:2222'
+     *
+     * @param  string $remote Remote
+     * @throws Exception\RuntimeException
+     * @return bool
+     */
+    protected function _connect($remote)
+    {
+        $errorNum = 0;
+        $errorStr = '';
+
+        // open connection
+        $this->socket = @stream_socket_client($remote, $errorNum, $errorStr, self::TIMEOUT_CONNECTION);
+
+        if ($this->socket === false) {
+            if ($errorNum == 0) {
+                $errorStr = 'Could not open socket';
+            }
+            throw new Exception\RuntimeException($errorStr);
+        }
+
+        if (($result = stream_set_timeout($this->socket, self::TIMEOUT_CONNECTION)) === false) {
+            throw new Exception\RuntimeException('Could not set stream timeout');
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Disconnect from remote host and free resource
+     *
+     */
+    protected function _disconnect()
+    {
+        if (is_resource($this->socket)) {
+            fclose($this->socket);
+        }
+    }
+
+
+    /**
+     * Send the given request followed by a LINEEND to the server.
+     *
+     * @param  string $request
+     * @throws Exception\RuntimeException
+     * @return int|bool Number of bytes written to remote host
+     */
+    protected function _send($request)
+    {
+        if (!is_resource($this->socket)) {
+            throw new Exception\RuntimeException('No connection has been established to ' . $this->host);
+        }
+
+        $this->request = $request;
+
+        $result = fwrite($this->socket, $request . self::EOL);
+
+        // Save request to internal log
+        $this->_addLog($request . self::EOL);
+
+        if ($result === false) {
+            throw new Exception\RuntimeException('Could not send request to ' . $this->host);
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Get a line from the stream.
+     *
+     * @param  int $timeout Per-request timeout value if applicable
+     * @throws Exception\RuntimeException
+     * @return string
+     */
+    protected function _receive($timeout = null)
+    {
+        if (!is_resource($this->socket)) {
+            throw new Exception\RuntimeException('No connection has been established to ' . $this->host);
+        }
+
+        // Adapters may wish to supply per-commend timeouts according to appropriate RFC
+        if ($timeout !== null) {
+           stream_set_timeout($this->socket, $timeout);
+        }
+
+        // Retrieve response
+        $response = fgets($this->socket, 1024);
+
+        // Save request to internal log
+        $this->_addLog($response);
+
+        // Check meta data to ensure connection is still valid
+        $info = stream_get_meta_data($this->socket);
+
+        if (!empty($info['timed_out'])) {
+            throw new Exception\RuntimeException($this->host . ' has timed out');
+        }
+
+        if ($response === false) {
+            throw new Exception\RuntimeException('Could not read from ' . $this->host);
+        }
+
+        return $response;
+    }
+
+
+    /**
+     * Parse server response for successful codes
+     *
+     * Read the response from the stream and check for expected return code.
+     * Throws a Zend\Mail\Protocol\Exception\ExceptionInterface if an unexpected code is returned.
+     *
+     * @param  string|array $code One or more codes that indicate a successful response
+     * @param  int $timeout Per-request timeout value if applicable
+     * @throws Exception\RuntimeException
+     * @return string Last line of response string
+     */
+    protected function _expect($code, $timeout = null)
+    {
+        $this->response = array();
+        $errMsg = '';
+
+        if (!is_array($code)) {
+            $code = array($code);
+        }
+
+        do {
+            $this->response[] = $result = $this->_receive($timeout);
+            list($cmd, $more, $msg) = preg_split('/([\s-]+)/', $result, 2, PREG_SPLIT_DELIM_CAPTURE);
+
+            if ($errMsg !== '') {
+                $errMsg .= ' ' . $msg;
+            } elseif ($cmd === null || !in_array($cmd, $code)) {
+                $errMsg =  $msg;
+            }
+
+        } while (strpos($more, '-') === 0); // The '-' message prefix indicates an information string instead of a response string.
+
+        if ($errMsg !== '') {
+            throw new Exception\RuntimeException($errMsg);
+        }
+
+        return $msg;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Protocol;
+
+/**
+ * SMTP implementation of Zend\Mail\Protocol\AbstractProtocol
+ *
+ * Minimum implementation according to RFC2821: EHLO, MAIL FROM, RCPT TO, DATA, RSET, NOOP, QUIT
+ */
+class Smtp extends AbstractProtocol
+{
+    /**
+     * The transport method for the socket
+     *
+     * @var string
+     */
+    protected $transport = 'tcp';
+
+
+    /**
+     * Indicates that a session is requested to be secure
+     *
+     * @var string
+     */
+    protected $secure;
+
+
+    /**
+     * Indicates an smtp session has been started by the HELO command
+     *
+     * @var bool
+     */
+    protected $sess = false;
+
+
+    /**
+     * Indicates an smtp AUTH has been issued and authenticated
+     *
+     * @var bool
+     */
+    protected $auth = false;
+
+
+    /**
+     * Indicates a MAIL command has been issued
+     *
+     * @var bool
+     */
+    protected $mail = false;
+
+
+    /**
+     * Indicates one or more RCTP commands have been issued
+     *
+     * @var bool
+     */
+    protected $rcpt = false;
+
+
+    /**
+     * Indicates that DATA has been issued and sent
+     *
+     * @var bool
+     */
+    protected $data = null;
+
+
+    /**
+     * Constructor.
+     *
+     * The first argument may be an array of all options. If so, it must include
+     * the 'host' and 'port' keys in order to ensure that all required values
+     * are present.
+     *
+     * @param  string|array $host
+     * @param  null|int $port
+     * @param  null|array   $config
+     * @throws Exception\InvalidArgumentException
+     */
+    public function __construct($host = '127.0.0.1', $port = null, array $config = null)
+    {
+        // Did we receive a configuration array?
+        if (is_array($host)) {
+            // Merge config array with principal array, if provided
+            if (is_array($config)) {
+                $config = array_replace_recursive($host, $config);
+            } else {
+                $config = $host;
+            }
+
+            // Look for a host key; if none found, use default value
+            if (isset($config['host'])) {
+                $host = $config['host'];
+            } else {
+                $host = '127.0.0.1';
+            }
+
+            // Look for a port key; if none found, use default value
+            if (isset($config['port'])) {
+                $port = $config['port'];
+            } else {
+                $port = null;
+            }
+        }
+
+        // If we don't have a config array, initialize it
+        if (null === $config) {
+            $config = array();
+        }
+
+        if (isset($config['ssl'])) {
+            switch (strtolower($config['ssl'])) {
+                case 'tls':
+                    $this->secure = 'tls';
+                    break;
+
+                case 'ssl':
+                    $this->transport = 'ssl';
+                    $this->secure = 'ssl';
+                    if ($port == null) {
+                        $port = 465;
+                    }
+                    break;
+
+                default:
+                    throw new Exception\InvalidArgumentException($config['ssl'] . ' is unsupported SSL type');
+                    break;
+            }
+        }
+
+        // If no port has been specified then check the master PHP ini file. Defaults to 25 if the ini setting is null.
+        if ($port == null) {
+            if (($port = ini_get('smtp_port')) == '') {
+                $port = 25;
+            }
+        }
+
+        parent::__construct($host, $port);
+    }
+
+
+    /**
+     * Connect to the server with the parameters given in the constructor.
+     *
+     * @return bool
+     */
+    public function connect()
+    {
+        return $this->_connect($this->transport . '://' . $this->host . ':' . $this->port);
+    }
+
+
+    /**
+     * Initiate HELO/EHLO sequence and set flag to indicate valid smtp session
+     *
+     * @param  string $host The client hostname or IP address (default: 127.0.0.1)
+     * @throws Exception\RuntimeException
+     */
+    public function helo($host = '127.0.0.1')
+    {
+        // Respect RFC 2821 and disallow HELO attempts if session is already initiated.
+        if ($this->sess === true) {
+            throw new Exception\RuntimeException('Cannot issue HELO to existing session');
+        }
+
+        // Validate client hostname
+        if (!$this->validHost->isValid($host)) {
+            throw new Exception\RuntimeException(implode(', ', $this->validHost->getMessages()));
+        }
+
+        // Initiate helo sequence
+        $this->_expect(220, 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
+        $this->_ehlo($host);
+
+        // If a TLS session is required, commence negotiation
+        if ($this->secure == 'tls') {
+            $this->_send('STARTTLS');
+            $this->_expect(220, 180);
+            if (!stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+                throw new Exception\RuntimeException('Unable to connect via TLS');
+            }
+            $this->_ehlo($host);
+        }
+
+        $this->_startSession();
+        $this->auth();
+    }
+
+    /**
+     * Returns the perceived session status
+     *
+     * @return bool
+     */
+    public function hasSession()
+    {
+        return $this->sess;
+    }
+
+    /**
+     * Send EHLO or HELO depending on capabilities of smtp host
+     *
+     * @param  string $host The client hostname or IP address (default: 127.0.0.1)
+     * @throws \Exception|Exception\ExceptionInterface
+     */
+    protected function _ehlo($host)
+    {
+        // Support for older, less-compliant remote servers. Tries multiple attempts of EHLO or HELO.
+        try {
+            $this->_send('EHLO ' . $host);
+            $this->_expect(250, 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
+        } catch (Exception\ExceptionInterface $e) {
+            $this->_send('HELO ' . $host);
+            $this->_expect(250, 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
+
+
+    /**
+     * Issues MAIL command
+     *
+     * @param  string $from Sender mailbox
+     * @throws Exception\RuntimeException
+     */
+    public function mail($from)
+    {
+        if ($this->sess !== true) {
+            throw new Exception\RuntimeException('A valid session has not been started');
+        }
+
+        $this->_send('MAIL FROM:<' . $from . '>');
+        $this->_expect(250, 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
+
+        // Set mail to true, clear recipients and any existing data flags as per 4.1.1.2 of RFC 2821
+        $this->mail = true;
+        $this->rcpt = false;
+        $this->data = false;
+    }
+
+
+    /**
+     * Issues RCPT command
+     *
+     * @param  string $to Receiver(s) mailbox
+     * @throws Exception\RuntimeException
+     */
+    public function rcpt($to)
+    {
+
+        if ($this->mail !== true) {
+            throw new Exception\RuntimeException('No sender reverse path has been supplied');
+        }
+
+        // Set rcpt to true, as per 4.1.1.3 of RFC 2821
+        $this->_send('RCPT TO:<' . $to . '>');
+        $this->_expect(array(250, 251), 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
+        $this->rcpt = true;
+    }
+
+
+    /**
+     * Issues DATA command
+     *
+     * @param  string $data
+     * @throws Exception\RuntimeException
+     */
+    public function data($data)
+    {
+        // Ensure recipients have been set
+        if ($this->rcpt !== true) { // Per RFC 2821 3.3 (page 18)
+            throw new Exception\RuntimeException('No recipient forward path has been supplied');
+        }
+
+        $this->_send('DATA');
+        $this->_expect(354, 120); // Timeout set for 2 minutes as per RFC 2821 4.5.3.2
+
+        // Ensure newlines are CRLF (\r\n)
+        if (PHP_EOL === "\n") {
+            $data = str_replace("\n", "\r\n", str_replace("\r", '', $data));
+        }
+
+        foreach (explode(self::EOL, $data) as $line) {
+            if (strpos($line, '.') === 0) {
+                // Escape lines prefixed with a '.'
+                $line = '.' . $line;
+            }
+            $this->_send($line);
+        }
+
+        $this->_send('.');
+        $this->_expect(250, 600); // Timeout set for 10 minutes as per RFC 2821 4.5.3.2
+        $this->data = true;
+    }
+
+
+    /**
+     * Issues the RSET command end validates answer
+     *
+     * Can be used to restore a clean smtp communication state when a transaction has been cancelled or commencing a new transaction.
+     *
+     */
+    public function rset()
+    {
+        $this->_send('RSET');
+        // MS ESMTP doesn't follow RFC, see [ZF-1377]
+        $this->_expect(array(250, 220));
+
+        $this->mail = false;
+        $this->rcpt = false;
+        $this->data = false;
+    }
+
+
+    /**
+     * Issues the NOOP command end validates answer
+     *
+     * Not used by Zend\Mail, could be used to keep a connection alive or check if it is still open.
+     *
+     */
+    public function noop()
+    {
+        $this->_send('NOOP');
+        $this->_expect(250, 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
+    }
+
+
+    /**
+     * Issues the VRFY command end validates answer
+     *
+     * Not used by Zend\Mail.
+     *
+     * @param  string $user User Name or eMail to verify
+     */
+    public function vrfy($user)
+    {
+        $this->_send('VRFY ' . $user);
+        $this->_expect(array(250, 251, 252), 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
+    }
+
+
+    /**
+     * Issues the QUIT command and clears the current session
+     *
+     */
+    public function quit()
+    {
+        if ($this->sess) {
+            $this->auth = false;
+            $this->_send('QUIT');
+            $this->_expect(221, 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
+            $this->_stopSession();
+        }
+    }
+
+
+    /**
+     * Default authentication method
+     *
+     * This default method is implemented by AUTH adapters to properly authenticate to a remote host.
+     *
+     * @throws Exception\RuntimeException
+     */
+    public function auth()
+    {
+        if ($this->auth === true) {
+            throw new Exception\RuntimeException('Already authenticated for this session');
+        }
+    }
+
+
+    /**
+     * Closes connection
+     *
+     */
+    public function disconnect()
+    {
+        $this->_disconnect();
+    }
+
+    /**
+     * Disconnect from remote host and free resource
+     */
+    protected function _disconnect()
+    {
+        // Make sure the session gets closed
+        $this->quit();
+        parent::_disconnect();
+    }
+
+    /**
+     * Start mail session
+     *
+     */
+    protected function _startSession()
+    {
+        $this->sess = true;
+    }
+
+
+    /**
+     * Stop mail session
+     *
+     */
+    protected function _stopSession()
+    {
+        $this->sess = false;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mail\Protocol\Smtp\Auth;
+
+use Zend\Mail\Protocol\Smtp;
+
+/**
+ * Performs LOGIN authentication
+ */
+class Login extends Smtp
+{
+    /**
+     * LOGIN username
+     *
+     * @var string
+     */
+    protected $username;
+
+
+    /**
+     * LOGIN password
+     *
+     * @var string
+     */
+    protected $password;
+
+
+    /**
+     * Constructor.
+     *
+     * @param  string $host   (Default: 127.0.0.1)
+     * @param  int    $port   (Default: null)
+     * @param  array  $config Auth-specific parameters
+     */
+    public function __construct($host = '127.0.0.1', $port = null, $config = null)
+    {
+        // Did we receive a configuration array?
+        $origConfig = $config;
+        if (is_array($host)) {
+            // Merge config array with principal array, if provided
+            if (is_array($config)) {
+                $config = array_replace_recursive($host, $config);
+            } else {
+                $config = $host;
+            }
+        }
+
+        if (is_array($config)) {
+            if (isset($config['username'])) {
+                $this->setUsername($config['username']);
+            }
+            if (isset($config['password'])) {
+                $this->setPassword($config['password']);
+            }
+        }
+
+        // Call parent with original arguments
+        parent::__construct($host, $port, $origConfig);
+    }
+
+
+    /**
+     * Perform LOGIN authentication with supplied credentials
+     *
+     */
+    public function auth()
+    {
+        // Ensure AUTH has not already been initiated.
+        parent::auth();
+
+        $this->_send('AUTH LOGIN');
+        $this->_expect(334);
+        $this->_send(base64_encode($this->getUsername()));
+        $this->_expect(334);
+        $this->_send(base64_encode($this->getPassword()));
+        $this->_expect(235);
+        $this->auth = true;
+    }
+
+    /**
+     * Set value for username
+     *
+     * @param  string $username
+     * @return Login
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * Get username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * Set value for password
+     *
+     * @param  string $password
+     * @return Login
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    /**
+     * Get password
+     *
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mime;
+
+/**
+ * Class representing a MIME part.
+ */
+class Part
+{
+    public $type = Mime::TYPE_OCTETSTREAM;
+    public $encoding = Mime::ENCODING_8BIT;
+    public $id;
+    public $disposition;
+    public $filename;
+    public $description;
+    public $charset;
+    public $boundary;
+    public $location;
+    public $language;
+    protected $content;
+    protected $isStream = false;
+    protected $filters = array();
+
+
+    /**
+     * create a new Mime Part.
+     * The (unencoded) content of the Part as passed
+     * as a string or stream
+     *
+     * @param mixed $content  String or Stream containing the content
+     */
+    public function __construct($content)
+    {
+        $this->content = $content;
+        if (is_resource($content)) {
+            $this->isStream = true;
+        }
+    }
+
+    /**
+     * @todo setters/getters
+     * @todo error checking for setting $type
+     * @todo error checking for setting $encoding
+     */
+
+    /**
+     * check if this part can be read as a stream.
+     * if true, getEncodedStream can be called, otherwise
+     * only getContent can be used to fetch the encoded
+     * content of the part
+     *
+     * @return bool
+     */
+    public function isStream()
+    {
+      return $this->isStream;
+    }
+
+    /**
+     * if this was created with a stream, return a filtered stream for
+     * reading the content. very useful for large file attachments.
+     *
+     * @param string $EOL
+     * @return resource
+     * @throws Exception\RuntimeException if not a stream or unable to append filter
+     */
+    public function getEncodedStream($EOL = Mime::LINEEND)
+    {
+        if (!$this->isStream) {
+            throw new Exception\RuntimeException('Attempt to get a stream from a string part');
+        }
+
+        //stream_filter_remove(); // ??? is that right?
+        switch ($this->encoding) {
+            case Mime::ENCODING_QUOTEDPRINTABLE:
+                if (array_key_exists(Mime::ENCODING_QUOTEDPRINTABLE, $this->filters)) {
+                    stream_filter_remove($this->filters[Mime::ENCODING_QUOTEDPRINTABLE]);
+                }
+                $filter = stream_filter_append(
+                    $this->content,
+                    'convert.quoted-printable-encode',
+                    STREAM_FILTER_READ,
+                    array(
+                        'line-length'      => 76,
+                        'line-break-chars' => $EOL
+                    )
+                );
+                $this->filters[Mime::ENCODING_QUOTEDPRINTABLE] = $filter;
+                if (!is_resource($filter)) {
+                    throw new Exception\RuntimeException('Failed to append quoted-printable filter');
+                }
+                break;
+            case Mime::ENCODING_BASE64:
+                if (array_key_exists(Mime::ENCODING_BASE64,$this->filters)) {
+                    stream_filter_remove($this->filters[Mime::ENCODING_BASE64]);
+                }
+                $filter = stream_filter_append(
+                    $this->content,
+                    'convert.base64-encode',
+                    STREAM_FILTER_READ,
+                    array(
+                        'line-length'      => 76,
+                        'line-break-chars' => $EOL
+                    )
+                );
+                $this->filters[Mime::ENCODING_BASE64] = $filter;
+                if (!is_resource($filter)) {
+                    throw new Exception\RuntimeException('Failed to append base64 filter');
+                }
+                break;
+            default:
+        }
+        return $this->content;
+    }
+
+    /**
+     * Get the Content of the current Mime Part in the given encoding.
+     *
+     * @param string $EOL
+     * @return string
+     */
+    public function getContent($EOL = Mime::LINEEND)
+    {
+        if ($this->isStream) {
+            $encodedStream = $this->getEncodedStream($EOL);
+            $encodedStreamContents = stream_get_contents($encodedStream);
+            rewind($encodedStream);
+            return $encodedStreamContents;
+        }
+        return Mime::encode($this->content, $this->encoding, $EOL);
+    }
+
+    /**
+     * Get the RAW unencoded content from this part
+     * @return string
+     */
+    public function getRawContent()
+    {
+        if ($this->isStream) {
+            return stream_get_contents($this->content);
+        }
+        return $this->content;
+    }
+
+    /**
+     * Create and return the array of headers for this MIME part
+     *
+     * @access public
+     * @param string $EOL
+     * @return array
+     */
+    public function getHeadersArray($EOL = Mime::LINEEND)
+    {
+        $headers = array();
+
+        $contentType = $this->type;
+        if ($this->charset) {
+            $contentType .= '; charset=' . $this->charset;
+        }
+
+        if ($this->boundary) {
+            $contentType .= ';' . $EOL
+                          . " boundary=\"" . $this->boundary . '"';
+        }
+
+        $headers[] = array('Content-Type', $contentType);
+
+        if ($this->encoding) {
+            $headers[] = array('Content-Transfer-Encoding', $this->encoding);
+        }
+
+        if ($this->id) {
+            $headers[]  = array('Content-ID', '<' . $this->id . '>');
+        }
+
+        if ($this->disposition) {
+            $disposition = $this->disposition;
+            if ($this->filename) {
+                $disposition .= '; filename="' . $this->filename . '"';
+            }
+            $headers[] = array('Content-Disposition', $disposition);
+        }
+
+        if ($this->description) {
+            $headers[] = array('Content-Description', $this->description);
+        }
+
+        if ($this->location) {
+            $headers[] = array('Content-Location', $this->location);
+        }
+
+        if ($this->language) {
+            $headers[] = array('Content-Language', $this->language);
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Return the headers for this part as a string
+     *
+     * @param string $EOL
+     * @return String
+     */
+    public function getHeaders($EOL = Mime::LINEEND)
+    {
+        $res = '';
+        foreach ($this->getHeadersArray($EOL) as $header) {
+            $res .= $header[0] . ': ' . $header[1] . $EOL;
+        }
+
+        return $res;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mime;
+
+/**
+ * Support class for MultiPart Mime Messages
+ */
+class Mime
+{
+    const TYPE_OCTETSTREAM = 'application/octet-stream';
+    const TYPE_TEXT = 'text/plain';
+    const TYPE_HTML = 'text/html';
+    const ENCODING_7BIT = '7bit';
+    const ENCODING_8BIT = '8bit';
+    const ENCODING_QUOTEDPRINTABLE = 'quoted-printable';
+    const ENCODING_BASE64 = 'base64';
+    const DISPOSITION_ATTACHMENT = 'attachment';
+    const DISPOSITION_INLINE = 'inline';
+    const LINELENGTH = 72;
+    const LINEEND = "\n";
+    const MULTIPART_ALTERNATIVE = 'multipart/alternative';
+    const MULTIPART_MIXED = 'multipart/mixed';
+    const MULTIPART_RELATED = 'multipart/related';
+
+    protected $boundary;
+    protected static $makeUnique = 0;
+
+    // lookup-Tables for QuotedPrintable
+    public static $qpKeys = array(
+        "\x00","\x01","\x02","\x03","\x04","\x05","\x06","\x07",
+        "\x08","\x09","\x0A","\x0B","\x0C","\x0D","\x0E","\x0F",
+        "\x10","\x11","\x12","\x13","\x14","\x15","\x16","\x17",
+        "\x18","\x19","\x1A","\x1B","\x1C","\x1D","\x1E","\x1F",
+        "\x7F","\x80","\x81","\x82","\x83","\x84","\x85","\x86",
+        "\x87","\x88","\x89","\x8A","\x8B","\x8C","\x8D","\x8E",
+        "\x8F","\x90","\x91","\x92","\x93","\x94","\x95","\x96",
+        "\x97","\x98","\x99","\x9A","\x9B","\x9C","\x9D","\x9E",
+        "\x9F","\xA0","\xA1","\xA2","\xA3","\xA4","\xA5","\xA6",
+        "\xA7","\xA8","\xA9","\xAA","\xAB","\xAC","\xAD","\xAE",
+        "\xAF","\xB0","\xB1","\xB2","\xB3","\xB4","\xB5","\xB6",
+        "\xB7","\xB8","\xB9","\xBA","\xBB","\xBC","\xBD","\xBE",
+        "\xBF","\xC0","\xC1","\xC2","\xC3","\xC4","\xC5","\xC6",
+        "\xC7","\xC8","\xC9","\xCA","\xCB","\xCC","\xCD","\xCE",
+        "\xCF","\xD0","\xD1","\xD2","\xD3","\xD4","\xD5","\xD6",
+        "\xD7","\xD8","\xD9","\xDA","\xDB","\xDC","\xDD","\xDE",
+        "\xDF","\xE0","\xE1","\xE2","\xE3","\xE4","\xE5","\xE6",
+        "\xE7","\xE8","\xE9","\xEA","\xEB","\xEC","\xED","\xEE",
+        "\xEF","\xF0","\xF1","\xF2","\xF3","\xF4","\xF5","\xF6",
+        "\xF7","\xF8","\xF9","\xFA","\xFB","\xFC","\xFD","\xFE",
+        "\xFF"
+    );
+
+    public static $qpReplaceValues = array(
+        "=00","=01","=02","=03","=04","=05","=06","=07",
+        "=08","=09","=0A","=0B","=0C","=0D","=0E","=0F",
+        "=10","=11","=12","=13","=14","=15","=16","=17",
+        "=18","=19","=1A","=1B","=1C","=1D","=1E","=1F",
+        "=7F","=80","=81","=82","=83","=84","=85","=86",
+        "=87","=88","=89","=8A","=8B","=8C","=8D","=8E",
+        "=8F","=90","=91","=92","=93","=94","=95","=96",
+        "=97","=98","=99","=9A","=9B","=9C","=9D","=9E",
+        "=9F","=A0","=A1","=A2","=A3","=A4","=A5","=A6",
+        "=A7","=A8","=A9","=AA","=AB","=AC","=AD","=AE",
+        "=AF","=B0","=B1","=B2","=B3","=B4","=B5","=B6",
+        "=B7","=B8","=B9","=BA","=BB","=BC","=BD","=BE",
+        "=BF","=C0","=C1","=C2","=C3","=C4","=C5","=C6",
+        "=C7","=C8","=C9","=CA","=CB","=CC","=CD","=CE",
+        "=CF","=D0","=D1","=D2","=D3","=D4","=D5","=D6",
+        "=D7","=D8","=D9","=DA","=DB","=DC","=DD","=DE",
+        "=DF","=E0","=E1","=E2","=E3","=E4","=E5","=E6",
+        "=E7","=E8","=E9","=EA","=EB","=EC","=ED","=EE",
+        "=EF","=F0","=F1","=F2","=F3","=F4","=F5","=F6",
+        "=F7","=F8","=F9","=FA","=FB","=FC","=FD","=FE",
+        "=FF"
+    );
+
+    public static $qpKeysString =
+         "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF";
+
+    /**
+     * Check if the given string is "printable"
+     *
+     * Checks that a string contains no unprintable characters. If this returns
+     * false, encode the string for secure delivery.
+     *
+     * @param string $str
+     * @return bool
+     */
+    public static function isPrintable($str)
+    {
+        return (strcspn($str, static::$qpKeysString) == strlen($str));
+    }
+
+    /**
+     * Encode a given string with the QUOTED_PRINTABLE mechanism and wrap the lines.
+     *
+     * @param string $str
+     * @param int $lineLength Defaults to {@link LINELENGTH}
+     * @param string $lineEnd Defaults to {@link LINEEND}
+     * @return string
+     */
+    public static function encodeQuotedPrintable($str,
+        $lineLength = self::LINELENGTH,
+        $lineEnd = self::LINEEND)
+    {
+        $out = '';
+        $str = self::_encodeQuotedPrintable($str);
+
+        // Split encoded text into separate lines
+        while ($str) {
+            $ptr = strlen($str);
+            if ($ptr > $lineLength) {
+                $ptr = $lineLength;
+            }
+
+            // Ensure we are not splitting across an encoded character
+            $pos = strrpos(substr($str, 0, $ptr), '=');
+            if ($pos !== false && $pos >= $ptr - 2) {
+                $ptr = $pos;
+            }
+
+            // Check if there is a space at the end of the line and rewind
+            if ($ptr > 0 && $str[$ptr - 1] == ' ') {
+                --$ptr;
+            }
+
+            // Add string and continue
+            $out .= substr($str, 0, $ptr) . '=' . $lineEnd;
+            $str = substr($str, $ptr);
+        }
+
+        $out = rtrim($out, $lineEnd);
+        $out = rtrim($out, '=');
+        return $out;
+    }
+
+    /**
+     * Converts a string into quoted printable format.
+     *
+     * @param  string $str
+     * @return string
+     */
+    private static function _encodeQuotedPrintable($str)
+    {
+        $str = str_replace('=', '=3D', $str);
+        $str = str_replace(static::$qpKeys, static::$qpReplaceValues, $str);
+        $str = rtrim($str);
+        return $str;
+    }
+
+    /**
+     * Encode a given string with the QUOTED_PRINTABLE mechanism for Mail Headers.
+     *
+     * Mail headers depend on an extended quoted printable algorithm otherwise
+     * a range of bugs can occur.
+     *
+     * @param string $str
+     * @param string $charset
+     * @param int $lineLength Defaults to {@link LINELENGTH}
+     * @param string $lineEnd Defaults to {@link LINEEND}
+     * @return string
+     */
+    public static function encodeQuotedPrintableHeader($str, $charset,
+        $lineLength = self::LINELENGTH,
+        $lineEnd = self::LINEEND)
+    {
+        // Reduce line-length by the length of the required delimiter, charsets and encoding
+        $prefix = sprintf('=?%s?Q?', $charset);
+        $lineLength = $lineLength-strlen($prefix)-3;
+
+        $str = self::_encodeQuotedPrintable($str);
+
+        // Mail-Header required chars have to be encoded also:
+        $str = str_replace(array('?', ' ', '_'), array('=3F', '=20', '=5F'), $str);
+
+        // initialize first line, we need it anyways
+        $lines = array(0 => "");
+
+        // Split encoded text into separate lines
+        $tmp = "";
+        while (strlen($str) > 0) {
+            $currentLine = max(count($lines)-1, 0);
+            $token       = static::getNextQuotedPrintableToken($str);
+            $str         = substr($str, strlen($token));
+
+            $tmp .= $token;
+            if ($token == '=20') {
+                // only if we have a single char token or space, we can append the
+                // tempstring it to the current line or start a new line if necessary.
+                if (strlen($lines[$currentLine] . $tmp) > $lineLength) {
+                    $lines[$currentLine+1] = $tmp;
+                } else {
+                    $lines[$currentLine] .= $tmp;
+                }
+                $tmp = "";
+            }
+            // don't forget to append the rest to the last line
+            if (strlen($str) == 0) {
+                $lines[$currentLine] .= $tmp;
+            }
+        }
+
+        // assemble the lines together by pre- and appending delimiters, charset, encoding.
+        for ($i = 0, $count = count($lines); $i < $count; $i++) {
+            $lines[$i] = " " . $prefix . $lines[$i] . "?=";
+        }
+        $str = trim(implode($lineEnd, $lines));
+        return $str;
+    }
+
+    /**
+     * Retrieves the first token from a quoted printable string.
+     *
+     * @param  string $str
+     * @return string
+     */
+    private static function getNextQuotedPrintableToken($str)
+    {
+        if (substr($str, 0, 1) == "=") {
+            $token = substr($str, 0, 3);
+        } else {
+            $token = substr($str, 0, 1);
+        }
+        return $token;
+    }
+
+    /**
+     * Encode a given string in mail header compatible base64 encoding.
+     *
+     * @param string $str
+     * @param string $charset
+     * @param int $lineLength Defaults to {@link LINELENGTH}
+     * @param string $lineEnd Defaults to {@link LINEEND}
+     * @return string
+     */
+    public static function encodeBase64Header($str,
+        $charset,
+        $lineLength = self::LINELENGTH,
+        $lineEnd = self::LINEEND)
+    {
+        $prefix = '=?' . $charset . '?B?';
+        $suffix = '?=';
+        $remainingLength = $lineLength - strlen($prefix) - strlen($suffix);
+
+        $encodedValue = static::encodeBase64($str, $remainingLength, $lineEnd);
+        $encodedValue = str_replace($lineEnd, $suffix . $lineEnd . ' ' . $prefix, $encodedValue);
+        $encodedValue = $prefix . $encodedValue . $suffix;
+        return $encodedValue;
+    }
+
+    /**
+     * Encode a given string in base64 encoding and break lines
+     * according to the maximum linelength.
+     *
+     * @param string $str
+     * @param int $lineLength Defaults to {@link LINELENGTH}
+     * @param string $lineEnd Defaults to {@link LINEEND}
+     * @return string
+     */
+    public static function encodeBase64($str,
+        $lineLength = self::LINELENGTH,
+        $lineEnd = self::LINEEND)
+    {
+        return rtrim(chunk_split(base64_encode($str), $lineLength, $lineEnd));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param null|string $boundary
+     * @access public
+     */
+    public function __construct($boundary = null)
+    {
+        // This string needs to be somewhat unique
+        if ($boundary === null) {
+            $this->boundary = '=_' . md5(microtime(1) . static::$makeUnique++);
+        } else {
+            $this->boundary = $boundary;
+        }
+    }
+
+    /**
+     * Encode the given string with the given encoding.
+     *
+     * @param string $str
+     * @param string $encoding
+     * @param string $EOL EOL string; defaults to {@link LINEEND}
+     * @return string
+     */
+    public static function encode($str, $encoding, $EOL = self::LINEEND)
+    {
+        switch ($encoding) {
+            case self::ENCODING_BASE64:
+                return static::encodeBase64($str, self::LINELENGTH, $EOL);
+
+            case self::ENCODING_QUOTEDPRINTABLE:
+                return static::encodeQuotedPrintable($str, self::LINELENGTH, $EOL);
+
+            default:
+                /**
+                 * @todo 7Bit and 8Bit is currently handled the same way.
+                 */
+                return $str;
+        }
+    }
+
+    /**
+     * Return a MIME boundary
+     *
+     * @access public
+     * @return string
+     */
+    public function boundary()
+    {
+        return $this->boundary;
+    }
+
+    /**
+     * Return a MIME boundary line
+     *
+     * @param string $EOL Defaults to {@link LINEEND}
+     * @access public
+     * @return string
+     */
+    public function boundaryLine($EOL = self::LINEEND)
+    {
+        return $EOL . '--' . $this->boundary . $EOL;
+    }
+
+    /**
+     * Return MIME ending
+     *
+     * @param string $EOL Defaults to {@link LINEEND}
+     * @access public
+     * @return string
+     */
+    public function mimeEnd($EOL = self::LINEEND)
+    {
+        return $EOL . '--' . $this->boundary . '--' . $EOL;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Mime;
+
+class Message
 {
 
+    protected $parts = array();
+    protected $mime = null;
+
+    /**
+     * Returns the list of all Zend\Mime\Part in the message
+     *
+     * @return array of \Zend\Mime\Part
+     */
+    public function getParts()
+    {
+        return $this->parts;
+    }
+
+    /**
+     * Sets the given array of Zend\Mime\Part as the array for the message
+     *
+     * @param array $parts
+     */
+    public function setParts($parts)
+    {
+        $this->parts = $parts;
+    }
+
+    /**
+     * Append a new Zend\Mime\Part to the current message
+     *
+     * @param \Zend\Mime\Part $part
+     */
+    public function addPart(Part $part)
+    {
+        /**
+         * @todo check for duplicate object handle
+         */
+        $this->parts[] = $part;
+    }
+
+    /**
+     * Check if message needs to be sent as multipart
+     * MIME message or if it has only one part.
+     *
+     * @return bool
+     */
+    public function isMultiPart()
+    {
+        return (count($this->parts) > 1);
+    }
+
+    /**
+     * Set Zend\Mime\Mime object for the message
+     *
+     * This can be used to set the boundary specifically or to use a subclass of
+     * Zend\Mime for generating the boundary.
+     *
+     * @param \Zend\Mime\Mime $mime
+     */
+    public function setMime(Mime $mime)
+    {
+        $this->mime = $mime;
+    }
+
+    /**
+     * Returns the Zend\Mime\Mime object in use by the message
+     *
+     * If the object was not present, it is created and returned. Can be used to
+     * determine the boundary used in this message.
+     *
+     * @return \Zend\Mime\Mime
+     */
+    public function getMime()
+    {
+        if ($this->mime === null) {
+            $this->mime = new Mime();
+        }
+
+        return $this->mime;
+    }
+
+    /**
+     * Generate MIME-compliant message from the current configuration
+     *
+     * This can be a multipart message if more than one MIME part was added. If
+     * only one part is present, the content of this part is returned. If no
+     * part had been added, an empty string is returned.
+     *
+     * Parts are separated by the mime boundary as defined in Zend\Mime\Mime. If
+     * {@link setMime()} has been called before this method, the Zend\Mime\Mime
+     * object set by this call will be used. Otherwise, a new Zend\Mime\Mime object
+     * is generated and used.
+     *
+     * @param string $EOL EOL string; defaults to {@link Zend\Mime\Mime::LINEEND}
+     * @return string
+     */
+    public function generateMessage($EOL = Mime::LINEEND)
+    {
+        if (!$this->isMultiPart()) {
+            if (empty($this->parts)) {
+                return '';
+            }
+            $part = current($this->parts);
+            $body = $part->getContent($EOL);
+        } else {
+            $mime = $this->getMime();
+
+            $boundaryLine = $mime->boundaryLine($EOL);
+            $body = 'This is a message in Mime Format.  If you see this, '
+                  . "your mail reader does not support this format." . $EOL;
+
+            foreach (array_keys($this->parts) as $p) {
+                $body .= $boundaryLine
+                       . $this->getPartHeaders($p, $EOL)
+                       . $EOL
+                       . $this->getPartContent($p, $EOL);
+            }
+
+            $body .= $mime->mimeEnd($EOL);
+        }
+
+        return trim($body);
+    }
+
+    /**
+     * Get the headers of a given part as an array
+     *
+     * @param int $partnum
+     * @return array
+     */
+    public function getPartHeadersArray($partnum)
+    {
+        return $this->parts[$partnum]->getHeadersArray();
+    }
+
+    /**
+     * Get the headers of a given part as a string
+     *
+     * @param int $partnum
+     * @param string $EOL
+     * @return string
+     */
+    public function getPartHeaders($partnum, $EOL = Mime::LINEEND)
+    {
+        return $this->parts[$partnum]->getHeaders($EOL);
+    }
+
+    /**
+     * Get the (encoded) content of a given part as a string
+     *
+     * @param int $partnum
+     * @param string $EOL
+     * @return string
+     */
+    public function getPartContent($partnum, $EOL = Mime::LINEEND)
+    {
+        return $this->parts[$partnum]->getContent($EOL);
+    }
+
+    /**
+     * Explode MIME multipart string into separate parts
+     *
+     * Parts consist of the header and the body of each MIME part.
+     *
+     * @param string $body
+     * @param string $boundary
+     * @throws Exception\RuntimeException
+     * @return array
+     */
+    protected static function _disassembleMime($body, $boundary)
+    {
+        $start  = 0;
+        $res    = array();
+        // find every mime part limiter and cut out the
+        // string before it.
+        // the part before the first boundary string is discarded:
+        $p = strpos($body, '--' . $boundary."\n", $start);
+        if ($p === false) {
+            // no parts found!
+            return array();
+        }
+
+        // position after first boundary line
+        $start = $p + 3 + strlen($boundary);
+
+        while (($p = strpos($body, '--' . $boundary . "\n", $start)) !== false) {
+            $res[] = substr($body, $start, $p-$start);
+            $start = $p + 3 + strlen($boundary);
+        }
+
+        // no more parts, find end boundary
+        $p = strpos($body, '--' . $boundary . '--', $start);
+        if ($p===false) {
+            throw new Exception\RuntimeException('Not a valid Mime Message: End Missing');
+        }
+
+        // the remaining part also needs to be parsed:
+        $res[] = substr($body, $start, $p-$start);
+        return $res;
+    }
+
+    /**
+     * Decodes a MIME encoded string and returns a Zend\Mime\Message object with
+     * all the MIME parts set according to the given string
+     *
+     * @param string $message
+     * @param string $boundary
+     * @param string $EOL EOL string; defaults to {@link Zend\Mime\Mime::LINEEND}
+     * @throws Exception\RuntimeException
+     * @return \Zend\Mime\Message
+     */
+    public static function createFromMessage($message, $boundary, $EOL = Mime::LINEEND)
+    {
+        $parts = Decode::splitMessageStruct($message, $boundary, $EOL);
+
+        $res = new static();
+        foreach ($parts as $part) {
+
+            // now we build a new MimePart for the current Message Part:
+            $properties = array();
+            foreach ($part['header'] as $header) {
+                /** @var \Zend\Mail\Header\HeaderInterface $header */
+                /**
+                 * @todo check for characterset and filename
+                 */
+
+                $fieldName  = $header->getFieldName();
+                $fieldValue = $header->getFieldValue();
+                switch (strtolower($fieldName)) {
+                    case 'content-type':
+                        $properties['type'] = $fieldValue;
+                        break;
+                    case 'content-transfer-encoding':
+                        $properties['encoding'] = $fieldValue;
+                        break;
+                    case 'content-id':
+                        $properties['id'] = trim($fieldValue,'<>');
+                        break;
+                    case 'content-disposition':
+                        $properties['disposition'] = $fieldValue;
+                        break;
+                    case 'content-description':
+                        $properties['description'] = $fieldValue;
+                        break;
+                    case 'content-location':
+                        $properties['location'] = $fieldValue;
+                        break;
+                    case 'content-language':
+                        $properties['language'] = $fieldValue;
+                        break;
+                    default:
+                        // Ignore unknown header
+                        break;
+                }
+            }
+
+            $body = $part['body'];
+
+            if (isset($properties['encoding'])) {
+                switch ($properties['encoding']) {
+                    case 'quoted-printable':
+                        $body = quoted_printable_decode($body);
+                        break;
+                    case 'base64':
+                        $body = base64_decode($body);
+                        break;
+                }
+            }
+
+            $newPart = new Part($body);
+            foreach ($properties as $key => $value) {
+                $newPart->$key = $value;
+            }
+            $res->addPart($newPart);
+        }
+
+        return $res;
+    }
 }
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Stdlib\StringWrapper;
+
+interface StringWrapperInterface
+{
+    /**
+     * Check if the given character encoding is supported by this wrapper
+     * and the character encoding to convert to is also supported.
+     *
+     * @param string      $encoding
+     * @param string|null $convertEncoding
+     */
+    public static function isSupported($encoding, $convertEncoding = null);
+
+    /**
+     * Get a list of supported character encodings
+     *
+     * @return string[]
+     */
+    public static function getSupportedEncodings();
+
+    /**
+     * Set character encoding working with and convert to
+     *
+     * @param string      $encoding         The character encoding to work with
+     * @param string|null $convertEncoding  The character encoding to convert to
+     * @return StringWrapperInterface
+     */
+    public function setEncoding($encoding, $convertEncoding = null);
+
+    /**
+     * Get the defined character encoding to work with (upper case)
+     *
+     * @return string
+     */
+    public function getEncoding();
+
+    /**
+     * Get the defined character encoding to convert to (upper case)
+     *
+     * @return string|null
+     */
+    public function getConvertEncoding();
+
+    /**
+     * Returns the length of the given string
+     *
+     * @param string $str
+     * @return int|false
+     */
+    public function strlen($str);
+
+    /**
+     * Returns the portion of string specified by the start and length parameters
+     *
+     * @param string   $str
+     * @param int      $offset
+     * @param int|null $length
+     * @return string|false
+     */
+    public function substr($str, $offset = 0, $length = null);
+
+    /**
+     * Find the position of the first occurrence of a substring in a string
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @param int    $offset
+     * @return int|false
+     */
+    public function strpos($haystack, $needle, $offset = 0);
+
+    /**
+     * Convert a string from defined encoding to the defined convert encoding
+     *
+     * @param string  $str
+     * @param bool $reverse
+     * @return string|false
+     */
+    public function convert($str, $reverse = false);
+
+    /**
+     * Wraps a string to a given number of characters
+     *
+     * @param  string  $str
+     * @param  int $width
+     * @param  string  $break
+     * @param  bool $cut
+     * @return string
+     */
+    public function wordWrap($str, $width = 75, $break = "\n", $cut = false);
+
+    /**
+     * Pad a string to a certain length with another string
+     *
+     * @param  string  $input
+     * @param  int $padLength
+     * @param  string  $padString
+     * @param  int $padType
+     * @return string
+     */
+    public function strPad($input, $padLength, $padString = ' ', $padType = STR_PAD_RIGHT);
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Stdlib\StringWrapper;
+
+use Zend\Stdlib\Exception;
+use Zend\Stdlib\StringUtils;
+
+abstract class AbstractStringWrapper implements StringWrapperInterface
+{
+    /**
+     * The character encoding working on
+     * @var string|null
+     */
+    protected $encoding = 'UTF-8';
+
+    /**
+     * An optionally character encoding to convert to
+     * @var string|null
+     */
+    protected $convertEncoding;
+
+    /**
+     * Check if the given character encoding is supported by this wrapper
+     * and the character encoding to convert to is also supported.
+     *
+     * @param  string      $encoding
+     * @param  string|null $convertEncoding
+     * @return bool
+     */
+    public static function isSupported($encoding, $convertEncoding = null)
+    {
+        $supportedEncodings = static::getSupportedEncodings();
+
+        if (!in_array(strtoupper($encoding), $supportedEncodings)) {
+            return false;
+        }
+
+        if ($convertEncoding !== null && !in_array(strtoupper($convertEncoding), $supportedEncodings)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Set character encoding working with and convert to
+     *
+     * @param string      $encoding         The character encoding to work with
+     * @param string|null $convertEncoding  The character encoding to convert to
+     * @return StringWrapperInterface
+     */
+    public function setEncoding($encoding, $convertEncoding = null)
+    {
+        $supportedEncodings = static::getSupportedEncodings();
+
+        $encodingUpper = strtoupper($encoding);
+        if (!in_array($encodingUpper, $supportedEncodings)) {
+            throw new Exception\InvalidArgumentException(
+                'Wrapper doesn\'t support character encoding "' . $encoding . '"'
+            );
+        }
+
+
+        if ($convertEncoding !== null) {
+            $convertEncodingUpper = strtoupper($convertEncoding);
+            if (!in_array($convertEncodingUpper, $supportedEncodings)) {
+                throw new Exception\InvalidArgumentException(
+                    'Wrapper doesn\'t support character encoding "' . $convertEncoding . '"'
+                );
+            }
+
+            $this->convertEncoding = $convertEncodingUpper;
+        } else {
+            $this->convertEncoding = null;
+        }
+        $this->encoding = $encodingUpper;
+
+        return $this;
+    }
+
+    /**
+     * Get the defined character encoding to work with
+     *
+     * @return string
+     * @throws Exception\LogicException If no encoding was defined
+     */
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * Get the defined character encoding to convert to
+     *
+     * @return string|null
+    */
+    public function getConvertEncoding()
+    {
+        return $this->convertEncoding;
+    }
+
+    /**
+     * Convert a string from defined character encoding to the defined convert encoding
+     *
+     * @param string  $str
+     * @param bool $reverse
+     * @return string|false
+     */
+    public function convert($str, $reverse = false)
+    {
+        $encoding        = $this->getEncoding();
+        $convertEncoding = $this->getConvertEncoding();
+        if ($convertEncoding === null) {
+            throw new Exception\LogicException(
+                'No convert encoding defined'
+            );
+        }
+
+        if ($encoding === $convertEncoding) {
+            return $str;
+        }
+
+        $from = $reverse ? $convertEncoding : $encoding;
+        $to   = $reverse ? $encoding : $convertEncoding;
+        throw new Exception\RuntimeException(sprintf(
+            'Converting from "%s" to "%s" isn\'t supported by this string wrapper',
+            $from,
+            $to
+        ));
+    }
+
+    /**
+     * Wraps a string to a given number of characters
+     *
+     * @param  string  $string
+     * @param  int $width
+     * @param  string  $break
+     * @param  bool $cut
+     * @return string|false
+     */
+    public function wordWrap($string, $width = 75, $break = "\n", $cut = false)
+    {
+        $string = (string) $string;
+        if ($string === '') {
+            return '';
+        }
+
+        $break = (string) $break;
+        if ($break === '') {
+            throw new Exception\InvalidArgumentException('Break string cannot be empty');
+        }
+
+        $width = (int) $width;
+        if ($width === 0 && $cut) {
+            throw new Exception\InvalidArgumentException('Cannot force cut when width is zero');
+        }
+
+        if (StringUtils::isSingleByteEncoding($this->getEncoding())) {
+            return wordwrap($string, $width, $break, $cut);
+        }
+
+        $stringWidth = $this->strlen($string);
+        $breakWidth  = $this->strlen($break);
+
+        $result    = '';
+        $lastStart = $lastSpace = 0;
+
+        for ($current = 0; $current < $stringWidth; $current++) {
+            $char = $this->substr($string, $current, 1);
+
+            $possibleBreak = $char;
+            if ($breakWidth !== 1) {
+                $possibleBreak = $this->substr($string, $current, $breakWidth);
+            }
+
+            if ($possibleBreak === $break) {
+                $result    .= $this->substr($string, $lastStart, $current - $lastStart + $breakWidth);
+                $current   += $breakWidth - 1;
+                $lastStart  = $lastSpace = $current + 1;
+                continue;
+            }
+
+            if ($char === ' ') {
+                if ($current - $lastStart >= $width) {
+                    $result    .= $this->substr($string, $lastStart, $current - $lastStart) . $break;
+                    $lastStart  = $current + 1;
+                }
+
+                $lastSpace = $current;
+                continue;
+            }
+
+            if ($current - $lastStart >= $width && $cut && $lastStart >= $lastSpace) {
+                $result    .= $this->substr($string, $lastStart, $current - $lastStart) . $break;
+                $lastStart  = $lastSpace = $current;
+                continue;
+            }
+
+            if ($current - $lastStart >= $width && $lastStart < $lastSpace) {
+                $result    .= $this->substr($string, $lastStart, $lastSpace - $lastStart) . $break;
+                $lastStart  = $lastSpace = $lastSpace + 1;
+                continue;
+            }
+        }
+
+        if ($lastStart !== $current) {
+            $result .= $this->substr($string, $lastStart, $current - $lastStart);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Pad a string to a certain length with another string
+     *
+     * @param  string  $input
+     * @param  int $padLength
+     * @param  string  $padString
+     * @param  int $padType
+     * @return string
+     */
+    public function strPad($input, $padLength, $padString = ' ', $padType = STR_PAD_RIGHT)
+    {
+        if (StringUtils::isSingleByteEncoding($this->getEncoding())) {
+            return str_pad($input, $padLength, $padString, $padType);
+        }
+
+        $lengthOfPadding = $padLength - $this->strlen($input);
+        if ($lengthOfPadding <= 0) {
+            return $input;
+        }
+
+        $padStringLength = $this->strlen($padString);
+        if ($padStringLength === 0) {
+            return $input;
+        }
+
+        $repeatCount = floor($lengthOfPadding / $padStringLength);
+
+        if ($padType === STR_PAD_BOTH) {
+            $repeatCountLeft = $repeatCountRight = ($repeatCount - $repeatCount % 2) / 2;
+
+            $lastStringLength       = $lengthOfPadding - 2 * $repeatCountLeft * $padStringLength;
+            $lastStringLeftLength   = $lastStringRightLength = floor($lastStringLength / 2);
+            $lastStringRightLength += $lastStringLength % 2;
+
+            $lastStringLeft  = $this->substr($padString, 0, $lastStringLeftLength);
+            $lastStringRight = $this->substr($padString, 0, $lastStringRightLength);
+
+            return str_repeat($padString, $repeatCountLeft) . $lastStringLeft
+                . $input
+                . str_repeat($padString, $repeatCountRight) . $lastStringRight;
+        }
+
+        $lastString = $this->substr($padString, 0, $lengthOfPadding % $padStringLength);
+
+        if ($padType === STR_PAD_LEFT) {
+            return str_repeat($padString, $repeatCount) . $lastString . $input;
+        }
+
+        return $input . str_repeat($padString, $repeatCount) . $lastString;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Stdlib\StringWrapper;
+
+use Zend\Stdlib\Exception;
+
+class MbString extends AbstractStringWrapper
+{
+    /**
+     * List of supported character sets (upper case)
+     *
+     * @var null|string[]
+     * @link http://php.net/manual/mbstring.supported-encodings.php
+     */
+    protected static $encodings = null;
+
+    /**
+     * Get a list of supported character encodings
+     *
+     * @return string[]
+     */
+    public static function getSupportedEncodings()
+    {
+        if (static::$encodings === null) {
+            static::$encodings = array_map('strtoupper', mb_list_encodings());
+
+            // FIXME: Converting € (UTF-8) to ISO-8859-16 gives a wrong result
+            $indexIso885916 = array_search('ISO-8859-16', static::$encodings, true);
+            if ($indexIso885916 !== false) {
+                unset(static::$encodings[$indexIso885916]);
+            }
+        }
+
+        return static::$encodings;
+    }
+
+    /**
+     * Constructor
+     *
+     * @throws Exception\ExtensionNotLoadedException
+     */
+    public function __construct()
+    {
+        if (!extension_loaded('mbstring')) {
+            throw new Exception\ExtensionNotLoadedException(
+                'PHP extension "mbstring" is required for this wrapper'
+            );
+        }
+    }
+
+    /**
+     * Returns the length of the given string
+     *
+     * @param string $str
+     * @return int|false
+     */
+    public function strlen($str)
+    {
+        return mb_strlen($str, $this->getEncoding());
+    }
+
+    /**
+     * Returns the portion of string specified by the start and length parameters
+     *
+     * @param string   $str
+     * @param int      $offset
+     * @param int|null $length
+     * @return string|false
+     */
+    public function substr($str, $offset = 0, $length = null)
+    {
+        return mb_substr($str, $offset, $length, $this->getEncoding());
+    }
+
+    /**
+     * Find the position of the first occurrence of a substring in a string
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @param int    $offset
+     * @return int|false
+     */
+    public function strpos($haystack, $needle, $offset = 0)
+    {
+        return mb_strpos($haystack, $needle, $offset, $this->getEncoding());
+    }
+
+    /**
+     * Convert a string from defined encoding to the defined convert encoding
+     *
+     * @param string  $str
+     * @param bool $reverse
+     * @return string|false
+     */
+    public function convert($str, $reverse = false)
+    {
+        $encoding        = $this->getEncoding();
+        $convertEncoding = $this->getConvertEncoding();
+
+        if ($convertEncoding === null) {
+            throw new Exception\LogicException(
+                'No convert encoding defined'
+            );
+        }
+
+        if ($encoding === $convertEncoding) {
+            return $str;
+        }
+
+        $fromEncoding = $reverse ? $convertEncoding : $encoding;
+        $toEncoding   = $reverse ? $encoding : $convertEncoding;
+        return mb_convert_encoding($str, $toEncoding, $fromEncoding);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Stdlib;
+
+use Zend\Stdlib\StringWrapper\StringWrapperInterface;
+
+/**
+ * Utility class for handling strings of different character encodings
+ * using available PHP extensions.
+ *
+ * Declared abstract, as we have no need for instantiation.
+ */
+abstract class StringUtils
+{
+
+    /**
+     * Ordered list of registered string wrapper instances
+     *
+     * @var StringWrapperInterface[]
+     */
+    protected static $wrapperRegistry = null;
+
+    /**
+     * A list of known single-byte character encodings (upper-case)
+     *
+     * @var string[]
+     */
+    protected static $singleByteEncodings = array(
+        'ASCII', '7BIT', '8BIT',
+        'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4', 'ISO-8859-5',
+        'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8', 'ISO-8859-9', 'ISO-8859-10',
+        'ISO-8859-11', 'ISO-8859-13', 'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16',
+        'CP-1251', 'CP-1252',
+        // TODO
+    );
+
+    /**
+     * Is PCRE compiled with Unicode support?
+     *
+     * @var bool
+     **/
+    protected static $hasPcreUnicodeSupport = null;
+
+    /**
+     * Get registered wrapper classes
+     *
+     * @return string[]
+     */
+    public static function getRegisteredWrappers()
+    {
+        if (static::$wrapperRegistry === null) {
+            static::$wrapperRegistry = array();
+
+            if (extension_loaded('intl')) {
+                static::$wrapperRegistry[] = 'Zend\Stdlib\StringWrapper\Intl';
+            }
+
+            if (extension_loaded('mbstring')) {
+                static::$wrapperRegistry[] = 'Zend\Stdlib\StringWrapper\MbString';
+            }
+
+            if (extension_loaded('iconv')) {
+                static::$wrapperRegistry[] = 'Zend\Stdlib\StringWrapper\Iconv';
+            }
+
+            static::$wrapperRegistry[] = 'Zend\Stdlib\StringWrapper\Native';
+        }
+
+        return static::$wrapperRegistry;
+    }
+
+    /**
+     * Register a string wrapper class
+     *
+     * @param string $wrapper
+     * @return void
+     */
+    public static function registerWrapper($wrapper)
+    {
+        $wrapper = (string) $wrapper;
+        if (!in_array($wrapper, static::$wrapperRegistry, true)) {
+            static::$wrapperRegistry[] = $wrapper;
+        }
+    }
+
+    /**
+     * Unregister a string wrapper class
+     *
+     * @param string $wrapper
+     * @return void
+     */
+    public static function unregisterWrapper($wrapper)
+    {
+        $index = array_search((string) $wrapper, static::$wrapperRegistry, true);
+        if ($index !== false) {
+            unset(static::$wrapperRegistry[$index]);
+        }
+    }
+
+    /**
+     * Reset all registered wrappers so the default wrappers will be used
+     *
+     * @return void
+     */
+    public static function resetRegisteredWrappers()
+    {
+        static::$wrapperRegistry = null;
+    }
+
+    /**
+     * Get the first string wrapper supporting the given character encoding
+     * and supports to convert into the given convert encoding.
+     *
+     * @param string      $encoding        Character encoding to support
+     * @param string|null $convertEncoding OPTIONAL character encoding to convert in
+     * @return StringWrapperInterface
+     * @throws Exception\RuntimeException If no wrapper supports given character encodings
+     */
+    public static function getWrapper($encoding = 'UTF-8', $convertEncoding = null)
+    {
+        foreach (static::getRegisteredWrappers() as $wrapperClass) {
+            if ($wrapperClass::isSupported($encoding, $convertEncoding)) {
+                $wrapper = new $wrapperClass($encoding, $convertEncoding);
+                $wrapper->setEncoding($encoding, $convertEncoding);
+                return $wrapper;
+            }
+        }
+
+        throw new Exception\RuntimeException(
+            'No wrapper found supporting "' . $encoding . '"'
+            . (($convertEncoding !== null) ? ' and "' . $convertEncoding . '"' : '')
+        );
+    }
+
+    /**
+     * Get a list of all known single-byte character encodings
+     *
+     * @return string[]
+     */
+    public static function getSingleByteEncodings()
+    {
+        return static::$singleByteEncodings;
+    }
+
+    /**
+     * Check if a given encoding is a known single-byte character encoding
+     *
+     * @param string $encoding
+     * @return bool
+     */
+    public static function isSingleByteEncoding($encoding)
+    {
+        return in_array(strtoupper($encoding), static::$singleByteEncodings);
+    }
+
+    /**
+     * Check if a given string is valid UTF-8 encoded
+     *
+     * @param string $str
+     * @return bool
+     */
+    public static function isValidUtf8($str)
+    {
+        return is_string($str) && ($str === '' || preg_match('/^./su', $str) == 1);
+    }
+
+    /**
+     * Is PCRE compiled with Unicode support?
+     *
+     * @return bool
+     */
+    public static function hasPcreUnicodeSupport()
+    {
+        if (static::$hasPcreUnicodeSupport === null) {
+            ErrorHandler::start();
+            static::$hasPcreUnicodeSupport = defined('PREG_BAD_UTF8_OFFSET_ERROR') && preg_match('/\pL/u', 'a') == 1;
+            ErrorHandler::stop();
+        }
+        return static::$hasPcreUnicodeSupport;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Validator;
+
+interface ValidatorInterface
+{
+    /**
+     * Returns true if and only if $value meets the validation requirements
+     *
+     * If $value fails validation, then this method returns false, and
+     * getMessages() will return an array of messages that explain why the
+     * validation failed.
+     *
+     * @param  mixed $value
+     * @return bool
+     * @throws Exception\RuntimeException If validation of $value is impossible
+     */
+    public function isValid($value);
+
+    /**
+     * Returns an array of messages that explain why the most recent isValid()
+     * call returned false. The array keys are validation failure message identifiers,
+     * and the array values are the corresponding human-readable message strings.
+     *
+     * If isValid() was never called or if the most recent isValid() call
+     * returned true, then this method returns an empty array.
+     *
+     * @return array
+     */
+    public function getMessages();
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *;
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Validator\Translator;
+
+interface TranslatorAwareInterface
+{
+    /**
+     * Sets translator to use in helper
+     *
+     * @param  TranslatorInterface $translator  [optional] translator.
+     *             Default is null, which sets no translator.
+     * @param  string $textDomain  [optional] text domain
+     *             Default is null, which skips setTranslatorTextDomain
+     * @return self
+     */
+    public function setTranslator(TranslatorInterface $translator = null, $textDomain = null);
+
+    /**
+     * Returns translator used in object
+     *
+     * @return TranslatorInterface|null
+     */
+    public function getTranslator();
+
+    /**
+     * Checks if the object has a translator
+     *
+     * @return bool
+     */
+    public function hasTranslator();
+
+    /**
+     * Sets whether translator is enabled and should be used
+     *
+     * @param  bool $enabled [optional] whether translator should be used.
+     *                  Default is true.
+     * @return self
+     */
+    public function setTranslatorEnabled($enabled = true);
+
+    /**
+     * Returns whether translator is enabled and should be used
+     *
+     * @return bool
+     */
+    public function isTranslatorEnabled();
+
+    /**
+     * Set translation text domain
+     *
+     * @param  string $textDomain
+     * @return TranslatorAwareInterface
+     */
+    public function setTranslatorTextDomain($textDomain = 'default');
+
+    /**
+     * Return the translation text domain
+     *
+     * @return string
+     */
+    public function getTranslatorTextDomain();
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Validator;
+
+use Traversable;
+use Zend\Stdlib\ArrayUtils;
+
+abstract class AbstractValidator implements
+    Translator\TranslatorAwareInterface,
+    ValidatorInterface
+{
+    /**
+     * The value to be validated
+     *
+     * @var mixed
+     */
+    protected $value;
+
+    /**
+     * Default translation object for all validate objects
+     * @var Translator\TranslatorInterface
+     */
+    protected static $defaultTranslator;
+
+    /**
+     * Default text domain to be used with translator
+     * @var string
+     */
+    protected static $defaultTranslatorTextDomain = 'default';
+
+    /**
+     * Limits the maximum returned length of an error message
+     *
+     * @var int
+     */
+    protected static $messageLength = -1;
+
+    protected $abstractOptions = array(
+        'messages'             => array(), // Array of validation failure messages
+        'messageTemplates'     => array(), // Array of validation failure message templates
+        'messageVariables'     => array(), // Array of additional variables available for validation failure messages
+        'translator'           => null,    // Translation object to used -> Translator\TranslatorInterface
+        'translatorTextDomain' => null,    // Translation text domain
+        'translatorEnabled'    => true,    // Is translation enabled?
+        'valueObscured'        => false,   // Flag indicating whether or not value should be obfuscated
+                                           // in error messages
+    );
+
+    /**
+     * Abstract constructor for all validators
+     * A validator should accept following parameters:
+     *  - nothing f.e. Validator()
+     *  - one or multiple scalar values f.e. Validator($first, $second, $third)
+     *  - an array f.e. Validator(array($first => 'first', $second => 'second', $third => 'third'))
+     *  - an instance of Traversable f.e. Validator($config_instance)
+     *
+     * @param array|Traversable $options
+     */
+    public function __construct($options = null)
+    {
+        // The abstract constructor allows no scalar values
+        if ($options instanceof Traversable) {
+            $options = ArrayUtils::iteratorToArray($options);
+        }
+
+        if (isset($this->messageTemplates)) {
+            $this->abstractOptions['messageTemplates'] = $this->messageTemplates;
+        }
+
+        if (isset($this->messageVariables)) {
+            $this->abstractOptions['messageVariables'] = $this->messageVariables;
+        }
+
+        if (is_array($options)) {
+            $this->setOptions($options);
+        }
+    }
+
+    /**
+     * Returns an option
+     *
+     * @param string $option Option to be returned
+     * @return mixed Returned option
+     * @throws Exception\InvalidArgumentException
+     */
+    public function getOption($option)
+    {
+        if (array_key_exists($option, $this->abstractOptions)) {
+            return $this->abstractOptions[$option];
+        }
+
+        if (isset($this->options) && array_key_exists($option, $this->options)) {
+            return $this->options[$option];
+        }
+
+        throw new Exception\InvalidArgumentException("Invalid option '$option'");
+    }
+
+    /**
+     * Returns all available options
+     *
+     * @return array Array with all available options
+     */
+    public function getOptions()
+    {
+        $result = $this->abstractOptions;
+        if (isset($this->options)) {
+            $result += $this->options;
+        }
+        return $result;
+    }
+
+    /**
+     * Sets one or multiple options
+     *
+     * @param  array|Traversable $options Options to set
+     * @throws Exception\InvalidArgumentException If $options is not an array or Traversable
+     * @return AbstractValidator Provides fluid interface
+     */
+    public function setOptions($options = array())
+    {
+        if (!is_array($options) && !$options instanceof Traversable) {
+            throw new Exception\InvalidArgumentException(__METHOD__ . ' expects an array or Traversable');
+        }
+
+        foreach ($options as $name => $option) {
+            $fname = 'set' . ucfirst($name);
+            $fname2 = 'is' . ucfirst($name);
+            if (($name != 'setOptions') && method_exists($this, $name)) {
+                $this->{$name}($option);
+            } elseif (($fname != 'setOptions') && method_exists($this, $fname)) {
+                $this->{$fname}($option);
+            } elseif (method_exists($this, $fname2)) {
+                $this->{$fname2}($option);
+            } elseif (isset($this->options)) {
+                $this->options[$name] = $option;
+            } else {
+                $this->abstractOptions[$name] = $option;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns array of validation failure messages
+     *
+     * @return array
+     */
+    public function getMessages()
+    {
+        return array_unique($this->abstractOptions['messages'], SORT_REGULAR);
+    }
+
+    /**
+     * Invoke as command
+     *
+     * @param  mixed $value
+     * @return bool
+     */
+    public function __invoke($value)
+    {
+        return $this->isValid($value);
+    }
+
+    /**
+     * Returns an array of the names of variables that are used in constructing validation failure messages
+     *
+     * @return array
+     */
+    public function getMessageVariables()
+    {
+        return array_keys($this->abstractOptions['messageVariables']);
+    }
+
+    /**
+     * Returns the message templates from the validator
+     *
+     * @return array
+     */
+    public function getMessageTemplates()
+    {
+        return $this->abstractOptions['messageTemplates'];
+    }
+
+    /**
+     * Sets the validation failure message template for a particular key
+     *
+     * @param  string $messageString
+     * @param  string $messageKey     OPTIONAL
+     * @return AbstractValidator Provides a fluent interface
+     * @throws Exception\InvalidArgumentException
+     */
+    public function setMessage($messageString, $messageKey = null)
+    {
+        if ($messageKey === null) {
+            $keys = array_keys($this->abstractOptions['messageTemplates']);
+            foreach ($keys as $key) {
+                $this->setMessage($messageString, $key);
+            }
+            return $this;
+        }
+
+        if (!isset($this->abstractOptions['messageTemplates'][$messageKey])) {
+            throw new Exception\InvalidArgumentException("No message template exists for key '$messageKey'");
+        }
+
+        $this->abstractOptions['messageTemplates'][$messageKey] = $messageString;
+        return $this;
+    }
+
+    /**
+     * Sets validation failure message templates given as an array, where the array keys are the message keys,
+     * and the array values are the message template strings.
+     *
+     * @param  array $messages
+     * @return AbstractValidator
+     */
+    public function setMessages(array $messages)
+    {
+        foreach ($messages as $key => $message) {
+            $this->setMessage($message, $key);
+        }
+        return $this;
+    }
+
+    /**
+     * Magic function returns the value of the requested property, if and only if it is the value or a
+     * message variable.
+     *
+     * @param  string $property
+     * @return mixed
+     * @throws Exception\InvalidArgumentException
+     */
+    public function __get($property)
+    {
+        if ($property == 'value') {
+            return $this->value;
+        }
+
+        if (array_key_exists($property, $this->abstractOptions['messageVariables'])) {
+            $result = $this->abstractOptions['messageVariables'][$property];
+            if (is_array($result)) {
+                $result = $this->{key($result)}[current($result)];
+            } else {
+                $result = $this->{$result};
+            }
+            return $result;
+        }
+
+        if (isset($this->messageVariables) && array_key_exists($property, $this->messageVariables)) {
+            $result = $this->{$this->messageVariables[$property]};
+            if (is_array($result)) {
+                $result = $this->{key($result)}[current($result)];
+            } else {
+                $result = $this->{$result};
+            }
+            return $result;
+        }
+
+        throw new Exception\InvalidArgumentException("No property exists by the name '$property'");
+    }
+
+    /**
+     * Constructs and returns a validation failure message with the given message key and value.
+     *
+     * Returns null if and only if $messageKey does not correspond to an existing template.
+     *
+     * If a translator is available and a translation exists for $messageKey,
+     * the translation will be used.
+     *
+     * @param  string              $messageKey
+     * @param  string|array|object $value
+     * @return string
+     */
+    protected function createMessage($messageKey, $value)
+    {
+        if (!isset($this->abstractOptions['messageTemplates'][$messageKey])) {
+            return null;
+        }
+
+        $message = $this->abstractOptions['messageTemplates'][$messageKey];
+
+        $message = $this->translateMessage($messageKey, $message);
+
+        if (is_object($value) &&
+            !in_array('__toString', get_class_methods($value))
+        ) {
+            $value = get_class($value) . ' object';
+        } elseif (is_array($value)) {
+            $value = var_export($value, 1);
+        } else {
+            $value = (string) $value;
+        }
+
+        if ($this->isValueObscured()) {
+            $value = str_repeat('*', strlen($value));
+        }
+
+        $message = str_replace('%value%', (string) $value, $message);
+        foreach ($this->abstractOptions['messageVariables'] as $ident => $property) {
+            if (is_array($property)) {
+                $value = $this->{key($property)}[current($property)];
+                if (is_array($value)) {
+                    $value = '[' . implode(', ', $value) . ']';
+                }
+            } else {
+                $value = $this->$property;
+            }
+            $message = str_replace("%$ident%", (string) $value, $message);
+        }
+
+        $length = self::getMessageLength();
+        if (($length > -1) && (strlen($message) > $length)) {
+            $message = substr($message, 0, ($length - 3)) . '...';
+        }
+
+        return $message;
+    }
+
+    /**
+     * @param  string $messageKey
+     * @param  string $value      OPTIONAL
+     * @return void
+     */
+    protected function error($messageKey, $value = null)
+    {
+        if ($messageKey === null) {
+            $keys = array_keys($this->abstractOptions['messageTemplates']);
+            $messageKey = current($keys);
+        }
+
+        if ($value === null) {
+            $value = $this->value;
+        }
+
+        $this->abstractOptions['messages'][$messageKey] = $this->createMessage($messageKey, $value);
+    }
+
+    /**
+     * Returns the validation value
+     *
+     * @return mixed Value to be validated
+     */
+    protected function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Sets the value to be validated and clears the messages and errors arrays
+     *
+     * @param  mixed $value
+     * @return void
+     */
+    protected function setValue($value)
+    {
+        $this->value               = $value;
+        $this->abstractOptions['messages'] = array();
+    }
+
+    /**
+     * Set flag indicating whether or not value should be obfuscated in messages
+     *
+     * @param  bool $flag
+     * @return AbstractValidator
+     */
+    public function setValueObscured($flag)
+    {
+        $this->abstractOptions['valueObscured'] = (bool) $flag;
+        return $this;
+    }
+
+    /**
+     * Retrieve flag indicating whether or not value should be obfuscated in
+     * messages
+     *
+     * @return bool
+     */
+    public function isValueObscured()
+    {
+        return $this->abstractOptions['valueObscured'];
+    }
+
+    /**
+     * Set translation object
+     *
+     * @param  Translator\TranslatorInterface|null $translator
+     * @param  string          $textDomain (optional)
+     * @return AbstractValidator
+     * @throws Exception\InvalidArgumentException
+     */
+    public function setTranslator(Translator\TranslatorInterface $translator = null, $textDomain = null)
+    {
+        $this->abstractOptions['translator'] = $translator;
+        if (null !== $textDomain) {
+            $this->setTranslatorTextDomain($textDomain);
+        }
+        return $this;
+    }
+
+    /**
+     * Return translation object
+     *
+     * @return Translator\TranslatorInterface|null
+     */
+    public function getTranslator()
+    {
+        if (! $this->isTranslatorEnabled()) {
+            return null;
+        }
+
+        if (null === $this->abstractOptions['translator']) {
+            $this->abstractOptions['translator'] = self::getDefaultTranslator();
+        }
+
+        return $this->abstractOptions['translator'];
+    }
+
+    /**
+     * Does this validator have its own specific translator?
+     *
+     * @return bool
+     */
+    public function hasTranslator()
+    {
+        return (bool) $this->abstractOptions['translator'];
+    }
+
+    /**
+     * Set translation text domain
+     *
+     * @param  string $textDomain
+     * @return AbstractValidator
+     */
+    public function setTranslatorTextDomain($textDomain = 'default')
+    {
+        $this->abstractOptions['translatorTextDomain'] = $textDomain;
+        return $this;
+    }
+
+    /**
+     * Return the translation text domain
+     *
+     * @return string
+     */
+    public function getTranslatorTextDomain()
+    {
+        if (null === $this->abstractOptions['translatorTextDomain']) {
+            $this->abstractOptions['translatorTextDomain'] =
+                self::getDefaultTranslatorTextDomain();
+        }
+        return $this->abstractOptions['translatorTextDomain'];
+    }
+
+    /**
+     * Set default translation object for all validate objects
+     *
+     * @param  Translator\TranslatorInterface|null $translator
+     * @param  string          $textDomain (optional)
+     * @return void
+     * @throws Exception\InvalidArgumentException
+     */
+    public static function setDefaultTranslator(
+        Translator\TranslatorInterface $translator = null, $textDomain = null
+    )
+    {
+        static::$defaultTranslator = $translator;
+        if (null !== $textDomain) {
+            self::setDefaultTranslatorTextDomain($textDomain);
+        }
+    }
+
+    /**
+     * Get default translation object for all validate objects
+     *
+     * @return Translator\TranslatorInterface|null
+     */
+    public static function getDefaultTranslator()
+    {
+        return static::$defaultTranslator;
+    }
+
+    /**
+     * Is there a default translation object set?
+     *
+     * @return bool
+     */
+    public static function hasDefaultTranslator()
+    {
+        return (bool) static::$defaultTranslator;
+    }
+
+    /**
+     * Set default translation text domain for all validate objects
+     *
+     * @param  string $textDomain
+     * @return void
+     */
+    public static function setDefaultTranslatorTextDomain($textDomain = 'default')
+    {
+        static::$defaultTranslatorTextDomain = $textDomain;
+    }
+
+    /**
+     * Get default translation text domain for all validate objects
+     *
+     * @return string
+     */
+    public static function getDefaultTranslatorTextDomain()
+    {
+        return static::$defaultTranslatorTextDomain;
+    }
+
+    /**
+     * Indicate whether or not translation should be enabled
+     *
+     * @param  bool $flag
+     * @return AbstractValidator
+     */
+    public function setTranslatorEnabled($flag = true)
+    {
+        $this->abstractOptions['translatorEnabled'] = (bool) $flag;
+        return $this;
+    }
+
+    /**
+     * Is translation enabled?
+     *
+     * @return bool
+     */
+    public function isTranslatorEnabled()
+    {
+        return $this->abstractOptions['translatorEnabled'];
+    }
+
+    /**
+     * Returns the maximum allowed message length
+     *
+     * @return int
+     */
+    public static function getMessageLength()
+    {
+        return static::$messageLength;
+    }
+
+    /**
+     * Sets the maximum allowed message length
+     *
+     * @param int $length
+     */
+    public static function setMessageLength($length = -1)
+    {
+        static::$messageLength = $length;
+    }
+
+    /**
+     * Translate a validation message
+     *
+     * @param  string $messageKey
+     * @param  string $message
+     * @return string
+     */
+    protected function translateMessage($messageKey, $message)
+    {
+        $translator = $this->getTranslator();
+        if (!$translator) {
+            return $message;
+        }
+
+        return $translator->translate(
+            $message, $this->getTranslatorTextDomain()
+        );
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Validator;
+
+use Countable;
+
+class ValidatorChain implements
+    Countable,
+    ValidatorInterface
+{
+    /**
+     * @var ValidatorPluginManager
+     */
+    protected $plugins;
+
+    /**
+     * Validator chain
+     *
+     * @var array
+     */
+    protected $validators = array();
+
+    /**
+     * Array of validation failure messages
+     *
+     * @var array
+     */
+    protected $messages = array();
+
+    /**
+     * Return the count of attached validators
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->validators);
+    }
+
+    /**
+     * Get plugin manager instance
+     *
+     * @return ValidatorPluginManager
+     */
+    public function getPluginManager()
+    {
+        if (!$this->plugins) {
+            $this->setPluginManager(new ValidatorPluginManager());
+        }
+        return $this->plugins;
+    }
+
+    /**
+     * Set plugin manager instance
+     *
+     * @param  ValidatorPluginManager $plugins Plugin manager
+     * @return ValidatorChain
+     */
+    public function setPluginManager(ValidatorPluginManager $plugins)
+    {
+        $this->plugins = $plugins;
+        return $this;
+    }
+
+    /**
+     * Retrieve a validator by name
+     *
+     * @param  string     $name    Name of validator to return
+     * @param  null|array $options Options to pass to validator constructor (if not already instantiated)
+     * @return ValidatorInterface
+     */
+    public function plugin($name, array $options = null)
+    {
+        $plugins = $this->getPluginManager();
+        return $plugins->get($name, $options);
+    }
+
+    /**
+     * Attach a validator to the end of the chain
+     *
+     * If $breakChainOnFailure is true, then if the validator fails, the next validator in the chain,
+     * if one exists, will not be executed.
+     *
+     * @param  ValidatorInterface      $validator
+     * @param  bool                 $breakChainOnFailure
+     * @return ValidatorChain Provides a fluent interface
+     */
+    public function attach(ValidatorInterface $validator, $breakChainOnFailure = false)
+    {
+        $this->validators[] = array(
+            'instance'            => $validator,
+            'breakChainOnFailure' => (bool) $breakChainOnFailure,
+        );
+        return $this;
+    }
+
+    /**
+     * Proxy to attach() to keep BC
+     *
+     * @deprecated Please use attach()
+     * @param  ValidatorInterface      $validator
+     * @param  bool                 $breakChainOnFailure
+     * @return ValidatorChain Provides a fluent interface
+     */
+    public function addValidator(ValidatorInterface $validator, $breakChainOnFailure = false)
+    {
+        return $this->attach($validator, $breakChainOnFailure);
+    }
+
+    /**
+     * Adds a validator to the beginning of the chain
+     *
+     * If $breakChainOnFailure is true, then if the validator fails, the next validator in the chain,
+     * if one exists, will not be executed.
+     *
+     * @param  ValidatorInterface      $validator
+     * @param  bool                 $breakChainOnFailure
+     * @return ValidatorChain Provides a fluent interface
+     */
+    public function prependValidator(ValidatorInterface $validator, $breakChainOnFailure = false)
+    {
+        array_unshift(
+            $this->validators,
+            array(
+               'instance'            => $validator,
+               'breakChainOnFailure' => (bool) $breakChainOnFailure,
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Use the plugin manager to add a validator by name
+     *
+     * @param  string $name
+     * @param  array  $options
+     * @param  bool   $breakChainOnFailure
+     * @return ValidatorChain
+     */
+    public function attachByName($name, $options = array(), $breakChainOnFailure = false)
+    {
+        if (isset($options['break_chain_on_failure'])) {
+            $breakChainOnFailure = (bool) $options['break_chain_on_failure'];
+        }
+
+        if (isset($options['breakchainonfailure'])) {
+            $breakChainOnFailure = (bool) $options['breakchainonfailure'];
+        }
+
+        $validator = $this->plugin($name, $options);
+        $this->attach($validator, $breakChainOnFailure);
+        return $this;
+    }
+
+    /**
+     * Proxy to attachByName() to keep BC
+     *
+     * @deprecated Please use attachByName()
+     * @param  string $name
+     * @param  array  $options
+     * @param  bool   $breakChainOnFailure
+     * @return ValidatorChain
+     */
+    public function addByName($name, $options = array(), $breakChainOnFailure = false)
+    {
+        return $this->attachByName($name, $options, $breakChainOnFailure);
+    }
+
+    /**
+     * Use the plugin manager to prepend a validator by name
+     *
+     * @param  string $name
+     * @param  array  $options
+     * @param  bool   $breakChainOnFailure
+     * @return ValidatorChain
+     */
+    public function prependByName($name, $options = array(), $breakChainOnFailure = false)
+    {
+        $validator = $this->plugin($name, $options);
+        $this->prependValidator($validator, $breakChainOnFailure);
+        return $this;
+    }
+
+    /**
+     * Returns true if and only if $value passes all validations in the chain
+     *
+     * Validators are run in the order in which they were added to the chain (FIFO).
+     *
+     * @param  mixed $value
+     * @param  mixed $context Extra "context" to provide the validator
+     * @return bool
+     */
+    public function isValid($value, $context = null)
+    {
+        $this->messages = array();
+        $result         = true;
+        foreach ($this->validators as $element) {
+            $validator = $element['instance'];
+            if ($validator->isValid($value, $context)) {
+                continue;
+            }
+            $result         = false;
+            $messages       = $validator->getMessages();
+            $this->messages = array_replace_recursive($this->messages, $messages);
+            if ($element['breakChainOnFailure']) {
+                break;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Merge the validator chain with the one given in parameter
+     *
+     * @param ValidatorChain $validatorChain
+     * @return ValidatorChain
+     */
+    public function merge(ValidatorChain $validatorChain)
+    {
+        foreach ($validatorChain->validators as $validator) {
+            $this->validators[] = $validator;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns array of validation failure messages
+     *
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * Get all the validators
+     *
+     * @return array
+     */
+    public function getValidators()
+    {
+        return $this->validators;
+    }
+
+    /**
+     * Invoke chain as command
+     *
+     * @param  mixed $value
+     * @return bool
+     */
+    public function __invoke($value)
+    {
+        return $this->isValid($value);
+    }
+
+    /**
+     * Prepare validator chain for serialization
+     *
+     * Plugin manager (property 'plugins') cannot
+     * be serialized. On wakeup the property remains unset
+     * and next invocation to getPluginManager() sets
+     * the default plugin manager instance (ValidatorPluginManager).
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return array('validators', 'messages');
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Validator;
+
+use Zend\Stdlib\ErrorHandler;
+use Zend\Stdlib\StringUtils;
+
+/**
+ * Please note there are two standalone test scripts for testing IDN characters due to problems
+ * with file encoding.
+ *
+ * The first is tests/Zend/Validator/HostnameTestStandalone.php which is designed to be run on
+ * the command line.
+ *
+ * The second is tests/Zend/Validator/HostnameTestForm.php which is designed to be run via HTML
+ * to allow users to test entering UTF-8 characters in a form.
+ */
+class Hostname extends AbstractValidator
+{
+    const CANNOT_DECODE_PUNYCODE  = 'hostnameCannotDecodePunycode';
+    const INVALID                 = 'hostnameInvalid';
+    const INVALID_DASH            = 'hostnameDashCharacter';
+    const INVALID_HOSTNAME        = 'hostnameInvalidHostname';
+    const INVALID_HOSTNAME_SCHEMA = 'hostnameInvalidHostnameSchema';
+    const INVALID_LOCAL_NAME      = 'hostnameInvalidLocalName';
+    const INVALID_URI             = 'hostnameInvalidUri';
+    const IP_ADDRESS_NOT_ALLOWED  = 'hostnameIpAddressNotAllowed';
+    const LOCAL_NAME_NOT_ALLOWED  = 'hostnameLocalNameNotAllowed';
+    const UNDECIPHERABLE_TLD      = 'hostnameUndecipherableTld';
+    const UNKNOWN_TLD             = 'hostnameUnknownTld';
+
+    /**
+     * @var array
+     */
+    protected $messageTemplates = array(
+        self::CANNOT_DECODE_PUNYCODE  => "The input appears to be a DNS hostname but the given punycode notation cannot be decoded",
+        self::INVALID                 => "Invalid type given. String expected",
+        self::INVALID_DASH            => "The input appears to be a DNS hostname but contains a dash in an invalid position",
+        self::INVALID_HOSTNAME        => "The input does not match the expected structure for a DNS hostname",
+        self::INVALID_HOSTNAME_SCHEMA => "The input appears to be a DNS hostname but cannot match against hostname schema for TLD '%tld%'",
+        self::INVALID_LOCAL_NAME      => "The input does not appear to be a valid local network name",
+        self::INVALID_URI             => "The input does not appear to be a valid URI hostname",
+        self::IP_ADDRESS_NOT_ALLOWED  => "The input appears to be an IP address, but IP addresses are not allowed",
+        self::LOCAL_NAME_NOT_ALLOWED  => "The input appears to be a local network name but local network names are not allowed",
+        self::UNDECIPHERABLE_TLD      => "The input appears to be a DNS hostname but cannot extract TLD part",
+        self::UNKNOWN_TLD             => "The input appears to be a DNS hostname but cannot match TLD against known list",
+    );
+
+    /**
+     * @var array
+     */
+    protected $messageVariables = array(
+        'tld' => 'tld',
+    );
+
+    const ALLOW_DNS   = 1;  // Allows Internet domain names (e.g., example.com)
+    const ALLOW_IP    = 2;  // Allows IP addresses
+    const ALLOW_LOCAL = 4;  // Allows local network names (e.g., localhost, www.localdomain)
+    const ALLOW_URI   = 8;  // Allows URI hostnames
+    const ALLOW_ALL   = 15;  // Allows all types of hostnames
+
+    /**
+     * Array of valid top-level-domains
+     *
+     * @see ftp://data.iana.org/TLD/tlds-alpha-by-domain.txt  List of all TLDs by domain
+     * @see http://www.iana.org/domains/root/db/ Official list of supported TLDs
+     * @var array
+     */
+    protected $validTlds = array(
+        'ac', 'academy', 'actor', 'ad', 'ae', 'aero', 'af', 'ag', 'agency', 'ai', 'al', 'am', 'an', 'ao', 'aq', 'ar',
+        'arpa', 'as', 'asia', 'at', 'au', 'aw', 'ax', 'az', 'ba', 'bar', 'bargains', 'bb', 'bd', 'be', 'berlin', 'best',
+        'bf', 'bg', 'bh', 'bi', 'bike', 'biz', 'bj', 'bl', 'blue', 'bm', 'bn', 'bo', 'boutique', 'bq', 'br', 'bs', 'bt',
+        'build', 'builders', 'buzz', 'bv', 'bw', 'by', 'bz', 'ca', 'cab', 'camera', 'camp', 'cards', 'careers', 'cat',
+        'catering', 'cc', 'cd', 'center', 'ceo', 'cf', 'cg', 'ch', 'cheap', 'christmas', 'ci', 'ck', 'cl', 'cleaning',
+        'clothing', 'club', 'cm', 'cn', 'co', 'codes', 'coffee', 'com', 'community', 'company', 'computer',
+        'construction', 'contractors', 'cool', 'coop', 'cr', 'cruises', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz', 'dance',
+        'dating', 'de', 'democrat', 'diamonds', 'directory', 'dj', 'dk', 'dm', 'do', 'domains', 'dz', 'ec', 'edu',
+        'education', 'ee', 'eg', 'eh', 'email', 'enterprises', 'equipment', 'er', 'es', 'estate', 'et', 'eu', 'events',
+        'expert', 'exposed', 'farm', 'fi', 'fish', 'fj', 'fk', 'flights', 'florist', 'fm', 'fo', 'foundation', 'fr',
+        'futbol', 'ga', 'gallery', 'gb', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gift', 'gl', 'glass', 'gm', 'gn', 'gov',
+        'gp', 'gq', 'gr', 'graphics', 'gs', 'gt', 'gu', 'guitars', 'guru', 'gw', 'gy', 'hk', 'hm', 'hn', 'holdings',
+        'holiday', 'house', 'hr', 'ht', 'hu', 'id', 'ie', 'il', 'im', 'immobilien', 'in', 'industries', 'info',
+        'institute', 'int', 'international', 'io', 'iq', 'ir', 'is', 'it', 'je', 'jm', 'jo', 'jobs', 'jp', 'kaufen',
+        'ke', 'kg', 'kh', 'ki', 'kim', 'kitchen', 'kiwi', 'km', 'kn', 'kp', 'kr', 'kred', 'kw', 'ky', 'kz', 'la',
+        'land', 'lb', 'lc', 'li', 'lighting', 'limo', 'link', 'lk', 'lr', 'ls', 'lt', 'lu', 'luxury', 'lv', 'ly', 'ma',
+        'management', 'mango', 'marketing', 'mc', 'md', 'me', 'menu', 'mf', 'mg', 'mh', 'mil', 'mk', 'ml', 'mm', 'mn',
+        'mo', 'mobi', 'moda', 'monash', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'museum', 'mv', 'mw', 'mx', 'my', 'mz',
+        'na', 'nagoya', 'name', 'nc', 'ne', 'net', 'neustar', 'nf', 'ng', 'ni', 'ninja', 'nl', 'no', 'np', 'nr', 'nu',
+        'nz', 'om', 'onl', 'org', 'pa', 'partners', 'parts', 'pe', 'pf', 'pg', 'ph', 'photo', 'photography', 'photos',
+        'pics', 'pink', 'pk', 'pl', 'plumbing', 'pm', 'pn', 'post', 'pr', 'pro', 'productions', 'properties', 'ps',
+        'pt', 'pub', 'pw', 'py', 'qa', 'qpon', 're', 'recipes', 'red', 'rentals', 'repair', 'report', 'reviews', 'rich',
+        'ro', 'rs', 'ru', 'ruhr', 'rw', 'sa', 'sb', 'sc', 'sd', 'se', 'sexy', 'sg', 'sh', 'shiksha', 'shoes', 'si',
+        'singles', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'social', 'solar', 'solutions', 'sr', 'ss', 'st', 'su',
+        'supplies', 'supply', 'support', 'sv', 'sx', 'sy', 'systems', 'sz', 'tattoo', 'tc', 'td', 'technology', 'tel',
+        'tf', 'tg', 'th', 'tienda', 'tips', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'today', 'tokyo', 'tools', 'tp', 'tr',
+        'training', 'travel', 'tt', 'tv', 'tw', 'tz', 'ua', 'ug', 'uk', 'um', 'uno', 'us', 'uy', 'uz', 'va',
+        'vacations', 'vc', 've', 'ventures', 'vg', 'vi', 'viajes', 'villas', 'vision', 'vn', 'voting', 'voyage', 'vu',
+        'wang', 'watch', 'wed', 'wf', 'wien', 'wiki', 'works', 'ws', '测试', 'परीक्षा', '集团', '在线', '한국', 'ভারত',
+        'বাংলা', '公益', '公司', '移动', '我爱你', 'испытание', 'қаз', 'онлайн', 'сайт', 'срб', '테스트', '삼성',
+        'சிங்கப்பூர்', 'дети', 'טעסט', '中文网', '中信', '中国', '中國', 'భారత్', 'ලංකා', '測試', 'ભારત', 'भारत',
+        'آزمایشی', 'பரிட்சை', '网络', 'укр', '香港', 'δοκιμή', 'إختبار', '台湾', '台灣', 'мон',
+        'الجزائر', 'عمان', 'ایران', 'امارات', 'بازار', 'پاکستان', 'الاردن', 'بھارت', 'المغرب', 'السعودية', 'سودان', 'مليسيا', 'شبكة', 'გე',
+        'ไทย', 'سورية', 'рф', 'تونس', 'みんな', 'ਭਾਰਤ', '游戏', 'مصر', 'قطر', 'இலங்கை', 'இந்தியா', '新加坡', 'فلسطين',
+        'テスト', '政务', 'xxx', 'xyz', 'ye', 'yt', 'za', 'zm', 'zone', 'zw'
+    );
+
+    /**
+     * Array for valid Idns
+     * @see http://www.iana.org/domains/idn-tables/ Official list of supported IDN Chars
+     * (.AC) Ascension Island http://www.nic.ac/pdf/AC-IDN-Policy.pdf
+     * (.AR) Argentina http://www.nic.ar/faqidn.html
+     * (.AS) American Samoa http://www.nic.as/idn/chars.cfm
+     * (.AT) Austria http://www.nic.at/en/service/technical_information/idn/charset_converter/
+     * (.BIZ) International http://www.iana.org/domains/idn-tables/
+     * (.BR) Brazil http://registro.br/faq/faq6.html
+     * (.BV) Bouvett Island http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+     * (.CAT) Catalan http://www.iana.org/domains/idn-tables/tables/cat_ca_1.0.html
+     * (.CH) Switzerland https://nic.switch.ch/reg/ocView.action?res=EF6GW2JBPVTG67DLNIQXU234MN6SC33JNQQGI7L6#anhang1
+     * (.CL) Chile http://www.iana.org/domains/idn-tables/tables/cl_latn_1.0.html
+     * (.COM) International http://www.verisign.com/information-services/naming-services/internationalized-domain-names/index.html
+     * (.DE) Germany http://www.denic.de/en/domains/idns/liste.html
+     * (.DK) Danmark http://www.dk-hostmaster.dk/index.php?id=151
+     * (.ES) Spain https://www.nic.es/media/2008-05/1210147705287.pdf
+     * (.FI) Finland http://www.ficora.fi/en/index/palvelut/fiverkkotunnukset/aakkostenkaytto.html
+     * (.GR) Greece https://grweb.ics.forth.gr/CharacterTable1_en.jsp
+     * (.HU) Hungary http://www.domain.hu/domain/English/szabalyzat/szabalyzat.html
+     * (.IL) Israel http://www.isoc.org.il/domains/il-domain-rules.html
+     * (.INFO) International http://www.nic.info/info/idn
+     * (.IO) British Indian Ocean Territory http://www.nic.io/IO-IDN-Policy.pdf
+     * (.IR) Iran http://www.nic.ir/Allowable_Characters_dot-iran
+     * (.IS) Iceland http://www.isnic.is/domain/rules.php
+     * (.KR) Korea http://www.iana.org/domains/idn-tables/tables/kr_ko-kr_1.0.html
+     * (.LI) Liechtenstein https://nic.switch.ch/reg/ocView.action?res=EF6GW2JBPVTG67DLNIQXU234MN6SC33JNQQGI7L6#anhang1
+     * (.LT) Lithuania http://www.domreg.lt/static/doc/public/idn_symbols-en.pdf
+     * (.MD) Moldova http://www.register.md/
+     * (.MUSEUM) International http://www.iana.org/domains/idn-tables/tables/museum_latn_1.0.html
+     * (.NET) International http://www.verisign.com/information-services/naming-services/internationalized-domain-names/index.html
+     * (.NO) Norway http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+     * (.NU) Niue http://www.worldnames.net/
+     * (.ORG) International http://www.pir.org/index.php?db=content/FAQs&tbl=FAQs_Registrant&id=2
+     * (.PE) Peru https://www.nic.pe/nuevas_politicas_faq_2.php
+     * (.PL) Poland http://www.dns.pl/IDN/allowed_character_sets.pdf
+     * (.PR) Puerto Rico http://www.nic.pr/idn_rules.asp
+     * (.PT) Portugal https://online.dns.pt/dns_2008/do?com=DS;8216320233;111;+PAGE(4000058)+K-CAT-CODIGO(C.125)+RCNT(100);
+     * (.RU) Russia http://www.iana.org/domains/idn-tables/tables/ru_ru-ru_1.0.html
+     * (.SA) Saudi Arabia http://www.iana.org/domains/idn-tables/tables/sa_ar_1.0.html
+     * (.SE) Sweden http://www.iis.se/english/IDN_campaignsite.shtml?lang=en
+     * (.SH) Saint Helena http://www.nic.sh/SH-IDN-Policy.pdf
+     * (.SJ) Svalbard and Jan Mayen http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+     * (.TH) Thailand http://www.iana.org/domains/idn-tables/tables/th_th-th_1.0.html
+     * (.TM) Turkmenistan http://www.nic.tm/TM-IDN-Policy.pdf
+     * (.TR) Turkey https://www.nic.tr/index.php
+     * (.UA) Ukraine http://www.iana.org/domains/idn-tables/tables/ua_cyrl_1.2.html
+     * (.VE) Venice http://www.iana.org/domains/idn-tables/tables/ve_es_1.0.html
+     * (.VN) Vietnam http://www.vnnic.vn/english/5-6-300-2-2-04-20071115.htm#1.%20Introduction
+     *
+     * @var array
+     */
+    protected $validIdns = array(
+        'AC'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēėęěĝġģĥħīįĵķĺļľŀłńņňŋőœŕŗřśŝşšţťŧūŭůűųŵŷźżž]{1,63}$/iu'),
+        'AR'  => array(1 => '/^[\x{002d}0-9a-zà-ãç-êìíñ-õü]{1,63}$/iu'),
+        'AS'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĸĺļľłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷźż]{1,63}$/iu'),
+        'AT'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿœšž]{1,63}$/iu'),
+        'BIZ' => 'Hostname/Biz.php',
+        'BR'  => array(1 => '/^[\x{002d}0-9a-zà-ãçéíó-õúü]{1,63}$/iu'),
+        'BV'  => array(1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),
+        'CAT' => array(1 => '/^[\x{002d}0-9a-z·àç-éíïòóúü]{1,63}$/iu'),
+        'CH'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿœ]{1,63}$/iu'),
+        'CL'  => array(1 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu'),
+        'CN'  => 'Hostname/Cn.php',
+        'COM' => 'Hostname/Com.php',
+        'DE'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),
+        'DK'  => array(1 => '/^[\x{002d}0-9a-zäéöü]{1,63}$/iu'),
+        'ES'  => array(1 => '/^[\x{002d}0-9a-zàáçèéíïñòóúü·]{1,63}$/iu'),
+        'EU'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿ]{1,63}$/iu',
+            2 => '/^[\x{002d}0-9a-zāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĺļľŀłńņňŉŋōŏőœŕŗřśŝšťŧũūŭůűųŵŷźżž]{1,63}$/iu',
+            3 => '/^[\x{002d}0-9a-zșț]{1,63}$/iu',
+            4 => '/^[\x{002d}0-9a-zΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώ]{1,63}$/iu',
+            5 => '/^[\x{002d}0-9a-zабвгдежзийклмнопрстуфхцчшщъыьэюя]{1,63}$/iu',
+            6 => '/^[\x{002d}0-9a-zἀ-ἇἐ-ἕἠ-ἧἰ-ἷὀ-ὅὐ-ὗὠ-ὧὰ-ὼώᾀ-ᾇᾐ-ᾗᾠ-ᾧᾰ-ᾴᾶᾷῂῃῄῆῇῐ-ῒΐῖῗῠ-ῧῲῳῴῶῷ]{1,63}$/iu'),
+        'FI'  => array(1 => '/^[\x{002d}0-9a-zäåö]{1,63}$/iu'),
+        'GR'  => array(1 => '/^[\x{002d}0-9a-zΆΈΉΊΌΎ-ΡΣ-ώἀ-ἕἘ-Ἕἠ-ὅὈ-Ὅὐ-ὗὙὛὝὟ-ώᾀ-ᾴᾶ-ᾼῂῃῄῆ-ῌῐ-ΐῖ-Ίῠ-Ῥῲῳῴῶ-ῼ]{1,63}$/iu'),
+        'HK'  => 'Hostname/Cn.php',
+        'HU'  => array(1 => '/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu'),
+        'IL'  => array(1 => '/^[\x{002d}0-9\x{05D0}-\x{05EA}]{1,63}$/iu',
+            2 => '/^[\x{002d}0-9a-z]{1,63}$/i'),
+        'INFO'=> array(1 => '/^[\x{002d}0-9a-zäåæéöøü]{1,63}$/iu',
+            2 => '/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu',
+            3 => '/^[\x{002d}0-9a-záæéíðóöúýþ]{1,63}$/iu',
+            4 => '/^[\x{AC00}-\x{D7A3}]{1,17}$/iu',
+            5 => '/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu',
+            6 => '/^[\x{002d}0-9a-ząčėęįšūųž]{1,63}$/iu',
+            7 => '/^[\x{002d}0-9a-zóąćęłńśźż]{1,63}$/iu',
+            8 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu'),
+        'IO'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),
+        'IS'  => array(1 => '/^[\x{002d}0-9a-záéýúíóþæöð]{1,63}$/iu'),
+        'IT'  => array(1 => '/^[\x{002d}0-9a-zàâäèéêëìîïòôöùûüæœçÿß-]{1,63}$/iu'),
+        'JP'  => 'Hostname/Jp.php',
+        'KR'  => array(1 => '/^[\x{AC00}-\x{D7A3}]{1,17}$/iu'),
+        'LI'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿœ]{1,63}$/iu'),
+        'LT'  => array(1 => '/^[\x{002d}0-9ąčęėįšųūž]{1,63}$/iu'),
+        'MD'  => array(1 => '/^[\x{002d}0-9ăâîşţ]{1,63}$/iu'),
+        'MUSEUM' => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćċčďđēėęěğġģħīįıķĺļľłńņňŋōőœŕŗřśşšţťŧūůűųŵŷźżžǎǐǒǔ\x{01E5}\x{01E7}\x{01E9}\x{01EF}ə\x{0292}ẁẃẅỳ]{1,63}$/iu'),
+        'NET' => 'Hostname/Com.php',
+        'NO'  => array(1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),
+        'NU'  => 'Hostname/Com.php',
+        'ORG' => array(1 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu',
+            2 => '/^[\x{002d}0-9a-zóąćęłńśźż]{1,63}$/iu',
+            3 => '/^[\x{002d}0-9a-záäåæéëíðóöøúüýþ]{1,63}$/iu',
+            4 => '/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu',
+            5 => '/^[\x{002d}0-9a-ząčėęįšūųž]{1,63}$/iu',
+            6 => '/^[\x{AC00}-\x{D7A3}]{1,17}$/iu',
+            7 => '/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu'),
+        'PE'  => array(1 => '/^[\x{002d}0-9a-zñáéíóúü]{1,63}$/iu'),
+        'PL'  => array(1 => '/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu',
+            2 => '/^[\x{002d}а-ик-ш\x{0450}ѓѕјљњќџ]{1,63}$/iu',
+            3 => '/^[\x{002d}0-9a-zâîăşţ]{1,63}$/iu',
+            4 => '/^[\x{002d}0-9а-яё\x{04C2}]{1,63}$/iu',
+            5 => '/^[\x{002d}0-9a-zàáâèéêìíîòóôùúûċġħż]{1,63}$/iu',
+            6 => '/^[\x{002d}0-9a-zàäåæéêòóôöøü]{1,63}$/iu',
+            7 => '/^[\x{002d}0-9a-zóąćęłńśźż]{1,63}$/iu',
+            8 => '/^[\x{002d}0-9a-zàáâãçéêíòóôõúü]{1,63}$/iu',
+            9 => '/^[\x{002d}0-9a-zâîăşţ]{1,63}$/iu',
+            10=> '/^[\x{002d}0-9a-záäéíóôúýčďĺľňŕšťž]{1,63}$/iu',
+            11=> '/^[\x{002d}0-9a-zçë]{1,63}$/iu',
+            12=> '/^[\x{002d}0-9а-ик-шђјљњћџ]{1,63}$/iu',
+            13=> '/^[\x{002d}0-9a-zćčđšž]{1,63}$/iu',
+            14=> '/^[\x{002d}0-9a-zâçöûüğış]{1,63}$/iu',
+            15=> '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu',
+            16=> '/^[\x{002d}0-9a-zäõöüšž]{1,63}$/iu',
+            17=> '/^[\x{002d}0-9a-zĉĝĥĵŝŭ]{1,63}$/iu',
+            18=> '/^[\x{002d}0-9a-zâäéëîô]{1,63}$/iu',
+            19=> '/^[\x{002d}0-9a-zàáâäåæçèéêëìíîïðñòôöøùúûüýćčłńřśš]{1,63}$/iu',
+            20=> '/^[\x{002d}0-9a-zäåæõöøüšž]{1,63}$/iu',
+            21=> '/^[\x{002d}0-9a-zàáçèéìíòóùú]{1,63}$/iu',
+            22=> '/^[\x{002d}0-9a-zàáéíóöúüőű]{1,63}$/iu',
+            23=> '/^[\x{002d}0-9ΐά-ώ]{1,63}$/iu',
+            24=> '/^[\x{002d}0-9a-zàáâåæçèéêëðóôöøüþœ]{1,63}$/iu',
+            25=> '/^[\x{002d}0-9a-záäéíóöúüýčďěňřšťůž]{1,63}$/iu',
+            26=> '/^[\x{002d}0-9a-z·àçèéíïòóúü]{1,63}$/iu',
+            27=> '/^[\x{002d}0-9а-ъьюя\x{0450}\x{045D}]{1,63}$/iu',
+            28=> '/^[\x{002d}0-9а-яёіў]{1,63}$/iu',
+            29=> '/^[\x{002d}0-9a-ząčėęįšūųž]{1,63}$/iu',
+            30=> '/^[\x{002d}0-9a-záäåæéëíðóöøúüýþ]{1,63}$/iu',
+            31=> '/^[\x{002d}0-9a-zàâæçèéêëîïñôùûüÿœ]{1,63}$/iu',
+            32=> '/^[\x{002d}0-9а-щъыьэюяёєіїґ]{1,63}$/iu',
+            33=> '/^[\x{002d}0-9א-ת]{1,63}$/iu'),
+        'PR'  => array(1 => '/^[\x{002d}0-9a-záéíóúñäëïüöâêîôûàèùæçœãõ]{1,63}$/iu'),
+        'PT'  => array(1 => '/^[\x{002d}0-9a-záàâãçéêíóôõú]{1,63}$/iu'),
+        'RU'  => array(1 => '/^[\x{002d}0-9а-яё]{1,63}$/iu'),
+        'SA'  => array(1 => '/^[\x{002d}.0-9\x{0621}-\x{063A}\x{0641}-\x{064A}\x{0660}-\x{0669}]{1,63}$/iu'),
+        'SE'  => array(1 => '/^[\x{002d}0-9a-zäåéöü]{1,63}$/iu'),
+        'SH'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),
+        'SI'  => array(
+            1 => '/^[\x{002d}0-9a-zà-öø-ÿ]{1,63}$/iu',
+            2 => '/^[\x{002d}0-9a-zāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĺļľŀłńņňŉŋōŏőœŕŗřśŝšťŧũūŭůűųŵŷźżž]{1,63}$/iu',
+            3 => '/^[\x{002d}0-9a-zșț]{1,63}$/iu'),
+        'SJ'  => array(1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),
+        'TH'  => array(1 => '/^[\x{002d}0-9a-z\x{0E01}-\x{0E3A}\x{0E40}-\x{0E4D}\x{0E50}-\x{0E59}]{1,63}$/iu'),
+        'TM'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēėęěĝġģĥħīįĵķĺļľŀłńņňŋőœŕŗřśŝşšţťŧūŭůűųŵŷźżž]{1,63}$/iu'),
+        'TW'  => 'Hostname/Cn.php',
+        'TR'  => array(1 => '/^[\x{002d}0-9a-zğıüşöç]{1,63}$/iu'),
+        'UA'  => array(1 => '/^[\x{002d}0-9a-zабвгдежзийклмнопрстуфхцчшщъыьэюяѐёђѓєѕіїјљњћќѝўџґӂʼ]{1,63}$/iu'),
+        'VE'  => array(1 => '/^[\x{002d}0-9a-záéíóúüñ]{1,63}$/iu'),
+        'VN'  => array(1 => '/^[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯư\x{1EA0}-\x{1EF9}]{1,63}$/iu'),
+        'мон' => array(1 => '/^[\x{002d}0-9\x{0430}-\x{044F}]{1,63}$/iu'),
+        'срб' => array(1 => '/^[\x{002d}0-9а-ик-шђјљњћџ]{1,63}$/iu'),
+        'сайт' => array(1 => '/^[\x{002d}0-9а-яёіїѝйўґг]{1,63}$/iu'),
+        'онлайн' => array(1 => '/^[\x{002d}0-9а-яёіїѝйўґг]{1,63}$/iu'),
+        '中国' => 'Hostname/Cn.php',
+        '中國' => 'Hostname/Cn.php',
+        'ලංකා' => array(1 => '/^[\x{0d80}-\x{0dff}]{1,63}$/iu'),
+        '香港' => 'Hostname/Cn.php',
+        '台湾' => 'Hostname/Cn.php',
+        '台灣' => 'Hostname/Cn.php',
+        'امارات'   => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
+        'الاردن'    => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
+        'السعودية' => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
+        'ไทย' => array(1 => '/^[\x{002d}0-9a-z\x{0E01}-\x{0E3A}\x{0E40}-\x{0E4D}\x{0E50}-\x{0E59}]{1,63}$/iu'),
+        'рф' => array(1 => '/^[\x{002d}0-9а-яё]{1,63}$/iu'),
+        'تونس' => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
+        'مصر' => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
+        'இலங்கை' => array(1 => '/^[\x{0b80}-\x{0bff}]{1,63}$/iu'),
+        'فلسطين' => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
+        'شبكة'  => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
+    );
+
+    protected $idnLength = array(
+        'BIZ' => array(5 => 17, 11 => 15, 12 => 20),
+        'CN'  => array(1 => 20),
+        'COM' => array(3 => 17, 5 => 20),
+        'HK'  => array(1 => 15),
+        'INFO'=> array(4 => 17),
+        'KR'  => array(1 => 17),
+        'NET' => array(3 => 17, 5 => 20),
+        'ORG' => array(6 => 17),
+        'TW'  => array(1 => 20),
+        'امارات' => array(1 => 30),
+        'الاردن' => array(1 => 30),
+        'السعودية' => array(1 => 30),
+        'تونس' => array(1 => 30),
+        'مصر' => array(1 => 30),
+        'فلسطين' => array(1 => 30),
+        'شبكة' => array(1 => 30),
+        '中国' => array(1 => 20),
+        '中國' => array(1 => 20),
+        '香港' => array(1 => 20),
+        '台湾' => array(1 => 20),
+        '台灣' => array(1 => 20),
+    );
+
+    protected $tld;
+
+    /**
+     * Options for the hostname validator
+     *
+     * @var array
+     */
+    protected $options = array(
+        'allow'       => self::ALLOW_DNS, // Allow these hostnames
+        'useIdnCheck' => true,  // Check IDN domains
+        'useTldCheck' => true,  // Check TLD elements
+        'ipValidator' => null,  // IP validator to use
+    );
+
+    /**
+     * Sets validator options.
+     *
+     * @param int  $allow       OPTIONAL Set what types of hostname to allow (default ALLOW_DNS)
+     * @param bool $useIdnCheck OPTIONAL Set whether IDN domains are validated (default true)
+     * @param bool $useTldCheck Set whether the TLD element of a hostname is validated (default true)
+     * @param Ip   $ipValidator OPTIONAL
+     * @see http://www.iana.org/cctld/specifications-policies-cctlds-01apr02.htm  Technical Specifications for ccTLDs
+     */
+    public function __construct($options = array())
+    {
+        if (!is_array($options)) {
+            $options = func_get_args();
+            $temp['allow'] = array_shift($options);
+            if (!empty($options)) {
+                $temp['useIdnCheck'] = array_shift($options);
+            }
+
+            if (!empty($options)) {
+                $temp['useTldCheck'] = array_shift($options);
+            }
+
+            if (!empty($options)) {
+                $temp['ipValidator'] = array_shift($options);
+            }
+
+            $options = $temp;
+        }
+
+        if (!array_key_exists('ipValidator', $options)) {
+            $options['ipValidator'] = null;
+        }
+
+        parent::__construct($options);
+    }
+
+    /**
+     * Returns the set ip validator
+     *
+     * @return Ip
+     */
+    public function getIpValidator()
+    {
+        return $this->options['ipValidator'];
+    }
+
+    /**
+     *
+     * @param Ip $ipValidator OPTIONAL
+     * @return Hostname;
+     */
+    public function setIpValidator(Ip $ipValidator = null)
+    {
+        if ($ipValidator === null) {
+            $ipValidator = new Ip();
+        }
+
+        $this->options['ipValidator'] = $ipValidator;
+        return $this;
+    }
+
+    /**
+     * Returns the allow option
+     *
+     * @return int
+     */
+    public function getAllow()
+    {
+        return $this->options['allow'];
+    }
+
+    /**
+     * Sets the allow option
+     *
+     * @param  int $allow
+     * @return Hostname Provides a fluent interface
+     */
+    public function setAllow($allow)
+    {
+        $this->options['allow'] = $allow;
+        return $this;
+    }
+
+    /**
+     * Returns the set idn option
+     *
+     * @return bool
+     */
+    public function getIdnCheck()
+    {
+        return $this->options['useIdnCheck'];
+    }
+
+    /**
+     * Set whether IDN domains are validated
+     *
+     * This only applies when DNS hostnames are validated
+     *
+     * @param  bool $useIdnCheck Set to true to validate IDN domains
+     * @return Hostname
+     */
+    public function useIdnCheck($useIdnCheck)
+    {
+        $this->options['useIdnCheck'] = (bool) $useIdnCheck;
+        return $this;
+    }
+
+    /**
+     * Returns the set tld option
+     *
+     * @return bool
+     */
+    public function getTldCheck()
+    {
+        return $this->options['useTldCheck'];
+    }
+
+    /**
+     * Set whether the TLD element of a hostname is validated
+     *
+     * This only applies when DNS hostnames are validated
+     *
+     * @param  bool $useTldCheck Set to true to validate TLD elements
+     * @return Hostname
+     */
+    public function useTldCheck($useTldCheck)
+    {
+        $this->options['useTldCheck'] = (bool) $useTldCheck;
+        return $this;
+    }
+
+    /**
+     * Defined by Interface
+     *
+     * Returns true if and only if the $value is a valid hostname with respect to the current allow option
+     *
+     * @param  string $value
+     * @return bool
+     */
+    public function isValid($value)
+    {
+        if (!is_string($value)) {
+            $this->error(self::INVALID);
+            return false;
+        }
+
+        $this->setValue($value);
+        // Check input against IP address schema
+        if (preg_match('/^[0-9a-f:.]*$/i', $value) && $this->getIpValidator()
+            ->setTranslator($this->getTranslator())
+            ->isValid($value)) {
+            if (!($this->getAllow() & self::ALLOW_IP)) {
+                $this->error(self::IP_ADDRESS_NOT_ALLOWED);
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        // Local hostnames are allowed to be partial (ending '.')
+        if ($this->getAllow() & self::ALLOW_LOCAL) {
+            if (substr($value, -1) === '.') {
+                $value = substr($value, 0, -1);
+                if (substr($value, -1) === '.') {
+                    // Empty hostnames (ending '..') are not allowed
+                    $this->error(self::INVALID_LOCAL_NAME);
+                    return false;
+                }
+            }
+        }
+
+        $domainParts = explode('.', $value);
+
+        // Prevent partial IP V4 addresses (ending '.')
+        if ((count($domainParts) == 4) && preg_match('/^[0-9.a-e:.]*$/i', $value) && $this->getIpValidator()
+            ->setTranslator($this->getTranslator())
+            ->isValid($value)) {
+            $this->error(self::INVALID_LOCAL_NAME);
+        }
+
+        $utf8StrWrapper = StringUtils::getWrapper('UTF-8');
+
+        // Check input against DNS hostname schema
+        if ((count($domainParts) > 1)
+            && ($utf8StrWrapper->strlen($value) >= 4)
+            && ($utf8StrWrapper->strlen($value) <= 254))
+        {
+            $status = false;
+
+            do {
+                // First check TLD
+                $matches = array();
+                if (preg_match('/([^.]{2,10})$/iu', end($domainParts), $matches)
+                    || (array_key_exists(end($domainParts), $this->validIdns))) {
+                    reset($domainParts);
+
+                    // Hostname characters are: *(label dot)(label dot label); max 254 chars
+                    // label: id-prefix [*ldh{61} id-prefix]; max 63 chars
+                    // id-prefix: alpha / digit
+                    // ldh: alpha / digit / dash
+
+                    // Match TLD against known list
+                    $this->tld = strtoupper($matches[1]);
+                    if ($this->getTldCheck()) {
+                        if (!in_array(strtolower($this->tld), $this->validTlds)
+                            && !in_array($this->tld, $this->validTlds)) {
+                            $this->error(self::UNKNOWN_TLD);
+                            $status = false;
+                            break;
+                        }
+                        // We have already validated that the TLD is fine. We don't want it to go through the below
+                        // checks as new UTF-8 TLDs will incorrectly fail if there is no IDN regex for it.
+                        array_pop($domainParts);
+                    }
+
+                    /**
+                     * Match against IDN hostnames
+                     * Note: Keep label regex short to avoid issues with long patterns when matching IDN hostnames
+                     *
+                     * @see Hostname\Interface
+                     */
+                    $regexChars = array(0 => '/^[a-z0-9\x2d]{1,63}$/i');
+                    if ($this->getIdnCheck() && isset($this->validIdns[$this->tld])) {
+                        if (is_string($this->validIdns[$this->tld])) {
+                            true;
+                        } else {
+                            $regexChars += $this->validIdns[$this->tld];
+                        }
+                    }
+
+                    // Check each hostname part
+                    $check = 0;
+                    foreach ($domainParts as $domainPart) {
+                        // Decode Punycode domain names to IDN
+                        if (strpos($domainPart, 'xn--') === 0) {
+                            $domainPart = $this->decodePunycode(substr($domainPart, 4));
+                            if ($domainPart === false) {
+                                return false;
+                            }
+                        }
+
+                        // Check dash (-) does not start, end or appear in 3rd and 4th positions
+                        if (($utf8StrWrapper->strpos($domainPart, '-') === 0)
+                            || (($utf8StrWrapper->strlen($domainPart) > 2) && ($utf8StrWrapper->strpos($domainPart, '-', 2) == 2) && ($utf8StrWrapper->strpos($domainPart, '-', 3) == 3))
+                            || ($utf8StrWrapper->strpos($domainPart, '-') === ($utf8StrWrapper->strlen($domainPart) - 1))) {
+                            $this->error(self::INVALID_DASH);
+                            $status = false;
+                            break 2;
+                        }
+
+                        // Check each domain part
+                        $checked = false;
+                        foreach ($regexChars as $regexKey => $regexChar) {
+                            ErrorHandler::start();
+                            $status = preg_match($regexChar, $domainPart);
+                            ErrorHandler::stop();
+                            if ($status > 0) {
+                                $length = 63;
+                                if (array_key_exists($this->tld, $this->idnLength)
+                                    && (array_key_exists($regexKey, $this->idnLength[$this->tld]))) {
+                                    $length = $this->idnLength[$this->tld];
+                                }
+
+                                if ($utf8StrWrapper->strlen($domainPart) > $length) {
+                                    $this->error(self::INVALID_HOSTNAME);
+                                    $status = false;
+                                } else {
+                                    $checked = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if ($checked) {
+                            ++$check;
+                        }
+                    }
+
+                    // If one of the labels doesn't match, the hostname is invalid
+                    if ($check !== count($domainParts)) {
+                        $this->error(self::INVALID_HOSTNAME_SCHEMA);
+                        $status = false;
+                    }
+                } else {
+                    // Hostname not long enough
+                    $this->error(self::UNDECIPHERABLE_TLD);
+                    $status = false;
+                }
+            } while (false);
+
+            // If the input passes as an Internet domain name, and domain names are allowed, then the hostname
+            // passes validation
+            if ($status && ($this->getAllow() & self::ALLOW_DNS)) {
+                return true;
+            }
+        } elseif ($this->getAllow() & self::ALLOW_DNS) {
+            $this->error(self::INVALID_HOSTNAME);
+            $status = false;
+        }
+
+        // Check for URI Syntax (RFC3986)
+        if ($this->getAllow() & self::ALLOW_URI) {
+            if (preg_match("/^([a-zA-Z0-9-._~!$&\'()*+,;=]|%[[:xdigit:]]{2}){1,254}$/i", $value)) {
+                return true;
+            } else {
+                $this->error(self::INVALID_URI);
+            }
+        }
+
+        // Check input against local network name schema; last chance to pass validation
+        ErrorHandler::start();
+        $regexLocal = '/^(([a-zA-Z0-9\x2d]{1,63}\x2e)*[a-zA-Z0-9\x2d]{1,63}[\x2e]{0,1}){1,254}$/';
+        $status = preg_match($regexLocal, $value);
+        ErrorHandler::stop();
+
+        // If the input passes as a local network name, and local network names are allowed, then the
+        // hostname passes validation
+        $allowLocal = $this->getAllow() & self::ALLOW_LOCAL;
+        if ($status && $allowLocal) {
+            return true;
+        }
+
+        // If the input does not pass as a local network name, add a message
+        if (!$status) {
+            $this->error(self::INVALID_LOCAL_NAME);
+        }
+
+        // If local network names are not allowed, add a message
+        if ($status && !$allowLocal) {
+            $this->error(self::LOCAL_NAME_NOT_ALLOWED);
+        }
+
+        return false;
+    }
+
+    /**
+     * Decodes a punycode encoded string to it's original utf8 string
+     * Returns false in case of a decoding failure.
+     *
+     * @param  string $encoded Punycode encoded string to decode
+     * @return string|false
+     */
+    protected function decodePunycode($encoded)
+    {
+        if (!preg_match('/^[a-z0-9-]+$/i', $encoded)) {
+            // no punycode encoded string
+            $this->error(self::CANNOT_DECODE_PUNYCODE);
+            return false;
+        }
+
+        $decoded = array();
+        $separator = strrpos($encoded, '-');
+        if ($separator > 0) {
+            for ($x = 0; $x < $separator; ++$x) {
+                // prepare decoding matrix
+                $decoded[] = ord($encoded[$x]);
+            }
+        }
+
+        $lengthd = count($decoded);
+        $lengthe = strlen($encoded);
+
+        // decoding
+        $init  = true;
+        $base  = 72;
+        $index = 0;
+        $char  = 0x80;
+
+        for ($indexe = ($separator) ? ($separator + 1) : 0; $indexe < $lengthe; ++$lengthd) {
+            for ($oldIndex = $index, $pos = 1, $key = 36; 1; $key += 36) {
+                $hex   = ord($encoded[$indexe++]);
+                $digit = ($hex - 48 < 10) ? $hex - 22
+                       : (($hex - 65 < 26) ? $hex - 65
+                       : (($hex - 97 < 26) ? $hex - 97
+                       : 36));
+
+                $index += $digit * $pos;
+                $tag    = ($key <= $base) ? 1 : (($key >= $base + 26) ? 26 : ($key - $base));
+                if ($digit < $tag) {
+                    break;
+                }
+
+                $pos = (int) ($pos * (36 - $tag));
+            }
+
+            $delta   = intval($init ? (($index - $oldIndex) / 700) : (($index - $oldIndex) / 2));
+            $delta  += intval($delta / ($lengthd + 1));
+            for ($key = 0; $delta > 910 / 2; $key += 36) {
+                $delta = intval($delta / 35);
+            }
+
+            $base   = intval($key + 36 * $delta / ($delta + 38));
+            $init   = false;
+            $char  += (int) ($index / ($lengthd + 1));
+            $index %= ($lengthd + 1);
+            if ($lengthd > 0) {
+                for ($i = $lengthd; $i > $index; $i--) {
+                    $decoded[$i] = $decoded[($i - 1)];
+                }
+            }
+
+            $decoded[$index++] = $char;
+        }
+
+        // convert decoded ucs4 to utf8 string
+        foreach ($decoded as $key => $value) {
+            if ($value < 128) {
+                $decoded[$key] = chr($value);
+            } elseif ($value < (1 << 11)) {
+                $decoded[$key]  = chr(192 + ($value >> 6));
+                $decoded[$key] .= chr(128 + ($value & 63));
+            } elseif ($value < (1 << 16)) {
+                $decoded[$key]  = chr(224 + ($value >> 12));
+                $decoded[$key] .= chr(128 + (($value >> 6) & 63));
+                $decoded[$key] .= chr(128 + ($value & 63));
+            } elseif ($value < (1 << 21)) {
+                $decoded[$key]  = chr(240 + ($value >> 18));
+                $decoded[$key] .= chr(128 + (($value >> 12) & 63));
+                $decoded[$key] .= chr(128 + (($value >> 6) & 63));
+                $decoded[$key] .= chr(128 + ($value & 63));
+            } else {
+                $this->error(self::CANNOT_DECODE_PUNYCODE);
+                return false;
+            }
+        }
+
+        return implode($decoded);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Validator;
+
+use Traversable;
+
+class Ip extends AbstractValidator
+{
+    const INVALID        = 'ipInvalid';
+    const NOT_IP_ADDRESS = 'notIpAddress';
+
+    /**
+     * @var array
+     */
+    protected $messageTemplates = array(
+        self::INVALID        => 'Invalid type given. String expected',
+        self::NOT_IP_ADDRESS => "The input does not appear to be a valid IP address",
+    );
+
+    /**
+     * Internal options
+     *
+     * @var array
+     */
+    protected $options = array(
+        'allowipv4'      => true, // Enable IPv4 Validation
+        'allowipv6'      => true, // Enable IPv6 Validation
+        'allowipvfuture' => false, // Enable IPvFuture Validation
+        'allowliteral'   => true, // Enable IPs in literal format (only IPv6 and IPvFuture)
+    );
+
+    /**
+     * Sets the options for this validator
+     *
+     * @param array|Traversable $options
+     * @throws Exception\InvalidArgumentException If there is any kind of IP allowed or $options is not an array or Traversable.
+     * @return AbstractValidator
+     */
+    public function setOptions($options = array())
+    {
+        parent::setOptions($options);
+
+        if (!$this->options['allowipv4'] && !$this->options['allowipv6'] && !$this->options['allowipvfuture']) {
+            throw new Exception\InvalidArgumentException('Nothing to validate. Check your options');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns true if and only if $value is a valid IP address
+     *
+     * @param  mixed $value
+     * @return bool
+     */
+    public function isValid($value)
+    {
+        if (!is_string($value)) {
+            $this->error(self::INVALID);
+            return false;
+        }
+
+        $this->setValue($value);
+
+        if ($this->options['allowipv4'] && $this->validateIPv4($value)) {
+            return true;
+        } else {
+            if ((bool) $this->options['allowliteral']) {
+                static $regex = '/^\[(.*)\]$/';
+                if ((bool) preg_match($regex, $value, $matches)) {
+                    $value = $matches[1];
+                }
+            }
+
+            if (($this->options['allowipv6'] && $this->validateIPv6($value)) ||
+                ($this->options['allowipvfuture'] && $this->validateIPvFuture($value))
+            ) {
+                return true;
+            }
+        }
+        $this->error(self::NOT_IP_ADDRESS);
+        return false;
+    }
+
+    /**
+     * Validates an IPv4 address
+     *
+     * @param string $value
+     * @return bool
+     */
+    protected function validateIPv4($value)
+    {
+        if (preg_match('/^([01]{8}.){3}[01]{8}\z/i', $value)) {
+            // binary format  00000000.00000000.00000000.00000000
+            $value = bindec(substr($value, 0, 8)) . '.' . bindec(substr($value, 9, 8)) . '.'
+                   . bindec(substr($value, 18, 8)) . '.' . bindec(substr($value, 27, 8));
+        } elseif (preg_match('/^([0-9]{3}.){3}[0-9]{3}\z/i', $value)) {
+            // octet format 777.777.777.777
+            $value = (int) substr($value, 0, 3) . '.' . (int) substr($value, 4, 3) . '.'
+                   . (int) substr($value, 8, 3) . '.' . (int) substr($value, 12, 3);
+        } elseif (preg_match('/^([0-9a-f]{2}.){3}[0-9a-f]{2}\z/i', $value)) {
+            // hex format ff.ff.ff.ff
+            $value = hexdec(substr($value, 0, 2)) . '.' . hexdec(substr($value, 3, 2)) . '.'
+                   . hexdec(substr($value, 6, 2)) . '.' . hexdec(substr($value, 9, 2));
+        }
+
+        $ip2long = ip2long($value);
+        if ($ip2long === false) {
+            return false;
+        }
+
+        return ($value == long2ip($ip2long));
+    }
+
+    /**
+     * Validates an IPv6 address
+     *
+     * @param  string $value Value to check against
+     * @return bool True when $value is a valid ipv6 address
+     *                 False otherwise
+     */
+    protected function validateIPv6($value)
+    {
+        if (strlen($value) < 3) {
+            return $value == '::';
+        }
+
+        if (strpos($value, '.')) {
+            $lastcolon = strrpos($value, ':');
+            if (!($lastcolon && $this->validateIPv4(substr($value, $lastcolon + 1)))) {
+                return false;
+            }
+
+            $value = substr($value, 0, $lastcolon) . ':0:0';
+        }
+
+        if (strpos($value, '::') === false) {
+            return preg_match('/\A(?:[a-f0-9]{1,4}:){7}[a-f0-9]{1,4}\z/i', $value);
+        }
+
+        $colonCount = substr_count($value, ':');
+        if ($colonCount < 8) {
+            return preg_match('/\A(?::|(?:[a-f0-9]{1,4}:)+):(?:(?:[a-f0-9]{1,4}:)*[a-f0-9]{1,4})?\z/i', $value);
+        }
+
+        // special case with ending or starting double colon
+        if ($colonCount == 8) {
+            return preg_match('/\A(?:::)?(?:[a-f0-9]{1,4}:){6}[a-f0-9]{1,4}(?:::)?\z/i', $value);
+        }
+
+        return false;
+    }
+
+    /**
+     * Validates an IPvFuture address.
+     *
+     * IPvFuture is loosely defined in the Section 3.2.2 of RFC 3986
+     *
+     * @param  string $value Value to check against
+     * @return bool True when $value is a valid IPvFuture address
+     *                 False otherwise
+     */
+    protected function validateIPvFuture($value)
+    {
+        /*
+         * ABNF:
+         * IPvFuture  = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+         * unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+         * sub-delims    = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / ","
+         *               / ";" / "="
+         */
+        static $regex = '/^v([[:xdigit:]]+)\.[[:alnum:]\-\._~!\$&\'\(\)\*\+,;=:]+$/';
+
+        $result = (bool) preg_match($regex, $value, $matches);
+
+        /*
+         * "As such, implementations must not provide the version flag for the
+         *  existing IPv4 and IPv6 literal address forms described below."
+         */
+        return ($result && $matches[1] != 4 && $matches[1] != 6);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Validator\Hostname;
+
+/**
+ * Resource file for com and net idn validation
+ */
+return array(
+    1  => '/^[\x{002d}0-9\x{0400}-\x{052f}]{1,63}$/iu',
+    2  => '/^[\x{002d}0-9\x{0370}-\x{03ff}]{1,63}$/iu',
+    3  => '/^[\x{002d}0-9a-z\x{ac00}-\x{d7a3}]{1,17}$/iu',
+    4  => '/^[\x{002d}0-9a-z·à-öø-ÿāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĸĺļľłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷźżž]{1,63}$/iu',
+    5  => '/^[\x{002d}0-9A-Za-z\x{3400}-\x{3401}\x{3404}-\x{3406}\x{340C}\x{3416}\x{341C}' .
+'\x{3421}\x{3424}\x{3428}-\x{3429}\x{342B}-\x{342E}\x{3430}-\x{3434}\x{3436}' .
+'\x{3438}-\x{343C}\x{343E}\x{3441}-\x{3445}\x{3447}\x{3449}-\x{3451}\x{3453}' .
+'\x{3457}-\x{345F}\x{3463}-\x{3467}\x{346E}-\x{3471}\x{3473}-\x{3477}\x{3479}-\x{348E}\x{3491}-\x{3497}' .
+'\x{3499}-\x{34A1}\x{34A4}-\x{34AD}\x{34AF}-\x{34B0}\x{34B2}-\x{34BF}\x{34C2}-\x{34C5}\x{34C7}-\x{34CC}' .
+'\x{34CE}-\x{34D1}\x{34D3}-\x{34D8}\x{34DA}-\x{34E4}\x{34E7}-\x{34E9}\x{34EC}-\x{34EF}\x{34F1}-\x{34FE}' .
+'\x{3500}-\x{3507}\x{350A}-\x{3513}\x{3515}\x{3517}-\x{351A}\x{351C}-\x{351E}\x{3520}-\x{352A}' .
+'\x{352C}-\x{3552}\x{3554}-\x{355C}\x{355E}-\x{3567}\x{3569}-\x{3573}\x{3575}-\x{357C}\x{3580}-\x{3588}' .
+'\x{358F}-\x{3598}\x{359E}-\x{35AB}\x{35B4}-\x{35CD}\x{35D0}\x{35D3}-\x{35DC}\x{35E2}-\x{35ED}' .
+'\x{35F0}-\x{35F6}\x{35FB}-\x{3602}\x{3605}-\x{360E}\x{3610}-\x{3611}\x{3613}-\x{3616}\x{3619}-\x{362D}' .
+'\x{362F}-\x{3634}\x{3636}-\x{363B}\x{363F}-\x{3645}\x{3647}-\x{364B}\x{364D}-\x{3653}\x{3655}' .
+'\x{3659}-\x{365E}\x{3660}-\x{3665}\x{3667}-\x{367C}\x{367E}\x{3680}-\x{3685}\x{3687}' .
+'\x{3689}-\x{3690}\x{3692}-\x{3698}\x{369A}\x{369C}-\x{36AE}\x{36B0}-\x{36BF}\x{36C1}-\x{36C5}' .
+'\x{36C9}-\x{36CA}\x{36CD}-\x{36DE}\x{36E1}-\x{36E2}\x{36E5}-\x{36FE}\x{3701}-\x{3713}\x{3715}-\x{371E}' .
+'\x{3720}-\x{372C}\x{372E}-\x{3745}\x{3747}-\x{3748}\x{374A}\x{374C}-\x{3759}\x{375B}-\x{3760}' .
+'\x{3762}-\x{3767}\x{3769}-\x{3772}\x{3774}-\x{378C}\x{378F}-\x{379C}\x{379F}\x{37A1}-\x{37AD}' .
+'\x{37AF}-\x{37B7}\x{37B9}-\x{37C1}\x{37C3}-\x{37C5}\x{37C7}-\x{37D4}\x{37D6}-\x{37E0}\x{37E2}' .
+'\x{37E5}-\x{37ED}\x{37EF}-\x{37F6}\x{37F8}-\x{3802}\x{3804}-\x{381D}\x{3820}-\x{3822}\x{3825}-\x{382A}' .
+'\x{382D}-\x{382F}\x{3831}-\x{3832}\x{3834}-\x{384C}\x{384E}-\x{3860}\x{3862}-\x{3863}\x{3865}-\x{386B}' .
+'\x{386D}-\x{3886}\x{3888}-\x{38A1}\x{38A3}\x{38A5}-\x{38AA}\x{38AC}\x{38AE}-\x{38B0}' .
+'\x{38B2}-\x{38B6}\x{38B8}\x{38BA}-\x{38BE}\x{38C0}-\x{38C9}\x{38CB}-\x{38D4}\x{38D8}-\x{38E0}' .
+'\x{38E2}-\x{38E6}\x{38EB}-\x{38ED}\x{38EF}-\x{38F2}\x{38F5}-\x{38F7}\x{38FA}-\x{38FF}\x{3901}-\x{392A}' .
+'\x{392C}\x{392E}-\x{393B}\x{393E}-\x{3956}\x{395A}-\x{3969}\x{396B}-\x{397A}\x{397C}-\x{3987}' .
+'\x{3989}-\x{3998}\x{399A}-\x{39B0}\x{39B2}\x{39B4}-\x{39D0}\x{39D2}-\x{39DA}\x{39DE}-\x{39DF}' .
+'\x{39E1}-\x{39EF}\x{39F1}-\x{3A17}\x{3A19}-\x{3A2A}\x{3A2D}-\x{3A40}\x{3A43}-\x{3A4E}\x{3A50}' .
+'\x{3A52}-\x{3A5E}\x{3A60}-\x{3A6D}\x{3A6F}-\x{3A77}\x{3A79}-\x{3A82}\x{3A84}-\x{3A85}\x{3A87}-\x{3A89}' .
+'\x{3A8B}-\x{3A8F}\x{3A91}-\x{3A93}\x{3A95}-\x{3A96}\x{3A9A}\x{3A9C}-\x{3AA6}\x{3AA8}-\x{3AA9}' .
+'\x{3AAB}-\x{3AB1}\x{3AB4}-\x{3ABC}\x{3ABE}-\x{3AC5}\x{3ACA}-\x{3ACB}\x{3ACD}-\x{3AD5}\x{3AD7}-\x{3AE1}' .
+'\x{3AE4}-\x{3AE7}\x{3AE9}-\x{3AEC}\x{3AEE}-\x{3AFD}\x{3B01}-\x{3B10}\x{3B12}-\x{3B15}\x{3B17}-\x{3B1E}' .
+'\x{3B20}-\x{3B23}\x{3B25}-\x{3B27}\x{3B29}-\x{3B36}\x{3B38}-\x{3B39}\x{3B3B}-\x{3B3C}\x{3B3F}' .
+'\x{3B41}-\x{3B44}\x{3B47}-\x{3B4C}\x{3B4E}\x{3B51}-\x{3B55}\x{3B58}-\x{3B62}\x{3B68}-\x{3B72}' .
+'\x{3B78}-\x{3B88}\x{3B8B}-\x{3B9F}\x{3BA1}\x{3BA3}-\x{3BBA}\x{3BBC}\x{3BBF}-\x{3BD0}' .
+'\x{3BD3}-\x{3BE6}\x{3BEA}-\x{3BFB}\x{3BFE}-\x{3C12}\x{3C14}-\x{3C1B}\x{3C1D}-\x{3C37}\x{3C39}-\x{3C4F}' .
+'\x{3C52}\x{3C54}-\x{3C5C}\x{3C5E}-\x{3C68}\x{3C6A}-\x{3C76}\x{3C78}-\x{3C8F}\x{3C91}-\x{3CA8}' .
+'\x{3CAA}-\x{3CAD}\x{3CAF}-\x{3CBE}\x{3CC0}-\x{3CC8}\x{3CCA}-\x{3CD3}\x{3CD6}-\x{3CE0}\x{3CE4}-\x{3CEE}' .
+'\x{3CF3}-\x{3D0A}\x{3D0E}-\x{3D1E}\x{3D20}-\x{3D21}\x{3D25}-\x{3D38}\x{3D3B}-\x{3D46}\x{3D4A}-\x{3D59}' .
+'\x{3D5D}-\x{3D7B}\x{3D7D}-\x{3D81}\x{3D84}-\x{3D88}\x{3D8C}-\x{3D8F}\x{3D91}-\x{3D98}\x{3D9A}-\x{3D9C}' .
+'\x{3D9E}-\x{3DA1}\x{3DA3}-\x{3DB0}\x{3DB2}-\x{3DB5}\x{3DB9}-\x{3DBC}\x{3DBE}-\x{3DCB}\x{3DCD}-\x{3DDB}' .
+'\x{3DDF}-\x{3DE8}\x{3DEB}-\x{3DF0}\x{3DF3}-\x{3DF9}\x{3DFB}-\x{3DFC}\x{3DFE}-\x{3E05}\x{3E08}-\x{3E33}' .
+'\x{3E35}-\x{3E3E}\x{3E40}-\x{3E47}\x{3E49}-\x{3E67}\x{3E6B}-\x{3E6F}\x{3E71}-\x{3E85}\x{3E87}-\x{3E8C}' .
+'\x{3E8E}-\x{3E98}\x{3E9A}-\x{3EA1}\x{3EA3}-\x{3EAE}\x{3EB0}-\x{3EB5}\x{3EB7}-\x{3EBA}\x{3EBD}' .
+'\x{3EBF}-\x{3EC4}\x{3EC7}-\x{3ECE}\x{3ED1}-\x{3ED7}\x{3ED9}-\x{3EDA}\x{3EDD}-\x{3EE3}\x{3EE7}-\x{3EE8}' .
+'\x{3EEB}-\x{3EF2}\x{3EF5}-\x{3EFF}\x{3F01}-\x{3F02}\x{3F04}-\x{3F07}\x{3F09}-\x{3F44}\x{3F46}-\x{3F4E}' .
+'\x{3F50}-\x{3F53}\x{3F55}-\x{3F72}\x{3F74}-\x{3F75}\x{3F77}-\x{3F7B}\x{3F7D}-\x{3FB0}\x{3FB6}-\x{3FBF}' .
+'\x{3FC1}-\x{3FCF}\x{3FD1}-\x{3FD3}\x{3FD5}-\x{3FDF}\x{3FE1}-\x{400B}\x{400D}-\x{401C}\x{401E}-\x{4024}' .
+'\x{4027}-\x{403F}\x{4041}-\x{4060}\x{4062}-\x{4069}\x{406B}-\x{408A}\x{408C}-\x{40A7}\x{40A9}-\x{40B4}' .
+'\x{40B6}-\x{40C2}\x{40C7}-\x{40CF}\x{40D1}-\x{40DE}\x{40E0}-\x{40E7}\x{40E9}-\x{40EE}\x{40F0}-\x{40FB}' .
+'\x{40FD}-\x{4109}\x{410B}-\x{4115}\x{4118}-\x{411D}\x{411F}-\x{4122}\x{4124}-\x{4133}\x{4136}-\x{4138}' .
+'\x{413A}-\x{4148}\x{414A}-\x{4169}\x{416C}-\x{4185}\x{4188}-\x{418B}\x{418D}-\x{41AD}\x{41AF}-\x{41B3}' .
+'\x{41B5}-\x{41C3}\x{41C5}-\x{41C9}\x{41CB}-\x{41F2}\x{41F5}-\x{41FE}\x{4200}-\x{4227}\x{422A}-\x{4246}' .
+'\x{4248}-\x{4263}\x{4265}-\x{428B}\x{428D}-\x{42A1}\x{42A3}-\x{42C4}\x{42C8}-\x{42DC}\x{42DE}-\x{430A}' .
+'\x{430C}-\x{4335}\x{4337}\x{4342}-\x{435F}\x{4361}-\x{439A}\x{439C}-\x{439D}\x{439F}-\x{43A4}' .
+'\x{43A6}-\x{43EC}\x{43EF}-\x{4405}\x{4407}-\x{4429}\x{442B}-\x{4455}\x{4457}-\x{4468}\x{446A}-\x{446D}' .
+'\x{446F}-\x{4476}\x{4479}-\x{447D}\x{447F}-\x{4486}\x{4488}-\x{4490}\x{4492}-\x{4498}\x{449A}-\x{44AD}' .
+'\x{44B0}-\x{44BD}\x{44C1}-\x{44D3}\x{44D6}-\x{44E7}\x{44EA}\x{44EC}-\x{44FA}\x{44FC}-\x{4541}' .
+'\x{4543}-\x{454F}\x{4551}-\x{4562}\x{4564}-\x{4575}\x{4577}-\x{45AB}\x{45AD}-\x{45BD}\x{45BF}-\x{45D5}' .
+'\x{45D7}-\x{45EC}\x{45EE}-\x{45F2}\x{45F4}-\x{45FA}\x{45FC}-\x{461A}\x{461C}-\x{461D}\x{461F}-\x{4631}' .
+'\x{4633}-\x{4649}\x{464C}\x{464E}-\x{4652}\x{4654}-\x{466A}\x{466C}-\x{4675}\x{4677}-\x{467A}' .
+'\x{467C}-\x{4694}\x{4696}-\x{46A3}\x{46A5}-\x{46AB}\x{46AD}-\x{46D2}\x{46D4}-\x{4723}\x{4729}-\x{4732}' .
+'\x{4734}-\x{4758}\x{475A}\x{475C}-\x{478B}\x{478D}\x{4791}-\x{47B1}\x{47B3}-\x{47F1}' .
+'\x{47F3}-\x{480B}\x{480D}-\x{4815}\x{4817}-\x{4839}\x{483B}-\x{4870}\x{4872}-\x{487A}\x{487C}-\x{487F}' .
+'\x{4883}-\x{488E}\x{4890}-\x{4896}\x{4899}-\x{48A2}\x{48A4}-\x{48B9}\x{48BB}-\x{48C8}\x{48CA}-\x{48D1}' .
+'\x{48D3}-\x{48E5}\x{48E7}-\x{48F2}\x{48F4}-\x{48FF}\x{4901}-\x{4922}\x{4924}-\x{4928}\x{492A}-\x{4931}' .
+'\x{4933}-\x{495B}\x{495D}-\x{4978}\x{497A}\x{497D}\x{4982}-\x{4983}\x{4985}-\x{49A8}' .
+'\x{49AA}-\x{49AF}\x{49B1}-\x{49B7}\x{49B9}-\x{49BD}\x{49C1}-\x{49C7}\x{49C9}-\x{49CE}\x{49D0}-\x{49E8}' .
+'\x{49EA}\x{49EC}\x{49EE}-\x{4A19}\x{4A1B}-\x{4A43}\x{4A45}-\x{4A4D}\x{4A4F}-\x{4A9E}' .
+'\x{4AA0}-\x{4AA9}\x{4AAB}-\x{4B4E}\x{4B50}-\x{4B5B}\x{4B5D}-\x{4B69}\x{4B6B}-\x{4BC2}\x{4BC6}-\x{4BE8}' .
+'\x{4BEA}-\x{4BFA}\x{4BFC}-\x{4C06}\x{4C08}-\x{4C2D}\x{4C2F}-\x{4C32}\x{4C34}-\x{4C35}\x{4C37}-\x{4C69}' .
+'\x{4C6B}-\x{4C73}\x{4C75}-\x{4C86}\x{4C88}-\x{4C97}\x{4C99}-\x{4C9C}\x{4C9F}-\x{4CA3}\x{4CA5}-\x{4CB5}' .
+'\x{4CB7}-\x{4CF8}\x{4CFA}-\x{4D27}\x{4D29}-\x{4DAC}\x{4DAE}-\x{4DB1}\x{4DB3}-\x{4DB5}\x{4E00}-\x{4E54}' .
+'\x{4E56}-\x{4E89}\x{4E8B}-\x{4EEC}\x{4EEE}-\x{4FAC}\x{4FAE}-\x{503C}\x{503E}-\x{51E5}\x{51E7}-\x{5270}' .
+'\x{5272}-\x{56A1}\x{56A3}-\x{5840}\x{5842}-\x{58B5}\x{58B7}-\x{58CB}\x{58CD}-\x{5BC8}\x{5BCA}-\x{5C01}' .
+'\x{5C03}-\x{5C25}\x{5C27}-\x{5D5B}\x{5D5D}-\x{5F08}\x{5F0A}-\x{61F3}\x{61F5}-\x{63BA}\x{63BC}-\x{6441}' .
+'\x{6443}-\x{657C}\x{657E}-\x{663E}\x{6640}-\x{66FC}\x{66FE}-\x{6728}\x{672A}-\x{6766}\x{6768}-\x{67A8}' .
+'\x{67AA}-\x{685B}\x{685D}-\x{685E}\x{6860}-\x{68B9}\x{68BB}-\x{6AC8}\x{6ACA}-\x{6BB0}\x{6BB2}-\x{6C16}' .
+'\x{6C18}-\x{6D9B}\x{6D9D}-\x{6E12}\x{6E14}-\x{6E8B}\x{6E8D}-\x{704D}\x{704F}-\x{7113}\x{7115}-\x{713B}' .
+'\x{713D}-\x{7154}\x{7156}-\x{729F}\x{72A1}-\x{731E}\x{7320}-\x{7362}\x{7364}-\x{7533}\x{7535}-\x{7551}' .
+'\x{7553}-\x{7572}\x{7574}-\x{75E8}\x{75EA}-\x{7679}\x{767B}-\x{783E}\x{7840}-\x{7A62}\x{7A64}-\x{7AC2}' .
+'\x{7AC4}-\x{7B06}\x{7B08}-\x{7B79}\x{7B7B}-\x{7BCE}\x{7BD0}-\x{7D99}\x{7D9B}-\x{7E49}\x{7E4C}-\x{8132}' .
+'\x{8134}\x{8136}-\x{81D2}\x{81D4}-\x{8216}\x{8218}-\x{822D}\x{822F}-\x{83B4}\x{83B6}-\x{841F}' .
+'\x{8421}-\x{86CC}\x{86CE}-\x{874A}\x{874C}-\x{877E}\x{8780}-\x{8A32}\x{8A34}-\x{8B71}\x{8B73}-\x{8B8E}' .
+'\x{8B90}-\x{8DE4}\x{8DE6}-\x{8E9A}\x{8E9C}-\x{8EE1}\x{8EE4}-\x{8F0B}\x{8F0D}-\x{8FB9}\x{8FBB}-\x{9038}' .
+'\x{903A}-\x{9196}\x{9198}-\x{91A3}\x{91A5}-\x{91B7}\x{91B9}-\x{91C7}\x{91C9}-\x{91E0}\x{91E2}-\x{91FB}' .
+'\x{91FD}-\x{922B}\x{922D}-\x{9270}\x{9272}-\x{9420}\x{9422}-\x{9664}\x{9666}-\x{9679}\x{967B}-\x{9770}' .
+'\x{9772}-\x{982B}\x{982D}-\x{98ED}\x{98EF}-\x{99C4}\x{99C6}-\x{9A11}\x{9A14}-\x{9A27}\x{9A29}-\x{9D0D}' .
+'\x{9D0F}-\x{9D2B}\x{9D2D}-\x{9D8E}\x{9D90}-\x{9DC5}\x{9DC7}-\x{9E77}\x{9E79}-\x{9EB8}\x{9EBB}-\x{9F20}' .
+'\x{9F22}-\x{9F61}\x{9F63}-\x{9FA5}\x{FA28}]{1,20}$/iu',
+    6 => '/^[\x{002d}0-9A-Za-z]{1,63}$/iu',
+    7 => '/^[\x{00A1}-\x{00FF}]{1,63}$/iu',
+    8 => '/^[\x{0100}-\x{017f}]{1,63}$/iu',
+    9 => '/^[\x{0180}-\x{024f}]{1,63}$/iu',
+    10 => '/^[\x{0250}-\x{02af}]{1,63}$/iu',
+    11 => '/^[\x{02b0}-\x{02ff}]{1,63}$/iu',
+    12 => '/^[\x{0300}-\x{036f}]{1,63}$/iu',
+    13 => '/^[\x{0370}-\x{03ff}]{1,63}$/iu',
+    14 => '/^[\x{0400}-\x{04ff}]{1,63}$/iu',
+    15 => '/^[\x{0500}-\x{052f}]{1,63}$/iu',
+    16 => '/^[\x{0530}-\x{058F}]{1,63}$/iu',
+    17 => '/^[\x{0590}-\x{05FF}]{1,63}$/iu',
+    18 => '/^[\x{0600}-\x{06FF}]{1,63}$/iu',
+    19 => '/^[\x{0700}-\x{074F}]{1,63}$/iu',
+    20 => '/^[\x{0780}-\x{07BF}]{1,63}$/iu',
+    21 => '/^[\x{0900}-\x{097F}]{1,63}$/iu',
+    22 => '/^[\x{0980}-\x{09FF}]{1,63}$/iu',
+    23 => '/^[\x{0A00}-\x{0A7F}]{1,63}$/iu',
+    24 => '/^[\x{0A80}-\x{0AFF}]{1,63}$/iu',
+    25 => '/^[\x{0B00}-\x{0B7F}]{1,63}$/iu',
+    26 => '/^[\x{0B80}-\x{0BFF}]{1,63}$/iu',
+    27 => '/^[\x{0C00}-\x{0C7F}]{1,63}$/iu',
+    28 => '/^[\x{0C80}-\x{0CFF}]{1,63}$/iu',
+    29 => '/^[\x{0D00}-\x{0D7F}]{1,63}$/iu',
+    30 => '/^[\x{0D80}-\x{0DFF}]{1,63}$/iu',
+    31 => '/^[\x{0E00}-\x{0E7F}]{1,63}$/iu',
+    32 => '/^[\x{0E80}-\x{0EFF}]{1,63}$/iu',
+    33 => '/^[\x{0F00}-\x{0FFF}]{1,63}$/iu',
+    34 => '/^[\x{1000}-\x{109F}]{1,63}$/iu',
+    35 => '/^[\x{10A0}-\x{10FF}]{1,63}$/iu',
+    36 => '/^[\x{1100}-\x{11FF}]{1,63}$/iu',
+    37 => '/^[\x{1200}-\x{137F}]{1,63}$/iu',
+    38 => '/^[\x{13A0}-\x{13FF}]{1,63}$/iu',
+    39 => '/^[\x{1400}-\x{167F}]{1,63}$/iu',
+    40 => '/^[\x{1680}-\x{169F}]{1,63}$/iu',
+    41 => '/^[\x{16A0}-\x{16FF}]{1,63}$/iu',
+    42 => '/^[\x{1700}-\x{171F}]{1,63}$/iu',
+    43 => '/^[\x{1720}-\x{173F}]{1,63}$/iu',
+    44 => '/^[\x{1740}-\x{175F}]{1,63}$/iu',
+    45 => '/^[\x{1760}-\x{177F}]{1,63}$/iu',
+    46 => '/^[\x{1780}-\x{17FF}]{1,63}$/iu',
+    47 => '/^[\x{1800}-\x{18AF}]{1,63}$/iu',
+    48 => '/^[\x{1E00}-\x{1EFF}]{1,63}$/iu',
+    49 => '/^[\x{1F00}-\x{1FFF}]{1,63}$/iu',
+    50 => '/^[\x{2070}-\x{209F}]{1,63}$/iu',
+    51 => '/^[\x{2100}-\x{214F}]{1,63}$/iu',
+    52 => '/^[\x{2150}-\x{218F}]{1,63}$/iu',
+    53 => '/^[\x{2460}-\x{24FF}]{1,63}$/iu',
+    54 => '/^[\x{2E80}-\x{2EFF}]{1,63}$/iu',
+    55 => '/^[\x{2F00}-\x{2FDF}]{1,63}$/iu',
+    56 => '/^[\x{2FF0}-\x{2FFF}]{1,63}$/iu',
+    57 => '/^[\x{3040}-\x{309F}]{1,63}$/iu',
+    58 => '/^[\x{30A0}-\x{30FF}]{1,63}$/iu',
+    59 => '/^[\x{3100}-\x{312F}]{1,63}$/iu',
+    60 => '/^[\x{3130}-\x{318F}]{1,63}$/iu',
+    61 => '/^[\x{3190}-\x{319F}]{1,63}$/iu',
+    62 => '/^[\x{31A0}-\x{31BF}]{1,63}$/iu',
+    63 => '/^[\x{31F0}-\x{31FF}]{1,63}$/iu',
+    64 => '/^[\x{3200}-\x{32FF}]{1,63}$/iu',
+    65 => '/^[\x{3300}-\x{33FF}]{1,63}$/iu',
+    66 => '/^[\x{3400}-\x{4DBF}]{1,63}$/iu',
+    67 => '/^[\x{4E00}-\x{9FFF}]{1,63}$/iu',
+    68 => '/^[\x{A000}-\x{A48F}]{1,63}$/iu',
+    69 => '/^[\x{A490}-\x{A4CF}]{1,63}$/iu',
+    70 => '/^[\x{AC00}-\x{D7AF}]{1,63}$/iu',
+    71 => '/^[\x{D800}-\x{DB7F}]{1,63}$/iu',
+    72 => '/^[\x{DC00}-\x{DFFF}]{1,63}$/iu',
+    73 => '/^[\x{F900}-\x{FAFF}]{1,63}$/iu',
+    74 => '/^[\x{FB00}-\x{FB4F}]{1,63}$/iu',
+    75 => '/^[\x{FB50}-\x{FDFF}]{1,63}$/iu',
+    76 => '/^[\x{FE20}-\x{FE2F}]{1,63}$/iu',
+    77 => '/^[\x{FE70}-\x{FEFF}]{1,63}$/iu',
+    78 => '/^[\x{FF00}-\x{FFEF}]{1,63}$/iu',
+    79 => '/^[\x{20000}-\x{2A6DF}]{1,63}$/iu',
+    80 => '/^[\x{2F800}-\x{2FA1F}]{1,63}$/iu',
+);

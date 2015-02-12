@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/general/index.css');?>"/>
 <ul>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>"><?php echo $GLOBALS['db']->config->siteName; ?></a></li>
+<li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>contact.php">Contattaci</a></li>
 <?php  if ($GLOBALS['user'] instanceof \login\user\User) : ?>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Amministrazione</a></li>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?logout">Esci</a></li>

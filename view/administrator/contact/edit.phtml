@@ -1,0 +1,42 @@
+<?php
+$contact = new \contact\contact\Contact($GLOBALS['db']);
+if (array_key_exists('id', $_REQUEST)) {
+   $contact->loadFromId($_REQUEST['id']);
+} else {
+   $contact->setData($_REQUEST);
+}
+?>
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=contact">Elenco dei contatti</a></p> &gt; <h2>Dettaglio contatto</h2>
+</div>
+<form method="post" action="#">
+   <input type="hidden" id="id" name="id" value="<?php echo $contact->getData('id')?>">
+   <div>
+   <div>Nome</div>
+   <div><?php echo $contact->getData('name')?></div>
+   </div>
+   <div>
+   <div>Data e ora</div>
+   <div><?php echo $contact->getData('datetime')?></div>
+   </div>
+   <div>
+   <div>Messaggio</div>
+   <div><?php echo $contact->getData('message')?></div>
+   </div>
+   <div>
+   <div>Mail</div>
+   <div><?php echo $contact->getData('mail')?></div>
+   </div>
+   <div>
+   <div>Telefono</div>
+   <div><?php echo $contact->getData('phone')?></div>
+   </div>
+   <div>
+   <div>Fax</div>
+   <div><?php echo $contact->getData('fax')?></div>
+   </div>
+   <div>
+   <div>IP</div>
+   <div><?php echo $contact->getData('ip')?></div>
+   </div>
+</form>

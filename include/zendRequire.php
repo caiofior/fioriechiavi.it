@@ -1,6 +1,9 @@
 <?php 
 //require __DIR__.'/../lib/zendframework/library/Zend/Loader/StandardAutoloader.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Loader/SplAutoloader.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Loader/ShortNameLocator.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Loader/PluginClassLocator.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Loader/PluginClassLoader.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Config/Config.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/AdapterInterface.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Profiler/ProfilerAwareInterface.php';
@@ -63,10 +66,6 @@ require __DIR__.'/../lib/zendframework/library/Zend/Cache/Storage/Plugin/Abstrac
 require __DIR__.'/../lib/zendframework/library/Zend/Cache/Storage/Plugin/Serializer.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Cache/Storage/Plugin/PluginOptions.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Stdlib/CallbackHandler.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Authentication/Adapter/AdapterInterface.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Mail/Transport/TransportInterface.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Mail/Transport/Smtp.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Mail/Transport/SmtpOptions.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Session/ManagerInterface.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Session/AbstractManager.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Session/SessionManager.php';
@@ -90,9 +89,14 @@ require __DIR__.'/../lib/zendframework/library/Zend/Session/ValidatorChain.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Exception/ExceptionInterface.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Exception/ErrorException.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Exception/RuntimeException.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Exception/UnexpectedValueException.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Exception/ExceptionInterface.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Exception/ErrorException.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Exception/RuntimeException.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Exception/UnexpectedValueException.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/Exception/InvalidQueryException.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/ParameterContainer.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/StatementContainer.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/TableGateway/TableGatewayInterface.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/TableGateway/AbstractTableGateway.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/TableGateway/TableGateway.php';
@@ -114,6 +118,13 @@ require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/ExpressionInterface.p
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/PredicateInterface.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/PredicateSet.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/Predicate.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/IsNull.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/Operator.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Literal.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/Literal.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Expression.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/Expression.php';
+
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Where.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Having.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Ddl/SqlInterface.php';
@@ -126,12 +137,53 @@ require __DIR__.'/../lib/zendframework/library/Zend/Serializer/Adapter/AbstractA
 require __DIR__.'/../lib/zendframework/library/Zend/Serializer/Adapter/PhpSerialize.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Stdlib/ErrorHandler.php';
 require __DIR__.'/../lib/zendframework/library/Zend/Cache/Storage/PostEvent.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/IsNull.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/ParameterContainer.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Db/Adapter/StatementContainer.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/Operator.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Expression.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/Expression.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Literal.php';
-require __DIR__.'/../lib/zendframework/library/Zend/Db/Sql/Predicate/Literal.php';
+
+
+require __DIR__.'/../lib/zendframework/library/Zend/Authentication/Adapter/AdapterInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Message.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Headers.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/HeaderInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/UnstructuredInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/GenericHeader.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/HeaderWrap.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/HeaderLoader.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/Date.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/AbstractAddressList.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/To.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/From.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/Bcc.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/Cc.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/Sender.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/Subject.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/MimeVersion.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/ContentType.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Header/ContentTransferEncoding.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Address/AddressInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Address.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/AddressList.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Transport/TransportInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Transport/Smtp.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Transport/SmtpOptions.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Protocol/SmtpPluginManager.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Protocol/AbstractProtocol.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Protocol/Smtp.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mail/Protocol/Smtp/Auth/Login.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mime/Part.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mime/Mime.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Mime/Message.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Stdlib/StringWrapper/StringWrapperInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Stdlib/StringWrapper/AbstractStringWrapper.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Stdlib/StringWrapper/MbString.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Stdlib/StringUtils.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Validator/ValidatorInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Validator/Translator/TranslatorAwareInterface.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Validator/AbstractValidator.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Validator/ValidatorChain.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Validator/Hostname.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Validator/Ip.php';
+require __DIR__.'/../lib/zendframework/library/Zend/Validator/Hostname/Com.php';
+
+
+
+
 

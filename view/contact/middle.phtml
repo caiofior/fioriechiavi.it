@@ -1,0 +1,26 @@
+<h2>Contattami</h2>
+<p>Contattami per informazioni o per richiedre l'inserimento di un taxa (specie, genere, famiglia)</p>
+<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
+   <input type="hidden" name="action" value="send" />
+   <div>
+   <label for="name">Nome</label>
+   <input type=text" name="name" id="name" value="" />
+   </div>
+   <div>
+   <label for="mail">Email</label>
+   <input type="email" name="mail" id="mail" value="" />
+   </div>
+   <div>
+   <label for="phone">Telefono</label>
+   <input type="tel" name="phone" id="phone" value="" />
+   </div>
+   <div>
+   <label for="fax">Fax</label>
+   <input type="tel" name="fax" id="fax" value="" />
+   </div>
+   <div>
+   <label for="message">Messaggio</label><br/>
+   <textarea name="message" id="message" cols="40" rows="20"></textarea>
+   </div>
+   <input type="submit" name="submit" value="Invia">
+</form>
