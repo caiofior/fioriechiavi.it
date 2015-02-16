@@ -58,6 +58,12 @@ class TaxaColl extends \ContentColl {
             $select->where(' (SELECT COUNT(`taxa_image`.`id`) FROM `taxa_image` WHERE `taxa_image`.`id_taxa`=`taxa`.`id`) = 1 ');
          }
       }
+      if (array_key_exists('moreDicoItems', $criteria) && $criteria['moreDicoItems'] != '') {
+         $select->columns(array('*','dico_item_count'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT COUNT(*) FROM `dico_item` WHERE `dico_item`.`id_dico`=`taxa`.`dico_id` )')));
+         $initials = explode(':',$criteria['moreDicoItems']);
+         $select->where(' `taxa_kind`.`initials` IN ("'.  implode('","', $initials).'")');
+         $select->order('dico_item_count DESC');
+      }
       return $select;
     }
 }
