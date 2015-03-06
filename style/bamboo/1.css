@@ -49,12 +49,15 @@ margin-bottom : 10px;
 margin-left : 5px; 
 background-image : url(picks/2.jpg); 
 } 
-h1,h2,h3,h3,h5,h6 {
+h1,h2,h3,h4,h5,h6 {
 font-size : 1em; 
 color : #000; 
 margin-top : 3px; 
 font-family : "firenze sf", verdana, arial, sans-serif ; 
 } 
+h2,h3,h4,h5,h6 {
+display: inline;
+}
 
 #menu ul {
 margin : 0; 

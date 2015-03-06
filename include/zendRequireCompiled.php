@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -68,7 +68,7 @@ interface SplAutoloader
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -108,7 +108,7 @@ interface ShortNameLocator
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -151,7 +151,7 @@ interface PluginClassLocator extends ShortNameLocator, IteratorAggregate
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -368,7 +368,7 @@ class PluginClassLoader implements PluginClassLocator
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -482,7 +482,6 @@ class Config implements Countable, Iterator, ArrayAccess
     public function __set($name, $value)
     {
         if ($this->allowModifications) {
-
             if (is_array($value)) {
                 $value = new static($value, true);
             }
@@ -769,7 +768,7 @@ class Config implements Countable, Iterator, ArrayAccess
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -791,14 +790,13 @@ interface AdapterInterface
      * @return Platform\PlatformInterface
      */
     public function getPlatform();
-
 }
 
 /**
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -813,7 +811,7 @@ interface ProfilerAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -970,6 +968,7 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
      *
      * @param string $sql
      * @param string|array|ParameterContainer $parametersOrQueryMode
+     * @param \Zend\Db\ResultSet\ResultSetInterface $resultPrototype
      * @throws Exception\InvalidArgumentException
      * @return Driver\StatementInterface|ResultSet\ResultSet
      */
@@ -1057,7 +1056,6 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
             default:
                 throw new Exception\InvalidArgumentException('Invalid magic property on adapter');
         }
-
     }
 
     /**
@@ -1201,7 +1199,7 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -1280,7 +1278,7 @@ interface DriverInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -1365,7 +1363,7 @@ interface ConnectionInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -1378,7 +1376,6 @@ use Zend\Db\Adapter\Profiler;
 
 class Mysqli implements DriverInterface, Profiler\ProfilerAwareInterface
 {
-
     /**
      * @var Connection
      */
@@ -1622,7 +1619,7 @@ class Mysqli implements DriverInterface, Profiler\ProfilerAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -1634,7 +1631,6 @@ use Zend\Db\Adapter\Profiler;
 
 class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
 {
-
     /**
      * @var Mysqli
      */
@@ -1969,7 +1965,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -2012,7 +2008,7 @@ interface StatementContainerInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -2022,7 +2018,6 @@ use Zend\Db\Adapter\StatementContainerInterface;
 
 interface StatementInterface extends StatementContainerInterface
 {
-
     /**
      * Get resource
      *
@@ -2051,14 +2046,13 @@ interface StatementInterface extends StatementContainerInterface
      * @return ResultInterface
      */
     public function execute($parameters = null);
-
 }
 
 /**
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -2071,7 +2065,6 @@ use Zend\Db\Adapter\Profiler;
 
 class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
 {
-
     /**
      * @var \mysqli
      */
@@ -2374,7 +2367,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -2441,7 +2434,7 @@ interface ResultInterface extends
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -2455,7 +2448,6 @@ class Result implements
     Iterator,
     ResultInterface
 {
-
     /**
      * @var \mysqli|\mysqli_result|\mysqli_stmt
      */
@@ -2783,7 +2775,7 @@ class Result implements
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -2877,7 +2869,7 @@ interface PlatformInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -3091,7 +3083,7 @@ class Mysql implements PlatformInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -3124,7 +3116,7 @@ interface ResultSetInterface extends Traversable, Countable
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -3292,7 +3284,9 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
         if ($this->buffer === null) {
             $this->buffer = -2; // implicitly disable buffering from here on
         }
-        $this->dataSource->next();
+        if (!is_array($this->buffer) || $this->position == $this->dataSource->key()) {
+            $this->dataSource->next();
+        }
         $this->position++;
     }
 
@@ -3404,7 +3398,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -3516,7 +3510,7 @@ class ResultSet extends AbstractResultSet
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -3763,7 +3757,7 @@ abstract class StorageFactory
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -3796,7 +3790,7 @@ interface ServiceLocatorInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -3823,17 +3817,14 @@ interface ServiceLocatorAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
 namespace Zend\ServiceManager;
 
-use ReflectionClass;
-
 class ServiceManager implements ServiceLocatorInterface
 {
-
     /**@#+
      * Constants
      */
@@ -4247,6 +4238,30 @@ class ServiceManager implements ServiceLocatorInterface
 
         $this->shared[$cName] = (bool) $isShared;
         return $this;
+    }
+
+    /**
+     * @param  string $name
+     * @return bool
+     * @throws Exception\ServiceNotFoundException
+     */
+    public function isShared($name)
+    {
+        $cName = $this->canonicalizeName($name);
+
+        if (!$this->has($name)) {
+            throw new Exception\ServiceNotFoundException(sprintf(
+                '%s: A service by the name "%s" was not found',
+                get_class($this) . '::' . __FUNCTION__,
+                $name
+            ));
+        }
+
+        if (!isset($this->shared[$cName])) {
+            return $this->shareByDefault();
+        }
+        
+        return $this->shared[$cName];
     }
 
     /**
@@ -4788,6 +4803,7 @@ class ServiceManager implements ServiceLocatorInterface
     {
         foreach ($this->peeringServiceManagers as $peeringServiceManager) {
             if ($peeringServiceManager->has($name)) {
+                $this->shared[$name] = $peeringServiceManager->isShared($name);
                 return $peeringServiceManager->get($name);
             }
         }
@@ -4802,6 +4818,7 @@ class ServiceManager implements ServiceLocatorInterface
 
         foreach ($this->peeringServiceManagers as $peeringServiceManager) {
             if ($peeringServiceManager->has($name)) {
+                $this->shared[$name] = $peeringServiceManager->isShared($name);
                 return $peeringServiceManager->get($name);
             }
         }
@@ -4950,7 +4967,6 @@ class ServiceManager implements ServiceLocatorInterface
         };
 
         for ($i = 0; $i < $delegatorsCount; $i += 1) {
-
             $delegatorFactory = $this->delegators[$canonicalName][$i];
 
             if (is_string($delegatorFactory)) {
@@ -4985,6 +5001,8 @@ class ServiceManager implements ServiceLocatorInterface
      * @see https://bugs.php.net/bug.php?id=53727
      * @see https://github.com/zendframework/zf2/pull/1807
      *
+     * @deprecated since zf 2.3 requires PHP >= 5.3.23
+     *
      * @param string $className
      * @param string $type
      * @return bool
@@ -4993,17 +5011,7 @@ class ServiceManager implements ServiceLocatorInterface
      */
     protected static function isSubclassOf($className, $type)
     {
-        if (is_subclass_of($className, $type)) {
-            return true;
-        }
-        if (PHP_VERSION_ID >= 50307) {
-            return false;
-        }
-        if (!interface_exists($type)) {
-            return false;
-        }
-        $r = new ReflectionClass($className);
-        return $r->implementsInterface($type);
+        return is_subclass_of($className, $type);
     }
 
     /**
@@ -5040,7 +5048,7 @@ class ServiceManager implements ServiceLocatorInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -5201,6 +5209,16 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
     {
         $invokable = $this->invokableClasses[$canonicalName];
 
+        if (!class_exists($invokable)) {
+            throw new Exception\ServiceNotFoundException(sprintf(
+                '%s: failed retrieving "%s%s" via invokable class "%s"; class does not exist',
+                get_class($this) . '::' . __FUNCTION__,
+                $canonicalName,
+                ($requestedName ? '(alias: ' . $requestedName . ')' : ''),
+                $invokable
+            ));
+        }
+
         if (null === $this->creationOptions
             || (is_array($this->creationOptions) && empty($this->creationOptions))
         ) {
@@ -5243,9 +5261,13 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
         } elseif (is_callable($factory)) {
             $instance = $this->createServiceViaCallback($factory, $canonicalName, $requestedName);
         } else {
-            throw new Exception\ServiceNotCreatedException(sprintf(
-                'While attempting to create %s%s an invalid factory was registered for this instance type.', $canonicalName, ($requestedName ? '(alias: ' . $requestedName . ')' : '')
-            ));
+            throw new Exception\ServiceNotCreatedException(
+                sprintf(
+                    'While attempting to create %s%s an invalid factory was registered for this instance type.',
+                    $canonicalName,
+                    ($requestedName ? '(alias: ' . $requestedName . ')' : '')
+                )
+            );
         }
 
         return $instance;
@@ -5287,7 +5309,7 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -5361,7 +5383,7 @@ class AdapterPluginManager extends AbstractPluginManager
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -5607,7 +5629,7 @@ interface StorageInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -5632,7 +5654,7 @@ interface EventsCapableInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7212,7 +7234,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7232,7 +7254,7 @@ interface AvailableSpaceCapableInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7253,7 +7275,7 @@ interface ClearByNamespaceInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7274,7 +7296,7 @@ interface ClearByPrefixInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7294,7 +7316,7 @@ interface ClearExpiredInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7314,7 +7336,7 @@ interface FlushableInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7334,7 +7356,7 @@ interface IterableInterface extends IteratorAggregate
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7354,7 +7376,7 @@ interface OptimizableInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7397,7 +7419,7 @@ interface TaggableInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7417,7 +7439,7 @@ interface TotalSpaceCapableInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -7452,7 +7474,6 @@ class Filesystem extends AbstractAdapter implements
     TaggableInterface,
     TotalSpaceCapableInterface
 {
-
     /**
      * Buffered total space in bytes
      *
@@ -7943,7 +7964,6 @@ class Filesystem extends AbstractAdapter implements
             }
             $success  = true;
             return $data;
-
         } catch (BaseException $e) {
             $success = false;
             throw $e;
@@ -7962,7 +7982,6 @@ class Filesystem extends AbstractAdapter implements
         $keys    = $normalizedKeys; // Don't change argument passed by reference
         $result  = array();
         while ($keys) {
-
             // LOCK_NB if more than one items have to read
             $nonBlocking = count($keys) > 1;
             $wouldblock  = null;
@@ -8830,8 +8849,16 @@ class Filesystem extends AbstractAdapter implements
             }
 
             if (!$res) {
-                $oct = ($perm === false) ? '777' : decoct($perm);
                 $err = ErrorHandler::stop();
+
+                // Issue 6435:
+                // mkdir could fail because of a race condition it was already created by another process
+                // after the first file_exists above
+                if (file_exists($pathname)) {
+                    return;
+                }
+
+                $oct = ($perm === false) ? '777' : decoct($perm);
                 throw new Exception\RuntimeException("mkdir('{$pathname}', 0{$oct}, true) failed", 0, $err);
             }
 
@@ -8840,7 +8867,6 @@ class Filesystem extends AbstractAdapter implements
                 $err = ErrorHandler::stop();
                 throw new Exception\RuntimeException("chmod('{$pathname}', 0{$oct}) failed", 0, $err);
             }
-
         } else {
             // build-in mkdir function sets permission together with current umask
             // which doesn't work well on multo threaded webservers
@@ -8870,6 +8896,13 @@ class Filesystem extends AbstractAdapter implements
                 }
 
                 if (!$res) {
+                    // Issue 6435:
+                    // mkdir could fail because of a race condition it was already created by another process
+                    // after the first file_exists above ... go to the next path part.
+                    if (file_exists($path)) {
+                        continue;
+                    }
+
                     $oct = ($perm === false) ? '777' : decoct($perm);
                     ErrorHandler::stop();
                     throw new Exception\RuntimeException(
@@ -8917,7 +8950,6 @@ class Filesystem extends AbstractAdapter implements
 
         // if locking and non blocking is enabled -> file_put_contents can't used
         if ($locking && $nonBlocking) {
-
             $umask = ($umask !== false) ? umask($umask) : false;
 
             $fp = fopen($file, 'cb');
@@ -9023,7 +9055,7 @@ class Filesystem extends AbstractAdapter implements
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -9061,7 +9093,7 @@ interface ParameterObjectInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -9105,10 +9137,15 @@ abstract class AbstractOptions implements ParameterObjectInterface
         }
 
         if (!is_array($options) && !$options instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Parameter provided to %s must be an %s, %s or %s',
-                __METHOD__, 'array', 'Traversable', 'Zend\Stdlib\AbstractOptions'
-            ));
+            throw new Exception\InvalidArgumentException(
+                sprintf(
+                    'Parameter provided to %s must be an %s, %s or %s',
+                    __METHOD__,
+                    'array',
+                    'Traversable',
+                    'Zend\Stdlib\AbstractOptions'
+                )
+            );
         }
 
         foreach ($options as $key => $value) {
@@ -9131,7 +9168,9 @@ abstract class AbstractOptions implements ParameterObjectInterface
             return '_' . strtolower($letter);
         };
         foreach ($this as $key => $value) {
-            if ($key === '__strictMode__') continue;
+            if ($key === '__strictMode__') {
+                continue;
+            }
             $normalizedKey = preg_replace_callback('/([A-Z])/', $transform, $key);
             $array[$normalizedKey] = $value;
         }
@@ -9149,17 +9188,21 @@ abstract class AbstractOptions implements ParameterObjectInterface
      */
     public function __set($key, $value)
     {
-        $setter = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-        if ($this->__strictMode__ && !method_exists($this, $setter)) {
-            throw new Exception\BadMethodCallException(
-                'The option "' . $key . '" does not '
-                . 'have a matching ' . $setter . ' setter method '
-                . 'which must be defined'
-            );
-        } elseif (!$this->__strictMode__ && !method_exists($this, $setter)) {
+        $setter = 'set' . str_replace('_', '', $key);
+
+        if (method_exists($this, $setter)) {
+            $this->{$setter}($value);
+
             return;
         }
-        $this->{$setter}($value);
+
+        if ($this->__strictMode__) {
+            throw new Exception\BadMethodCallException(sprintf(
+                'The option "%s" does not have a matching "%s" setter method which must be defined',
+                $key,
+                'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))
+            ));
+        }
     }
 
     /**
@@ -9172,16 +9215,17 @@ abstract class AbstractOptions implements ParameterObjectInterface
      */
     public function __get($key)
     {
-        $getter = 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-        if (!method_exists($this, $getter)) {
-            throw new Exception\BadMethodCallException(
-                'The option "' . $key . '" does not '
-                . 'have a matching ' . $getter . ' getter method '
-                . 'which must be defined'
-            );
+        $getter = 'get' . str_replace('_', '', $key);
+
+        if (method_exists($this, $getter)) {
+            return $this->{$getter}();
         }
 
-        return $this->{$getter}();
+        throw new Exception\BadMethodCallException(sprintf(
+            'The option "%s" does not have a matching "%s" getter method which must be defined',
+            $key,
+            'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))
+        ));
     }
 
     /**
@@ -9210,7 +9254,7 @@ abstract class AbstractOptions implements ParameterObjectInterface
         } catch (Exception\BadMethodCallException $e) {
             throw new Exception\InvalidArgumentException(
                 'The class property $' . $key . ' cannot be unset as'
-                    . ' NULL is an invalid value for it',
+                . ' NULL is an invalid value for it',
                 0,
                 $e
             );
@@ -9222,7 +9266,7 @@ abstract class AbstractOptions implements ParameterObjectInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -9241,11 +9285,10 @@ use Zend\Stdlib\ErrorHandler;
  */
 class AdapterOptions extends AbstractOptions
 {
-
     /**
      * The adapter using these options
      *
-     * @var null|Filesystem
+     * @var null|StorageInterface
      */
     protected $adapter;
 
@@ -9478,7 +9521,7 @@ class AdapterOptions extends AbstractOptions
         }
 
         if ($ttl < 0) {
-             throw new Exception\InvalidArgumentException("TTL can't be negative");
+            throw new Exception\InvalidArgumentException("TTL can't be negative");
         }
     }
 }
@@ -9487,7 +9530,7 @@ class AdapterOptions extends AbstractOptions
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -9501,7 +9544,6 @@ use Zend\Cache\Exception;
  */
 class FilesystemOptions extends AdapterOptions
 {
-
     /**
      * Directory to store cache files
      *
@@ -9945,7 +9987,7 @@ class FilesystemOptions extends AdapterOptions
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -9983,7 +10025,7 @@ interface SharedEventManagerAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -10017,7 +10059,7 @@ interface EventManagerInterface extends SharedEventManagerAwareInterface
     public function trigger($event, $target = null, $argv = array(), $callback = null);
 
     /**
-     * Trigger an event until the given callback returns a boolean false
+     * Trigger an event until the given callback returns a boolean true
      *
      * Should allow handling the following scenarios:
      * - Passing Event object and callback only
@@ -10127,7 +10169,7 @@ interface EventManagerInterface extends SharedEventManagerAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -10223,7 +10265,7 @@ interface EventInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -10432,7 +10474,7 @@ class Event implements EventInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -10497,7 +10539,7 @@ class Event extends BaseEvent
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11024,7 +11066,7 @@ class EventManager implements EventManagerInterface
      * Used to inject shared listeners and wildcard listeners.
      *
      * @param  PriorityQueue $masterListeners
-     * @param  PriorityQueue $listeners
+     * @param  array|Traversable $listeners
      * @return void
      */
     protected function insertListeners($masterListeners, $listeners)
@@ -11047,7 +11089,7 @@ class EventManager implements EventManagerInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11131,7 +11173,7 @@ class ResponseCollection extends SplStack
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11433,7 +11475,7 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11466,7 +11508,7 @@ interface SharedEventAggregateAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11531,7 +11573,7 @@ interface SharedEventManagerInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11707,7 +11749,7 @@ class SharedEventManager implements
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11788,7 +11830,7 @@ class StaticEventManager extends SharedEventManager
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11827,7 +11869,6 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
         parent::insert($datum, $priority);
     }
 
-
     /**
      * Serialize to an array
      *
@@ -11843,7 +11884,6 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
         }
         return $array;
     }
-
 
     /**
      * Serialize
@@ -11881,7 +11921,7 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11947,7 +11987,7 @@ class PluginManager extends AbstractPluginManager
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11989,7 +12029,7 @@ interface ListenerAggregateInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -12022,7 +12062,7 @@ abstract class AbstractListenerAggregate implements ListenerAggregateInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -12052,7 +12092,7 @@ interface PluginInterface extends ListenerAggregateInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -12097,7 +12137,7 @@ abstract class AbstractPlugin extends AbstractListenerAggregate implements Plugi
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -12356,7 +12396,7 @@ class Serializer extends AbstractPlugin
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -12656,7 +12696,7 @@ class PluginOptions extends AbstractOptions
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -12873,7 +12913,7 @@ class CallbackHandler
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -12923,7 +12963,7 @@ interface ManagerInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -13099,13 +13139,14 @@ abstract class AbstractManager implements Manager
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
 namespace Zend\Session;
 
 use Zend\EventManager\EventManagerInterface;
+use Zend\Stdlib\ArrayUtils;
 
 /**
  * Session ManagerInterface implementation utilizing ext/session
@@ -13188,7 +13229,15 @@ class SessionManager extends AbstractManager
             $this->registerSaveHandler($saveHandler);
         }
 
+        $oldSessionData = $_SESSION;
+
         session_start();
+
+        if ($oldSessionData instanceof \Traversable
+            || (! empty($oldSessionData) && is_array($oldSessionData))
+        ) {
+            $_SESSION = ArrayUtils::merge($oldSessionData, $_SESSION, true);
+        }
 
         $storage = $this->getStorage();
 
@@ -13452,8 +13501,8 @@ class SessionManager extends AbstractManager
             return;
         }
         setcookie(
-            $this->getName(),                 // session name
-            '',                               // value
+            $this->getName(), // session name
+            '', // value
             $_SERVER['REQUEST_TIME'] - 42000, // TTL for cookie
             $config->getCookiePath(),
             $config->getCookieDomain(),
@@ -13513,7 +13562,7 @@ class SessionManager extends AbstractManager
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -13565,7 +13614,7 @@ interface ConfigInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -13649,7 +13698,6 @@ class StandardConfig implements ConfigInterface
      * @var array
      */
     protected $options = array();
-
 
     /**
      * Set many options at once
@@ -13812,8 +13860,6 @@ class StandardConfig implements ConfigInterface
         }
         return $this->savePath;
     }
-
-
 
     /**
      * Set session.name
@@ -14374,7 +14420,7 @@ class StandardConfig implements ConfigInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -14457,9 +14503,10 @@ class SessionConfig extends StandardConfig
         }
 
         $result = ini_set($key, $storageValue);
-        if (FALSE === $result) {
-            throw new Exception\InvalidArgumentException("'" . $key .
-                    "' is not a valid sessions-related ini setting.");
+        if (false === $result) {
+            throw new Exception\InvalidArgumentException(
+                "'{$key}' is not a valid sessions-related ini setting."
+            );
         }
         return $this;
     }
@@ -14531,7 +14578,6 @@ class SessionConfig extends StandardConfig
         $this->setOption('save_path', $savePath);
         return $this;
     }
-
 
     /**
      * Set session.serialize_handler
@@ -14652,7 +14698,7 @@ class SessionConfig extends StandardConfig
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -14693,7 +14739,7 @@ interface StorageInterface extends Traversable, ArrayAccess, Serializable, Count
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -14720,7 +14766,7 @@ interface StorageInitializationInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -14751,7 +14797,6 @@ abstract class AbstractSessionArrayStorage implements
         // this is here for B.C.
         $this->init($input);
     }
-
 
     /**
      * Initialize Storage
@@ -15068,9 +15113,9 @@ abstract class AbstractSessionArrayStorage implements
     public function setMetadata($key, $value, $overwriteArray = false)
     {
         if ($this->isImmutable()) {
-            throw new Exception\RuntimeException(sprintf(
-                'Cannot set key "%s" as storage is marked isImmutable', $key
-            ));
+            throw new Exception\RuntimeException(
+                sprintf('Cannot set key "%s" as storage is marked isImmutable', $key)
+            );
         }
 
         if (!isset($_SESSION['__ZF'])) {
@@ -15207,7 +15252,7 @@ abstract class AbstractSessionArrayStorage implements
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -15245,7 +15290,7 @@ class SessionArrayStorage extends AbstractSessionArrayStorage
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -15677,7 +15722,282 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Stdlib;
+
+use Traversable;
+
+/**
+ * Utility class for testing and manipulation of PHP arrays.
+ *
+ * Declared abstract, as we have no need for instantiation.
+ */
+abstract class ArrayUtils
+{
+    /**
+     * Test whether an array contains one or more string keys
+     *
+     * @param  mixed $value
+     * @param  bool  $allowEmpty    Should an empty array() return true
+     * @return bool
+     */
+    public static function hasStringKeys($value, $allowEmpty = false)
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        if (!$value) {
+            return $allowEmpty;
+        }
+
+        return count(array_filter(array_keys($value), 'is_string')) > 0;
+    }
+
+    /**
+     * Test whether an array contains one or more integer keys
+     *
+     * @param  mixed $value
+     * @param  bool  $allowEmpty    Should an empty array() return true
+     * @return bool
+     */
+    public static function hasIntegerKeys($value, $allowEmpty = false)
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        if (!$value) {
+            return $allowEmpty;
+        }
+
+        return count(array_filter(array_keys($value), 'is_int')) > 0;
+    }
+
+    /**
+     * Test whether an array contains one or more numeric keys.
+     *
+     * A numeric key can be one of the following:
+     * - an integer 1,
+     * - a string with a number '20'
+     * - a string with negative number: '-1000'
+     * - a float: 2.2120, -78.150999
+     * - a string with float:  '4000.99999', '-10.10'
+     *
+     * @param  mixed $value
+     * @param  bool  $allowEmpty    Should an empty array() return true
+     * @return bool
+     */
+    public static function hasNumericKeys($value, $allowEmpty = false)
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        if (!$value) {
+            return $allowEmpty;
+        }
+
+        return count(array_filter(array_keys($value), 'is_numeric')) > 0;
+    }
+
+    /**
+     * Test whether an array is a list
+     *
+     * A list is a collection of values assigned to continuous integer keys
+     * starting at 0 and ending at count() - 1.
+     *
+     * For example:
+     * <code>
+     * $list = array('a', 'b', 'c', 'd');
+     * $list = array(
+     *     0 => 'foo',
+     *     1 => 'bar',
+     *     2 => array('foo' => 'baz'),
+     * );
+     * </code>
+     *
+     * @param  mixed $value
+     * @param  bool  $allowEmpty    Is an empty list a valid list?
+     * @return bool
+     */
+    public static function isList($value, $allowEmpty = false)
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        if (!$value) {
+            return $allowEmpty;
+        }
+
+        return (array_values($value) === $value);
+    }
+
+    /**
+     * Test whether an array is a hash table.
+     *
+     * An array is a hash table if:
+     *
+     * 1. Contains one or more non-integer keys, or
+     * 2. Integer keys are non-continuous or misaligned (not starting with 0)
+     *
+     * For example:
+     * <code>
+     * $hash = array(
+     *     'foo' => 15,
+     *     'bar' => false,
+     * );
+     * $hash = array(
+     *     1995  => 'Birth of PHP',
+     *     2009  => 'PHP 5.3.0',
+     *     2012  => 'PHP 5.4.0',
+     * );
+     * $hash = array(
+     *     'formElement,
+     *     'options' => array( 'debug' => true ),
+     * );
+     * </code>
+     *
+     * @param  mixed $value
+     * @param  bool  $allowEmpty    Is an empty array() a valid hash table?
+     * @return bool
+     */
+    public static function isHashTable($value, $allowEmpty = false)
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        if (!$value) {
+            return $allowEmpty;
+        }
+
+        return (array_values($value) !== $value);
+    }
+
+    /**
+     * Checks if a value exists in an array.
+     *
+     * Due to "foo" == 0 === TRUE with in_array when strict = false, an option
+     * has been added to prevent this. When $strict = 0/false, the most secure
+     * non-strict check is implemented. if $strict = -1, the default in_array
+     * non-strict behaviour is used.
+     *
+     * @param mixed $needle
+     * @param array $haystack
+     * @param int|bool $strict
+     * @return bool
+     */
+    public static function inArray($needle, array $haystack, $strict = false)
+    {
+        if (!$strict) {
+            if (is_int($needle) || is_float($needle)) {
+                $needle = (string) $needle;
+            }
+            if (is_string($needle)) {
+                foreach ($haystack as &$h) {
+                    if (is_int($h) || is_float($h)) {
+                        $h = (string) $h;
+                    }
+                }
+            }
+        }
+        return in_array($needle, $haystack, $strict);
+    }
+
+    /**
+     * Convert an iterator to an array.
+     *
+     * Converts an iterator to an array. The $recursive flag, on by default,
+     * hints whether or not you want to do so recursively.
+     *
+     * @param  array|Traversable  $iterator     The array or Traversable object to convert
+     * @param  bool               $recursive    Recursively check all nested structures
+     * @throws Exception\InvalidArgumentException if $iterator is not an array or a Traversable object
+     * @return array
+     */
+    public static function iteratorToArray($iterator, $recursive = true)
+    {
+        if (!is_array($iterator) && !$iterator instanceof Traversable) {
+            throw new Exception\InvalidArgumentException(__METHOD__ . ' expects an array or Traversable object');
+        }
+
+        if (!$recursive) {
+            if (is_array($iterator)) {
+                return $iterator;
+            }
+
+            return iterator_to_array($iterator);
+        }
+
+        if (method_exists($iterator, 'toArray')) {
+            return $iterator->toArray();
+        }
+
+        $array = array();
+        foreach ($iterator as $key => $value) {
+            if (is_scalar($value)) {
+                $array[$key] = $value;
+                continue;
+            }
+
+            if ($value instanceof Traversable) {
+                $array[$key] = static::iteratorToArray($value, $recursive);
+                continue;
+            }
+
+            if (is_array($value)) {
+                $array[$key] = static::iteratorToArray($value, $recursive);
+                continue;
+            }
+
+            $array[$key] = $value;
+        }
+
+        return $array;
+    }
+
+    /**
+     * Merge two arrays together.
+     *
+     * If an integer key exists in both arrays and preserveNumericKeys is false, the value
+     * from the second array will be appended to the first array. If both values are arrays, they
+     * are merged together, else the value of the second array overwrites the one of the first array.
+     *
+     * @param  array $a
+     * @param  array $b
+     * @param  bool  $preserveNumericKeys
+     * @return array
+     */
+    public static function merge(array $a, array $b, $preserveNumericKeys = false)
+    {
+        foreach ($b as $key => $value) {
+            if (isset($a[$key]) || array_key_exists($key, $a)) {
+                if (!$preserveNumericKeys && is_int($key)) {
+                    $a[] = $value;
+                } elseif (is_array($value) && is_array($a[$key])) {
+                    $a[$key] = static::merge($a[$key], $value, $preserveNumericKeys);
+                } else {
+                    $a[$key] = $value;
+                }
+            } else {
+                $a[$key] = $value;
+            }
+        }
+
+        return $a;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -15686,9 +16006,6 @@ namespace Zend\Stdlib;
 use Countable;
 use Iterator;
 
-/**
- * Priority list
- */
 class PriorityList implements Iterator, Countable
 {
     const EXTR_DATA     = 0x00000001;
@@ -15697,7 +16014,7 @@ class PriorityList implements Iterator, Countable
     /**
      * Internal list of all items.
      *
-     * @var array
+     * @var array[]
      */
     protected $items = array();
 
@@ -15732,8 +16049,9 @@ class PriorityList implements Iterator, Countable
      * Insert a new item.
      *
      * @param  string  $name
-     * @param  mixed $value
-     * @param  int $priority
+     * @param  mixed   $value
+     * @param  int     $priority
+     *
      * @return void
      */
     public function insert($name, $value, $priority = 0)
@@ -15748,13 +16066,23 @@ class PriorityList implements Iterator, Countable
         );
     }
 
+    /**
+     * @param string $name
+     * @param int    $priority
+     *
+     * @return $this
+     *
+     * @throws \Exception
+     */
     public function setPriority($name, $priority)
     {
         if (!isset($this->items[$name])) {
             throw new \Exception("item $name not found");
         }
+
         $this->items[$name]['priority'] = (int) $priority;
-        $this->sorted = false;
+        $this->sorted                   = false;
+
         return $this;
     }
 
@@ -15766,11 +16094,10 @@ class PriorityList implements Iterator, Countable
      */
     public function remove($name)
     {
-        if (!isset($this->items[$name])) {
-            return;
+        if (isset($this->items[$name])) {
+            $this->count--;
         }
 
-        $this->count--;
         unset($this->items[$name]);
     }
 
@@ -15781,7 +16108,7 @@ class PriorityList implements Iterator, Countable
      */
     public function clear()
     {
-        $this->items = array();
+        $this->items  = array();
         $this->serial = 0;
         $this->count  = 0;
         $this->sorted = false;
@@ -15832,25 +16159,26 @@ class PriorityList implements Iterator, Countable
     /**
      * Get/Set serial order mode
      *
-     * @param bool $flag
+     * @param bool|null $flag
+     *
      * @return bool
      */
     public function isLIFO($flag = null)
     {
         if ($flag !== null) {
-            if (($flag = ($flag === true ? 1 : -1)) !== $this->isLIFO) {
-                $this->isLIFO = $flag;
+            $isLifo = $flag === true ? 1 : -1;
+
+            if ($isLifo !== $this->isLIFO) {
+                $this->isLIFO = $isLifo;
                 $this->sorted = false;
             }
         }
-        return $this->isLIFO === 1;
+
+        return 1 === $this->isLIFO;
     }
 
     /**
-     * rewind(): defined by Iterator interface.
-     *
-     * @see    Iterator::rewind()
-     * @return void
+     * {@inheritDoc}
      */
     public function rewind()
     {
@@ -15859,22 +16187,17 @@ class PriorityList implements Iterator, Countable
     }
 
     /**
-     * current(): defined by Iterator interface.
-     *
-     * @see    Iterator::current()
-     * @return mixed
+     * {@inheritDoc}
      */
     public function current()
     {
         $node = current($this->items);
-        return ($node !== false ? $node['data'] : false);
+
+        return $node ? $node['data'] : false;
     }
 
     /**
-     * key(): defined by Iterator interface.
-     *
-     * @see    Iterator::key()
-     * @return string
+     * {@inheritDoc}
      */
     public function key()
     {
@@ -15882,33 +16205,25 @@ class PriorityList implements Iterator, Countable
     }
 
     /**
-     * next(): defined by Iterator interface.
-     *
-     * @see    Iterator::next()
-     * @return mixed
+     * {@inheritDoc}
      */
     public function next()
     {
         $node = next($this->items);
-        return ($node !== false ? $node['data'] : false);
+
+        return $node ? $node['data'] : false;
     }
 
     /**
-     * valid(): defined by Iterator interface.
-     *
-     * @see    Iterator::valid()
-     * @return bool
+     * {@inheritDoc}
      */
     public function valid()
     {
-        return ($this->current() !== false);
+        return current($this->items) !== false;
     }
 
     /**
-     * count(): defined by Countable interface.
-     *
-     * @see    Countable::count()
-     * @return int
+     * {@inheritDoc}
      */
     public function count()
     {
@@ -15919,18 +16234,21 @@ class PriorityList implements Iterator, Countable
      * Return list as array
      *
      * @param int $flag
+     *
      * @return array
      */
     public function toArray($flag = self::EXTR_DATA)
     {
         $this->sort();
+
         if ($flag == self::EXTR_BOTH) {
             return $this->items;
         }
+
         return array_map(
-            ($flag == self::EXTR_PRIORITY)
-                ? function ($item) { return $item['priority']; }
-                : function ($item) { return $item['data']; },
+            function ($item) use ($flag) {
+                return ($flag == PriorityList::EXTR_PRIORITY) ? $item['priority'] : $item['data'];
+            },
             $this->items
         );
     }
@@ -15940,7 +16258,7 @@ class PriorityList implements Iterator, Countable
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -16000,7 +16318,7 @@ abstract class AbstractContainer extends ArrayObject
      */
     public function __construct($name = 'Default', Manager $manager = null)
     {
-        if (!preg_match('/^[a-z][a-z0-9_\\\]+$/i', $name)) {
+        if (!preg_match('/^[a-z0-9][a-z0-9_\\\\]+$/i', $name)) {
             throw new Exception\InvalidArgumentException(
                 'Name passed to container is invalid; must consist of alphanumerics, backslashes and underscores only'
             );
@@ -16554,7 +16872,7 @@ abstract class AbstractContainer extends ArrayObject
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -16594,7 +16912,7 @@ class Container extends AbstractContainer
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -16638,7 +16956,7 @@ interface AuthenticationServiceInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -16800,7 +17118,7 @@ class AuthenticationService implements AuthenticationServiceInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -16848,7 +17166,7 @@ interface StorageInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -16974,7 +17292,7 @@ class Session implements StorageInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17096,7 +17414,7 @@ class Result
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 namespace Zend\Session;
@@ -17179,7 +17497,7 @@ class ValidatorChain extends EventManager
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17193,7 +17511,7 @@ interface ExceptionInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17207,7 +17525,7 @@ class ErrorException extends \Exception implements ExceptionInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17221,7 +17539,7 @@ class RuntimeException extends \RuntimeException implements ExceptionInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17235,7 +17553,7 @@ class UnexpectedValueException extends \UnexpectedValueException implements Exce
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17251,7 +17569,7 @@ interface ExceptionInterface extends Exception\ExceptionInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17267,7 +17585,7 @@ class ErrorException extends Exception\ErrorException implements ExceptionInterf
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17283,7 +17601,7 @@ class RuntimeException extends Exception\RuntimeException implements ExceptionIn
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17299,7 +17617,7 @@ class UnexpectedValueException extends Exception\UnexpectedValueException implem
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17313,7 +17631,7 @@ class InvalidQueryException extends UnexpectedValueException implements Exceptio
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17325,7 +17643,6 @@ use Iterator;
 
 class ParameterContainer implements Iterator, ArrayAccess, Countable
 {
-
     const TYPE_AUTO    = 'auto';
     const TYPE_NULL    = 'null';
     const TYPE_DOUBLE  = 'double';
@@ -17648,7 +17965,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17656,7 +17973,6 @@ namespace Zend\Db\Adapter;
 
 class StatementContainer implements StatementContainerInterface
 {
-
     /**
      * @var string
      */
@@ -17720,7 +18036,7 @@ class StatementContainer implements StatementContainerInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17739,7 +18055,7 @@ interface TableGatewayInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17755,6 +18071,7 @@ use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\TableIdentifier;
 use Zend\Db\Sql\Update;
 use Zend\Db\Sql\Where;
+use Zend\Db\TableGateway\Feature\EventFeature;
 
 /**
  *
@@ -17764,7 +18081,6 @@ use Zend\Db\Sql\Where;
  */
 abstract class AbstractTableGateway implements TableGatewayInterface
 {
-
     /**
      * @var bool
      */
@@ -17831,13 +18147,13 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         }
 
         $this->featureSet->setTableGateway($this);
-        $this->featureSet->apply('preInitialize', array());
+        $this->featureSet->apply(EventFeature::EVENT_PRE_INITIALIZE, array());
 
         if (!$this->adapter instanceof AdapterInterface) {
             throw new Exception\RuntimeException('This table does not have an Adapter setup');
         }
 
-        if (!is_string($this->table) && !$this->table instanceof TableIdentifier) {
+        if (!is_string($this->table) && !$this->table instanceof TableIdentifier && !is_array($this->table)) {
             throw new Exception\RuntimeException('This table object does not have a valid table set.');
         }
 
@@ -17849,7 +18165,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
             $this->sql = new Sql($this->adapter, $this->table);
         }
 
-        $this->featureSet->apply('postInitialize', array());
+        $this->featureSet->apply(EventFeature::EVENT_POST_INITIALIZE, array());
 
         $this->isInitialized = true;
     }
@@ -17962,7 +18278,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         }
 
         // apply preSelect features
-        $this->featureSet->apply('preSelect', array($select));
+        $this->featureSet->apply(EventFeature::EVENT_PRE_SELECT, array($select));
 
         // prepare and execute
         $statement = $this->sql->prepareStatementForSqlObject($select);
@@ -17973,7 +18289,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         $resultSet->initialize($result);
 
         // apply postSelect features
-        $this->featureSet->apply('postSelect', array($statement, $result, $resultSet));
+        $this->featureSet->apply(EventFeature::EVENT_POST_SELECT, array($statement, $result, $resultSet));
 
         return $resultSet;
     }
@@ -18021,14 +18337,14 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         }
 
         // apply preInsert features
-        $this->featureSet->apply('preInsert', array($insert));
+        $this->featureSet->apply(EventFeature::EVENT_PRE_INSERT, array($insert));
 
         $statement = $this->sql->prepareStatementForSqlObject($insert);
         $result = $statement->execute();
         $this->lastInsertValue = $this->adapter->getDriver()->getConnection()->getLastGeneratedValue();
 
         // apply postInsert features
-        $this->featureSet->apply('postInsert', array($statement, $result));
+        $this->featureSet->apply(EventFeature::EVENT_POST_INSERT, array($statement, $result));
 
         return $result->getAffectedRows();
     }
@@ -18081,13 +18397,13 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         }
 
         // apply preUpdate features
-        $this->featureSet->apply('preUpdate', array($update));
+        $this->featureSet->apply(EventFeature::EVENT_PRE_UPDATE, array($update));
 
         $statement = $this->sql->prepareStatementForSqlObject($update);
         $result = $statement->execute();
 
         // apply postUpdate features
-        $this->featureSet->apply('postUpdate', array($statement, $result));
+        $this->featureSet->apply(EventFeature::EVENT_POST_UPDATE, array($statement, $result));
 
         return $result->getAffectedRows();
     }
@@ -18137,13 +18453,13 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         }
 
         // pre delete update
-        $this->featureSet->apply('preDelete', array($delete));
+        $this->featureSet->apply(EventFeature::EVENT_PRE_DELETE, array($delete));
 
         $statement = $this->sql->prepareStatementForSqlObject($delete);
         $result = $statement->execute();
 
         // apply postDelete features
-        $this->featureSet->apply('postDelete', array($statement, $result));
+        $this->featureSet->apply(EventFeature::EVENT_POST_DELETE, array($statement, $result));
 
         return $result->getAffectedRows();
     }
@@ -18218,16 +18534,23 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         $this->sql = clone $this->sql;
         if (is_object($this->table)) {
             $this->table = clone $this->table;
+        } elseif (
+            is_array($this->table)
+            && count($this->table) == 1
+            && is_object(reset($this->table))
+        ) {
+            foreach ($this->table as $alias => &$tableObject) {
+                $tableObject = clone $tableObject;
+            }
         }
     }
-
 }
 
 /**
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18241,7 +18564,6 @@ use Zend\Db\Sql\TableIdentifier;
 
 class TableGateway extends AbstractTableGateway
 {
-
     /**
      * Constructor
      *
@@ -18255,7 +18577,7 @@ class TableGateway extends AbstractTableGateway
     public function __construct($table, AdapterInterface $adapter, $features = null, ResultSetInterface $resultSetPrototype = null, Sql $sql = null)
     {
         // table
-        if (!(is_string($table) || $table instanceof TableIdentifier)) {
+        if (!(is_string($table) || $table instanceof TableIdentifier || is_array($table))) {
             throw new Exception\InvalidArgumentException('Table name must be a string or an instance of Zend\Db\Sql\TableIdentifier');
         }
         $this->table = $table;
@@ -18300,7 +18622,7 @@ class TableGateway extends AbstractTableGateway
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18446,7 +18768,334 @@ class FeatureSet
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\TableGateway\Feature;
+
+use Zend\Db\TableGateway\AbstractTableGateway;
+use Zend\Db\TableGateway\Exception;
+
+abstract class AbstractFeature extends AbstractTableGateway
+{
+    /**
+     * @var AbstractTableGateway
+     */
+    protected $tableGateway = null;
+
+    protected $sharedData = array();
+
+    public function getName()
+    {
+        return get_class($this);
+    }
+
+    public function setTableGateway(AbstractTableGateway $tableGateway)
+    {
+        $this->tableGateway = $tableGateway;
+    }
+
+    public function initialize()
+    {
+        throw new Exception\RuntimeException('This method is not intended to be called on this object.');
+    }
+
+    public function getMagicMethodSpecifications()
+    {
+        return array();
+    }
+
+
+    /*
+    public function preInitialize();
+    public function postInitialize();
+    public function preSelect(Select $select);
+    public function postSelect(StatementInterface $statement, ResultInterface $result, ResultSetInterface $resultSet);
+    public function preInsert(Insert $insert);
+    public function postInsert(StatementInterface $statement, ResultInterface $result);
+    public function preUpdate(Update $update);
+    public function postUpdate(StatementInterface $statement, ResultInterface $result);
+    public function preDelete(Delete $delete);
+    public function postDelete(StatementInterface $statement, ResultInterface $result);
+    */
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\TableGateway\Feature;
+
+use Zend\Db\Adapter\Driver\ResultInterface;
+use Zend\Db\Adapter\Driver\StatementInterface;
+use Zend\Db\ResultSet\ResultSetInterface;
+use Zend\Db\Sql\Delete;
+use Zend\Db\Sql\Insert;
+use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Update;
+use Zend\EventManager\EventManager;
+use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\EventsCapableInterface;
+
+class EventFeature extends AbstractFeature implements EventsCapableInterface
+{
+    const EVENT_PRE_INITIALIZE  = 'preInitialize';
+    const EVENT_POST_INITIALIZE = 'postInitialize';
+
+    const EVENT_PRE_SELECT      = 'preSelect';
+    const EVENT_POST_SELECT     = 'postSelect';
+
+    const EVENT_PRE_INSERT      = 'preInsert';
+    const EVENT_POST_INSERT     = 'postInsert';
+
+    const EVENT_PRE_DELETE      = 'preDelete';
+    const EVENT_POST_DELETE     = 'postDelete';
+
+    const EVENT_PRE_UPDATE      = 'preUpdate';
+    const EVENT_POST_UPDATE     = 'postUpdate';
+
+    /**
+     * @var EventManagerInterface
+     */
+    protected $eventManager = null;
+
+    /**
+     * @var null
+     */
+    protected $event = null;
+
+    /**
+     * @param EventManagerInterface $eventManager
+     * @param EventFeature\TableGatewayEvent $tableGatewayEvent
+     */
+    public function __construct(
+        EventManagerInterface $eventManager = null,
+        EventFeature\TableGatewayEvent $tableGatewayEvent = null
+    ) {
+        $this->eventManager = ($eventManager instanceof EventManagerInterface)
+                            ? $eventManager
+                            : new EventManager;
+
+        $this->eventManager->addIdentifiers(array(
+            'Zend\Db\TableGateway\TableGateway',
+        ));
+
+        $this->event = ($tableGatewayEvent) ?: new EventFeature\TableGatewayEvent();
+    }
+
+    /**
+     * Retrieve composed event manager instance
+     *
+     * @return EventManagerInterface
+     */
+    public function getEventManager()
+    {
+        return $this->eventManager;
+    }
+
+    /**
+     * Retrieve composed event instance
+     *
+     * @return EventFeature\TableGatewayEvent
+     */
+    public function getEvent()
+    {
+        return $this->event;
+    }
+
+    /**
+     * Initialize feature and trigger "preInitialize" event
+     *
+     * Ensures that the composed TableGateway has identifiers based on the
+     * class name, and that the event target is set to the TableGateway
+     * instance. It then triggers the "preInitialize" event.
+     *
+     * @return void
+     */
+    public function preInitialize()
+    {
+        if (get_class($this->tableGateway) != 'Zend\Db\TableGateway\TableGateway') {
+            $this->eventManager->addIdentifiers(get_class($this->tableGateway));
+        }
+
+        $this->event->setTarget($this->tableGateway);
+        $this->event->setName(static::EVENT_PRE_INITIALIZE);
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "postInitialize" event
+     *
+     * @return void
+     */
+    public function postInitialize()
+    {
+        $this->event->setName(static::EVENT_POST_INITIALIZE);
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "preSelect" event
+     *
+     * Triggers the "preSelect" event mapping the following parameters:
+     * - $select as "select"
+     *
+     * @param  Select $select
+     * @return void
+     */
+    public function preSelect(Select $select)
+    {
+        $this->event->setName(static::EVENT_PRE_SELECT);
+        $this->event->setParams(array('select' => $select));
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "postSelect" event
+     *
+     * Triggers the "postSelect" event mapping the following parameters:
+     * - $statement as "statement"
+     * - $result as "result"
+     * - $resultSet as "result_set"
+     *
+     * @param  StatementInterface $statement
+     * @param  ResultInterface $result
+     * @param  ResultSetInterface $resultSet
+     * @return void
+     */
+    public function postSelect(StatementInterface $statement, ResultInterface $result, ResultSetInterface $resultSet)
+    {
+        $this->event->setName(static::EVENT_POST_SELECT);
+        $this->event->setParams(array(
+            'statement' => $statement,
+            'result' => $result,
+            'result_set' => $resultSet
+        ));
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "preInsert" event
+     *
+     * Triggers the "preInsert" event mapping the following parameters:
+     * - $insert as "insert"
+     *
+     * @param  Insert $insert
+     * @return void
+     */
+    public function preInsert(Insert $insert)
+    {
+        $this->event->setName(static::EVENT_PRE_INSERT);
+        $this->event->setParams(array('insert' => $insert));
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "postInsert" event
+     *
+     * Triggers the "postInsert" event mapping the following parameters:
+     * - $statement as "statement"
+     * - $result as "result"
+     *
+     * @param  StatementInterface $statement
+     * @param  ResultInterface $result
+     * @return void
+     */
+    public function postInsert(StatementInterface $statement, ResultInterface $result)
+    {
+        $this->event->setName(static::EVENT_POST_INSERT);
+        $this->event->setParams(array(
+            'statement' => $statement,
+            'result' => $result,
+        ));
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "preUpdate" event
+     *
+     * Triggers the "preUpdate" event mapping the following parameters:
+     * - $update as "update"
+     *
+     * @param  Update $update
+     * @return void
+     */
+    public function preUpdate(Update $update)
+    {
+        $this->event->setName(static::EVENT_PRE_UPDATE);
+        $this->event->setParams(array('update' => $update));
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "postUpdate" event
+     *
+     * Triggers the "postUpdate" event mapping the following parameters:
+     * - $statement as "statement"
+     * - $result as "result"
+     *
+     * @param  StatementInterface $statement
+     * @param  ResultInterface $result
+     * @return void
+     */
+    public function postUpdate(StatementInterface $statement, ResultInterface $result)
+    {
+        $this->event->setName(static::EVENT_POST_UPDATE);
+        $this->event->setParams(array(
+            'statement' => $statement,
+            'result' => $result,
+        ));
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "preDelete" event
+     *
+     * Triggers the "preDelete" event mapping the following parameters:
+     * - $delete as "delete"
+     *
+     * @param  Delete $delete
+     * @return void
+     */
+    public function preDelete(Delete $delete)
+    {
+        $this->event->setName(static::EVENT_PRE_DELETE);
+        $this->event->setParams(array('delete' => $delete));
+        $this->eventManager->trigger($this->event);
+    }
+
+    /**
+     * Trigger the "postDelete" event
+     *
+     * Triggers the "postDelete" event mapping the following parameters:
+     * - $statement as "statement"
+     * - $result as "result"
+     *
+     * @param  StatementInterface $statement
+     * @param  ResultInterface $result
+     * @return void
+     */
+    public function postDelete(StatementInterface $statement, ResultInterface $result)
+    {
+        $this->event->setName(static::EVENT_POST_DELETE);
+        $this->event->setParams(array(
+            'statement' => $statement,
+            'result' => $result,
+        ));
+        $this->eventManager->trigger($this->event);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18572,18 +19221,24 @@ class Sql
         return $statement;
     }
 
+    /**
+     * Get sql string using platform or sql object
+     *
+     * @param SqlInterface      $sqlObject
+     * @param PlatformInterface $platform
+     *
+     * @return string
+     */
     public function getSqlStringForSqlObject(SqlInterface $sqlObject, PlatformInterface $platform = null)
     {
         $platform = ($platform) ?: $this->adapter->getPlatform();
 
         if ($this->sqlPlatform) {
             $this->sqlPlatform->setSubject($sqlObject);
-            $sqlString = $this->sqlPlatform->getSqlString($platform);
-        } else {
-            $sqlString = $sqlObject->getSqlString($platform);
+            return $this->sqlPlatform->getSqlString($platform);
         }
 
-        return $sqlString;
+        return $sqlObject->getSqlString($platform);
     }
 }
 
@@ -18591,7 +19246,7 @@ class Sql
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18606,7 +19261,7 @@ interface PlatformDecoratorInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18617,7 +19272,6 @@ use Zend\Db\Adapter\StatementContainerInterface;
 
 interface PreparableSqlInterface
 {
-
     /**
      * @param AdapterInterface $adapter
      * @param StatementContainerInterface $statementContainer
@@ -18630,7 +19284,7 @@ interface PreparableSqlInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18640,6 +19294,11 @@ use Zend\Db\Adapter\Platform\PlatformInterface;
 
 interface SqlInterface
 {
+    /**
+     * @param PlatformInterface $adapterPlatform
+     *
+     * @return string
+     */
     public function getSqlString(PlatformInterface $adapterPlatform = null);
 }
 
@@ -18647,7 +19306,7 @@ interface SqlInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18757,7 +19416,7 @@ class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInter
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18803,7 +19462,7 @@ class Platform extends AbstractPlatform
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18824,12 +19483,13 @@ class Mysql extends AbstractPlatform
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
 namespace Zend\Db\Sql;
 
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\Driver\DriverInterface;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
@@ -18876,7 +19536,6 @@ abstract class AbstractSql
         $expressionParamIndex = &$this->instanceParameterIndex[$namedParameterPrefix];
 
         foreach ($parts as $part) {
-
             // if it is a string, simply tack it onto the return sql "specification" string
             if (is_string($part)) {
                 $sql .= $part;
@@ -18908,7 +19567,6 @@ abstract class AbstractSql
                         $parameterContainer->merge($innerStatementContainer->getParameterContainer());
                     }
                 } elseif (isset($types[$vIndex]) && $types[$vIndex] == ExpressionInterface::TYPE_VALUE) {
-
                     // if prepareType is set, it means that this particular value must be
                     // passed back to the statement in a way it can be used as a placeholder value
                     if ($driver) {
@@ -18999,9 +19657,9 @@ abstract class AbstractSql
                 /** @var Select|PlatformDecoratorInterface $subselectDecorator */
                 $subselectDecorator = clone $this;
                 $subselectDecorator->setSubject($subselect);
-                $subselectDecorator->prepareStatement(new \Zend\Db\Adapter\Adapter($driver, $platform), $stmtContainer);
+                $subselectDecorator->prepareStatement(new Adapter($driver, $platform), $stmtContainer);
             } else {
-                $subselect->prepareStatement(new \Zend\Db\Adapter\Adapter($driver, $platform), $stmtContainer);
+                $subselect->prepareStatement(new Adapter($driver, $platform), $stmtContainer);
             }
 
             // copy count
@@ -19026,7 +19684,7 @@ abstract class AbstractSql
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -19230,9 +19888,9 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     public function quantifier($quantifier)
     {
-        if (!is_string($quantifier) && !$quantifier instanceof Expression) {
+        if (!is_string($quantifier) && !$quantifier instanceof ExpressionInterface) {
             throw new Exception\InvalidArgumentException(
-                'Quantifier must be one of DISTINCT, ALL, or some platform specific Expression object'
+                'Quantifier must be one of DISTINCT, ALL, or some platform specific object implementing ExpressionInterface'
             );
         }
         $this->quantifier = $quantifier;
@@ -19653,7 +20311,6 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
         // process table columns
         $columns = array();
         foreach ($this->columns as $columnIndexOrAs => $column) {
-
             $columnName = '';
             if ($column === self::SQL_STAR) {
                 $columns[] = array($fromTable . self::SQL_STAR);
@@ -19847,7 +20504,7 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
         }
         $orders = array();
         foreach ($this->order as $k => $v) {
-            if ($v instanceof Expression) {
+            if ($v instanceof ExpressionInterface) {
                 /** @var $orderParts \Zend\Db\Adapter\StatementContainer */
                 $orderParts = $this->processExpression($v, $platform, $driver);
                 if ($parameterContainer) {
@@ -19966,7 +20623,7 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -20237,7 +20894,7 @@ class Update extends AbstractSql implements SqlInterface, PreparableSqlInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -20609,7 +21266,7 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -20814,7 +21471,7 @@ class Delete extends AbstractSql implements SqlInterface, PreparableSqlInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -20911,7 +21568,7 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -20947,7 +21604,7 @@ interface ExpressionInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -20957,14 +21614,13 @@ use Zend\Db\Sql\ExpressionInterface;
 
 interface PredicateInterface extends ExpressionInterface
 {
-
 }
 
 /**
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -21121,7 +21777,6 @@ class PredicateSet implements PredicateInterface, Countable
     {
         $parts = array();
         for ($i = 0, $count = count($this->predicates); $i < $count; $i++) {
-
             /** @var $predicate PredicateInterface */
             $predicate = $this->predicates[$i][1];
 
@@ -21157,7 +21812,7 @@ class PredicateSet implements PredicateInterface, Countable
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -21214,9 +21869,9 @@ class Predicate extends PredicateSet
         if ($this->unnest == null) {
             throw new RuntimeException('Not nested');
         }
-        $unnset       = $this->unnest;
+        $unnest       = $this->unnest;
         $this->unnest = null;
-        return $unnset;
+        return $unnest;
     }
 
     /**
@@ -21566,7 +22221,7 @@ class Predicate extends PredicateSet
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -21574,7 +22229,6 @@ namespace Zend\Db\Sql\Predicate;
 
 class IsNull implements PredicateInterface
 {
-
     /**
      * @var string
      */
@@ -21660,7 +22314,7 @@ class IsNull implements PredicateInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -21878,7 +22532,7 @@ class Operator implements PredicateInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -21934,7 +22588,7 @@ class Literal implements ExpressionInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -21944,14 +22598,13 @@ use Zend\Db\Sql\Literal as BaseLiteral;
 
 class Literal extends BaseLiteral implements PredicateInterface
 {
-
 }
 
 /**
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22104,7 +22757,7 @@ class Expression implements ExpressionInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22114,7 +22767,6 @@ use Zend\Db\Sql\Expression as BaseExpression;
 
 class Expression extends BaseExpression implements PredicateInterface
 {
-
     /**
      * Constructor
      *
@@ -22127,18 +22779,7 @@ class Expression extends BaseExpression implements PredicateInterface
             $this->setExpression($expression);
         }
 
-        if (is_array($valueParameter)) {
-            $this->setParameters($valueParameter);
-        } else {
-            $argNum = func_num_args();
-            if ($argNum > 2 || is_scalar($valueParameter)) {
-                $parameters = array();
-                for ($i = 1; $i < $argNum; $i++) {
-                    $parameters[] = func_get_arg($i);
-                }
-                $this->setParameters($parameters);
-            }
-        }
+        $this->setParameters(is_array($valueParameter) ? $valueParameter : array_slice(func_get_args(), 1));
     }
 }
 
@@ -22146,7 +22787,7 @@ class Expression extends BaseExpression implements PredicateInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22154,14 +22795,13 @@ namespace Zend\Db\Sql;
 
 class Where extends Predicate\Predicate
 {
-
 }
 
 /**
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22169,14 +22809,13 @@ namespace Zend\Db\Sql;
 
 class Having extends Predicate\Predicate
 {
-
 }
 
 /**
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22192,7 +22831,7 @@ interface SqlInterface extends BaseSqlInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22410,7 +23049,7 @@ class CreateTable extends AbstractSql implements SqlInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22496,7 +23135,7 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22642,7 +23281,7 @@ abstract class Serializer
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22703,7 +23342,7 @@ class AdapterPluginManager extends AbstractPluginManager
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22734,7 +23373,7 @@ interface AdapterInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22793,7 +23432,7 @@ abstract class AbstractAdapter implements AdapterInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22838,9 +23477,7 @@ class PhpSerialize extends AbstractAdapter
         $ret = serialize($value);
         $err = ErrorHandler::stop();
         if ($err) {
-            throw new Exception\RuntimeException(
-                'Serialization failed', 0, $err
-            );
+            throw new Exception\RuntimeException('Serialization failed', 0, $err);
         }
 
         return $ret;
@@ -22881,7 +23518,7 @@ class PhpSerialize extends AbstractAdapter
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22996,7 +23633,7 @@ abstract class ErrorHandler
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -23056,7 +23693,36 @@ class PostEvent extends Event
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Cache\Exception;
+
+interface ExceptionInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Cache\Exception;
+
+class InvalidArgumentException extends \InvalidArgumentException implements
+    ExceptionInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -23077,7 +23743,7 @@ interface AdapterInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -23631,7 +24297,7 @@ class Message
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -23806,7 +24472,6 @@ class Headers implements Countable, Iterator
             } elseif (is_string($name)) {
                 $this->addHeaderLine($name, $value);
             }
-
         }
 
         return $this;
@@ -23931,6 +24596,7 @@ class Headers implements Countable, Iterator
                 } else {
                     return $results[0];
                 }
+                //fall-trough
             default:
                 return new ArrayIterator($results);
         }
@@ -24116,7 +24782,7 @@ class Headers implements Countable, Iterator
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24137,7 +24803,6 @@ interface HeaderInterface
      * @var bool
      */
     const FORMAT_RAW     = false;
-
 
     /**
      * Factory to generate a header object from a string
@@ -24193,7 +24858,7 @@ interface HeaderInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24210,7 +24875,7 @@ interface UnstructuredInterface extends HeaderInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24365,7 +25030,7 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24460,7 +25125,7 @@ abstract class HeaderWrap
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24505,7 +25170,7 @@ class HeaderLoader extends PluginClassLoader
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24571,7 +25236,7 @@ class Date implements HeaderInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24739,7 +25404,7 @@ abstract class AbstractAddressList implements HeaderInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24755,7 +25420,7 @@ class To extends AbstractAddressList
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24771,7 +25436,7 @@ class From extends AbstractAddressList
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24787,7 +25452,7 @@ class Bcc extends AbstractAddressList
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24803,7 +25468,7 @@ class Cc extends AbstractAddressList
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24933,7 +25598,7 @@ class Sender implements HeaderInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -25013,7 +25678,7 @@ class Subject implements UnstructuredInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -25097,7 +25762,7 @@ class MimeVersion implements HeaderInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -25274,12 +25939,11 @@ class ContentType implements HeaderInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
 namespace Zend\Mail\Header;
-
 
 class ContentTransferEncoding implements HeaderInterface
 {
@@ -25299,7 +25963,6 @@ class ContentTransferEncoding implements HeaderInterface
          * x-token: 'X-'
          */
     );
-
 
     /**
      * @var string
@@ -25391,7 +26054,7 @@ class ContentTransferEncoding implements HeaderInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -25408,7 +26071,7 @@ interface AddressInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -25482,7 +26145,7 @@ class Address implements Address\AddressInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -25699,7 +26362,7 @@ class AddressList implements Countable, Iterator
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -25725,7 +26388,7 @@ interface TransportInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -25886,7 +26549,6 @@ class Smtp implements TransportInterface
         $this->connection = $connection;
     }
 
-
     /**
      * Gets the connection protocol instance
      *
@@ -25937,11 +26599,13 @@ class Smtp implements TransportInterface
         $body       = $this->prepareBody($message);
 
         if ((count($recipients) == 0) && (!empty($headers) || !empty($body))) {
-            throw new Exception\RuntimeException(  // Per RFC 2821 3.3 (page 18)
+            // Per RFC 2821 3.3 (page 18)
+            throw new Exception\RuntimeException(
                 sprintf(
                     '%s transport expects at least one recipient if the message has at least one header or body',
                     __CLASS__
-                ));
+                )
+            );
         }
 
         // Set sender email address
@@ -26069,7 +26733,7 @@ class Smtp implements TransportInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -26250,7 +26914,7 @@ class SmtpOptions extends AbstractOptions
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -26306,7 +26970,7 @@ class SmtpPluginManager extends AbstractPluginManager
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -26326,7 +26990,6 @@ abstract class AbstractProtocol
      */
     const EOL = "\r\n";
 
-
     /**
      * Default timeout in seconds for initiating session
      */
@@ -26338,13 +27001,11 @@ abstract class AbstractProtocol
      */
     protected $maximumLog = 64;
 
-
     /**
      * Hostname or IP address of remote server
      * @var string
      */
     protected $host;
-
 
     /**
      * Port number of connection
@@ -26352,13 +27013,11 @@ abstract class AbstractProtocol
      */
     protected $port;
 
-
     /**
      * Instance of Zend\Validator\ValidatorChain to check hostnames
      * @var \Zend\Validator\ValidatorChain
      */
     protected $validHost;
-
 
     /**
      * Socket connection resource
@@ -26366,13 +27025,11 @@ abstract class AbstractProtocol
      */
     protected $socket;
 
-
     /**
      * Last request sent to server
      * @var string
      */
     protected $request;
-
 
     /**
      * Array of server responses to last request
@@ -26380,13 +27037,11 @@ abstract class AbstractProtocol
      */
     protected $response;
 
-
     /**
      * Log of mail requests and server responses for a session
      * @var array
      */
     private $log = array();
-
 
     /**
      * Constructor.
@@ -26408,7 +27063,6 @@ abstract class AbstractProtocol
         $this->port = $port;
     }
 
-
     /**
      * Class destructor to cleanup open resources
      *
@@ -26428,7 +27082,6 @@ abstract class AbstractProtocol
         $this->maximumLog = (int) $maximumLog;
     }
 
-
     /**
      * Get the maximum log size
      *
@@ -26439,14 +27092,12 @@ abstract class AbstractProtocol
         return $this->maximumLog;
     }
 
-
     /**
      * Create a connection to the remote host
      *
      * Concrete adapters for this class will implement their own unique connect scripts, using the _connect() method to create the socket resource.
      */
     abstract public function connect();
-
 
     /**
      * Retrieve the last client request
@@ -26458,7 +27109,6 @@ abstract class AbstractProtocol
         return $this->request;
     }
 
-
     /**
      * Retrieve the last server response
      *
@@ -26469,7 +27119,6 @@ abstract class AbstractProtocol
         return $this->response;
     }
 
-
     /**
      * Retrieve the transaction log
      *
@@ -26479,7 +27128,6 @@ abstract class AbstractProtocol
     {
         return implode('', $this->log);
     }
-
 
     /**
      * Reset the transaction log
@@ -26535,7 +27183,6 @@ abstract class AbstractProtocol
         return $result;
     }
 
-
     /**
      * Disconnect from remote host and free resource
      *
@@ -26546,7 +27193,6 @@ abstract class AbstractProtocol
             fclose($this->socket);
         }
     }
-
 
     /**
      * Send the given request followed by a LINEEND to the server.
@@ -26575,7 +27221,6 @@ abstract class AbstractProtocol
         return $result;
     }
 
-
     /**
      * Get a line from the stream.
      *
@@ -26591,7 +27236,7 @@ abstract class AbstractProtocol
 
         // Adapters may wish to supply per-commend timeouts according to appropriate RFC
         if ($timeout !== null) {
-           stream_set_timeout($this->socket, $timeout);
+            stream_set_timeout($this->socket, $timeout);
         }
 
         // Retrieve response
@@ -26613,7 +27258,6 @@ abstract class AbstractProtocol
 
         return $response;
     }
-
 
     /**
      * Parse server response for successful codes
@@ -26644,7 +27288,6 @@ abstract class AbstractProtocol
             } elseif ($cmd === null || !in_array($cmd, $code)) {
                 $errMsg =  $msg;
             }
-
         } while (strpos($more, '-') === 0); // The '-' message prefix indicates an information string instead of a response string.
 
         if ($errMsg !== '') {
@@ -26659,7 +27302,7 @@ abstract class AbstractProtocol
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -26679,14 +27322,12 @@ class Smtp extends AbstractProtocol
      */
     protected $transport = 'tcp';
 
-
     /**
      * Indicates that a session is requested to be secure
      *
      * @var string
      */
     protected $secure;
-
 
     /**
      * Indicates an smtp session has been started by the HELO command
@@ -26695,14 +27336,12 @@ class Smtp extends AbstractProtocol
      */
     protected $sess = false;
 
-
     /**
      * Indicates an smtp AUTH has been issued and authenticated
      *
      * @var bool
      */
     protected $auth = false;
-
 
     /**
      * Indicates a MAIL command has been issued
@@ -26711,7 +27350,6 @@ class Smtp extends AbstractProtocol
      */
     protected $mail = false;
 
-
     /**
      * Indicates one or more RCTP commands have been issued
      *
@@ -26719,14 +27357,12 @@ class Smtp extends AbstractProtocol
      */
     protected $rcpt = false;
 
-
     /**
      * Indicates that DATA has been issued and sent
      *
      * @var bool
      */
     protected $data = null;
-
 
     /**
      * Constructor.
@@ -26910,7 +27546,6 @@ class Smtp extends AbstractProtocol
      */
     public function rcpt($to)
     {
-
         if ($this->mail !== true) {
             throw new Exception\RuntimeException('No sender reverse path has been supplied');
         }
@@ -26974,7 +27609,6 @@ class Smtp extends AbstractProtocol
         $this->data = false;
     }
 
-
     /**
      * Issues the NOOP command end validates answer
      *
@@ -26986,7 +27620,6 @@ class Smtp extends AbstractProtocol
         $this->_send('NOOP');
         $this->_expect(250, 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
     }
-
 
     /**
      * Issues the VRFY command end validates answer
@@ -27000,7 +27633,6 @@ class Smtp extends AbstractProtocol
         $this->_send('VRFY ' . $user);
         $this->_expect(array(250, 251, 252), 300); // Timeout set for 5 minutes as per RFC 2821 4.5.3.2
     }
-
 
     /**
      * Issues the QUIT command and clears the current session
@@ -27016,7 +27648,6 @@ class Smtp extends AbstractProtocol
         }
     }
 
-
     /**
      * Default authentication method
      *
@@ -27030,7 +27661,6 @@ class Smtp extends AbstractProtocol
             throw new Exception\RuntimeException('Already authenticated for this session');
         }
     }
-
 
     /**
      * Closes connection
@@ -27060,7 +27690,6 @@ class Smtp extends AbstractProtocol
         $this->sess = true;
     }
 
-
     /**
      * Stop mail session
      *
@@ -27075,7 +27704,7 @@ class Smtp extends AbstractProtocol
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -27095,14 +27724,12 @@ class Login extends Smtp
      */
     protected $username;
 
-
     /**
      * LOGIN password
      *
      * @var string
      */
     protected $password;
-
 
     /**
      * Constructor.
@@ -27136,7 +27763,6 @@ class Login extends Smtp
         // Call parent with original arguments
         parent::__construct($host, $port, $origConfig);
     }
-
 
     /**
      * Perform LOGIN authentication with supplied credentials
@@ -27205,7 +27831,7 @@ class Login extends Smtp
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -27229,7 +27855,6 @@ class Part
     protected $content;
     protected $isStream = false;
     protected $filters = array();
-
 
     /**
      * create a new Mime Part.
@@ -27262,7 +27887,7 @@ class Part
      */
     public function isStream()
     {
-      return $this->isStream;
+        return $this->isStream;
     }
 
     /**
@@ -27331,9 +27956,14 @@ class Part
     public function getContent($EOL = Mime::LINEEND)
     {
         if ($this->isStream) {
-            $encodedStream = $this->getEncodedStream($EOL);
+            $encodedStream         = $this->getEncodedStream($EOL);
             $encodedStreamContents = stream_get_contents($encodedStream);
-            rewind($encodedStream);
+            $streamMetaData        = stream_get_meta_data($encodedStream);
+
+            if (isset($streamMetaData['seekable']) && $streamMetaData['seekable']) {
+                rewind($encodedStream);
+            }
+
             return $encodedStreamContents;
         }
         return Mime::encode($this->content, $this->encoding, $EOL);
@@ -27426,7 +28056,7 @@ class Part
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -27775,7 +28405,7 @@ class Mime
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -27783,7 +28413,6 @@ namespace Zend\Mime;
 
 class Message
 {
-
     protected $parts = array();
     protected $mime = null;
 
@@ -27997,7 +28626,6 @@ class Message
 
         $res = new static();
         foreach ($parts as $part) {
-
             // now we build a new MimePart for the current Message Part:
             $properties = array();
             foreach ($part['header'] as $header) {
@@ -28064,7 +28692,7 @@ class Message
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -28175,7 +28803,7 @@ interface StringWrapperInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -28238,7 +28866,6 @@ abstract class AbstractStringWrapper implements StringWrapperInterface
                 'Wrapper doesn\'t support character encoding "' . $encoding . '"'
             );
         }
-
 
         if ($convertEncoding !== null) {
             $convertEncodingUpper = strtoupper($convertEncoding);
@@ -28445,7 +29072,7 @@ abstract class AbstractStringWrapper implements StringWrapperInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -28566,7 +29193,7 @@ class MbString extends AbstractStringWrapper
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -28582,7 +29209,6 @@ use Zend\Stdlib\StringWrapper\StringWrapperInterface;
  */
 abstract class StringUtils
 {
-
     /**
      * Ordered list of registered string wrapper instances
      *
@@ -28754,7 +29380,7 @@ abstract class StringUtils
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -28792,7 +29418,7 @@ interface ValidatorInterface
  * Zend Framework (http://framework.zend.com/)
  *;
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -28861,7 +29487,7 @@ interface TranslatorAwareInterface
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -29106,21 +29732,17 @@ abstract class AbstractValidator implements
         if (array_key_exists($property, $this->abstractOptions['messageVariables'])) {
             $result = $this->abstractOptions['messageVariables'][$property];
             if (is_array($result)) {
-                $result = $this->{key($result)}[current($result)];
-            } else {
-                $result = $this->{$result};
+                return $this->{key($result)}[current($result)];
             }
-            return $result;
+            return $this->{$result};
         }
 
         if (isset($this->messageVariables) && array_key_exists($property, $this->messageVariables)) {
             $result = $this->{$this->messageVariables[$property]};
             if (is_array($result)) {
-                $result = $this->{key($result)}[current($result)];
-            } else {
-                $result = $this->{$result};
+                return $this->{key($result)}[current($result)];
             }
-            return $result;
+            return $this->{$result};
         }
 
         throw new Exception\InvalidArgumentException("No property exists by the name '$property'");
@@ -29326,9 +29948,7 @@ abstract class AbstractValidator implements
      * @return void
      * @throws Exception\InvalidArgumentException
      */
-    public static function setDefaultTranslator(
-        Translator\TranslatorInterface $translator = null, $textDomain = null
-    )
+    public static function setDefaultTranslator(Translator\TranslatorInterface $translator = null, $textDomain = null)
     {
         static::$defaultTranslator = $translator;
         if (null !== $textDomain) {
@@ -29433,9 +30053,7 @@ abstract class AbstractValidator implements
             return $message;
         }
 
-        return $translator->translate(
-            $message, $this->getTranslatorTextDomain()
-        );
+        return $translator->translate($message, $this->getTranslatorTextDomain());
     }
 }
 
@@ -29443,7 +30061,7 @@ abstract class AbstractValidator implements
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -29722,13 +30340,12 @@ class ValidatorChain implements
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
 namespace Zend\Validator;
 
-use Zend\Stdlib\ErrorHandler;
 use Zend\Stdlib\StringUtils;
 
 /**
@@ -29793,41 +30410,758 @@ class Hostname extends AbstractValidator
      * @var array
      */
     protected $validTlds = array(
-        'ac', 'academy', 'actor', 'ad', 'ae', 'aero', 'af', 'ag', 'agency', 'ai', 'al', 'am', 'an', 'ao', 'aq', 'ar',
-        'arpa', 'as', 'asia', 'at', 'au', 'aw', 'ax', 'az', 'ba', 'bar', 'bargains', 'bb', 'bd', 'be', 'berlin', 'best',
-        'bf', 'bg', 'bh', 'bi', 'bike', 'biz', 'bj', 'bl', 'blue', 'bm', 'bn', 'bo', 'boutique', 'bq', 'br', 'bs', 'bt',
-        'build', 'builders', 'buzz', 'bv', 'bw', 'by', 'bz', 'ca', 'cab', 'camera', 'camp', 'cards', 'careers', 'cat',
-        'catering', 'cc', 'cd', 'center', 'ceo', 'cf', 'cg', 'ch', 'cheap', 'christmas', 'ci', 'ck', 'cl', 'cleaning',
-        'clothing', 'club', 'cm', 'cn', 'co', 'codes', 'coffee', 'com', 'community', 'company', 'computer',
-        'construction', 'contractors', 'cool', 'coop', 'cr', 'cruises', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz', 'dance',
-        'dating', 'de', 'democrat', 'diamonds', 'directory', 'dj', 'dk', 'dm', 'do', 'domains', 'dz', 'ec', 'edu',
-        'education', 'ee', 'eg', 'eh', 'email', 'enterprises', 'equipment', 'er', 'es', 'estate', 'et', 'eu', 'events',
-        'expert', 'exposed', 'farm', 'fi', 'fish', 'fj', 'fk', 'flights', 'florist', 'fm', 'fo', 'foundation', 'fr',
-        'futbol', 'ga', 'gallery', 'gb', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gift', 'gl', 'glass', 'gm', 'gn', 'gov',
-        'gp', 'gq', 'gr', 'graphics', 'gs', 'gt', 'gu', 'guitars', 'guru', 'gw', 'gy', 'hk', 'hm', 'hn', 'holdings',
-        'holiday', 'house', 'hr', 'ht', 'hu', 'id', 'ie', 'il', 'im', 'immobilien', 'in', 'industries', 'info',
-        'institute', 'int', 'international', 'io', 'iq', 'ir', 'is', 'it', 'je', 'jm', 'jo', 'jobs', 'jp', 'kaufen',
-        'ke', 'kg', 'kh', 'ki', 'kim', 'kitchen', 'kiwi', 'km', 'kn', 'kp', 'kr', 'kred', 'kw', 'ky', 'kz', 'la',
-        'land', 'lb', 'lc', 'li', 'lighting', 'limo', 'link', 'lk', 'lr', 'ls', 'lt', 'lu', 'luxury', 'lv', 'ly', 'ma',
-        'management', 'mango', 'marketing', 'mc', 'md', 'me', 'menu', 'mf', 'mg', 'mh', 'mil', 'mk', 'ml', 'mm', 'mn',
-        'mo', 'mobi', 'moda', 'monash', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'museum', 'mv', 'mw', 'mx', 'my', 'mz',
-        'na', 'nagoya', 'name', 'nc', 'ne', 'net', 'neustar', 'nf', 'ng', 'ni', 'ninja', 'nl', 'no', 'np', 'nr', 'nu',
-        'nz', 'om', 'onl', 'org', 'pa', 'partners', 'parts', 'pe', 'pf', 'pg', 'ph', 'photo', 'photography', 'photos',
-        'pics', 'pink', 'pk', 'pl', 'plumbing', 'pm', 'pn', 'post', 'pr', 'pro', 'productions', 'properties', 'ps',
-        'pt', 'pub', 'pw', 'py', 'qa', 'qpon', 're', 'recipes', 'red', 'rentals', 'repair', 'report', 'reviews', 'rich',
-        'ro', 'rs', 'ru', 'ruhr', 'rw', 'sa', 'sb', 'sc', 'sd', 'se', 'sexy', 'sg', 'sh', 'shiksha', 'shoes', 'si',
-        'singles', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'social', 'solar', 'solutions', 'sr', 'ss', 'st', 'su',
-        'supplies', 'supply', 'support', 'sv', 'sx', 'sy', 'systems', 'sz', 'tattoo', 'tc', 'td', 'technology', 'tel',
-        'tf', 'tg', 'th', 'tienda', 'tips', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'today', 'tokyo', 'tools', 'tp', 'tr',
-        'training', 'travel', 'tt', 'tv', 'tw', 'tz', 'ua', 'ug', 'uk', 'um', 'uno', 'us', 'uy', 'uz', 'va',
-        'vacations', 'vc', 've', 'ventures', 'vg', 'vi', 'viajes', 'villas', 'vision', 'vn', 'voting', 'voyage', 'vu',
-        'wang', 'watch', 'wed', 'wf', 'wien', 'wiki', 'works', 'ws', '测试', 'परीक्षा', '集团', '在线', '한국', 'ভারত',
-        'বাংলা', '公益', '公司', '移动', '我爱你', 'испытание', 'қаз', 'онлайн', 'сайт', 'срб', '테스트', '삼성',
-        'சிங்கப்பூர்', 'дети', 'טעסט', '中文网', '中信', '中国', '中國', 'భారత్', 'ලංකා', '測試', 'ભારત', 'भारत',
-        'آزمایشی', 'பரிட்சை', '网络', 'укр', '香港', 'δοκιμή', 'إختبار', '台湾', '台灣', 'мон',
-        'الجزائر', 'عمان', 'ایران', 'امارات', 'بازار', 'پاکستان', 'الاردن', 'بھارت', 'المغرب', 'السعودية', 'سودان', 'مليسيا', 'شبكة', 'გე',
-        'ไทย', 'سورية', 'рф', 'تونس', 'みんな', 'ਭਾਰਤ', '游戏', 'مصر', 'قطر', 'இலங்கை', 'இந்தியா', '新加坡', 'فلسطين',
-        'テスト', '政务', 'xxx', 'xyz', 'ye', 'yt', 'za', 'zm', 'zone', 'zw'
+        'abogado',
+        'ac',
+        'academy',
+        'accountants',
+        'active',
+        'actor',
+        'ad',
+        'ae',
+        'aero',
+        'af',
+        'ag',
+        'agency',
+        'ai',
+        'airforce',
+        'al',
+        'allfinanz',
+        'alsace',
+        'am',
+        'an',
+        'android',
+        'ao',
+        'aq',
+        'ar',
+        'archi',
+        'army',
+        'arpa',
+        'as',
+        'asia',
+        'associates',
+        'at',
+        'attorney',
+        'au',
+        'auction',
+        'audio',
+        'autos',
+        'aw',
+        'ax',
+        'axa',
+        'az',
+        'ba',
+        'band',
+        'bar',
+        'bargains',
+        'bayern',
+        'bb',
+        'bd',
+        'be',
+        'beer',
+        'berlin',
+        'best',
+        'bf',
+        'bg',
+        'bh',
+        'bi',
+        'bid',
+        'bike',
+        'bio',
+        'biz',
+        'bj',
+        'black',
+        'blackfriday',
+        'bloomberg',
+        'blue',
+        'bm',
+        'bmw',
+        'bn',
+        'bnpparibas',
+        'bo',
+        'boo',
+        'boutique',
+        'br',
+        'brussels',
+        'bs',
+        'bt',
+        'budapest',
+        'build',
+        'builders',
+        'business',
+        'buzz',
+        'bv',
+        'bw',
+        'by',
+        'bz',
+        'bzh',
+        'ca',
+        'cab',
+        'cal',
+        'camera',
+        'camp',
+        'cancerresearch',
+        'capetown',
+        'capital',
+        'caravan',
+        'cards',
+        'care',
+        'career',
+        'careers',
+        'casa',
+        'cash',
+        'cat',
+        'catering',
+        'cc',
+        'cd',
+        'center',
+        'ceo',
+        'cern',
+        'cf',
+        'cg',
+        'ch',
+        'channel',
+        'cheap',
+        'christmas',
+        'chrome',
+        'church',
+        'ci',
+        'citic',
+        'city',
+        'ck',
+        'cl',
+        'claims',
+        'cleaning',
+        'click',
+        'clinic',
+        'clothing',
+        'club',
+        'cm',
+        'cn',
+        'co',
+        'coach',
+        'codes',
+        'coffee',
+        'college',
+        'cologne',
+        'com',
+        'community',
+        'company',
+        'computer',
+        'condos',
+        'construction',
+        'consulting',
+        'contractors',
+        'cooking',
+        'cool',
+        'coop',
+        'country',
+        'cr',
+        'credit',
+        'creditcard',
+        'cricket',
+        'crs',
+        'cruises',
+        'cu',
+        'cuisinella',
+        'cv',
+        'cw',
+        'cx',
+        'cy',
+        'cymru',
+        'cz',
+        'dad',
+        'dance',
+        'dating',
+        'day',
+        'de',
+        'deals',
+        'degree',
+        'delivery',
+        'democrat',
+        'dental',
+        'dentist',
+        'desi',
+        'diamonds',
+        'diet',
+        'digital',
+        'direct',
+        'directory',
+        'discount',
+        'dj',
+        'dk',
+        'dm',
+        'dnp',
+        'do',
+        'domains',
+        'durban',
+        'dvag',
+        'dz',
+        'eat',
+        'ec',
+        'edu',
+        'education',
+        'ee',
+        'eg',
+        'email',
+        'emerck',
+        'energy',
+        'engineer',
+        'engineering',
+        'enterprises',
+        'equipment',
+        'er',
+        'es',
+        'esq',
+        'estate',
+        'et',
+        'eu',
+        'eus',
+        'events',
+        'everbank',
+        'exchange',
+        'expert',
+        'exposed',
+        'fail',
+        'farm',
+        'feedback',
+        'fi',
+        'finance',
+        'financial',
+        'firmdale',
+        'fish',
+        'fishing',
+        'fitness',
+        'fj',
+        'fk',
+        'flights',
+        'florist',
+        'flsmidth',
+        'fly',
+        'fm',
+        'fo',
+        'foo',
+        'forsale',
+        'foundation',
+        'fr',
+        'frl',
+        'frogans',
+        'fund',
+        'furniture',
+        'futbol',
+        'ga',
+        'gal',
+        'gallery',
+        'gb',
+        'gbiz',
+        'gd',
+        'ge',
+        'gent',
+        'gf',
+        'gg',
+        'gh',
+        'gi',
+        'gift',
+        'gifts',
+        'gives',
+        'gl',
+        'glass',
+        'gle',
+        'global',
+        'globo',
+        'gm',
+        'gmail',
+        'gmo',
+        'gmx',
+        'gn',
+        'google',
+        'gop',
+        'gov',
+        'gp',
+        'gq',
+        'gr',
+        'graphics',
+        'gratis',
+        'green',
+        'gripe',
+        'gs',
+        'gt',
+        'gu',
+        'guide',
+        'guitars',
+        'guru',
+        'gw',
+        'gy',
+        'hamburg',
+        'haus',
+        'healthcare',
+        'help',
+        'here',
+        'hiphop',
+        'hiv',
+        'hk',
+        'hm',
+        'hn',
+        'holdings',
+        'holiday',
+        'homes',
+        'horse',
+        'host',
+        'hosting',
+        'house',
+        'how',
+        'hr',
+        'ht',
+        'hu',
+        'ibm',
+        'id',
+        'ie',
+        'il',
+        'im',
+        'immo',
+        'immobilien',
+        'in',
+        'industries',
+        'info',
+        'ing',
+        'ink',
+        'institute',
+        'insure',
+        'int',
+        'international',
+        'investments',
+        'io',
+        'iq',
+        'ir',
+        'is',
+        'it',
+        'je',
+        'jetzt',
+        'jm',
+        'jo',
+        'jobs',
+        'joburg',
+        'jp',
+        'juegos',
+        'kaufen',
+        'ke',
+        'kg',
+        'kh',
+        'ki',
+        'kim',
+        'kitchen',
+        'kiwi',
+        'km',
+        'kn',
+        'koeln',
+        'kp',
+        'kr',
+        'krd',
+        'kred',
+        'kw',
+        'ky',
+        'kz',
+        'la',
+        'lacaixa',
+        'land',
+        'lawyer',
+        'lb',
+        'lc',
+        'lds',
+        'lease',
+        'legal',
+        'lgbt',
+        'li',
+        'life',
+        'lighting',
+        'limited',
+        'limo',
+        'link',
+        'lk',
+        'loans',
+        'london',
+        'lotto',
+        'lr',
+        'ls',
+        'lt',
+        'ltda',
+        'lu',
+        'luxe',
+        'luxury',
+        'lv',
+        'ly',
+        'ma',
+        'madrid',
+        'maison',
+        'management',
+        'mango',
+        'market',
+        'marketing',
+        'mc',
+        'md',
+        'me',
+        'media',
+        'meet',
+        'melbourne',
+        'meme',
+        'memorial',
+        'menu',
+        'mg',
+        'mh',
+        'miami',
+        'mil',
+        'mini',
+        'mk',
+        'ml',
+        'mm',
+        'mn',
+        'mo',
+        'mobi',
+        'moda',
+        'moe',
+        'monash',
+        'money',
+        'mormon',
+        'mortgage',
+        'moscow',
+        'motorcycles',
+        'mov',
+        'mp',
+        'mq',
+        'mr',
+        'ms',
+        'mt',
+        'mu',
+        'museum',
+        'mv',
+        'mw',
+        'mx',
+        'my',
+        'mz',
+        'na',
+        'nagoya',
+        'name',
+        'navy',
+        'nc',
+        'ne',
+        'net',
+        'network',
+        'neustar',
+        'new',
+        'nexus',
+        'nf',
+        'ng',
+        'ngo',
+        'nhk',
+        'ni',
+        'ninja',
+        'nl',
+        'no',
+        'np',
+        'nr',
+        'nra',
+        'nrw',
+        'nu',
+        'nyc',
+        'nz',
+        'okinawa',
+        'om',
+        'ong',
+        'onl',
+        'ooo',
+        'org',
+        'organic',
+        'otsuka',
+        'ovh',
+        'pa',
+        'paris',
+        'partners',
+        'parts',
+        'party',
+        'pe',
+        'pf',
+        'pg',
+        'ph',
+        'pharmacy',
+        'photo',
+        'photography',
+        'photos',
+        'physio',
+        'pics',
+        'pictures',
+        'pink',
+        'pizza',
+        'pk',
+        'pl',
+        'place',
+        'plumbing',
+        'pm',
+        'pn',
+        'pohl',
+        'poker',
+        'post',
+        'pr',
+        'praxi',
+        'press',
+        'pro',
+        'prod',
+        'productions',
+        'prof',
+        'properties',
+        'property',
+        'ps',
+        'pt',
+        'pub',
+        'pw',
+        'py',
+        'qa',
+        'qpon',
+        'quebec',
+        're',
+        'realtor',
+        'recipes',
+        'red',
+        'rehab',
+        'reise',
+        'reisen',
+        'reit',
+        'ren',
+        'rentals',
+        'repair',
+        'report',
+        'republican',
+        'rest',
+        'restaurant',
+        'reviews',
+        'rich',
+        'rio',
+        'rip',
+        'ro',
+        'rocks',
+        'rodeo',
+        'rs',
+        'rsvp',
+        'ru',
+        'ruhr',
+        'rw',
+        'ryukyu',
+        'sa',
+        'saarland',
+        'sarl',
+        'sb',
+        'sc',
+        'sca',
+        'scb',
+        'schmidt',
+        'schule',
+        'science',
+        'scot',
+        'sd',
+        'se',
+        'services',
+        'sexy',
+        'sg',
+        'sh',
+        'shiksha',
+        'shoes',
+        'si',
+        'singles',
+        'sj',
+        'sk',
+        'sl',
+        'sm',
+        'sn',
+        'so',
+        'social',
+        'software',
+        'sohu',
+        'solar',
+        'solutions',
+        'soy',
+        'space',
+        'spiegel',
+        'sr',
+        'st',
+        'su',
+        'supplies',
+        'supply',
+        'support',
+        'surf',
+        'surgery',
+        'suzuki',
+        'sv',
+        'sx',
+        'sy',
+        'sydney',
+        'systems',
+        'sz',
+        'taipei',
+        'tatar',
+        'tattoo',
+        'tax',
+        'tc',
+        'td',
+        'technology',
+        'tel',
+        'tf',
+        'tg',
+        'th',
+        'tienda',
+        'tips',
+        'tirol',
+        'tj',
+        'tk',
+        'tl',
+        'tm',
+        'tn',
+        'to',
+        'today',
+        'tokyo',
+        'tools',
+        'top',
+        'town',
+        'toys',
+        'tp',
+        'tr',
+        'trade',
+        'training',
+        'travel',
+        'tt',
+        'tui',
+        'tv',
+        'tw',
+        'tz',
+        'ua',
+        'ug',
+        'uk',
+        'university',
+        'uno',
+        'uol',
+        'us',
+        'uy',
+        'uz',
+        'va',
+        'vacations',
+        'vc',
+        've',
+        'vegas',
+        'ventures',
+        'versicherung',
+        'vet',
+        'vg',
+        'vi',
+        'viajes',
+        'villas',
+        'vision',
+        'vlaanderen',
+        'vn',
+        'vodka',
+        'vote',
+        'voting',
+        'voto',
+        'voyage',
+        'vu',
+        'wales',
+        'wang',
+        'watch',
+        'webcam',
+        'website',
+        'wed',
+        'wedding',
+        'wf',
+        'whoswho',
+        'wien',
+        'wiki',
+        'williamhill',
+        'wme',
+        'work',
+        'works',
+        'world',
+        'ws',
+        'wtc',
+        'wtf',
+        '测试',
+        'परीक्षा',
+        '集团',
+        '在线',
+        '한국',
+        'ভারত',
+        'বাংলা',
+        '公益',
+        '公司',
+        '移动',
+        '我爱你',
+        'испытание',
+        'қаз',
+        'онлайн',
+        'сайт',
+        'срб',
+        '테스트',
+        '삼성',
+        'சிங்கப்பூர்',
+        'дети',
+        'טעסט',
+        '中文网',
+        '中信',
+        '中国',
+        '中國',
+        'భారత్',
+        'ලංකා',
+        '測試',
+        'ભારત',
+        'भारत',
+        'آزمایشی',
+         'பரிட்சை',
+        '网络',
+        'укр',
+        '香港',
+        'δοκιμή',
+        'إختبار',
+        '台湾',
+        '台灣',
+        'мон',
+        'الجزا',
+        'عمان',
+        'ایران',
+        'امارات',
+        'بازار',
+        'پاکستا',
+        'الاردن',
+        'بھارت',
+        'المغرب',
+        'السعودية',
+        'سودان',
+        'مليسيا',
+        'شبكة',
+        'გე',
+        'ไทย',
+        'سورية',
+        'рф',
+        'تونس',
+        'みんな',
+        'ਭਾਰਤ',
+        '游戏',
+        'مصر',
+        'قطر',
+        'இலங்கை',
+        'இந்தியா',
+        '新加坡',
+        'فلسطين',
+        'テスト',
+        '政务',
+        'xxx',
+        'xyz',
+        'yachts',
+        'yandex',
+        'ye',
+        'yoga',
+        'yokohama',
+        'youtube',
+        'yt',
+        'za',
+        'zip',
+        'zm',
+        'zone',
+        'zw'
     );
 
     /**
@@ -30197,15 +31531,15 @@ class Hostname extends AbstractValidator
 
         $this->setValue($value);
         // Check input against IP address schema
-        if (preg_match('/^[0-9a-f:.]*$/i', $value) && $this->getIpValidator()
-            ->setTranslator($this->getTranslator())
-            ->isValid($value)) {
+        if (preg_match('/^[0-9a-f:.]*$/i', $value)
+            && $this->getIpValidator()->setTranslator($this->getTranslator())->isValid($value)
+        ) {
             if (!($this->getAllow() & self::ALLOW_IP)) {
                 $this->error(self::IP_ADDRESS_NOT_ALLOWED);
                 return false;
-            } else {
-                return true;
             }
+
+            return true;
         }
 
         // Local hostnames are allowed to be partial (ending '.')
@@ -30223,26 +31557,27 @@ class Hostname extends AbstractValidator
         $domainParts = explode('.', $value);
 
         // Prevent partial IP V4 addresses (ending '.')
-        if ((count($domainParts) == 4) && preg_match('/^[0-9.a-e:.]*$/i', $value) && $this->getIpValidator()
-            ->setTranslator($this->getTranslator())
-            ->isValid($value)) {
+        if (count($domainParts) == 4 && preg_match('/^[0-9.a-e:.]*$/i', $value)
+            && $this->getIpValidator()->setTranslator($this->getTranslator())->isValid($value)
+        ) {
             $this->error(self::INVALID_LOCAL_NAME);
         }
 
         $utf8StrWrapper = StringUtils::getWrapper('UTF-8');
 
         // Check input against DNS hostname schema
-        if ((count($domainParts) > 1)
-            && ($utf8StrWrapper->strlen($value) >= 4)
-            && ($utf8StrWrapper->strlen($value) <= 254))
-        {
+        if (count($domainParts) > 1
+            && $utf8StrWrapper->strlen($value) >= 4
+            && $utf8StrWrapper->strlen($value) <= 254
+        ) {
             $status = false;
 
             do {
                 // First check TLD
                 $matches = array();
-                if (preg_match('/([^.]{2,10})$/iu', end($domainParts), $matches)
-                    || (array_key_exists(end($domainParts), $this->validIdns))) {
+                if (preg_match('/([^.]{2,63})$/iu', end($domainParts), $matches)
+                    || (array_key_exists(end($domainParts), $this->validIdns))
+                ) {
                     reset($domainParts);
 
                     // Hostname characters are: *(label dot)(label dot label); max 254 chars
@@ -30291,9 +31626,13 @@ class Hostname extends AbstractValidator
                         }
 
                         // Check dash (-) does not start, end or appear in 3rd and 4th positions
-                        if (($utf8StrWrapper->strpos($domainPart, '-') === 0)
-                            || (($utf8StrWrapper->strlen($domainPart) > 2) && ($utf8StrWrapper->strpos($domainPart, '-', 2) == 2) && ($utf8StrWrapper->strpos($domainPart, '-', 3) == 3))
-                            || ($utf8StrWrapper->strpos($domainPart, '-') === ($utf8StrWrapper->strlen($domainPart) - 1))) {
+                        if ($utf8StrWrapper->strpos($domainPart, '-') === 0
+                            || ($utf8StrWrapper->strlen($domainPart) > 2
+                                && $utf8StrWrapper->strpos($domainPart, '-', 2) == 2
+                                && $utf8StrWrapper->strpos($domainPart, '-', 3) == 3
+                            )
+                            || ($utf8StrWrapper->strpos($domainPart, '-') === ($utf8StrWrapper->strlen($domainPart) - 1))
+                        ) {
                             $this->error(self::INVALID_DASH);
                             $status = false;
                             break 2;
@@ -30302,13 +31641,12 @@ class Hostname extends AbstractValidator
                         // Check each domain part
                         $checked = false;
                         foreach ($regexChars as $regexKey => $regexChar) {
-                            ErrorHandler::start();
                             $status = preg_match($regexChar, $domainPart);
-                            ErrorHandler::stop();
                             if ($status > 0) {
                                 $length = 63;
                                 if (array_key_exists($this->tld, $this->idnLength)
-                                    && (array_key_exists($regexKey, $this->idnLength[$this->tld]))) {
+                                    && array_key_exists($regexKey, $this->idnLength[$this->tld])
+                                ) {
                                     $length = $this->idnLength[$this->tld];
                                 }
 
@@ -30353,16 +31691,14 @@ class Hostname extends AbstractValidator
         if ($this->getAllow() & self::ALLOW_URI) {
             if (preg_match("/^([a-zA-Z0-9-._~!$&\'()*+,;=]|%[[:xdigit:]]{2}){1,254}$/i", $value)) {
                 return true;
-            } else {
-                $this->error(self::INVALID_URI);
             }
+
+            $this->error(self::INVALID_URI);
         }
 
         // Check input against local network name schema; last chance to pass validation
-        ErrorHandler::start();
         $regexLocal = '/^(([a-zA-Z0-9\x2d]{1,63}\x2e)*[a-zA-Z0-9\x2d]{1,63}[\x2e]{0,1}){1,254}$/';
         $status = preg_match($regexLocal, $value);
-        ErrorHandler::stop();
 
         // If the input passes as a local network name, and local network names are allowed, then the
         // hostname passes validation
@@ -30483,7 +31819,7 @@ class Hostname extends AbstractValidator
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -30672,7 +32008,7 @@ class Ip extends AbstractValidator
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -30838,8 +32174,6 @@ return array(
     68 => '/^[\x{A000}-\x{A48F}]{1,63}$/iu',
     69 => '/^[\x{A490}-\x{A4CF}]{1,63}$/iu',
     70 => '/^[\x{AC00}-\x{D7AF}]{1,63}$/iu',
-    71 => '/^[\x{D800}-\x{DB7F}]{1,63}$/iu',
-    72 => '/^[\x{DC00}-\x{DFFF}]{1,63}$/iu',
     73 => '/^[\x{F900}-\x{FAFF}]{1,63}$/iu',
     74 => '/^[\x{FB00}-\x{FB4F}]{1,63}$/iu',
     75 => '/^[\x{FB50}-\x{FDFF}]{1,63}$/iu',

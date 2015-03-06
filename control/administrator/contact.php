@@ -42,15 +42,17 @@ case 'edit':
             array_key_exists('xhrValidate', $_REQUEST) ||
             array_key_exists('submit', $_REQUEST)
       ) {
+      if (!array_key_exists('id', $_REQUEST) ||$_REQUEST['id']=='') {
+            $this->addValidationMessage('message','Il messaggio a cui rispondere è obbligatorio');
+      }
+      if (!array_key_exists('message', $_REQUEST) ||$_REQUEST['message']=='') {
+            $this->addValidationMessage('message','Il messaggio è obbligatorio');
+      }
+      $fromContact = new \contact\contact\Contact($GLOBALS['db']);
+      $fromContact->loadFromId($_REQUEST['id']);
       $contact = new \contact\contact\Contact($GLOBALS['db']);
       if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
-         $contact = new \contact\contact\Contact($GLOBALS['db']);
-         $contact->setData($_REQUEST);
-         if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
-            $contact->update();
-         } else {
-            $contact->insert();
-         }
+
          header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=contact');
          exit(); 
       }
