@@ -168,7 +168,9 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    <?php echo $positions[$dicoItem->getData('id')]; ?>
    <span id="d<?php echo $dicoItem->getData('id'); ?>">
       <?php echo $label;
-      if (is_numeric($dicoItem->getData('taxa_id'))) : ?>
+      if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 0) : ?>
+      <?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?>
+      <?php elseif (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 1) : ?>
       <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $dicoItem->getData('taxa_id'); ?>"><?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?></a>
       <?php endif; ?>
    </span>

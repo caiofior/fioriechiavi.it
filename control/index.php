@@ -7,6 +7,15 @@ if (array_key_exists('id', $_REQUEST)) {
 } else {
    $dico->loadRoot();
 }
+if (array_key_exists('id', $_REQUEST) && $taxa->getRawData('status') == 0) {
+    $handle = curl_init();
+    curl_setopt($handle, CURLOPT_URL, $GLOBALS['config']->baseUrl.'/undefined_location.html');
+    curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($handle);
+    header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found'); 
+    echo $response;
+    exit;
+}
 if (!array_key_exists('action', $_REQUEST)) {
    $_REQUEST['action']=null;
 }

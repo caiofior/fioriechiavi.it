@@ -64,6 +64,19 @@ class TaxaColl extends \ContentColl {
          $select->where(' `taxa_kind`.`initials` IN ("'.  implode('","', $initials).'")');
          $select->order('dico_item_count DESC');
       }
+      if (
+               array_key_exists('status', $criteria) &&
+               $criteria['status'] == true) {
+         $select->where('
+                (               
+                    IFNULL(LENGTH(taxa.description),0)+
+                    IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`id_taxa`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`id_taxa`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`id_dico`=`taxa`.`dico_id`),0)
+                ) > 0
+             '); 
+         
+      }
       return $select;
     }
 }

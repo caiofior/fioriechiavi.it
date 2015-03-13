@@ -14,7 +14,8 @@ $newTaxaColl->loadAll(array(
     'sColumns'=>'change_datetime',
     'iSortingCols'=>'1',
     'iSortCol_0'=>'0',
-    'sSortDir_0'=>'DESC'
+    'sSortDir_0'=>'DESC',
+    'status'=>true
 ));
 if($newTaxaColl->count() > 0):
    foreach($newTaxaColl->getItems() as $newTaxa) : 

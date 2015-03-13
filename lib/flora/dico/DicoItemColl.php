@@ -33,6 +33,22 @@ class DicoItemColl extends \ContentColl {
           $this->dico_id = $criteria['id_dico'];
           $select->where('id_dico = '.intval($criteria['id_dico']));
        }
+       if (
+               array_key_exists('status', $criteria) &&
+               $criteria['status'] == true) {
+           $select->columns(array(
+           '*',
+           'status'=>new \Zend\Db\Sql\Predicate\Expression('
+                (               
+                    IFNULL(LENGTH(taxa.description),0)+
+                    IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`id_taxa`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`id_taxa`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`id_dico`=`taxa`.`dico_id`),0)
+                ) > 0
+               ')
+           ));
+           
+       }
        $select->order('id_dico asc, id asc');
        return $select;
     }

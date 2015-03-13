@@ -57,7 +57,7 @@ class Dico extends \Content
    public function getDicoItemColl ($edit=false) {
       $dicoItemColl = new \flora\dico\DicoItemColl($this->db);
       if (key_exists('id', $this->data) && $this->data['id'] != '') {
-         $dicoItemColl->loadAll(array('id_dico'=>$this->data['id']));
+         $dicoItemColl->loadAll(array('id_dico'=>$this->data['id'],'status'=>true));
       }
       if ($edit == true) {
          if ($dicoItemColl->count() == 0) {

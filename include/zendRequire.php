@@ -140,8 +140,10 @@ require __DIR__.'/../lib/zendframework/zend-serializer/Zend/Serializer/Adapter/A
 require __DIR__.'/../lib/zendframework/zend-serializer/Zend/Serializer/Adapter/PhpSerialize.php';
 require __DIR__.'/../lib/zendframework/zend-stdlib/Zend/Stdlib/ErrorHandler.php';
 require __DIR__.'/../lib/zendframework/zend-cache/Zend/Cache/Storage/PostEvent.php';
+require __DIR__.'/../lib/zendframework/zend-cache/Zend/Cache/Storage/ExceptionEvent.php';
 require __DIR__.'/../lib/zendframework/zend-cache/Zend/Cache/Exception/ExceptionInterface.php';
 require __DIR__.'/../lib/zendframework/zend-cache/Zend/Cache/Exception/InvalidArgumentException.php';
+require __DIR__.'/../lib/zendframework/zend-cache/Zend/Cache/Exception/RuntimeException.php';
 
 require __DIR__.'/../lib/zendframework/zend-authentication/Zend/Authentication/Adapter/AdapterInterface.php';
 require __DIR__.'/../lib/zendframework/zend-mail/Zend/Mail/Message.php';
