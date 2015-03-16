@@ -54,7 +54,7 @@ $("input:submit").click(function (e,mode) {
              if (message == true)
                 status = true;
              else {
-               $(form).find("input:submit").after("<div class=\"validMessage\">"+data.validMessage+"</div>");
+               $(form).find("input:submit").after("<div class=\"validMessage\"><span>"+data.validMessage+"</span></div>");
             }
           }
           else {
@@ -63,7 +63,7 @@ $("input:submit").click(function (e,mode) {
                   el = $("#"+elementId);
                } catch (err) {}
                if (el.length > 0 ) {
-                  el.addClass("notValid").focus().after("<div class=\"errorMessage\">"+content+"</div>");
+                  el.addClass("notValid").focus().after("<div class=\"errorMessage\"><span>"+content+"</span></div>");
                }
             });
           }

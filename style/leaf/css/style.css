@@ -704,6 +704,19 @@ a.hvr-shutter-in-horizontal:hover:before,a.hvr-shutter-in-horizontal:focus:befor
 .about-section-grids {
 	margin-bottom: 5em;
 }
+.errorMessage{
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+.errorMessage span{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: bold;
+    color: #8A132B;
+    background-color: #FF2D55;
+    border: 2px solid;
+    border-radius: 25px;
+}
 /*-- responsive-design starts-here --*/
 
 @media screen and (max-width: 1440px) {
