@@ -1,13 +1,13 @@
 <?php
-namespace flora\dico\inport;
+namespace flora\dico\import;
 /**
  * Exports the Dico data
  */
-interface Inport {
+interface Import {
     /**
     * Exports the data in the stream
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
-   public function inport (\flora\dico\DicoItemColl $dicoItemColl, $stream);
+   public function import (\flora\dico\DicoItemColl $dicoItemColl, $stream);
 }

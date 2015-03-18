@@ -1,18 +1,18 @@
 <?php
-namespace flora\dico\inport;
+namespace flora\dico\import;
 /**
  * Imports the data in the Pignatti flora Italica Format
  */
-class Pignatti implements \flora\dico\inport\Inport {
+class Pignatti implements \flora\dico\import\Import {
    /**
     * imports the data in the stream
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
-   public function inport (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
+   public function import (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
       
-      stream_filter_register('pignatti_input', 'flora\dico\inport\pignatti_input_filter');
-      stream_filter_append($stream, 'pignatti_input');
+      stream_filter_register('pignatti_imput', 'flora\dico\import\pignatti_imput_filter');
+      stream_filter_append($stream, 'pignatti_imput');
       $dicoItemColl->emptyColl();
       $positions = array();
       $lastPosition = '';
@@ -58,7 +58,7 @@ class Pignatti implements \flora\dico\inport\Inport {
    }
 }
 
-class pignatti_input_filter extends \php_user_filter {
+class pignatti_imput_filter extends \php_user_filter {
   function filter($in, $out, &$consumed, $closing)
   {
     while ($bucket = stream_bucket_make_writeable($in)) {

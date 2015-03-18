@@ -45,6 +45,7 @@ class TaxaColl extends \ContentColl {
      * @return \Zend\Db\Sql\Select
      */
     private function setFilter ($select,$criteria) {
+      $select->where(' `taxa`.`id` != 1 ');
       if (array_key_exists('term', $criteria) && $criteria['term'] != '') {
          $criteria['sSearch']=$criteria['term'];
       }
@@ -59,7 +60,7 @@ class TaxaColl extends \ContentColl {
          }
       }
       if (array_key_exists('moreDicoItems', $criteria) && $criteria['moreDicoItems'] != '') {
-         $select->columns(array('*','dico_item_count'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT COUNT(*) FROM `dico_item` WHERE `dico_item`.`id_dico`=`taxa`.`dico_id` )')));
+         $select->columns(array('*','dico_item_count'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT COUNT(*) FROM `dico_item` WHERE  `dico_item`.`parent_taxa_id`=`taxa`.`id` )')));
          $initials = explode(':',$criteria['moreDicoItems']);
          $select->where(' `taxa_kind`.`initials` IN ("'.  implode('","', $initials).'")');
          $select->order('dico_item_count DESC');
@@ -72,7 +73,7 @@ class TaxaColl extends \ContentColl {
                     IFNULL(LENGTH(taxa.description),0)+
                     IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`id_taxa`=`taxa`.`id`),0)+
                     IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`id_taxa`=`taxa`.`id`),0)+
-                    IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`id_dico`=`taxa`.`dico_id`),0)
+                    IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)
                 ) > 0
              '); 
          

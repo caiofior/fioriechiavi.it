@@ -18,9 +18,8 @@ endif;
 </form>
 <?php
 $taxa = $this->object;
-$dico = $taxa->dico;
 $title = $GLOBALS['db']->config->siteName;
-if ($taxa->getData('name') != '') :
+if ($taxa->getData('id') != 1 && $taxa->getData('name') != '' ) :
     $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); 
 require (__DIR__.DIRECTORY_SEPARATOR.'social.php');
 endif; ?>
@@ -153,7 +152,7 @@ if (
 </div>
 <?php endif;
 $searchTerm = '';
-if (is_numeric($taxa->getData('id'))) {
+if ($taxa->getData('id') != '' && $taxa->getData('id') != '1') {
    $searchTerm = $taxa->getData('name');
 }
 ?>

@@ -40,15 +40,15 @@ class DicoItemTest extends \PHPUnit_Framework_TestCase
     {
     }
     public function testLoadFromIdAndDico () {
-       $this->object->loadFromIdAndDico(4, 0);
+       $this->object->loadFromIdAndTaxa(4, 0);
        $this->assertGreaterThan(0,sizeof(array_filter($this->object->getData())));
     }
     public function testReplace () {
-       $this->object->loadFromIdAndDico(4, 0);
+       $this->object->loadFromIdAndTaxa(4, 0);
        $this->assertGreaterThan(0,sizeof(array_filter($this->object->getData())));
        $this->object->setData(8, 'taxa_id');
        $this->object->replace();
-       $this->object->loadFromIdAndDico(4, 0);
+       $this->object->loadFromIdAndTaxa(4, 0);
        var_dump($this->object->getData());
     }
 }

@@ -41,6 +41,7 @@ class TaxaKindColl extends \ContentColl {
      * @return \Zend\Db\Sql\Select
      */
     private function setFilter ($select,$criteria) {
+      $select->where(' `id` != 1 ');
       if (array_key_exists('term', $criteria) && $criteria['term'] != '') {
          $criteria['sSearch']=$criteria['term'];
       }

@@ -1,18 +1,20 @@
 <div id="breadcrump">
-   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico">Elenco delle chiavi dicotomiche</a></p> &gt; <h2>Modifica una chiave dicotomica</h2>
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica chiave dicotomica</h2>
 </div>
 <?php
-$dico = $this->object;
+$taxa = $this->object;
 ?>
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/administrator/taxa.css');?>">
 <form method="post" action="#">
-   <input type="hidden" name="id" id="id" value="<?php echo $dico->getData('id');?>">
+   <input type="hidden" name="id" id="id" value="<?php echo $taxa->getData('id');?>">
 </form>
+<a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&action=edit&id=<?php echo $taxa->getData('id')?>">Modifica taxa</a>
 <a class="actions update" href="#" title="Aggiorna">Aggiorna</a>
 <a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
 <a class="downloadButton actions download" href="#" title="Download">Download</a>
 <a class="uploadButton actions upload" href="#" title="Upload">Upload</a>
-<form class="downloadForm" style="display:none;" method="post" action="?task=dico&amp;action=download&amp;id=<?php echo $dico->getData('id');?>">
+<a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>
+<form class="downloadForm" style="display:none;" method="post" action="?task=dico&amp;action=download&amp;id=<?php echo $taxa->getData('id');?>">
    <label for="download_format">Formato</label>
    <select id="download_format" name="download_format">
       <option value="internal">Tal quale</option>
@@ -20,7 +22,7 @@ $dico = $this->object;
    </select>
    <input id="downloadDico" type="submit" name="dowload" value="Scarica"/>
 </form>
-<form class="uploadForm" <?php if (!array_key_exists('dicotext', $_REQUEST)) : ?>style="display:none;"<?php endif;?> method="post" action="?task=dico&amp;action=preview&amp;id=<?php echo $dico->getData('id');?>">
+<form class="uploadForm" <?php if (!array_key_exists('dicotext', $_REQUEST)) : ?>style="display:none;"<?php endif;?> method="post" action="?task=dico&amp;action=preview&amp;id=<?php echo $taxa->getData('id');?>">
    <?php if (array_key_exists('dicotext', $_REQUEST)) : ?>
    <div class="errorMessage">Il formato in input è obbligatorio</div>
    <?php endif;?>
@@ -40,43 +42,45 @@ $dico = $this->object;
 </form>
 <div>
 <?php
-$dicoItemColl = $dico->getDicoItemColl(true);
+$taxaItemColl = $taxa->getDicoItemColl(true);
 $positions = array();
 $lastPosition = 0;
-foreach ($dicoItemColl->getItems() as $dicoItem): 
-   $label = $dicoItem->getData('text');
-   $lastCharacter = substr($dicoItem->getData('id'),-1);
+foreach ($taxaItemColl->getItems() as $taxaItem): 
+   $label = $taxaItem->getData('text');
+   $lastCharacter = substr($taxaItem->getData('id'),-1);
    if ($lastCharacter == 0) {
       $lastPosition++;
-      $positions[substr($dicoItem->getData('id'),0,-1).'0']= $lastPosition;
-      $positions[substr($dicoItem->getData('id'),0,-1).'1']= $lastPosition;
+      $positions[substr($taxaItem->getData('id'),0,-1).'0']= $lastPosition;
+      $positions[substr($taxaItem->getData('id'),0,-1).'1']= $lastPosition;
    }
    $missing='';
-   if ($dicoItem->getRawData('incomplete') == 1)
+   if ($taxaItem->getRawData('incomplete') == 1)
       $missing=' missing';
 ?>
 <div>
-   <?php echo str_repeat('&#160;', strlen($dicoItem->getData('id'))-1); ?>
-   <?php echo $positions[$dicoItem->getData('id')]; ?>
-   <span id="d<?php echo $dicoItem->getData('id'); ?>" class="editable<?php echo $missing;?>"><?php echo $label;?></span>
+   <?php echo str_repeat('&#160;', strlen($taxaItem->getData('id'))-1); ?>
+   <?php echo $positions[$taxaItem->getData('id')]; ?>
+   <span id="d<?php echo $taxaItem->getData('id'); ?>" class="editable<?php echo $missing;?>"><?php echo $label;?></span>
    <a class="editDicoItem actions edit" href="#"title="Modifica">Modifica</a>
-   <?php if($dicoItem->getRawData('possible_taxa') === true) : ?>
+   <?php if($taxaItem->getRawData('possible_taxa') === true) : ?>
    <a class="addTaxaButton actions add" href="#"title="Aggiungi Taxa">Aggiungi Taxa</a>
-   <a class="deleteTaxaItem actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=deletetaxaitem&amp;id=<?php echo $dico->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>" title="Cancella voce">Cancella voce</a>
+   <a class="deleteTaxaItem actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=deletetaxaitem&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $taxaItem->getData('id');?>" title="Cancella voce">Cancella voce</a>
    <form style="display:none;" class="addTaxa" method="post" action="?task=taxa&amp;action=edit">
-      <input type="hidden" name="children_dico_id" value="<?php echo $dico->getData('id');?>"/>
-      <input type="hidden" name="children_dico_item_id" value="<?php echo $dicoItem->getData('id');?>"/>
+      <input type="hidden" name="children_dico_id" value="<?php echo $taxa->getData('id');?>"/>
+      <input type="hidden" name="children_dico_item_id" value="<?php echo $taxaItem->getData('id');?>"/>
       <input class="taxaName" name="name"/>
       <input type="submit" name="submit" value="Crea"/>
       <a class="restoreTaxaButton actions close" href="#" title="Chiudi">Chiudi</a>
    </form>
    <?php else: 
-      if ($dicoItem->getRawData('name') != ''):  ?>
-   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $dicoItem->getData('taxa_id');?>"><?php echo $dicoItem->getRawData('initials');?> <?php echo $dicoItem->getRawData('name');?></a>
-   <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $dico->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
+      if ($taxaItem->getRawData('name') != ''):  ?>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $taxaItem->getData('taxa_id');?>"><?php echo $taxaItem->getRawData('initials');?> <?php echo $taxaItem->getRawData('name');?></a>
+   <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $taxaItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
       <?php endif; 
       endif; ?>
 </div>
 <?php endforeach; ?>
 </div>
-<a class="actions update" href="#" title="Aggiorna">Aggiorna</a><a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
+<a class="actions update" href="#" title="Aggiorna">Aggiorna</a>
+<a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
+<a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>

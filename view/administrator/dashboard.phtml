@@ -3,9 +3,6 @@
    <?php if ($role->getData('id') <= 2) : ?>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Taxa</a></li>
    <?php endif; ?>
-   <?php if ($role->getData('id') <= 2) : ?>
-   <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico">Chiavi dicotomiche</a></li>
-   <?php endif; ?>
    <?php if ($role->getData('id') <= 1) : ?>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa_category">Raggruppamenti sistematici</a></li>
    <?php endif; ?>

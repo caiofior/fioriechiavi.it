@@ -1,36 +1,4 @@
 $(document).ready(function() {
-    di = $("#dico").dataTable({
-        "oLanguage":  {
-                "sUrl": "js/common/datatables/lang/it.json"
-         },
-        "bStateSave" : true,
-        "aaSorting": [[ 1, "desc" ]],
-        "bJQueryUI": true,
-        "bProcessing": true,
-        "bServerSide": true,
-        "sAjaxSource": "#",
-        "fnServerParams": function ( aoData ) {
-            aoData.push({ "name": "task", "value": "dico" });  
-         },
-        "aoColumnDefs":  getDatatableMetadata(this),
-        "drawCallback": function( ) {
-            $(".actions.delete").click(function (e) {
-               e.preventDefault();
-               $(this).dialog({
-                  buttons: {
-                     "Confermi la cancellazione della chiave dicotomica?": function() {
-                        $.ajax({
-                           url: $(this).attr("href"),
-                           async : false
-                           });
-                        di.dataTable().fnDraw();
-                        $( this ).dialog( "close" );
-                     }
-                  }
-               });
-            });
-        }
-    });
     $('.editable').editable('?task=dico&action=jeditable&id_dico='+$('#id').val(), {
          "onblur": "submit",
          "indicator" : "Salvataggio in corso...",
@@ -65,16 +33,19 @@ $(document).ready(function() {
        window.location.reload();
        e.preventDefault();
     });
-    $(".deleteTaxaItem").click(function (e){
+    $(".deleteButton").click(function (e){
+        e.preventDefault();
         $(this).dialog({
            buttons: {
-              "Confermi la cancellazione della voce?": function() {
+              "Confermi la cancellazione di tutte le voci della chiave?": function() {
+                   window.location =  $(this).attr("href");
               }
            }
         });
+        
     });
     $( ".editDicoItem" ).click(function (e){
-        $(this).prev().trigger("click");
+       $(this).prev().trigger("click");
        e.preventDefault();
     });
     $(".hideMissing").click (function (e){

@@ -47,8 +47,6 @@ class Autoload {
          self::$instance = new $class();
       }
 
-      require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'Dico.php';
-      require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoColl.php';
       require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoItem.php';
       require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoItemColl.php';
       

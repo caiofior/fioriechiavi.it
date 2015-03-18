@@ -1,4 +1,4 @@
-<?php $dicoItemColl = $dico->getDicoItemColl();
+<?php $dicoItemColl = $taxa->getDicoItemColl();
 $positions = array();
 $lastPosition = 0;
 foreach ($dicoItemColl->getItems() as $dicoItem): 

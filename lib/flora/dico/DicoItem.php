@@ -28,20 +28,20 @@ class DicoItem extends \Content
     * @see loadFromIdAndDico
     */
    public function loadFromId ($id) {
-      throw new \Exception('Deprecated see loadFromIdAndDico',1509141504);
+      throw new \Exception('Deprecated see loadFromIdAndtaxa',1509141504);
    }
    /**
     * Load data fro dico id and id
     * @param type $dico_id
     * @param type $id
     */
-   public function loadFromIdAndDico($id_dico,$id) {
-      $this->data['id_dico']=$id_dico;
-      $this->rawData['id_dico']=$id_dico;
+   public function loadFromIdAndTaxa($parent_taxa_id,$id) {
+      $this->data['parent_taxa_id']=$parent_taxa_id;
+      $this->rawData['parent_taxa_id']=$parent_taxa_id;
       $this->data['id']=$id;
       $this->rawData['id']=$id;
       $data = $this->table->select(array(
-          'id_dico'=>$this->data['id_dico'],
+          'parent_taxa_id'=>$this->data['parent_taxa_id'],
           'id'=>$this->data['id']
       ))->current();
       if (is_object($data)) {
@@ -50,7 +50,7 @@ class DicoItem extends \Content
       } else {
          $this->data = array (
              'id'=>$id,
-             'id_dico'=>$id_dico,
+             'parent_taxa_id'=>$parent_taxa_id,
              'text'=>''
              );
          $this->rawData = $this->data;
@@ -78,19 +78,25 @@ class DicoItem extends \Content
      * Replaces dico item data
      */
    public function replace() {
-      if (array_key_exists('taxa_id', $this->rawData) && $this->rawData['taxa_id']!= '') {
-         $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
-              (id,id_dico,text,taxa_id)
-              VALUES
-              ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
-              ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-      } else {
-         $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
-              (id,id_dico,text)
-              VALUES
-              ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['id_dico']).',"'.  addslashes($this->rawData['text']).'")
-              ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-      }
+        if (
+                !array_key_exists('parent_taxa_id', $this->data) &&
+                array_key_exists('parent_taxa_id', $this->rawData)
+                ) {
+        $this->data['parent_taxa_id'] = $this->rawData['parent_taxa_id'];
+        }
+        if (array_key_exists('taxa_id',$this->rawData)) {
+            $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
+            (id,parent_taxa_id,text,taxa_id)
+            VALUES
+            ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
+            ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        } else {
+            $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
+            (id,parent_taxa_id,text)
+            VALUES
+            ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'")
+            ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        }
    }
    /**
     * Deletes a dico item
@@ -99,12 +105,12 @@ class DicoItem extends \Content
        if (
                array_key_exists('id', $this->rawData) && 
                $this->rawData['id'] != '' &&
-               array_key_exists('id_dico', $this->rawData) && 
-               $this->rawData['id_dico'] != ''
+               array_key_exists('parent_taxa_id', $this->rawData) && 
+               $this->rawData['parent_taxa_id'] != ''
            ) {
             $this->db->query('DELETE FROM `'.$this->table->getTable().'` 
-              WHERE id = "'.addslashes($this->rawData['id']).'"
-              AND id_dico='.intval($this->rawData['id_dico']),
+              WHERE `id`="'.addslashes($this->rawData['id']).'"
+              AND `parent_taxa_id`='.intval($this->rawData['parent_taxa_id']),
             \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
            }
    }

@@ -21,7 +21,12 @@ if (array_key_exists('sEcho', $_REQUEST)) {
             }else if ($column == 'taxa_kind_id') {
                $data=$taxa->getRawData('taxa_kind_initials');
             } else if ($column == 'actions') {
-               $data = '<a class="actions modify" title="Modifica" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a><a class="actions delete" title="Cancella" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>';
+               $data = '
+                   <a class="actions modify" title="Modifica" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a>
+                   <a class="actions modify" title="Modifica" href="?task=dico&amp;action=edit&amp;id='.$taxa->getData('id').'">Chiave dicotomica</a>
+                   <a class="actions delete" title="Cancella" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>
+                   ';
+               
             } 
             $row[] = $data;     
          }
@@ -134,7 +139,7 @@ case 'edit':
                  array_key_exists('children_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_id'])
              ) {
              $dicoItem = new flora\dico\DicoItem($GLOBALS['db']);
-             $dicoItem->loadFromIdAndDico($_REQUEST['children_dico_id'],$_REQUEST['children_dico_item_id']);
+             $dicoItem->loadFromIdAndTaxa($_REQUEST['children_dico_id'],$_REQUEST['children_dico_item_id']);
              $dicoItem->setData($taxa->getData('id'), 'taxa_id');
              $dicoItem->replace();
          }
