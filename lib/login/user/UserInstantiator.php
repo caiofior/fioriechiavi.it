@@ -33,11 +33,31 @@ class UserInstantiator {
       }
       $adminColl = new \login\user\UserColl($db);
       $adminColl->loadAll(array('role_id'=>3));
-      $role_id = 1;
+      $role_id = 3;
+      $role_description='User';
       $active = 0;
       if ($adminColl->count() == 0 ) {
-         $role_id = 3;
+         $role_id = 1;
+         $role_description='Administrator';
          $active = 1;
+      }
+      
+      $userRole = new \login\user\UserRole($db);
+      $userRole->loadFromId($role_id);
+      if($userRole->getData('id') != $role_id ) {
+          $defaultRuleFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
+                  .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'sql'.DIRECTORY_SEPARATOR.'user_role.sql';
+          if (is_file($defaultRuleFile)) {
+            $db->query(file_get_contents($defaultRuleFile), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+          }
+          $userRole->loadFromId($role_id);
+          if($userRole->getData('id') != $role_id ) {
+            $userRole->setData(array(
+                'id'=>$role_id,
+                'description'=>$role_description
+            ));
+            $userRole->insert();
+          }
       }
       $user = new \login\user\User($db);
       $user->setData(array(

@@ -7,7 +7,22 @@ namespace flora\region;
  */
 class RegionColl extends \ContentColl {
       public function __construct($db) {
-         parent::__construct(new \flora\region\Region($db));
+         parent::__construct(new \flora\region\Region($db));         
+      }
+      /**
+       * Check if default regions are loaded
+       * @param array $criteria
+       */
+      public function loadAll(array $criteria=null) {
+          parent::loadAll($criteria);
+          if ($this->count() == 0) {
+              $defaultRegionFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
+                  .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'sql'.DIRECTORY_SEPARATOR.'region.sql';
+              if (is_file($defaultRegionFile)) {
+                $this->content->getDb()->query(file_get_contents($defaultRegionFile), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+                parent::loadAll($criteria);
+              }
+          }
       }
       /**
       * Customizes select statement

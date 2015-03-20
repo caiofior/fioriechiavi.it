@@ -18,14 +18,19 @@ if (array_key_exists('sEcho', $_REQUEST)) {
                $data = strip_tags($data);
                if (strlen($data)>200)
                   $data = substr($data,0,200).'&#133;';
-            }else if ($column == 'taxa_kind_id') {
+            } else if ($column == 'taxa_kind_id') {
                $data=$taxa->getRawData('taxa_kind_initials');
             } else if ($column == 'actions') {
+               if($taxa->getData('id') > 1) {
                $data = '
                    <a class="actions modify" title="Modifica" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a>
-                   <a class="actions modify" title="Modifica" href="?task=dico&amp;action=edit&amp;id='.$taxa->getData('id').'">Chiave dicotomica</a>
                    <a class="actions delete" title="Cancella" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>
                    ';
+               } else {
+                   $data = '
+                   <a class="actions modify" title="Modifica" href="?task=dico&amp;action=edit&amp;id='.$taxa->getData('id').'">Chiave dicotomica</a>
+                   ';
+               }
                
             } 
             $row[] = $data;     

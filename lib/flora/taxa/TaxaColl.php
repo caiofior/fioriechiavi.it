@@ -14,6 +14,23 @@ class TaxaColl extends \ContentColl {
          parent::__construct(new \flora\taxa\Taxa($db));
       }
       /**
+       * Check if default taxa are loaded
+       * @param array $criteria
+       */
+      public function loadAll(array $criteria=null) {
+          parent::loadAll($criteria);
+          if ($this->count() == 0) {
+              $taxaKindColl = new \flora\taxa\TaxaKindColl($this->content->getDb());
+              $taxaKindColl->loadAll();
+              $defaultTaxaFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
+                  .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'sql'.DIRECTORY_SEPARATOR.'taxa.sql';
+              if (is_file($defaultTaxaFile)) {
+                $this->content->getDb()->query(file_get_contents($defaultTaxaFile), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+                parent::loadAll($criteria);
+              }
+          }
+      }
+      /**
       * Customizes select statement
       * @param Zend_Db_Select $select Zend Db Select
       * @param array $criteria Filtering criteria
@@ -45,7 +62,6 @@ class TaxaColl extends \ContentColl {
      * @return \Zend\Db\Sql\Select
      */
     private function setFilter ($select,$criteria) {
-      $select->where(' `taxa`.`id` != 1 ');
       if (array_key_exists('term', $criteria) && $criteria['term'] != '') {
          $criteria['sSearch']=$criteria['term'];
       }

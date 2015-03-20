@@ -8,7 +8,9 @@ $taxa = $this->object;
 <form method="post" action="#">
    <input type="hidden" name="id" id="id" value="<?php echo $taxa->getData('id');?>">
 </form>
+<?php if ($taxa->getData('id') > 1) : ?>
 <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&action=edit&id=<?php echo $taxa->getData('id')?>">Modifica taxa</a>
+<?php endif; ?>
 <a class="actions update" href="#" title="Aggiorna">Aggiorna</a>
 <a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
 <a class="downloadButton actions download" href="#" title="Download">Download</a>

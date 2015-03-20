@@ -9,6 +9,21 @@ class TaxaKindColl extends \ContentColl {
       public function __construct($db) {
          parent::__construct(new \flora\taxa\TaxaKind($db));
       }
+       /**
+       * Check if default taxa  categoriesare loaded
+       * @param array $criteria
+       */
+      public function loadAll(array $criteria=null) {
+          parent::loadAll($criteria);
+          if ($this->count() == 0) {
+              $defaultTaxaKindFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
+                  .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'sql'.DIRECTORY_SEPARATOR.'taxa_kind.sql';
+              if (is_file($defaultTaxaKindFile)) {
+                $this->content->getDb()->query(file_get_contents($defaultTaxaKindFile), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+                parent::loadAll($criteria);
+              }
+          }
+      }
     /**
       * Customizes select statement
       * @param Zend_Db_Select $select Zend Db Select
