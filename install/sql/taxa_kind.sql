@@ -13,4 +13,4 @@
 -- 
 -- Dump dei dati per la tabella `taxa_kind`
 -- 
-INSERT INTO `taxa_kind` (`id`, `name`) VALUES ('1', 'Radice');
+INSERT IGNORE INTO `taxa_kind` (`id`, `name`) VALUES ('1', 'Radice');

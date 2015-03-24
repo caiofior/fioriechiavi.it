@@ -71,7 +71,7 @@ foreach ($taxaItemColl->getItems() as $taxaItem):
       <input type="hidden" name="children_dico_id" value="<?php echo $taxa->getData('id');?>"/>
       <input type="hidden" name="children_dico_item_id" value="<?php echo $taxaItem->getData('id');?>"/>
       <input class="taxaName" name="name"/>
-      <input type="submit" name="submit" value="Crea"/>
+      <input type="submit" name="submit" value="Crea" title="Premi CTRL per copiare il nome senza creare l'associazione con il taxa"/>
       <a class="restoreTaxaButton actions close" href="#" title="Chiudi">Chiudi</a>
    </form>
    <?php else: 

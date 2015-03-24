@@ -19,7 +19,7 @@ class TaxaColl extends \ContentColl {
        */
       public function loadAll(array $criteria=null) {
           parent::loadAll($criteria);
-          if ($this->count() == 0) {
+          if (sizeof($criteria) == 0 && $this->count() == 0) {
               $taxaKindColl = new \flora\taxa\TaxaKindColl($this->content->getDb());
               $taxaKindColl->loadAll();
               $defaultTaxaFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
