@@ -35,6 +35,9 @@ switch ($_REQUEST['task']) {
    case 'contact':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'contact.php';       
       break;
+   case 'backup':
+      require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'backup.php';       
+      break;
    default:
       $this->getTemplate()->setBlock('middle','administrator/dashboard.phtml');
       break;
