@@ -2,5 +2,16 @@
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <h2>Backup / Restore</h2>
 </div>
 <ul>
-    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=backup&action=backup" class="blank">Backup</a></li>
+    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=backup&action=backuptaxa" class="blank">Backup taxa</a></li>
+    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=backup&action=backuputenti" class="blank">Backup utenti</a></li>
+    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=backup&action=resettaxa" class="resetTaxa">Reset taxa</a></li>
+    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=backup&action=resetutenti" class="resetUtenti" >Reset utenti</a></li>
+    <li>
+    <form class="uploadForm" method="post" action="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=backup">
+    <div id="container">
+       <a id="pickfiles" href="#">Seleziona il file per il ripristino</a>
+    </div>
+    <input type="hidden" id="filename" name="filename" value=""/>
+    </form>
+    </li>
 </ul>

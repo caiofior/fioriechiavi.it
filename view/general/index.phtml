@@ -36,9 +36,11 @@ if ($taxa->getData('name') != '') :
 endif;
 ?>
 <?php
-require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php'); 
 if ($taxa->getData('description') != '') :
 echo $taxa->getData('description');
+endif;
+require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php'); 
+if ($taxa->getData('description') != '') :
 require (__DIR__.DIRECTORY_SEPARATOR.'map.php'); 
 $attributeColl = $taxa->getTaxaAttributeColl();
    if ($attributeColl->count() > 0) : ?>
@@ -203,7 +205,7 @@ if($newTaxaColl->count() > 0): ?>
 <div class="clear"></div>
 <?php endif; ?>
 <?php
-   if ($taxa->getData('id') == '') :
+   if ($taxa->getData('id') == 1) :
       $content = new \content\content\Content($GLOBALS['db']);
    $content->loadFromLabel('root_category'); ?>
    <div>

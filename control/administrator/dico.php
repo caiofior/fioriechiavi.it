@@ -204,6 +204,8 @@ case 'upload':
    }
 
    while ($buff = fread($in, 4096)) {
+           $buff = preg_replace('/-{10,}.*\r\n\r\n/s','', $buff);
+           $buff = preg_replace('/-{10,}.*-{2}/s','', $buff);
            fwrite($out, $buff);
    }
 
