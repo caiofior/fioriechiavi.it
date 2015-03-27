@@ -1,7 +1,7 @@
 <?php
 namespace login;
 if (!interface_exists('\Zend\Authentication\Adapter\AdapterInterface')) {
-      require('/usr/share/php/vendor/zendframework/zendframework/library/Zend/Authentication/Adapter/AdapterInterface.php');
+      require('/usr/share/php/vendor/zendframework/zend-authentication/Zend/Authentication/Adapter/AdapterInterface.php');
 }
 
 class Auth implements \Zend\Authentication\Adapter\AdapterInterface {

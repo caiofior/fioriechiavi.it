@@ -11,8 +11,8 @@ class Pignatti implements \flora\dico\import\Import {
     */
    public function import (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
       
-      stream_filter_register('pignatti_imput', 'flora\dico\import\pignatti_imput_filter');
-      stream_filter_append($stream, 'pignatti_imput');
+      stream_filter_register('pignatti_input', 'flora\dico\inport\pignatti_input_filter');
+      stream_filter_append($stream, 'pignatti_input');
       $dicoItemColl->emptyColl();
       $positions = array();
       $lastPosition = '';
@@ -58,7 +58,7 @@ class Pignatti implements \flora\dico\import\Import {
    }
 }
 
-class pignatti_imput_filter extends \php_user_filter {
+class pignatti_input_filter extends \php_user_filter {
   function filter($in, $out, &$consumed, $closing)
   {
     while ($bucket = stream_bucket_make_writeable($in)) {

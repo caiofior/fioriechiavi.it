@@ -1,437 +1,492 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg height="1517" version="1.1" width="1242" xmlns="http://www.w3.org/2000/svg">
-<rect fill="#ffffff" height="198" stroke="#ffffff" stroke-width="1" width="374" x="138" y="201"/>
-<rect fill="none" height="198" stroke="#000000" stroke-width="1" width="374" x="138" y="201"/>
-<text font-family="Dialog" font-size="12" x="311" y="214">
-Dico</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="374" x="138" y="224"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="374" x="138" y="245"/>
-<text font-family="Dialog" font-size="12" x="142" y="259">
+<svg height="1444" version="1.1" width="1544" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#ffffff" height="342" stroke="#ffffff" stroke-width="1" width="352" x="14" y="224"/>
+<rect fill="none" height="342" stroke="#000000" stroke-width="1" width="352" x="14" y="224"/>
+<text font-family="Dialog" font-size="12" x="140" y="237">
+flora::taxa::Taxa</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="352" x="14" y="247"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="352" x="14" y="268"/>
+<text font-family="Dialog" font-size="12" x="18" y="282">
 __construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="142" y="275">
+<text font-family="Dialog" font-size="12" x="18" y="298">
+loadFromId(id : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="18" y="314">
 loadRoot() : void</text>
-<text font-family="Dialog" font-size="12" x="142" y="291">
-getTaxa() : unknown</text>
-<text font-family="Dialog" font-size="12" x="142" y="307">
-getDicoItemColl(edit : boolean) : unknown</text>
-<text font-family="Dialog" font-size="12" x="142" y="323">
-export(format : string,stream : resource) : void</text>
-<text font-family="Dialog" font-size="12" x="142" y="339">
-import(format : unknown,stream : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="142" y="355">
-importAndSave(format : unknown,stream : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="142" y="371">
-emptyDicoItems() : void</text>
-<text font-family="Dialog" font-size="12" x="142" y="387">
-delete() : void</text>
-<rect fill="#ffffff" height="86" stroke="#ffffff" stroke-width="1" width="369" x="642" y="305"/>
-<rect fill="none" height="86" stroke="#000000" stroke-width="1" width="369" x="642" y="305"/>
-<text font-family="Dialog" font-size="12" x="802" y="318">
-DicoColl</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="642" y="328"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="642" y="349"/>
-<text font-family="Dialog" font-size="12" x="646" y="363">
-__construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="646" y="379">
-customSelect(select : unknown,criteria : array) : unknown</text>
-<polyline fill="none" points="642,337 511,337" stroke="#000000" stroke-width="1"/>
-<polygon fill="#000000" points="642,337 632,342 622,337 632,332" stroke="#000000" stroke-width="1"/>
-<polygon fill="none" points="642,337 632,342 622,337 632,332" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="523" x2="511" y1="330" y2="337"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="523" x2="511" y1="344" y2="337"/>
-<text font-family="Dialog" font-size="12" x="532" y="317">
-Dico Composition</text>
-<rect fill="#ffffff" height="310" stroke="#ffffff" stroke-width="1" width="352" x="146" y="693"/>
-<rect fill="none" height="310" stroke="#000000" stroke-width="1" width="352" x="146" y="693"/>
-<text font-family="Dialog" font-size="12" x="307" y="706">
-Taxa</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="352" x="146" y="716"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="352" x="146" y="737"/>
-<text font-family="Dialog" font-size="12" x="150" y="751">
-__construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="767">
-loadFromId(id : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="783">
+<text font-family="Dialog" font-size="12" x="18" y="330">
 insert() : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="799">
+<text font-family="Dialog" font-size="12" x="18" y="346">
 update() : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="815">
+<text font-family="Dialog" font-size="12" x="18" y="362">
+delete() : void</text>
+<text font-family="Dialog" font-size="12" x="18" y="378">
 getRegionColl() : unknown</text>
-<text font-family="Dialog" font-size="12" x="150" y="831">
-setRegions(regions : array) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="847">
+<text font-family="Dialog" font-size="12" x="18" y="394">
+setRegions(regions) : void</text>
+<text font-family="Dialog" font-size="12" x="18" y="410">
 getTaxaKind() : unknown</text>
-<text font-family="Dialog" font-size="12" x="150" y="863">
-getDico() : unknown</text>
-<text font-family="Dialog" font-size="12" x="150" y="879">
+<text font-family="Dialog" font-size="12" x="18" y="426">
 addTaxaAttribute(name : string,value : string) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="895">
+<text font-family="Dialog" font-size="12" x="18" y="442">
 addTaxaAttributeById(id : unknown,value : string) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="911">
+<text font-family="Dialog" font-size="12" x="18" y="458">
 getAttributeById(id : unknown) : string</text>
-<text font-family="Dialog" font-size="12" x="150" y="927">
+<text font-family="Dialog" font-size="12" x="18" y="474">
 deleteAllTaxaAttributes() : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="943">
+<text font-family="Dialog" font-size="12" x="18" y="490">
 deleteTaxaAttributeById(id : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="959">
+<text font-family="Dialog" font-size="12" x="18" y="506">
 getTaxaImgeColl() : unknown</text>
-<text font-family="Dialog" font-size="12" x="150" y="975">
+<text font-family="Dialog" font-size="12" x="18" y="522">
 getTaxaAttributeColl() : unknown</text>
-<text font-family="Dialog" font-size="12" x="150" y="991">
+<text font-family="Dialog" font-size="12" x="18" y="538">
 getParentColl() : unknown</text>
-<rect fill="#ffffff" height="86" stroke="#ffffff" stroke-width="1" width="369" x="586" y="693"/>
-<rect fill="none" height="86" stroke="#000000" stroke-width="1" width="369" x="586" y="693"/>
-<text font-family="Dialog" font-size="12" x="745" y="706">
-TaxaColl</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="586" y="716"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="586" y="737"/>
-<text font-family="Dialog" font-size="12" x="590" y="751">
+<text font-family="Dialog" font-size="12" x="18" y="554">
+getDicoItemColl(edit : unknown) : unknown</text>
+<rect fill="#ffffff" height="118" stroke="#ffffff" stroke-width="1" width="369" x="446" y="224"/>
+<rect fill="none" height="118" stroke="#000000" stroke-width="1" width="369" x="446" y="224"/>
+<text font-family="Dialog" font-size="12" x="542" y="237">
+flora::taxa::TaxaAttributeColl</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="446" y="247"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="446" y="268"/>
+<text font-family="Dialog" font-size="12" x="450" y="282">
 __construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="590" y="767">
-customSelect(select : unknown,criteria : array) : unknown</text>
-<polyline fill="none" points="586,769 497,769" stroke="#000000" stroke-width="1"/>
-<polygon fill="#000000" points="586,769 576,774 566,769 576,764" stroke="#000000" stroke-width="1"/>
-<polygon fill="none" points="586,769 576,774 566,769 576,764" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="509" x2="497" y1="762" y2="769"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="509" x2="497" y1="776" y2="769"/>
-<text font-family="Dialog" font-size="12" x="497" y="749">
-TaxaComposition</text>
-<rect fill="#ffffff" height="86" stroke="#ffffff" stroke-width="1" width="369" x="586" y="821"/>
-<rect fill="none" height="86" stroke="#000000" stroke-width="1" width="369" x="586" y="821"/>
-<text font-family="Dialog" font-size="12" x="717" y="834">
-TaxaAttributeColl</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="586" y="844"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="586" y="865"/>
-<text font-family="Dialog" font-size="12" x="590" y="879">
+<text font-family="Dialog" font-size="12" x="450" y="298">
+customSelect(select : unknown,criteria) : unknown</text>
+<text font-family="Dialog" font-size="12" x="450" y="314">
+countAll(criteria : unknown) : unknown</text>
+<text font-family="Dialog" font-size="12" x="450" y="330">
+setFilter(select : unknown,criteria) : unknown</text>
+<rect fill="#ffffff" height="182" stroke="#ffffff" stroke-width="1" width="335" x="926" y="216"/>
+<rect fill="none" height="182" stroke="#000000" stroke-width="1" width="335" x="926" y="216"/>
+<text font-family="Dialog" font-size="12" x="1016" y="229">
+flora::taxa::TaxaAttribute</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="335" x="926" y="239"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="335" x="926" y="260"/>
+<text font-family="Dialog" font-size="12" x="930" y="274">
 __construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="590" y="895">
-customSelect(select : unknown,criteria : array) : unknown</text>
-<rect fill="#ffffff" height="86" stroke="#ffffff" stroke-width="1" width="232" x="594" y="949"/>
-<rect fill="none" height="86" stroke="#000000" stroke-width="1" width="232" x="594" y="949"/>
-<text font-family="Dialog" font-size="12" x="668" y="962">
-TaxaAttribute</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="232" x="594" y="972"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="232" x="594" y="993"/>
-<text font-family="Dialog" font-size="12" x="598" y="1007">
-__construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="598" y="1023">
+<text font-family="Dialog" font-size="12" x="930" y="290">
 loadFromName(name : string) : void</text>
-<polyline fill="none" points="682,906 682,949" stroke="#000000" stroke-width="1"/>
-<polygon fill="#000000" points="682,906 687,916 682,926 677,916" stroke="#000000" stroke-width="1"/>
-<polygon fill="none" points="682,906 687,916 682,926 677,916" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="675" x2="682" y1="937" y2="949"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="689" x2="682" y1="937" y2="949"/>
-<text font-family="Dialog" font-size="12" x="684" y="932">
+<text font-family="Dialog" font-size="12" x="930" y="306">
+getAllValues(criteria)</text>
+<text font-family="Dialog" font-size="12" x="930" y="322">
+countAllValues(criteria) : unknown</text>
+<text font-family="Dialog" font-size="12" x="930" y="338">
+setFilter(criteria) : string</text>
+<text font-family="Dialog" font-size="12" x="930" y="354">
+deleteValue(value : string) : void</text>
+<text font-family="Dialog" font-size="12" x="930" y="370">
+replaceValue(oldValue : string,value : string) : string</text>
+<text font-family="Dialog" font-size="12" x="930" y="386">
+getValues(request) : unknown</text>
+<polyline fill="none" points="365,341 446,341" stroke="#000000" stroke-width="1"/>
+<polygon fill="#000000" points="365,341 375,336 385,341 375,346" stroke="#000000" stroke-width="1"/>
+<polygon fill="none" points="365,341 375,336 385,341 375,346" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="434" x2="446" y1="348" y2="341"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="434" x2="446" y1="334" y2="341"/>
+<polyline fill="none" points="814,341 926,341" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="814,341 824,336 834,341 824,346" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="814,341 824,336 834,341 824,346" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="914" x2="926" y1="348" y2="341"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="914" x2="926" y1="334" y2="341"/>
+<text font-family="Dialog" font-size="12" x="826" y="321">
 TaxaAttribute</text>
-<polyline fill="none" points="497,897 586,897" stroke="#000000" stroke-width="1"/>
-<text font-family="Dialog" font-size="12" x="495" y="877">
-Attributes to Taxa</text>
-<rect fill="#ffffff" height="105" stroke="#ffffff" stroke-width="1" width="369" x="602" y="1061"/>
-<rect fill="none" height="105" stroke="#000000" stroke-width="1" width="369" x="602" y="1061"/>
-<text font-family="Dialog" font-size="12" x="742" y="1074">
-TaxaImageColl</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="602" y="1084"/>
-<text font-family="Dialog" font-size="12" x="606" y="1098">
+<text font-family="Dialog" font-size="12" x="825" y="336">
+1</text>
+<text font-family="Dialog" font-size="12" x="900" y="336">
+1..*</text>
+<rect fill="#ffffff" height="105" stroke="#ffffff" stroke-width="1" width="325" x="446" y="424"/>
+<rect fill="none" height="105" stroke="#000000" stroke-width="1" width="325" x="446" y="424"/>
+<text font-family="Dialog" font-size="12" x="528" y="437">
+flora::taxa::TaxaImageColl</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="325" x="446" y="447"/>
+<text font-family="Dialog" font-size="12" x="450" y="461">
 taxa_id : unknown</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="602" y="1108"/>
-<text font-family="Dialog" font-size="12" x="606" y="1122">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="325" x="446" y="471"/>
+<text font-family="Dialog" font-size="12" x="450" y="485">
 __construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="606" y="1138">
-customSelect(select : unknown,criteria : array) : unknown</text>
-<text font-family="Dialog" font-size="12" x="606" y="1154">
+<text font-family="Dialog" font-size="12" x="450" y="501">
+customSelect(select : unknown,criteria) : unknown</text>
+<text font-family="Dialog" font-size="12" x="450" y="517">
 addItem(key : unknown) : unknown</text>
-<rect fill="#ffffff" height="198" stroke="#ffffff" stroke-width="1" width="245" x="666" y="1209"/>
-<rect fill="none" height="198" stroke="#000000" stroke-width="1" width="245" x="666" y="1209"/>
-<text font-family="Dialog" font-size="12" x="755" y="1222">
-TaxaImage</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="245" x="666" y="1232"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="245" x="666" y="1253"/>
-<text font-family="Dialog" font-size="12" x="670" y="1267">
+<polyline fill="none" points="365,528 446,528" stroke="#000000" stroke-width="1"/>
+<polygon fill="#000000" points="365,528 375,523 385,528 375,533" stroke="#000000" stroke-width="1"/>
+<polygon fill="none" points="365,528 375,523 385,528 375,533" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="434" x2="446" y1="535" y2="528"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="434" x2="446" y1="521" y2="528"/>
+<rect fill="#ffffff" height="198" stroke="#ffffff" stroke-width="1" width="245" x="926" y="416"/>
+<rect fill="none" height="198" stroke="#000000" stroke-width="1" width="245" x="926" y="416"/>
+<text font-family="Dialog" font-size="12" x="979" y="429">
+flora::taxa::TaxaImage</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="245" x="926" y="439"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="245" x="926" y="460"/>
+<text font-family="Dialog" font-size="12" x="930" y="474">
 __construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="670" y="1283">
+<text font-family="Dialog" font-size="12" x="930" y="490">
 insert() : void</text>
-<text font-family="Dialog" font-size="12" x="670" y="1299">
+<text font-family="Dialog" font-size="12" x="930" y="506">
 update() : void</text>
-<text font-family="Dialog" font-size="12" x="670" y="1315">
+<text font-family="Dialog" font-size="12" x="930" y="522">
 moveInsert(inputFile : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="670" y="1331">
+<text font-family="Dialog" font-size="12" x="930" y="538">
 getUrl() : string</text>
-<text font-family="Dialog" font-size="12" x="670" y="1347">
+<text font-family="Dialog" font-size="12" x="930" y="554">
 getPath() : string</text>
-<text font-family="Dialog" font-size="12" x="670" y="1363">
+<text font-family="Dialog" font-size="12" x="930" y="570">
 getBaseFileName() : string</text>
-<text font-family="Dialog" font-size="12" x="670" y="1379">
+<text font-family="Dialog" font-size="12" x="930" y="586">
 moveFile(inputFile : string) : string</text>
-<text font-family="Dialog" font-size="12" x="670" y="1395">
+<text font-family="Dialog" font-size="12" x="930" y="602">
 delete() : void</text>
-<polyline fill="none" points="778,1165 778,1209" stroke="#000000" stroke-width="1"/>
-<polygon fill="#000000" points="778,1165 783,1175 778,1185 773,1175" stroke="#000000" stroke-width="1"/>
-<polygon fill="none" points="778,1165 783,1175 778,1185 773,1175" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="771" x2="778" y1="1197" y2="1209"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="785" x2="778" y1="1197" y2="1209"/>
-<text font-family="Dialog" font-size="12" x="778" y="1196">
-Taxa Image composition</text>
-<polyline fill="none" points="497,1002 602,1061" stroke="#000000" stroke-width="1"/>
-<text font-family="Dialog" font-size="12" x="519" y="1010">
-Taxa to Image</text>
-<rect fill="#ffffff" height="86" stroke="#ffffff" stroke-width="1" width="369" x="250" y="1201"/>
-<rect fill="none" height="86" stroke="#000000" stroke-width="1" width="369" x="250" y="1201"/>
-<text font-family="Dialog" font-size="12" x="396" y="1214">
-TaxaKindColl</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="250" y="1224"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="250" y="1245"/>
-<text font-family="Dialog" font-size="12" x="254" y="1259">
+<polyline fill="none" points="770,528 926,528" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="770,528 780,523 790,528 780,533" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="770,528 780,523 790,528 780,533" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="914" x2="926" y1="535" y2="528"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="914" x2="926" y1="521" y2="528"/>
+<text font-family="Dialog" font-size="12" x="804" y="508">
+TaxaImage</text>
+<text font-family="Dialog" font-size="12" x="781" y="523">
+1</text>
+<text font-family="Dialog" font-size="12" x="900" y="523">
+1..*</text>
+<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="211" x="446" y="568"/>
+<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="211" x="446" y="568"/>
+<text font-family="Dialog" font-size="12" x="488" y="581">
+flora::taxa::TaxaKind</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="211" x="446" y="591"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="211" x="446" y="612"/>
+<text font-family="Dialog" font-size="12" x="450" y="626">
 __construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="254" y="1275">
-customSelect(select : unknown,criteria : array) : unknown</text>
-<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="211" x="362" y="1081"/>
-<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="211" x="362" y="1081"/>
-<text font-family="Dialog" font-size="12" x="440" y="1094">
+<rect fill="#ffffff" height="134" stroke="#ffffff" stroke-width="1" width="325" x="830" y="624"/>
+<rect fill="none" height="134" stroke="#000000" stroke-width="1" width="325" x="830" y="624"/>
+<text font-family="Dialog" font-size="12" x="918" y="637">
+flora::taxa::TaxaKindColl</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="325" x="830" y="647"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="325" x="830" y="668"/>
+<text font-family="Dialog" font-size="12" x="834" y="682">
+__construct(db : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="834" y="698">
+loadAll(criteria) : void</text>
+<text font-family="Dialog" font-size="12" x="834" y="714">
+customSelect(select : unknown,criteria) : unknown</text>
+<text font-family="Dialog" font-size="12" x="834" y="730">
+countAll(criteria : unknown) : unknown</text>
+<text font-family="Dialog" font-size="12" x="834" y="746">
+setFilter(select : unknown,criteria) : unknown</text>
+<polyline fill="none" points="365,565 446,568" stroke="#000000" stroke-width="1"/>
+<polygon fill="#000000" points="365,565 375,560 385,565 374,570" stroke="#000000" stroke-width="1"/>
+<polygon fill="none" points="365,565 375,560 385,565 374,570" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="433" x2="446" y1="574" y2="568"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="434" x2="446" y1="560" y2="568"/>
+<polyline fill="none" points="830,637 656,637" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="830,637 820,642 810,637 820,632" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="830,637 820,642 810,637 820,632" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="668" x2="656" y1="630" y2="637"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="668" x2="656" y1="644" y2="637"/>
+<text font-family="Dialog" font-size="12" x="699" y="617">
 TaxaKind</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="211" x="362" y="1104"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="211" x="362" y="1125"/>
-<text font-family="Dialog" font-size="12" x="366" y="1139">
+<text font-family="Dialog" font-size="12" x="811" y="632">
+1</text>
+<text font-family="Dialog" font-size="12" x="660" y="632">
+1..*</text>
+<rect fill="#ffffff" height="134" stroke="#ffffff" stroke-width="1" width="325" x="294" y="656"/>
+<rect fill="none" height="134" stroke="#000000" stroke-width="1" width="325" x="294" y="656"/>
+<text font-family="Dialog" font-size="12" x="382" y="669">
+flora::region::RegionColl</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="325" x="294" y="679"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="325" x="294" y="700"/>
+<text font-family="Dialog" font-size="12" x="298" y="714">
 __construct(db : unknown) : void</text>
-<polyline fill="none" points="466,1201 466,1150" stroke="#000000" stroke-width="1"/>
-<polygon fill="#000000" points="466,1201 461,1191 466,1181 471,1191" stroke="#000000" stroke-width="1"/>
-<polygon fill="none" points="466,1201 461,1191 466,1181 471,1191" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="473" x2="466" y1="1162" y2="1150"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="459" x2="466" y1="1162" y2="1150"/>
-<text font-family="Dialog" font-size="12" x="374" y="1181">
-Taxa composition</text>
-<polyline fill="none" points="466,1002 466,1081" stroke="#000000" stroke-width="1"/>
-<text font-family="Dialog" font-size="12" x="469" y="1053">
-Taxa to Kind</text>
-<rect fill="#ffffff" height="153" stroke="#ffffff" stroke-width="1" width="377" x="618" y="441"/>
-<rect fill="none" height="153" stroke="#000000" stroke-width="1" width="377" x="618" y="441"/>
-<text font-family="Dialog" font-size="12" x="768" y="454">
-DicoItemColl</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="377" x="618" y="464"/>
-<text font-family="Dialog" font-size="12" x="622" y="478">
-dico_id : unknown</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="377" x="618" y="488"/>
-<text font-family="Dialog" font-size="12" x="622" y="502">
+<text font-family="Dialog" font-size="12" x="298" y="730">
+loadAll(criteria) : void</text>
+<text font-family="Dialog" font-size="12" x="298" y="746">
+customSelect(select : unknown,criteria) : unknown</text>
+<text font-family="Dialog" font-size="12" x="298" y="762">
+countAll(criteria : unknown) : unknown</text>
+<text font-family="Dialog" font-size="12" x="298" y="778">
+setFilter(select : unknown,criteria) : unknown</text>
+<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="211" x="734" y="784"/>
+<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="211" x="734" y="784"/>
+<text font-family="Dialog" font-size="12" x="776" y="797">
+flora::region::Region</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="211" x="734" y="807"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="211" x="734" y="828"/>
+<text font-family="Dialog" font-size="12" x="738" y="842">
 __construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="622" y="518">
-customSelect(select : unknown,criteria : array) : unknown</text>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="622" x2="928" y1="535" y2="535"/>
-<text font-family="Dialog" font-size="12" x="622" y="534">
-customSort(a : unknown,b : unknown) : unknown</text>
-<text font-family="Dialog" font-size="12" x="622" y="550">
-filterByAttributeValue(value : mixed,field : mixed) : unknown</text>
-<text font-family="Dialog" font-size="12" x="622" y="566">
-setDicoId(dico_id : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="622" y="582">
-addItem(key : unknown) : unknown</text>
-<rect fill="#ffffff" height="230" stroke="#ffffff" stroke-width="1" width="369" x="146" y="425"/>
-<rect fill="none" height="230" stroke="#000000" stroke-width="1" width="369" x="146" y="425"/>
-<text font-family="Dialog" font-size="12" x="303" y="438">
-DicoItem</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="146" y="448"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="146" y="469"/>
-<text font-family="Dialog" font-size="12" x="150" y="483">
-__construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="499">
-loadFromId(id : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="515">
-loadFromIdAndDico(id_dico : unknown,id : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="531">
-update() : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="547">
-insert() : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="563">
-replace() : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="579">
-delete() : void</text>
-<text font-family="Dialog" font-size="12" x="150" y="595">
-getSiblingCode() : string</text>
-<text font-family="Dialog" font-size="12" x="150" y="611">
-getChildrenCodeArray() : array</text>
-<text font-family="Dialog" font-size="12" x="150" y="627">
-getTaxa() : unknown</text>
-<text font-family="Dialog" font-size="12" x="150" y="643">
-removesTaxaAssociation() : void</text>
-<polyline fill="none" points="511,398 618,441" stroke="#000000" stroke-width="1"/>
-<text font-family="Dialog" font-size="12" x="529" y="399">
-Dico Items in Dico</text>
-<polyline fill="none" points="618,537 514,537" stroke="#000000" stroke-width="1"/>
-<polygon fill="#000000" points="618,537 608,542 598,537 608,532" stroke="#000000" stroke-width="1"/>
-<polygon fill="none" points="618,537 608,542 598,537 608,532" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="526" x2="514" y1="530" y2="537"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="526" x2="514" y1="544" y2="537"/>
-<text font-family="Dialog" font-size="12" x="521" y="517">
-DicoItem Composition</text>
-<polyline fill="none" points="386,654 386,693" stroke="#000000" stroke-width="1"/>
-<text font-family="Dialog" font-size="12" x="387" y="678">
-Taxa associated with DicoItem</text>
-<polyline fill="none" points="146,693 106,641 106,361 138,361" stroke="#000000" stroke-width="1"/>
-<text font-family="Dialog" font-size="12" x="13" y="523">
-Dico associated with Taxa</text>
-<rect fill="#ffffff" height="86" stroke="#ffffff" stroke-width="1" width="369" x="90" y="1161"/>
-<rect fill="none" height="86" stroke="#000000" stroke-width="1" width="369" x="90" y="1161"/>
-<text font-family="Dialog" font-size="12" x="218" y="1174">
-region::RegionColl</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="90" y="1184"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="369" x="90" y="1205"/>
-<text font-family="Dialog" font-size="12" x="94" y="1219">
-__construct(db : unknown) : void</text>
-<text font-family="Dialog" font-size="12" x="94" y="1235">
-customSelect(select : unknown,criteria : array) : unknown</text>
-<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="211" x="138" y="1433"/>
-<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="211" x="138" y="1433"/>
-<text font-family="Dialog" font-size="12" x="198" y="1446">
-region::Region</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="211" x="138" y="1456"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="211" x="138" y="1477"/>
-<text font-family="Dialog" font-size="12" x="142" y="1491">
-__construct(db : unknown) : void</text>
-<polyline fill="none" points="234,1246 234,1433" stroke="#000000" stroke-width="1"/>
-<polygon fill="#000000" points="234,1246 239,1256 234,1266 229,1256" stroke="#000000" stroke-width="1"/>
-<polygon fill="none" points="234,1246 239,1256 234,1266 229,1256" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="227" x2="234" y1="1421" y2="1433"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="241" x2="234" y1="1421" y2="1433"/>
-<text font-family="Dialog" font-size="12" x="237" y="1344">
+<polyline fill="none" points="294,565 294,656" stroke="#000000" stroke-width="1"/>
+<polygon fill="#000000" points="294,565 299,575 294,585 289,575" stroke="#000000" stroke-width="1"/>
+<polygon fill="none" points="294,565 299,575 294,585 289,575" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="287" x2="294" y1="644" y2="656"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="301" x2="294" y1="644" y2="656"/>
+<polyline fill="none" points="618,789 734,789" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="618,789 628,784 638,789 628,794" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="618,789 628,784 638,789 628,794" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="722" x2="734" y1="796" y2="789"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="722" x2="734" y1="782" y2="789"/>
+<text font-family="Dialog" font-size="12" x="632" y="769">
 Region</text>
-<polyline fill="none" points="186,1002 186,1161" stroke="#000000" stroke-width="1"/>
-<text font-family="Dialog" font-size="12" x="188" y="1086">
-Taxa to Region</text>
-<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="132" x="594" y="57"/>
-<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="132" x="594" y="57"/>
-<text font-family="Dialog" font-size="12" x="599" y="89">
-dico::export::Export</text>
-<text font-family="Dialog" font-size="12" x="612" y="71">
+<text font-family="Dialog" font-size="12" x="629" y="784">
+1</text>
+<text font-family="Dialog" font-size="12" x="708" y="784">
+1..*</text>
+<rect fill="#ffffff" height="182" stroke="#ffffff" stroke-width="1" width="377" x="86" y="808"/>
+<rect fill="none" height="182" stroke="#000000" stroke-width="1" width="377" x="86" y="808"/>
+<text font-family="Dialog" font-size="12" x="201" y="821">
+flora::dico::DicoItemColl</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="377" x="86" y="831"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="377" x="86" y="852"/>
+<text font-family="Dialog" font-size="12" x="90" y="866">
+__construct(db : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="882">
+customSelect(select : unknown,criteria) : unknown</text>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="90" x2="396" y1="899" y2="899"/>
+<text font-family="Dialog" font-size="12" x="90" y="898">
+customSort(a : unknown,b : unknown) : unknown</text>
+<text font-family="Dialog" font-size="12" x="90" y="914">
+export(format : string,stream : resource) : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="930">
+import(format : unknown,stream : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="946">
+importAndSave(format : unknown,stream : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="962">
+filterByAttributeValue(value : mixed,field : mixed) : unknown</text>
+<text font-family="Dialog" font-size="12" x="90" y="978">
+emptyDicoItems() : void</text>
+<polyline fill="none" points="174,565 174,808" stroke="#000000" stroke-width="1"/>
+<polygon fill="#000000" points="174,565 179,575 174,585 169,575" stroke="#000000" stroke-width="1"/>
+<polygon fill="none" points="174,565 179,575 174,585 169,575" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="167" x2="174" y1="796" y2="808"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="181" x2="174" y1="796" y2="808"/>
+<rect fill="#ffffff" height="230" stroke="#ffffff" stroke-width="1" width="420" x="86" y="1048"/>
+<rect fill="none" height="230" stroke="#000000" stroke-width="1" width="420" x="86" y="1048"/>
+<text font-family="Dialog" font-size="12" x="230" y="1061">
+flora::dico::DicoItem--</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="420" x="86" y="1071"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="420" x="86" y="1092"/>
+<text font-family="Dialog" font-size="12" x="90" y="1106">
+__construct(db : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="1122">
+loadFromId(id : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="1138">
+loadFromIdAndTaxa(parent_taxa_id : unknown,id : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="1154">
+update() : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="1170">
+insert() : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="1186">
+replace() : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="1202">
+delete() : void</text>
+<text font-family="Dialog" font-size="12" x="90" y="1218">
+getSiblingCode() : string</text>
+<text font-family="Dialog" font-size="12" x="90" y="1234">
+getChildrenCodeArray()</text>
+<text font-family="Dialog" font-size="12" x="90" y="1250">
+getTaxa() : unknown</text>
+<text font-family="Dialog" font-size="12" x="90" y="1266">
+removesTaxaAssociation() : void</text>
+<polyline fill="none" points="302,989 302,1048" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="302,989 307,999 302,1009 297,999" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="302,989 307,999 302,1009 297,999" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="295" x2="302" y1="1036" y2="1048"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="309" x2="302" y1="1036" y2="1048"/>
+<text font-family="Dialog" font-size="12" x="315" y="1016">
+1</text>
+<text font-family="Dialog" font-size="12" x="308" y="1031">
+1..*</text>
+<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="356" x="590" y="1056"/>
+<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="356" x="590" y="1056"/>
+<text font-family="Dialog" font-size="12" x="689" y="1088">
+flora::dico::import::Import</text>
+<text font-family="Dialog" font-size="12" x="720" y="1070">
 &lt;&lt;interface&gt;&gt;</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="132" x="594" y="99"/>
-<text font-family="Dialog" font-size="12" x="598" y="113">
-export()</text>
-<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="126" x="602" y="193"/>
-<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="126" x="602" y="193"/>
-<text font-family="Dialog" font-size="12" x="607" y="225">
-dico::inport::Inport</text>
-<text font-family="Dialog" font-size="12" x="617" y="207">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="356" x="590" y="1098"/>
+<text font-family="Dialog" font-size="12" font-style="italic" x="594" y="1112">
+import(dicoItemColl : unknown,stream : unknown) : void</text>
+<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="357" x="590" y="920"/>
+<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="357" x="590" y="920"/>
+<text font-family="Dialog" font-size="12" x="689" y="952">
+flora::dico::export::Export</text>
+<text font-family="Dialog" font-size="12" x="720" y="934">
 &lt;&lt;interface&gt;&gt;</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="126" x="602" y="235"/>
-<text font-family="Dialog" font-size="12" x="606" y="249">
-inport()</text>
-<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="351" x="818" y="161"/>
-<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="351" x="818" y="161"/>
-<text font-family="Dialog" font-size="12" x="930" y="174">
-dico::inport::Internal</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="351" x="818" y="184"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="351" x="818" y="205"/>
-<text font-family="Dialog" font-size="12" x="822" y="219">
-inport(dicoItemColl : unknown,stream : unknown) : void</text>
-<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="351" x="874" y="209"/>
-<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="351" x="874" y="209"/>
-<text font-family="Dialog" font-size="12" x="986" y="222">
-dico::inport::Pignatti</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="351" x="874" y="232"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="351" x="874" y="253"/>
-<text font-family="Dialog" font-size="12" x="878" y="267">
-inport(dicoItemColl : unknown,stream : unknown) : void</text>
-<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="354" x="818" y="25"/>
-<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="354" x="818" y="25"/>
-<text font-family="Dialog" font-size="12" x="930" y="38">
-dico::export::Internal</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="818" y="48"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="818" y="69"/>
-<text font-family="Dialog" font-size="12" x="822" y="83">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="357" x="590" y="962"/>
+<text font-family="Dialog" font-size="12" font-style="italic" x="594" y="976">
 export(dicoItemColl : unknown,stream : unknown) : void</text>
-<rect fill="#ffffff" height="89" stroke="#ffffff" stroke-width="1" width="354" x="874" y="57"/>
-<rect fill="none" height="89" stroke="#000000" stroke-width="1" width="354" x="874" y="57"/>
-<text font-family="Dialog" font-size="12" x="986" y="70">
-dico::export::Pignatti</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="874" y="80"/>
-<text font-family="Dialog" font-size="12" x="878" y="94">
-positions : array</text>
-<text font-family="Dialog" font-size="12" x="878" y="110">
+<polyline fill="none" points="462,986 590,986" stroke="#000000" stroke-width="1"/>
+<polygon fill="#000000" points="462,986 472,981 482,986 472,991" stroke="#000000" stroke-width="1"/>
+<polygon fill="none" points="462,986 472,981 482,986 472,991" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="578" x2="590" y1="993" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="578" x2="590" y1="979" y2="986"/>
+<polyline fill="none" points="462,989 590,1056" stroke="#000000" stroke-width="1"/>
+<polygon fill="#000000" points="462,989 473,989 479,998 468,998" stroke="#000000" stroke-width="1"/>
+<polygon fill="none" points="462,989 473,989 479,998 468,998" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="576" x2="590" y1="1056" y2="1056"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="582" x2="590" y1="1044" y2="1056"/>
+<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="354" x="1062" y="880"/>
+<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="354" x="1062" y="880"/>
+<text font-family="Dialog" font-size="12" x="1156" y="893">
+flora::dico::export::Internal</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="1062" y="903"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="1062" y="924"/>
+<text font-family="Dialog" font-size="12" x="1066" y="938">
+export(dicoItemColl : unknown,stream : unknown) : void</text>
+<rect fill="#ffffff" height="89" stroke="#ffffff" stroke-width="1" width="354" x="1062" y="976"/>
+<rect fill="none" height="89" stroke="#000000" stroke-width="1" width="354" x="1062" y="976"/>
+<text font-family="Dialog" font-size="12" x="1156" y="989">
+flora::dico::export::Pignatti</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="1062" y="999"/>
+<text font-family="Dialog" font-size="12" x="1066" y="1013">
+positions</text>
+<text font-family="Dialog" font-size="12" x="1066" y="1029">
 lastPosition : unknown</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="874" y="120"/>
-<text font-family="Dialog" font-size="12" x="878" y="134">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="1062" y="1039"/>
+<text font-family="Dialog" font-size="12" x="1066" y="1053">
 export(dicoItemColl : unknown,stream : unknown) : void</text>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="818" x2="813" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="808" x2="803" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="798" x2="793" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="788" x2="783" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="778" x2="773" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="768" x2="763" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="758" x2="753" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="748" x2="743" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="738" x2="733" y1="57" y2="57"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="728" x2="725" y1="57" y2="57"/>
-<polygon fill="#ffffff" points="725,57 737,50 737,64" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="725,57 737,50 737,64" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="874" x2="869" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="864" x2="859" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="854" x2="849" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="844" x2="839" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="834" x2="829" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="824" x2="819" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="814" x2="809" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="804" x2="799" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="794" x2="789" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="784" x2="779" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="774" x2="769" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="764" x2="759" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="754" x2="749" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="744" x2="739" y1="120" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="734" x2="729" y1="120" y2="120"/>
-<polygon fill="#ffffff" points="725,120 737,113 737,127" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="725,120 737,113 737,127" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="818" x2="813" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="808" x2="803" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="798" x2="793" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="788" x2="783" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="778" x2="773" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="768" x2="763" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="758" x2="753" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="748" x2="743" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="738" x2="733" y1="193" y2="193"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="728" x2="727" y1="193" y2="193"/>
-<polygon fill="#ffffff" points="727,193 739,186 739,200" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="727,193 739,186 739,200" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="874" x2="869" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="864" x2="859" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="854" x2="849" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="844" x2="839" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="834" x2="829" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="824" x2="819" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="814" x2="809" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="804" x2="799" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="794" x2="789" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="784" x2="779" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="774" x2="769" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="764" x2="759" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="754" x2="749" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="744" x2="739" y1="256" y2="256"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="734" x2="729" y1="256" y2="256"/>
-<polygon fill="#ffffff" points="727,256 739,249 739,263" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="727,256 739,249 739,263" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="511" x2="514" y1="201" y2="198"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="518" x2="522" y1="195" y2="191"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="525" x2="529" y1="188" y2="184"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="533" x2="536" y1="181" y2="177"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="540" x2="544" y1="174" y2="170"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="547" x2="551" y1="167" y2="164"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="555" x2="558" y1="160" y2="157"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="562" x2="566" y1="153" y2="150"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="569" x2="573" y1="146" y2="143"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="577" x2="580" y1="139" y2="136"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="584" x2="588" y1="132" y2="129"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="591" x2="594" y1="126" y2="123"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="590" x2="594" y1="136" y2="123"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="580" x2="594" y1="126" y2="123"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="511" x2="516" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="521" x2="526" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="531" x2="536" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="541" x2="546" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="551" x2="556" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="561" x2="566" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="571" x2="576" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="581" x2="586" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="591" x2="596" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="601" x2="602" y1="233" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="590" x2="602" y1="240" y2="233"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="590" x2="602" y1="226" y2="233"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1062" x2="1057" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1052" x2="1047" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1042" x2="1037" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1032" x2="1027" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1022" x2="1017" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1012" x2="1007" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1002" x2="997" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="992" x2="987" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="982" x2="977" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="972" x2="967" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="962" x2="957" y1="949" y2="949"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="952" x2="947" y1="949" y2="949"/>
+<polygon fill="#ffffff" points="946,949 958,942 958,956" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="946,949 958,942 958,956" stroke="#000000" stroke-width="1"/>
+<text font-family="Dialog" font-size="12" x="959" y="919">
+Internal</text>
+<text font-family="Dialog" font-size="12" x="964" y="936">
+&lt;&lt;realize&gt;&gt;</text>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1062" x2="1057" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1052" x2="1047" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1042" x2="1037" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1032" x2="1027" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1022" x2="1017" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1012" x2="1007" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1002" x2="997" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="992" x2="987" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="982" x2="977" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="972" x2="967" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="962" x2="957" y1="986" y2="986"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="952" x2="947" y1="986" y2="986"/>
+<polygon fill="#ffffff" points="946,986 958,979 958,993" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="946,986 958,979 958,993" stroke="#000000" stroke-width="1"/>
+<text font-family="Dialog" font-size="12" x="959" y="956">
+Pignatti</text>
+<text font-family="Dialog" font-size="12" x="964" y="973">
+&lt;&lt;realize&gt;&gt;</text>
+<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="354" x="590" y="1240"/>
+<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="354" x="590" y="1240"/>
+<text font-family="Dialog" font-size="12" x="684" y="1253">
+flora::dico::import::Internal</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="590" y="1263"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="590" y="1284"/>
+<text font-family="Dialog" font-size="12" x="594" y="1298">
+import(dicoItemColl : unknown,stream : unknown) : void</text>
+<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="354" x="1022" y="1240"/>
+<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="354" x="1022" y="1240"/>
+<text font-family="Dialog" font-size="12" x="1116" y="1253">
+flora::dico::import::Pignatti</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="1022" y="1263"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="354" x="1022" y="1284"/>
+<text font-family="Dialog" font-size="12" x="1026" y="1298">
+import(dicoItemColl : unknown,stream : unknown) : void</text>
+<rect fill="#ffffff" height="70" stroke="#ffffff" stroke-width="1" width="508" x="1022" y="1360"/>
+<rect fill="none" height="70" stroke="#000000" stroke-width="1" width="508" x="1022" y="1360"/>
+<text font-family="Dialog" font-size="12" x="1157" y="1373">
+flora::dico::import::pignatti_input_filter</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="508" x="1022" y="1383"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="508" x="1022" y="1404"/>
+<text font-family="Dialog" font-size="12" x="1026" y="1418">
+filter(in : unknown,out : unknown,consumed : unknown,closing : unknown) : void</text>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1102" x2="1102" y1="1360" y2="1355"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1102" x2="1102" y1="1350" y2="1345"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1102" x2="1102" y1="1340" y2="1335"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1102" x2="1102" y1="1330" y2="1325"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1102" x2="1102" y1="1320" y2="1315"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1102" x2="1102" y1="1310" y2="1309"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1109" x2="1102" y1="1321" y2="1309"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1095" x2="1102" y1="1321" y2="1309"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1240" y2="1235"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1230" y2="1225"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1220" y2="1215"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1210" y2="1205"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1200" y2="1195"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1190" y2="1185"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1180" y2="1175"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1170" y2="1165"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1160" y2="1155"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1150" y2="1145"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1140" y2="1135"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="1130" y2="1125"/>
+<polygon fill="#ffffff" points="782,1122 789,1134 775,1134" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="782,1122 789,1134 775,1134" stroke="#000000" stroke-width="1"/>
+<text font-family="Dialog" font-size="12" x="690" y="1176">
+Internal</text>
+<text font-family="Dialog" font-size="12" x="695" y="1193">
+&lt;&lt;realize&gt;&gt;</text>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1022" x2="1020" y1="1240" y2="1236"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1017" x2="1014" y1="1232" y2="1228"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1011" x2="1009" y1="1224" y2="1219"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1006" x2="1003" y1="1215" y2="1211"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1000" x2="998" y1="1207" y2="1203"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="995" x2="992" y1="1198" y2="1194"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="989" x2="987" y1="1190" y2="1186"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="984" x2="981" y1="1181" y2="1177"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="978" x2="976" y1="1173" y2="1169"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="973" x2="970" y1="1165" y2="1160"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="967" x2="965" y1="1156" y2="1152"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="962" x2="959" y1="1148" y2="1144"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="956" x2="954" y1="1139" y2="1135"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="951" x2="948" y1="1131" y2="1127"/>
+<polygon fill="#ffffff" points="945,1122 957,1128 945,1135" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="945,1122 957,1128 945,1135" stroke="#000000" stroke-width="1"/>
+<text font-family="Dialog" font-size="12" x="979" y="1149">
+Pignatti</text>
+<text font-family="Dialog" font-size="12" x="984" y="1166">
+&lt;&lt;realize&gt;&gt;</text>
+<rect fill="#ffffff" height="134" stroke="#ffffff" stroke-width="1" width="325" x="14" y="14"/>
+<rect fill="none" height="134" stroke="#000000" stroke-width="1" width="325" x="14" y="14"/>
+<text font-family="Dialog" font-size="12" x="115" y="27">
+flora::taxa::TaxaColl</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="325" x="14" y="37"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="325" x="14" y="58"/>
+<text font-family="Dialog" font-size="12" x="18" y="72">
+__construct(db : unknown) : void</text>
+<text font-family="Dialog" font-size="12" x="18" y="88">
+loadAll(criteria) : void</text>
+<text font-family="Dialog" font-size="12" x="18" y="104">
+customSelect(select : unknown,criteria) : unknown</text>
+<text font-family="Dialog" font-size="12" x="18" y="120">
+countAll(criteria : unknown) : unknown</text>
+<text font-family="Dialog" font-size="12" x="18" y="136">
+setFilter(select : unknown,criteria) : unknown</text>
+<rect fill="#ffffff" height="89" stroke="#ffffff" stroke-width="1" width="130" x="454" y="22"/>
+<rect fill="none" height="89" stroke="#000000" stroke-width="1" width="130" x="454" y="22"/>
+<text font-family="Dialog" font-size="12" x="473" y="35">
+flora::Autoload</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="130" x="454" y="45"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="458" x2="580" y1="60" y2="60"/>
+<text font-family="Dialog" font-size="12" x="458" y="59">
+instance : unknown</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="130" x="454" y="69"/>
+<text font-family="Dialog" font-size="12" x="458" y="83">
+__construct() : void</text>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="458" x2="580" y1="100" y2="100"/>
+<text font-family="Dialog" font-size="12" x="458" y="99">
+getInstance() : void</text>
+<polyline fill="none" points="166,147 166,224" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="166,147 171,157 166,167 161,157" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="166,147 171,157 166,167 161,157" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="159" x2="166" y1="212" y2="224"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="173" x2="166" y1="212" y2="224"/>
+<text font-family="Dialog" font-size="12" x="169" y="190">
+Taxa</text>
+<text font-family="Dialog" font-size="12" x="179" y="174">
+1</text>
+<text font-family="Dialog" font-size="12" x="172" y="207">
+1..*</text>
 </svg>

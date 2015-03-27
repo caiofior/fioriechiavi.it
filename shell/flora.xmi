@@ -1,0 +1,1367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XMI xmi.version="1.1" timestamp="Fri Mar 27 14:35:29 CET 2015" xmlns:UML="http://schema.omg.org/spec/UML/1.4">
+  <XMI.header>
+    <XMI.documentation>
+      <XMI.exporter>PHiMX - PHiMX_XMI_1_1</XMI.exporter>
+      <XMI.exporterVersion>1.0.0</XMI.exporterVersion>
+    </XMI.documentation>
+    <XMI.metamodel xmi.name="UML" xmi.version="1.4"/>
+  </XMI.header>
+  <XMI.content>
+    <UML:Model xmi.id="472" name="Main">
+      <UML:Namespace.ownedElement>
+        <UML:DataType xmi.id="1" name="unknown"/>
+        <UML:DataType xmi.id="2" name="boolean"/>
+        <UML:DataType xmi.id="3" name="integer"/>
+        <UML:DataType xmi.id="4" name="double"/>
+        <UML:DataType xmi.id="5" name="float"/>
+        <UML:DataType xmi.id="6" name="string"/>
+        <UML:DataType xmi.id="7" name="array"/>
+        <UML:DataType xmi.id="8" name="object"/>
+        <UML:DataType xmi.id="9" name="resource"/>
+        <UML:DataType xmi.id="10" name="mixed"/>
+        <UML:DataType xmi.id="11" name="void"/>
+        <UML:Generalization xmi.id="184" parent="13" child="18"/>
+        <UML:Generalization xmi.id="200" parent="14" child="19"/>
+        <UML:Generalization xmi.id="245" parent="13" child="25"/>
+        <UML:Generalization xmi.id="248" parent="14" child="26"/>
+        <UML:Generalization xmi.id="261" parent="13" child="27"/>
+        <UML:Generalization xmi.id="290" parent="13" child="28"/>
+        <UML:Generalization xmi.id="308" parent="14" child="29"/>
+        <UML:Generalization xmi.id="319" parent="14" child="30"/>
+        <UML:Generalization xmi.id="332" parent="13" child="31"/>
+        <UML:Generalization xmi.id="345" parent="14" child="32"/>
+        <UML:Generalization xmi.id="354" parent="13" child="33"/>
+        <UML:Generalization xmi.id="357" parent="14" child="34"/>
+        <UML:Generalization xmi.id="373" parent="13" child="36"/>
+        <UML:Generalization xmi.id="376" parent="14" child="37"/>
+        <UML:Generalization xmi.id="390" parent="13" child="39"/>
+        <UML:Generalization xmi.id="395" parent="13" child="40"/>
+        <UML:Generalization xmi.id="399" parent="14" child="41"/>
+        <UML:Generalization xmi.id="405" parent="14" child="42"/>
+        <UML:Generalization xmi.id="427" parent="13" child="45"/>
+        <UML:Generalization xmi.id="430" parent="13" child="46"/>
+        <UML:Generalization xmi.id="448" parent="14" child="47"/>
+        <UML:Generalization xmi.id="469" parent="13" child="49"/>
+        <UML:Abstraction xmi.id="222" supplier="50" client="20"/>
+        <UML:Abstraction xmi.id="228" supplier="50" client="21"/>
+        <UML:Abstraction xmi.id="232" supplier="51" client="22"/>
+        <UML:Abstraction xmi.id="241" supplier="51" client="24"/>
+        <UML:Interface xmi.id="50" name="flora\dico\export\Export">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="52" name="export" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="true">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="473" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="53" name="dicoItemColl" type="1"/>
+                <UML:Parameter xmi.id="54" name="stream" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Interface>
+        <UML:Interface xmi.id="51" name="flora\dico\import\Import">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="55" name="import" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="true">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="474" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="56" name="dicoItemColl" type="1"/>
+                <UML:Parameter xmi.id="57" name="stream" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Interface>
+        <UML:Class xmi.id="12" name="Autoload" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="58" name="instance" visibility="private" ownerScope="classifier" type="1"/>
+            <UML:Operation xmi.id="59" name="__construct" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="475" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="60" name="getInstance" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="476" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="13" name="Content" isAbstract="true">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="61" name="db" visibility="protected" ownerScope="instance" type="1"/>
+            <UML:Attribute xmi.id="62" name="table" visibility="protected" ownerScope="instance" type="1"/>
+            <UML:Attribute xmi.id="63" name="data" visibility="protected" ownerScope="instance" type="7"/>
+            <UML:Attribute xmi.id="64" name="rawData" visibility="protected" ownerScope="instance" type="7"/>
+            <UML:Attribute xmi.id="65" name="empty_entity" visibility="protected" ownerScope="instance" type="7"/>
+            <UML:Attribute xmi.id="66" name="primary" visibility="protected" ownerScope="instance" type="6"/>
+            <UML:Attribute xmi.id="67" name="metadata" visibility="protected" ownerScope="classifier" type="1"/>
+            <UML:Operation xmi.id="68" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="477" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="69" name="db" type="1"/>
+                <UML:Parameter xmi.id="70" name="table" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="71" name="loadFromId" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="478" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="72" name="id" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="73" name="getData" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="479" name="return" kind="return" type="7"/>
+                <UML:Parameter xmi.id="74" name="field" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="75" name="getRawData" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="480" name="return" kind="return" type="7"/>
+                <UML:Parameter xmi.id="76" name="field" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="77" name="setData" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="481" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="78" name="data" type="1"/>
+                <UML:Parameter xmi.id="79" name="field" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="80" name="insert" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="482" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="81" name="delete" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="483" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="82" name="update" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="484" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="83" name="getDb" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="485" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="84" name="getTable" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="486" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="85" name="isEmpty" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="487" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="86" name="getCache" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="488" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="87" name="getPrimaryKey" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="489" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="14" name="ContentColl" isAbstract="true">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="88" name="content" visibility="protected" ownerScope="instance" type="13"/>
+            <UML:Attribute xmi.id="89" name="items" visibility="protected" ownerScope="instance" type="7"/>
+            <UML:Attribute xmi.id="90" name="columns" visibility="protected" ownerScope="instance" type="7"/>
+            <UML:Attribute xmi.id="91" name="sortCriteria" visibility="protected" ownerScope="classifier" type="7"/>
+            <UML:Operation xmi.id="92" name="__construct" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="490" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="93" name="content" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="94" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="true">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="491" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="95" name="select" type="1"/>
+                <UML:Parameter xmi.id="96" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="97" name="customSort" visibility="protected" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="492" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="98" name="a" type="1"/>
+                <UML:Parameter xmi.id="99" name="b" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="100" name="loadAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="493" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="101" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="102" name="getItems" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="494" name="return" kind="return" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="103" name="count" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="495" name="return" kind="return" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="104" name="countAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="496" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="105" name="criteria" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="106" name="getColumns" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="497" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="107" name="addItem" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="498" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="108" name="key" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="109" name="prependItem" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="499" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="110" name="item" type="13"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="111" name="appendItem" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="500" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="112" name="item" type="13"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="113" name="getFirst" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="501" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="114" name="deleteByKey" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="502" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="115" name="key" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="116" name="emptyColl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="503" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="117" name="filterByAttributeValue" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="504" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="118" name="value" type="10"/>
+                <UML:Parameter xmi.id="119" name="field" type="10"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="120" name="sort" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="505" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="121" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="122" name="shuffle" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="506" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="123" name="getFieldsAsArray" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="507" name="return" kind="return" type="7"/>
+                <UML:Parameter xmi.id="124" name="field" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="15" name="Control" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="125" name="template" visibility="private" ownerScope="instance" type="6"/>
+            <UML:Attribute xmi.id="126" name="baseDir" visibility="private" ownerScope="instance" type="6"/>
+            <UML:Attribute xmi.id="127" name="page" visibility="private" ownerScope="instance" type="6"/>
+            <UML:Attribute xmi.id="128" name="pageName" visibility="private" ownerScope="instance" type="6"/>
+            <UML:Attribute xmi.id="129" name="validationMessages" visibility="private" ownerScope="instance" type="7"/>
+            <UML:Operation xmi.id="130" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="508" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="131" name="template" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="132" name="setBaseDir" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="509" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="133" name="baseDir" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="134" name="getBaseDir" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="510" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="135" name="setPage" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="511" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="136" name="page" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="137" name="getPage" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="512" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="138" name="setPageName" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="513" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="139" name="page" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="140" name="getPageName" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="514" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="141" name="getTemplate" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="515" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="142" name="addValidationMessage" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="516" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="143" name="key" type="6"/>
+                <UML:Parameter xmi.id="144" name="message" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="145" name="getValidationMessages" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="517" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="146" name="formIsValid" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="518" name="return" kind="return" type="2"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="147" name="getUrlParameters" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="519" name="return" kind="return" type="6"/>
+                <UML:Parameter xmi.id="148" name="parameters" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="16" name="Template" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="149" name="baseDir" visibility="private" ownerScope="instance" type="6"/>
+            <UML:Attribute xmi.id="150" name="templateFileName" visibility="private" ownerScope="instance" type="6"/>
+            <UML:Attribute xmi.id="151" name="blocks" visibility="private" ownerScope="instance" type="7"/>
+            <UML:Attribute xmi.id="152" name="control" visibility="private" ownerScope="instance" type="1"/>
+            <UML:Attribute xmi.id="153" name="object" visibility="private" ownerScope="instance" type="1"/>
+            <UML:Attribute xmi.id="154" name="cache" visibility="private" ownerScope="instance" type="1"/>
+            <UML:Operation xmi.id="155" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="520" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="156" name="baseDir" type="6"/>
+                <UML:Parameter xmi.id="157" name="templateFileName" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="158" name="setTemplate" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="521" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="159" name="templateFileName" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="160" name="setTemplatePage" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="522" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="161" name="templateFileName" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="162" name="setBlock" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="523" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="163" name="blockName" type="6"/>
+                <UML:Parameter xmi.id="164" name="blockFile" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="165" name="renderBlock" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="524" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="166" name="blockName" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="167" name="render" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="525" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="168" name="createControl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="526" name="return" kind="return" type="15"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="169" name="getControl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="527" name="return" kind="return" type="15"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="170" name="getBaseDir" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="528" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="171" name="setObjectData" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="529" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="172" name="object" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="173" name="encodeId" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="530" name="return" kind="return" type="6"/>
+                <UML:Parameter xmi.id="174" name="id" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="175" name="decodeId" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="531" name="return" kind="return" type="6"/>
+                <UML:Parameter xmi.id="176" name="code" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="177" name="getUrlModifyTimestamp" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="532" name="return" kind="return" type="6"/>
+                <UML:Parameter xmi.id="178" name="relativePath" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="179" name="cache" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="533" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="180" name="createCacheKey" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="534" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="17" name="flora\Autoload" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="181" name="instance" visibility="private" ownerScope="classifier" type="1"/>
+            <UML:Operation xmi.id="182" name="__construct" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="535" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="183" name="getInstance" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="536" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="18" name="flora\dico\DicoItem" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="185" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="537" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="186" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="187" name="loadFromId" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="538" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="188" name="id" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="189" name="loadFromIdAndTaxa" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="539" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="190" name="parent_taxa_id" type="1"/>
+                <UML:Parameter xmi.id="191" name="id" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="192" name="update" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="540" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="193" name="insert" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="541" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="194" name="replace" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="542" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="195" name="delete" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="543" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="196" name="getSiblingCode" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="544" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="197" name="getChildrenCodeArray" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="545" name="return" kind="return" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="198" name="getTaxa" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="546" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="199" name="removesTaxaAssociation" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="547" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="19" name="flora\dico\DicoItemColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="201" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="548" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="202" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="203" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="549" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="204" name="select" type="1"/>
+                <UML:Parameter xmi.id="205" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="206" name="customSort" visibility="protected" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="550" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="207" name="a" type="1"/>
+                <UML:Parameter xmi.id="208" name="b" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="209" name="export" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="551" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="210" name="format" type="6"/>
+                <UML:Parameter xmi.id="211" name="stream" type="9"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="212" name="import" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="552" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="213" name="format" type="1"/>
+                <UML:Parameter xmi.id="214" name="stream" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="215" name="importAndSave" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="553" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="216" name="format" type="1"/>
+                <UML:Parameter xmi.id="217" name="stream" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="218" name="filterByAttributeValue" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="554" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="219" name="value" type="10"/>
+                <UML:Parameter xmi.id="220" name="field" type="10"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="221" name="emptyDicoItems" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="555" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="20" name="flora\dico\export\Internal" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="223" name="export" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="556" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="224" name="dicoItemColl" type="1"/>
+                <UML:Parameter xmi.id="225" name="stream" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="21" name="flora\dico\export\Pignatti" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="226" name="positions" visibility="private" ownerScope="instance" type="7"/>
+            <UML:Attribute xmi.id="227" name="lastPosition" visibility="private" ownerScope="instance" type="1"/>
+            <UML:Operation xmi.id="229" name="export" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="557" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="230" name="dicoItemColl" type="1"/>
+                <UML:Parameter xmi.id="231" name="stream" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="22" name="flora\dico\import\Internal" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="233" name="import" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="558" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="234" name="dicoItemColl" type="1"/>
+                <UML:Parameter xmi.id="235" name="stream" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="23" name="flora\dico\import\pignatti_imput_filter" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="236" name="filter" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="559" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="237" name="in" type="1"/>
+                <UML:Parameter xmi.id="238" name="out" type="1"/>
+                <UML:Parameter xmi.id="239" name="consumed" type="1"/>
+                <UML:Parameter xmi.id="240" name="closing" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="24" name="flora\dico\import\Pignatti" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="242" name="import" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="560" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="243" name="dicoItemColl" type="1"/>
+                <UML:Parameter xmi.id="244" name="stream" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="25" name="flora\region\Region" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="246" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="561" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="247" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="26" name="flora\region\RegionColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="249" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="562" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="250" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="251" name="loadAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="563" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="252" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="253" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="564" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="254" name="select" type="1"/>
+                <UML:Parameter xmi.id="255" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="256" name="countAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="565" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="257" name="criteria" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="258" name="setFilter" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="566" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="259" name="select" type="1"/>
+                <UML:Parameter xmi.id="260" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="27" name="flora\taxa\Taxa" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="262" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="567" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="263" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="264" name="loadFromId" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="568" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="265" name="id" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="266" name="loadRoot" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="569" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="267" name="insert" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="570" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="268" name="update" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="571" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="269" name="delete" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="572" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="270" name="getRegionColl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="573" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="271" name="setRegions" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="574" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="272" name="regions" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="273" name="getTaxaKind" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="575" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="274" name="addTaxaAttribute" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="576" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="275" name="name" type="6"/>
+                <UML:Parameter xmi.id="276" name="value" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="277" name="addTaxaAttributeById" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="577" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="278" name="id" type="1"/>
+                <UML:Parameter xmi.id="279" name="value" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="280" name="getAttributeById" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="578" name="return" kind="return" type="6"/>
+                <UML:Parameter xmi.id="281" name="id" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="282" name="deleteAllTaxaAttributes" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="579" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="283" name="deleteTaxaAttributeById" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="580" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="284" name="id" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="285" name="getTaxaImgeColl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="581" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="286" name="getTaxaAttributeColl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="582" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="287" name="getParentColl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="583" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="288" name="getDicoItemColl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="584" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="289" name="edit" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="28" name="flora\taxa\TaxaAttribute" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="291" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="585" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="292" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="293" name="loadFromName" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="586" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="294" name="name" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="295" name="getAllValues" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="587" name="return" kind="return" type="7"/>
+                <UML:Parameter xmi.id="296" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="297" name="countAllValues" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="588" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="298" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="299" name="setFilter" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="589" name="return" kind="return" type="6"/>
+                <UML:Parameter xmi.id="300" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="301" name="deleteValue" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="590" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="302" name="value" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="303" name="replaceValue" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="591" name="return" kind="return" type="6"/>
+                <UML:Parameter xmi.id="304" name="oldValue" type="6"/>
+                <UML:Parameter xmi.id="305" name="value" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="306" name="getValues" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="592" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="307" name="request" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="29" name="flora\taxa\TaxaAttributeColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="309" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="593" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="310" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="311" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="594" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="312" name="select" type="1"/>
+                <UML:Parameter xmi.id="313" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="314" name="countAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="595" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="315" name="criteria" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="316" name="setFilter" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="596" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="317" name="select" type="1"/>
+                <UML:Parameter xmi.id="318" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="30" name="flora\taxa\TaxaColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="320" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="597" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="321" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="322" name="loadAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="598" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="323" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="324" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="599" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="325" name="select" type="1"/>
+                <UML:Parameter xmi.id="326" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="327" name="countAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="600" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="328" name="criteria" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="329" name="setFilter" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="601" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="330" name="select" type="1"/>
+                <UML:Parameter xmi.id="331" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="31" name="flora\taxa\TaxaImage" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="333" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="602" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="334" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="335" name="insert" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="603" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="336" name="update" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="604" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="337" name="moveInsert" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="605" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="338" name="inputFile" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="339" name="getUrl" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="606" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="340" name="getPath" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="607" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="341" name="getBaseFileName" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="608" name="return" kind="return" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="342" name="moveFile" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="609" name="return" kind="return" type="6"/>
+                <UML:Parameter xmi.id="343" name="inputFile" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="344" name="delete" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="610" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="32" name="flora\taxa\TaxaImageColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="346" name="taxa_id" visibility="private" ownerScope="instance" type="1"/>
+            <UML:Operation xmi.id="347" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="611" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="348" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="349" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="612" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="350" name="select" type="1"/>
+                <UML:Parameter xmi.id="351" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="352" name="addItem" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="613" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="353" name="key" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="33" name="flora\taxa\TaxaKind" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="355" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="614" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="356" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="34" name="flora\taxa\TaxaKindColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="358" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="615" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="359" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="360" name="loadAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="616" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="361" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="362" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="617" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="363" name="select" type="1"/>
+                <UML:Parameter xmi.id="364" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="365" name="countAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="618" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="366" name="criteria" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="367" name="setFilter" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="619" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="368" name="select" type="1"/>
+                <UML:Parameter xmi.id="369" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="35" name="contact\Autoload" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="370" name="instance" visibility="private" ownerScope="classifier" type="1"/>
+            <UML:Operation xmi.id="371" name="__construct" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="620" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="372" name="getInstance" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="621" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="36" name="contact\contact\Contact" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="374" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="622" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="375" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="37" name="contact\contact\ContactColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="377" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="623" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="378" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="379" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="624" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="380" name="select" type="1"/>
+                <UML:Parameter xmi.id="381" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="382" name="countAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="625" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="383" name="criteria" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="384" name="setFilter" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="626" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="385" name="select" type="1"/>
+                <UML:Parameter xmi.id="386" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="38" name="content\Autoload" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="387" name="instance" visibility="private" ownerScope="classifier" type="1"/>
+            <UML:Operation xmi.id="388" name="__construct" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="627" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="389" name="getInstance" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="628" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="39" name="content\content\Content" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="391" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="629" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="392" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="393" name="loadFromLabel" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="630" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="394" name="label" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="40" name="content\content\ContentCategory" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="396" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="631" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="397" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="398" name="delete" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="632" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="41" name="content\content\ContentCategoryColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="400" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="633" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="401" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="402" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="634" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="403" name="select" type="1"/>
+                <UML:Parameter xmi.id="404" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="42" name="content\content\ContentColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="406" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="635" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="407" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="408" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="636" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="409" name="select" type="1"/>
+                <UML:Parameter xmi.id="410" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="411" name="countAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="637" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="412" name="criteria" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="413" name="setFilter" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="638" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="414" name="select" type="1"/>
+                <UML:Parameter xmi.id="415" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="43" name="login\Auth" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="416" name="db" visibility="protected" ownerScope="instance" type="1"/>
+            <UML:Attribute xmi.id="417" name="username" visibility="protected" ownerScope="instance" type="6"/>
+            <UML:Attribute xmi.id="418" name="password" visibility="protected" ownerScope="instance" type="6"/>
+            <UML:Operation xmi.id="419" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="639" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="420" name="db" type="1"/>
+                <UML:Parameter xmi.id="421" name="username" type="6"/>
+                <UML:Parameter xmi.id="422" name="password" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="423" name="authenticate" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="640" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="44" name="login\Autoload" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id="424" name="instance" visibility="private" ownerScope="classifier" type="1"/>
+            <UML:Operation xmi.id="425" name="__construct" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="641" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="426" name="getInstance" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="642" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="45" name="login\user\Profile" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="428" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="643" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="429" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="46" name="login\user\User" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="431" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="644" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="432" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="433" name="loadFromId" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="645" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="434" name="id" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="435" name="loadFromConfirmCode" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="646" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="436" name="confirmCode" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="437" name="insert" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="647" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="438" name="getProfile" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="648" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="439" name="getRole" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="649" name="return" kind="return" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="440" name="resetPassword" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="650" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="441" name="setPassword" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="651" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="442" name="password" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="443" name="checkPassword" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="652" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="444" name="password" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="445" name="setNewLogin" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="653" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="446" name="newLogin" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="447" name="newLoginConfirmed" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="654" name="return" kind="return" type="11"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="47" name="login\user\UserColl" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="449" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="655" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="450" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="451" name="customSelect" visibility="protected" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="656" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="452" name="select" type="1"/>
+                <UML:Parameter xmi.id="453" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="454" name="countAll" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="657" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="455" name="criteria" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="456" name="setFilter" visibility="private" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="658" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="457" name="select" type="1"/>
+                <UML:Parameter xmi.id="458" name="criteria" type="7"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="48" name="login\user\UserInstantiator" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="459" name="getUserInstance" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="659" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="460" name="db" type="1"/>
+                <UML:Parameter xmi.id="461" name="login" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="462" name="createUserInstance" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="660" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="463" name="db" type="1"/>
+                <UML:Parameter xmi.id="464" name="login" type="1"/>
+                <UML:Parameter xmi.id="465" name="password" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id="466" name="confirmUserInstance" visibility="public" ownerScope="classifier" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="661" name="return" kind="return" type="1"/>
+                <UML:Parameter xmi.id="467" name="db" type="1"/>
+                <UML:Parameter xmi.id="468" name="confirmCode" type="6"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="49" name="login\user\UserRole" isAbstract="false">
+          <UML:Classifier.feature>
+            <UML:Operation xmi.id="470" name="__construct" visibility="public" ownerScope="instance" isLeaf="false" isAbstract="false">
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id="662" name="return" kind="return" type="11"/>
+                <UML:Parameter xmi.id="471" name="db" type="1"/>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+          </UML:Classifier.feature>
+        </UML:Class>
+      </UML:Namespace.ownedElement>
+    </UML:Model>
+  </XMI.content>
+</XMI>
