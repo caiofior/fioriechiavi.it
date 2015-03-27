@@ -36,7 +36,7 @@ $regionColl = $taxa->getRegionColl();
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
-      <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
+      <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
    </div>
    <div>
    <label for="taxa_kind_id_name">Categoria</label>
@@ -133,6 +133,6 @@ $regionColl = $taxa->getRegionColl();
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
-      <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
+      <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
    </div>
 </form>

@@ -15,7 +15,7 @@ class TaxaKindColl extends \ContentColl {
        */
       public function loadAll(array $criteria=null) {
           parent::loadAll($criteria);
-          if (sizeof($criteria) == 0 && $this->count() == 0) {
+          if (sizeof(array_filter($criteria)) == 0 && $this->count() == 0) {
               $defaultTaxaKindFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
                   .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'sql'.DIRECTORY_SEPARATOR.'taxa_kind.sql';
               if (is_file($defaultTaxaKindFile)) {

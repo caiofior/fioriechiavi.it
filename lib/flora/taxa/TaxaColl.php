@@ -19,7 +19,7 @@ class TaxaColl extends \ContentColl {
        */
       public function loadAll(array $criteria=null) {
           parent::loadAll($criteria);
-          if (sizeof($criteria) == 0 && $this->count() == 0) {
+          if (sizeof(array_filter($criteria)) == 0 && $this->count() == 0) {
               $taxaKindColl = new \flora\taxa\TaxaKindColl($this->content->getDb());
               $taxaKindColl->loadAll();
               $defaultTaxaFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
@@ -66,7 +66,7 @@ class TaxaColl extends \ContentColl {
          $criteria['sSearch']=$criteria['term'];
       }
       if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-         $select->where(' ( `taxa`.`name` LIKE "%'.addslashes($criteria['sSearch']).'%" OR `taxa`.`description` LIKE "%'.addslashes($criteria['sSearch']).'%" ) ');
+         $select->where(' ( `taxa`.`name` LIKE "'.addslashes($criteria['sSearch']).'%" OR `taxa`.`description` LIKE "'.addslashes($criteria['sSearch']).'%" ) ');
       }
       if (array_key_exists('images', $criteria) && $criteria['images'] != '') {
          if ($criteria['images'] == 0 ) {
