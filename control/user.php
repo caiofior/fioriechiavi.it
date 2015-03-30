@@ -115,7 +115,7 @@ switch ($_REQUEST['task']) {
       break;
    default :
       if ($GLOBALS['user'] instanceof \login\user\User) {
-         switch ($GLOBALS['user']->getData('role_id')) {
+         switch ($GLOBALS['user']->getProfile()->getData('role_id')) {
             case 1 :
                $this->getTemplate()->setBlock('middle','administrator/dashboard.phtml');      
                break;
