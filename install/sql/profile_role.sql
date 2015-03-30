@@ -11,9 +11,9 @@
 -- 
 
 -- 
--- Dump dei dati per la tabella `user_role`
+-- Dump dei dati per la tabella `profile_role`
 -- 
 
-INSERT IGNORE INTO `user_role` (`id`, `description`) VALUES (1, 'Administrator'),
+INSERT IGNORE INTO `profile_role` (`id`, `description`) VALUES (1, 'Administrator'),
 (2, 'Editor'),
 (3, 'User');

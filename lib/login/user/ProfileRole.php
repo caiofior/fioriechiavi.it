@@ -5,13 +5,13 @@ namespace login\user;
  *
  * @author caiofior
  */
-class UserRole extends \Content
+class ProfileRole extends \Content
 {
    /**
     * Associates the database table
     * @param \Zend\Db\Adapter\Adapter $db
     */
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
-      parent::__construct($db, 'user_role');
+      parent::__construct($db, 'profile_role');
    }
 }

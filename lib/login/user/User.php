@@ -54,22 +54,8 @@ class User extends \Content
     public function getProfile()
     {
       $profile = new \login\user\Profile($this->db);
-      if (array_key_exists('role_id', $this->data)) {
-          $profile->loadFromId($this->data['profile_id']);
-      }
+      $profile->loadFromId($this->data['profile_id']);
       return $profile;
-    }
-    /**
-     * Gets the user role object
-     * @return \login\user\UserRole
-     */
-    public function getRole()
-    {
-      $userRole = new \login\user\UserRole($this->db);
-      if (array_key_exists('role_id', $this->data)) {
-          $userRole->loadFromId($this->data['role_id']);
-      }
-      return $userRole;
     }
     /**
      * Resets user password

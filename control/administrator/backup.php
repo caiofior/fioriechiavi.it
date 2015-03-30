@@ -195,10 +195,11 @@ case 'resettaxa':
    }
    $command .= ' '.$GLOBALS['config']->database->database.' ';
    $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE taxa_kind; TRUNCATE TABLE region; TRUNCATE TABLE taxa; TRUNCATE TABLE taxa_region; TRUNCATE TABLE taxa_attribute; TRUNCATE TABLE taxa_attribute_value; TRUNCATE TABLE taxa_image;SET FOREIGN_KEY_CHECKS=1"';
+   exec($command);
    $this->getTemplate()->setBlock('middle','administrator/backup/main.phtml');
    $this->getTemplate()->setBlock('footer','administrator/backup/footer.phtml');  
    break; 
-   case 'resetutenti':
+case 'resetutenti':
     $command = 'mysql ';
    if ($GLOBALS['config']->database->hostname != '') {
        $command .= ' -h '.$GLOBALS['config']->database->hostname;
@@ -210,7 +211,8 @@ case 'resettaxa':
        $command .= ' -p'.$GLOBALS['config']->database->password;
    }
    $command .= ' '.$GLOBALS['config']->database->database.' ';
-   $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE user profile; TRUNCATE TABLE contact; TRUNCATE TABLE contact_parent;SET FOREIGN_KEY_CHECKS=1"';
+   $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE user; TRUNCATE TABLE profile; TRUNCATE TABLE contact; TRUNCATE TABLE contact_parent;SET FOREIGN_KEY_CHECKS=1"';
+   exec($command);
    $this->getTemplate()->setBlock('middle','administrator/backup/main.phtml');
    $this->getTemplate()->setBlock('footer','administrator/backup/footer.phtml');  
    break; 

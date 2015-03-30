@@ -38,7 +38,7 @@ CREATE TABLE `contact` (
   KEY `datetime` (`datetime`) USING BTREE,
   KEY `from_id` (`from_id`),
   KEY `to_id` (`to_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,6 +122,7 @@ DROP TABLE IF EXISTS `profile`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Profile data',
+  `role_id` int(11) DEFAULT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
   `address` varchar(200) DEFAULT NULL,
@@ -130,8 +131,24 @@ CREATE TABLE `profile` (
   `state` varchar(100) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
+  `profilecol` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `role_id` (`role_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='Profile';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `profile_role`
+--
+
+DROP TABLE IF EXISTS `profile_role`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `profile_role` (
+  `id` int(11) NOT NULL,
+  `description` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='Profile';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='User role';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -165,8 +182,8 @@ CREATE TABLE `taxa` (
   PRIMARY KEY (`id`),
   KEY `fk_taxonomy_kind_idx` (`taxa_kind_id`),
   KEY `modidy_datetime` (`change_datetime`),
-  CONSTRAINT `fk_taxonomy_kind` FOREIGN KEY (`taxa_kind_id`) REFERENCES `taxa_kind` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=275 DEFAULT CHARSET=utf8 COMMENT='Taxa';
+  FULLTEXT KEY `FullText` (`name`,`description`)
+) ENGINE=MyISAM AUTO_INCREMENT=389 DEFAULT CHARSET=utf8 COMMENT='Taxa';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -182,7 +199,7 @@ CREATE TABLE `taxa_attribute` (
   `description` text COMMENT 'Taxa attribute desciption',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='Taxa attribute';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa attribute';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -200,9 +217,8 @@ CREATE TABLE `taxa_attribute_value` (
   KEY `fk_taxa_attribute_value_taxa_id` (`id_taxa`),
   KEY `fk_taxa_attribute_value_taxa_attribute` (`id_taxa_attribute`),
   KEY `taxa_attribute_value` (`value`),
-  CONSTRAINT `fk_taxa_attribute_value_taxa` FOREIGN KEY (`id_taxa`) REFERENCES `taxa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_taxa_attribute_value_taxa_attribute` FOREIGN KEY (`id_taxa_attribute`) REFERENCES `taxa_attribute` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa attribute value';
+  FULLTEXT KEY `FullText` (`value`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Taxa attribute value';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -217,9 +233,8 @@ CREATE TABLE `taxa_image` (
   `id_taxa` int(11) DEFAULT NULL COMMENT 'Id of taxa',
   `filename` varchar(200) DEFAULT NULL COMMENT 'Filename',
   PRIMARY KEY (`id`),
-  KEY `fk_taxa_image_1_idx` (`id_taxa`),
-  CONSTRAINT `fk_taxa_image_1` FOREIGN KEY (`id_taxa`) REFERENCES `taxa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8 COMMENT='Taxa images';
+  KEY `fk_taxa_image_1_idx` (`id_taxa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa images';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -237,7 +252,7 @@ CREATE TABLE `taxa_kind` (
   `description` text,
   PRIMARY KEY (`id`),
   KEY `order` (`ord`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='Taxa kind';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa kind';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -253,8 +268,7 @@ CREATE TABLE `taxa_region` (
   PRIMARY KEY (`id_taxa`,`id_region`),
   KEY `fk_taxa_region_region_idx` (`id_region`),
   KEY `fk_taxa_region_taxa_idx` (`id_taxa`),
-  CONSTRAINT `fk_taxa_region_region` FOREIGN KEY (`id_region`) REFERENCES `region` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_taxa_region_taxa` FOREIGN KEY (`id_taxa`) REFERENCES `taxa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_taxa_region_region` FOREIGN KEY (`id_region`) REFERENCES `region` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Association between taxa and region';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -270,31 +284,14 @@ CREATE TABLE `user` (
   `password` varchar(100) DEFAULT NULL,
   `active` smallint(6) DEFAULT NULL,
   `profile_id` int(11) DEFAULT NULL,
-  `role_id` int(11) DEFAULT NULL,
   `creation_datetime` datetime DEFAULT NULL COMMENT 'user creation datetime',
   `change_datetime` datetime DEFAULT NULL COMMENT 'user last modify date time',
   `confirm_datetime` datetime DEFAULT NULL COMMENT 'confirm datet time',
   `last_login_datetime` datetime DEFAULT NULL,
   `confirm_code` varchar(50) DEFAULT NULL COMMENT 'confirm code',
   `new_username` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`username`),
-  KEY `fk_user_role_idx` (`role_id`),
-  CONSTRAINT `fk_user_role` FOREIGN KEY (`role_id`) REFERENCES `user_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='User data';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `user_role`
---
-
-DROP TABLE IF EXISTS `user_role`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_role` (
-  `id` int(11) NOT NULL,
-  `description` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='User role';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -306,4 +303,4 @@ CREATE TABLE `user_role` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-18 17:24:42
+-- Dump completed on 2015-03-30 10:04:05

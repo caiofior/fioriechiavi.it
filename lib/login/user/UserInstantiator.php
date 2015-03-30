@@ -42,21 +42,21 @@ class UserInstantiator {
          $active = 1;
       }
       
-      $userRole = new \login\user\UserRole($db);
-      $userRole->loadFromId($role_id);
-      if($userRole->getData('id') != $role_id ) {
+      $profileRole = new \login\user\ProfileRole($db);
+      $profileRole->loadFromId($role_id);
+      if($profileRole->getData('id') != $role_id ) {
           $defaultRuleFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
-                  .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'sql'.DIRECTORY_SEPARATOR.'user_role.sql';
+                  .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'sql'.DIRECTORY_SEPARATOR.'profile_role.sql';
           if (is_file($defaultRuleFile)) {
             $db->query(file_get_contents($defaultRuleFile), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
           }
-          $userRole->loadFromId($role_id);
-          if($userRole->getData('id') != $role_id ) {
-            $userRole->setData(array(
+          $profileRole->loadFromId($role_id);
+          if($profileRole->getData('id') != $role_id ) {
+            $profileRole->setData(array(
                 'id'=>$role_id,
                 'description'=>$role_description
             ));
-            $userRole->insert();
+            $profileRole->insert();
           }
       }
       $user = new \login\user\User($db);
@@ -65,10 +65,12 @@ class UserInstantiator {
               'password'=>md5($password),
               'active'=>$active,
               'creation_datetime'=>date('Y-m-d H:i:s'),
-              'role_id'=>$role_id,
               'confirm_code'=>md5(serialize($_SERVER).time())
               ));
       $user->insert();
+      $profile = $user->getProfile();
+      $profile->setData($role_id, 'role_id');
+      $profile->update();
       ob_start();
       require $db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'register.php';
       $html = new \Zend\Mime\Part(ob_get_clean());
