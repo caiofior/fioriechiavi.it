@@ -4,6 +4,7 @@ $manager->setName('abbrevia');
 \Zend\Session\Container::setDefaultManager($manager);
 $auth = new Zend\Authentication\AuthenticationService();
 $db->session = $manager->getStorage();
+$facebookSession = new \Zend\Session\Container('facebook_id');
 if (
         array_key_exists('action', $_REQUEST) &&
         $_REQUEST['action']=='login' &&

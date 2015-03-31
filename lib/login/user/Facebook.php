@@ -61,4 +61,19 @@ class Facebook extends \Content
       }
       return $profile;
     }
+    /**
+     * Sets Graph value
+     * @param string $label
+     * @param string $value
+     * @param string $accessToken
+     */
+    public function setGraphvalue($label,$value,$accessToken='') {
+         $this->db->query('REPLACE INTO `facebook_graph` 
+        SET `userId`="' . $this->data['userID'].'",
+            `label` ="' . addslashes($label).'",
+            `value` ="' . addslashes($value).'",
+            `accessToken` ="' . addslashes($accessToken).'",
+            `last_update_datetime`=NOW()
+            ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+    }
 }
