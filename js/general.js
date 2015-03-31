@@ -14,7 +14,7 @@ $(document).ready(function() {
        $(this).parent().siblings("div").show();
        e.preventDefault();
     });
-    if (searchTerm != "") {
+    if (typeof searchTerm != 'undefined' && searchTerm != "") {
       $.getJSON( "https://www.googleapis.com/customsearch/v1?q="+searchTerm+"&cx="+cx+"&key="+key+"&num=7", function( data ) {
         $.each(data["items"],function (key,value) {
            if (   

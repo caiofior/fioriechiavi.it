@@ -135,7 +135,6 @@ abstract class ContentColl {
                throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
             }
             if(!headers_sent()) {
-                //print($select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()));
                //$GLOBALS['firephp']->log($select->getSqlString($this->content->getTable()->getAdapter()->getPlatform()));
             }
             $this->items=array();

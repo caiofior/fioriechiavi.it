@@ -3,7 +3,7 @@
 <ul>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>"><?php echo $GLOBALS['db']->config->siteName; ?></a></li>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>contact.php">Contattaci</a></li>
-<?php  if ($GLOBALS['user'] instanceof \login\user\User) : ?>
+<?php  if ($GLOBALS['profile'] instanceof \login\user\Profile) : ?>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Amministrazione</a></li>
 <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?logout">Esci</a></li>
 <?php else: ?>

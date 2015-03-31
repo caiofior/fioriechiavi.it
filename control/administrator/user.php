@@ -1,28 +1,38 @@
 <?php
 if (array_key_exists('sEcho', $_REQUEST)) {
       $result = array();
-      $userColl = new \login\user\UserColl($GLOBALS['db']);
-      $userColl->loadAll($_REQUEST);
+      $profileColl = new \login\user\ProfileColl($GLOBALS['db']);
+      $profileColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
       $request = $_REQUEST;
       unset($request['sSearch']);
-      $result['iTotalRecords']=$userColl->countAll($request);
-      $result['iTotalDisplayRecords']=$userColl->countAll($_REQUEST);
+      $result['iTotalRecords']=$profileColl->countAll($request);
+      $result['iTotalDisplayRecords']=$profileColl->countAll($_REQUEST);
       $result['aaData']=array();
-      $columns = $userColl->getColumns();
-      foreach($userColl->getItems() as $key => $user) {
+      $columns = $profileColl->getColumns();
+      foreach($profileColl->getItems() as $key => $profile) {
          $row=array();
          foreach($columns as $column) {
-            $data = $user->getRawData($column);
+            $user = $profile->getUserColl()->getFirst(); 
+            $data = $profile->getRawData($column);
+            if ($column == 'username') {
+                $data = $user->getRawData('username');
+                if ($data == '') {
+                    $data = $profile->getRawData('email');
+                }
+            }
+            if ($column == 'creation_datetime' || $column == 'last_login_datetime') {
+                $data = $user->getRawData($column);
+            }
             if ($column == 'active') {
                $checked='';
-               if ($data ==1)
+               if ($user->getRawData('active') ==1)
                   $checked='checked="checked" ';
                $data = '<input '.$checked.'type="checkbox" name="active">';
             } else if ($column == 'actions') {
                $data = '';
                if ($user->getData('username') !== $GLOBALS['user']->getData('username')) {
-                  $data = '<a class="actions view" title="Vedi dettagli" href="?task=user&amp;action=view&amp;id='.$user->getData('username').'">Vedi dettagli</a><a class="actions delete" title="Cancella" href="?task=user&amp;action=delete&amp;id='.$user->getData('username').'">Cancella</a>';
+                  $data = '<a class="actions view" title="Vedi dettagli" href="?task=user&amp;action=view&amp;id='.$profile->getData('id').'">Vedi dettagli</a><a class="actions delete" title="Cancella" href="?task=user&amp;action=delete&amp;id='.$profile->getData('id').'">Cancella</a>';
                }
             } 
             $row[] = $data;     
@@ -40,9 +50,9 @@ $this->getTemplate()->setBlock('middle','administrator/user/list.phtml');
 $this->getTemplate()->setBlock('footer','administrator/user/footer.phtml'); 
 switch ($_REQUEST['action']) {
    case 'view':
-      $user = new \login\user\User($GLOBALS['db']);
-      $user->loadFromId($_REQUEST['id']);
-      $this->getTemplate()->setObjectData($user->getProfile());
+      $profile = new \login\user\Profile($GLOBALS['db']);
+      $profile->loadFromId($_REQUEST['id']);
+      $this->getTemplate()->setObjectData($profile);
       $this->getTemplate()->setBlock('middle','administrator/user/view.phtml');
       break;
    case 'isactive' :
@@ -53,10 +63,10 @@ switch ($_REQUEST['action']) {
       exit;
       break;
    case 'delete' :
-      $user = new \login\user\User($GLOBALS['db']);
+      $profile = new \login\user\Profile($GLOBALS['db']);
       if (array_key_exists('id', $_REQUEST) && $_REQUEST['id'] != '') {
-         $user->loadFromId($_REQUEST['id']);
-         $user->delete();
+         $profile->loadFromId($_REQUEST['id']);
+         $profile->delete();
       }
       exit;
    break;

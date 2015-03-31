@@ -9,7 +9,10 @@
    <label for="password_login">Password</label>
    <input type="password" name="password" id="password_login" value="" />
    </div>
-   <input type="submit" name="login" value="Accedi">
+   <input type="submit" name="login" value="Accedi">  
+   <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+   </fb:login-button>
+   <div id="fbstatus">
 </form>
 <h2>Dimenticato le credenziali? Crea una nuova password.</h2>
 <form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">

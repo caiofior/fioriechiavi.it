@@ -68,12 +68,23 @@ else if (
    
 } else if (array_key_exists('logout', $_REQUEST)) {
    $auth->getStorage()->clear();
+   $facebookSession->getManager()->getStorage()->clear('facebook_id');
    if (is_numeric(session_id())) session_destroy();
 }
-$user = null;
+$profile = null;
 try{
    $user = login\user\UserInstantiator::getUserInstance($db,$auth->getStorage()->read());
+   if (is_object($user)) {
+       $profile = $user->getProfile();
+   } else {
+       unset ($user);
+   }
 } catch (\Exception $e) {
    if ($e->getCode() != 1401231705)
       throw $e;
+}
+if ($facebookSession->facebook_id != '') {
+    $fb = new \login\user\Facebook($GLOBALS['db']);
+    $fb->loadFromId($facebookSession->facebook_id);
+    $profile = $fb->getProfile();
 }

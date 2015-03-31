@@ -38,7 +38,9 @@ class Autoload {
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'UserInstantiator.php';
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'User.php';
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'UserColl.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'Facebook.php';
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'Profile.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'ProfileColl.php';
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'ProfileRole.php';
 
       return self::$instance;

@@ -26,5 +26,16 @@ class Profile extends \Content
       }
       return $profileRole;
     }
+    public function getUserColl() {
+        $userColl = new \login\user\UserColl($this->db);
+        $userColl->loadAll(array('profile_id'=>$this->data['id']));
+        return $userColl;
+    }
+    public function delete() {
+        $this->db->query('DELETE FROM `user` 
+        WHERE `profile_id`=' . intval($this->data['id'])
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        parent::delete();
+    }
 
 }

@@ -113,9 +113,12 @@ switch ($_REQUEST['task']) {
          exit;
       }
       break;
+   case 'facebook' :
+       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'facebook.php';   
+   break;
    default :
-      if ($GLOBALS['user'] instanceof \login\user\User) {
-         switch ($GLOBALS['user']->getProfile()->getData('role_id')) {
+      if ($GLOBALS['profile'] instanceof \login\user\Profile) {
+         switch ($GLOBALS['profile']->getData('role_id')) {
             case 1 :
                $this->getTemplate()->setBlock('middle','administrator/dashboard.phtml');      
                break;
@@ -124,7 +127,8 @@ switch ($_REQUEST['task']) {
                break;
          }
       } else {
-         $this->getTemplate()->setBlock('middle','user/login.phtml');      
+         $this->getTemplate()->setBlock('middle','user/login.phtml');
+         $this->getTemplate()->setBlock('footer','user/footer.phtml');  
       }
    break;
 }

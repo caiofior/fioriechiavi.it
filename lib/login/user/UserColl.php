@@ -40,12 +40,8 @@ class UserColl extends \ContentColl {
      * @return \Zend\Db\Sql\Select
      */
     private function setFilter ($select,$criteria) {
-      $select->join('profile', 'profile.id=user.profile_id', array('profile.first_name'=>'first_name','profile.last_name'=>'last_name'), \Zend\Db\Sql\Select::JOIN_LEFT);
-      if (array_key_exists('role_id', $criteria) && $criteria['role_id'] != '') {
-          $select->where('`role_id` = '.intval($criteria['role_id']));
-      }
-      if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-         $select->where(' ( `profile`.`first_name` LIKE "'.addslashes($criteria['sSearch']).'%" OR `profile`.`last_name` LIKE "'.addslashes($criteria['sSearch']).'%" OR `username` LIKE "'.addslashes($criteria['sSearch']).'%" ) ');
+      if (array_key_exists('profile_id', $criteria) && $criteria['profile_id'] != '') {
+          $select->where('`profile_id` = '.intval($criteria['profile_id']));
       }
       return $select;
     }
