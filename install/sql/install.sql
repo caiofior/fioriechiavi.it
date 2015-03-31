@@ -114,6 +114,45 @@ CREATE TABLE `dico_item` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `facebook`
+--
+
+DROP TABLE IF EXISTS `facebook`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `facebook` (
+  `userID` varchar(20) NOT NULL,
+  `accessToken` text,
+  `signedRequest` text,
+  `creation_datetime` datetime DEFAULT NULL,
+  `last_login_datetime` datetime DEFAULT NULL,
+  `expires_datetime` datetime DEFAULT NULL,
+  `profile_id` varchar(45) DEFAULT NULL,
+  `active` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`userID`),
+  KEY `profile` (`profile_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `facebook_graph`
+--
+
+DROP TABLE IF EXISTS `facebook_graph`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `facebook_graph` (
+  `userID` varchar(20) NOT NULL,
+  `label` varchar(50) NOT NULL,
+  `value` text,
+  `accessToken` text,
+  `last_update_datetime` datetime DEFAULT NULL,
+  PRIMARY KEY (`userID`,`label`),
+  CONSTRAINT `fk_facebook_graph_1` FOREIGN KEY (`userID`) REFERENCES `facebook` (`userid`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `profile`
 --
 
@@ -303,4 +342,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-30 10:04:05
+-- Dump completed on 2015-03-31 12:57:52

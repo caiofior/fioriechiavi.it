@@ -25,7 +25,7 @@ switch ($_REQUEST['action']) {
                 }
                 $facebookSession = new \Zend\Session\Container('facebook_id');
                 $facebookSession->facebook_id=$fb->getData('userID');
-                 pclose(popen('php ' . $GLOBALS['db']->baseDir . '/shell/facebook.php  '.$fb->getData('userID').' > /dev/null &', 'r'));
+                pclose(popen('php ' . $GLOBALS['db']->baseDir . '/shell/facebook.php  '.$fb->getData('userID').' > /dev/null &', 'r'));
             break;
             case 'not_authorized':
                 $m->status = false;
