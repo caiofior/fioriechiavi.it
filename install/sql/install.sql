@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: fioriech65618
 -- ------------------------------------------------------
--- Server version	5.5.41-0ubuntu0.14.10.1
+-- Server version	5.5.41-0ubuntu0.14.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -127,10 +127,10 @@ CREATE TABLE `facebook` (
   `creation_datetime` datetime DEFAULT NULL,
   `last_login_datetime` datetime DEFAULT NULL,
   `expires_datetime` datetime DEFAULT NULL,
-  `profile_id` varchar(45) DEFAULT NULL,
-  `active` smallint(6) DEFAULT NULL,
+  `profile_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`userID`),
-  KEY `profile` (`profile_id`)
+  KEY `profile` (`profile_id`),
+  CONSTRAINT `fk_facebook_1` FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -148,8 +148,31 @@ CREATE TABLE `facebook_graph` (
   `accessToken` text,
   `last_update_datetime` datetime DEFAULT NULL,
   PRIMARY KEY (`userID`,`label`),
-  CONSTRAINT `fk_facebook_graph_1` FOREIGN KEY (`userID`) REFERENCES `facebook` (`userid`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_facebook_graph_1` FOREIGN KEY (`userID`) REFERENCES `facebook` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `login`
+--
+
+DROP TABLE IF EXISTS `login`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `login` (
+  `username` varchar(100) NOT NULL,
+  `password` varchar(100) DEFAULT NULL,
+  `profile_id` int(11) DEFAULT NULL,
+  `creation_datetime` datetime DEFAULT NULL COMMENT 'user creation datetime',
+  `change_datetime` datetime DEFAULT NULL COMMENT 'user last modify date time',
+  `confirm_datetime` datetime DEFAULT NULL COMMENT 'confirm datet time',
+  `last_login_datetime` datetime DEFAULT NULL,
+  `confirm_code` varchar(50) DEFAULT NULL COMMENT 'confirm code',
+  `new_username` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`username`),
+  KEY `fk_login_1_idx` (`profile_id`),
+  CONSTRAINT `fk_login_1` FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='User data';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -162,6 +185,7 @@ DROP TABLE IF EXISTS `profile`;
 CREATE TABLE `profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Profile data',
   `role_id` int(11) DEFAULT NULL,
+  `active` smallint(1) DEFAULT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
   `address` varchar(200) DEFAULT NULL,
@@ -170,7 +194,6 @@ CREATE TABLE `profile` (
   `state` varchar(100) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `profilecol` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `role_id` (`role_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='Profile';
@@ -222,7 +245,7 @@ CREATE TABLE `taxa` (
   KEY `fk_taxonomy_kind_idx` (`taxa_kind_id`),
   KEY `modidy_datetime` (`change_datetime`),
   FULLTEXT KEY `FullText` (`name`,`description`)
-) ENGINE=MyISAM AUTO_INCREMENT=389 DEFAULT CHARSET=utf8 COMMENT='Taxa';
+) ENGINE=MyISAM AUTO_INCREMENT=395 DEFAULT CHARSET=utf8 COMMENT='Taxa';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -238,7 +261,7 @@ CREATE TABLE `taxa_attribute` (
   `description` text COMMENT 'Taxa attribute desciption',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa attribute';
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COMMENT='Taxa attribute';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -273,7 +296,7 @@ CREATE TABLE `taxa_image` (
   `filename` varchar(200) DEFAULT NULL COMMENT 'Filename',
   PRIMARY KEY (`id`),
   KEY `fk_taxa_image_1_idx` (`id_taxa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa images';
+) ENGINE=InnoDB AUTO_INCREMENT=191 DEFAULT CHARSET=utf8 COMMENT='Taxa images';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -291,7 +314,7 @@ CREATE TABLE `taxa_kind` (
   `description` text,
   PRIMARY KEY (`id`),
   KEY `order` (`ord`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa kind';
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='Taxa kind';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -310,28 +333,6 @@ CREATE TABLE `taxa_region` (
   CONSTRAINT `fk_taxa_region_region` FOREIGN KEY (`id_region`) REFERENCES `region` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Association between taxa and region';
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `user`
---
-
-DROP TABLE IF EXISTS `user`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user` (
-  `username` varchar(100) NOT NULL,
-  `password` varchar(100) DEFAULT NULL,
-  `active` smallint(6) DEFAULT NULL,
-  `profile_id` int(11) DEFAULT NULL,
-  `creation_datetime` datetime DEFAULT NULL COMMENT 'user creation datetime',
-  `change_datetime` datetime DEFAULT NULL COMMENT 'user last modify date time',
-  `confirm_datetime` datetime DEFAULT NULL COMMENT 'confirm datet time',
-  `last_login_datetime` datetime DEFAULT NULL,
-  `confirm_code` varchar(50) DEFAULT NULL COMMENT 'confirm code',
-  `new_username` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='User data';
-/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -342,4 +343,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-31 12:57:52
+-- Dump completed on 2015-04-03 19:26:30

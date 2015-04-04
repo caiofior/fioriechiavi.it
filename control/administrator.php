@@ -5,7 +5,7 @@ if (!array_key_exists('task', $_REQUEST)) {
 if (
       !isset($GLOBALS['user']) ||
       !is_object($GLOBALS['user']) ||
-      !$GLOBALS['user'] instanceof \login\user\User
+      !$GLOBALS['user'] instanceof \login\user\Login
       ) {
    header('Location: '.$GLOBALS['db']->config->baseUrl.'user.php');
    exit;

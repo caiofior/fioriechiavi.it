@@ -14,7 +14,7 @@ switch ($_REQUEST['task']) {
             array_key_exists('xhrValidate', $_REQUEST) ||
             array_key_exists('submit', $_REQUEST)
       ) {
-         $user = \login\user\UserInstantiator::getUserInstance($GLOBALS['db'], $_REQUEST['recover_login']);
+         $user = \login\user\LoginInstantiator::getLoginInstance($GLOBALS['db'], $_REQUEST['recover_login']);
          if(!is_object($user)) {
             $this->addValidationMessage('recover_login','La tua mail non si trova nei nostri archivi');
          }
@@ -26,7 +26,7 @@ switch ($_REQUEST['task']) {
          }
       }
       if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
-         $user = \login\user\UserInstantiator::getUserInstance($GLOBALS['db'], $_REQUEST['recover_login']);
+         $user = \login\user\LoginInstantiator::getLoginInstance($GLOBALS['db'], $_REQUEST['recover_login']);
          $user->resetPassword();
          $this->getTemplate()->setBlock('middle','user/reset.phtml');    
       }
@@ -60,7 +60,7 @@ switch ($_REQUEST['task']) {
     case 'changelogin':
       $this->getTemplate()->setBlock('middle','user/changelogin.phtml');
       if (array_key_exists('changeLoginConfirmCode', $_REQUEST)) {
-            $user = new \login\user\User($GLOBALS['db']);
+            $user = new \login\user\Login($GLOBALS['db']);
             $user->loadFromConfirmCode($_REQUEST['changeLoginConfirmCode']);
             if($user->getData('username') == '') {
                 $this->addValidationMessage('username','Utente non valido');

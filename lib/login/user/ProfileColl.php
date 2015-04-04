@@ -26,6 +26,7 @@ class ProfileColl extends \ContentColl {
      * @return \Zend\Db\Sql\Select
      */
     private function setFilter ($select,$criteria) {
+      $select->join('login', 'login.profile_id=profile.id', array('*'), \Zend\Db\Sql\Select::JOIN_LEFT);
       if (array_key_exists('role_id', $criteria) && $criteria['role_id'] != '') {
           $select->where('`profile`.`role_id` = '.intval($criteria['role_id']));
       }

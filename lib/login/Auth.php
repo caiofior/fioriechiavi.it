@@ -37,8 +37,8 @@ class Auth implements \Zend\Authentication\Adapter\AdapterInterface {
     */
    public function authenticate() {
       extract($this->db->query('
-      SELECT COUNT(`username`) as isAuthenticated FROM `user` WHERE 
-      `active` = 1 AND
+      SELECT COUNT(`username`) as isAuthenticated FROM `login` WHERE 
+      (SELECT `active` FROM `profile` WHERE `login`.`profile_id`=`profile`.`id`) = 1 AND
       `username`="'.addslashes($this->username).'" AND
       `password`="'.addslashes(md5($this->password)).'"
       ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current()->getArrayCopy());

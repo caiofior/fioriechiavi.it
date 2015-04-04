@@ -20,7 +20,7 @@ $(document).ready(function() {
                $.ajax({
                   data: {
                     "action":"isactive",
-                    "user_id":aData[0],
+                    "id":aData[0],
                     "checked":($(this).is(':checked') ? 1 : 0)
                   },
                   async : false

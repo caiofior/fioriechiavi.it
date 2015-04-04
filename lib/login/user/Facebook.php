@@ -41,7 +41,6 @@ class Facebook extends \Content
       $profile = new \login\user\Profile($this->db);
       $profile->insert();
       $this->setData($profile->getData('id'), 'profile_id');
-      $this->data['active']=1;
       $this->data['creation_datetime']=date('Y-m-d H:i:s');
       $this->data['last_login_datetime']=date('Y-m-d H:i:s');
       if (array_key_exists('expiresIn', $this->rawData) && $this->rawData['expiresIn'] != '')  {

@@ -37,20 +37,20 @@ else if (
          $control->addValidationMessage('password_register','Le due password non coincidono');
       }
       if ($control->formIsValid()) {
-         $user = \login\user\UserInstantiator::getUserInstance($db, $_REQUEST['username']);
+         $user = \login\user\LoginInstantiator::getLoginInstance($db, $_REQUEST['username']);
          if(is_object($user) && $user->getData('username') != '') {
             $control->addValidationMessage('username_register','Utente già registrato');
          }
       }
    } else {
-      $user = \login\user\UserInstantiator::createUserInstance($db, $_REQUEST['username'],$_REQUEST['password']);
+      $user = \login\user\LoginInstantiator::createLoginInstance($db, $_REQUEST['username'],$_REQUEST['password']);
    }
    $auth->getStorage()->clear();
    if (is_numeric(session_id())) session_destroy();
 } else if (array_key_exists('confirmCode', $_REQUEST)){
    $_REQUEST['task']='confirm';
    try {
-      $user = \login\user\UserInstantiator::confirmUserInstance($db, $_REQUEST['confirmCode']);
+      $user = \login\user\LoginInstantiator::confirmLoginInstance($db, $_REQUEST['confirmCode']);
    } catch (\Exception $e) {
       switch ($e->getCode()) {
          case 1409011509 :
@@ -74,7 +74,7 @@ else if (
 }
 $profile = null;
 try{
-   $user = login\user\UserInstantiator::getUserInstance($db,$auth->getStorage()->read());
+   $user = login\user\LoginInstantiator::getLoginInstance($db,$auth->getStorage()->read());
    if (is_object($user)) {
        $profile = $user->getProfile();
    } else {

@@ -7,7 +7,7 @@ namespace login\user;
  */
 class UserColl extends \ContentColl {
       public function __construct($db) {
-         parent::__construct(new \login\user\User($db));
+         parent::__construct(new \login\user\Login($db));
       }
     /**
       * Customizes select statement

@@ -26,13 +26,26 @@ class Profile extends \Content
       }
       return $profileRole;
     }
+    /**
+     * Gets a collection of users
+     *     
+     */
     public function getUserColl() {
         $userColl = new \login\user\UserColl($this->db);
         $userColl->loadAll(array('profile_id'=>$this->data['id']));
         return $userColl;
     }
+    /**
+     * Delets a prfile and associated users
+     */
     public function delete() {
-        $this->db->query('DELETE FROM `user` 
+        $this->db->query('DELETE FROM `login` 
+        WHERE `profile_id`=' . intval($this->data['id'])
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $this->db->query('DELETE FROM `facebook_graph` 
+        WHERE `userID` IN (SELECT `userID` FROM `facebook` WHERE `profile_id`=' . intval($this->data['id']).')'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $this->db->query('DELETE FROM `facebook` 
         WHERE `profile_id`=' . intval($this->data['id'])
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         parent::delete();

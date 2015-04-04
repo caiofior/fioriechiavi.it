@@ -26,7 +26,7 @@ if (array_key_exists('sEcho', $_REQUEST)) {
             }
             if ($column == 'active') {
                $checked='';
-               if ($user->getRawData('active') ==1)
+               if ($profile->getRawData('active') ==1)
                   $checked='checked="checked" ';
                $data = '<input '.$checked.'type="checkbox" name="active">';
             } else if ($column == 'actions') {
@@ -56,10 +56,10 @@ switch ($_REQUEST['action']) {
       $this->getTemplate()->setBlock('middle','administrator/user/view.phtml');
       break;
    case 'isactive' :
-      $user = new \login\user\User($GLOBALS['db']);
-      $user->loadFromId($_REQUEST['user_id']);
-      $user->setData($_REQUEST['checked'], 'active');
-      $user->update();
+      $profile = new \login\user\Profile($GLOBALS['db']);
+      $profile->loadFromId($_REQUEST['id']);
+      $profile->setData($_REQUEST['checked'], 'active');
+      $profile->update();
       exit;
       break;
    case 'delete' :

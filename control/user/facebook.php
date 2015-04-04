@@ -18,7 +18,10 @@ switch ($_REQUEST['action']) {
                 if ($insert) {
                     $profile=$fb->getProfile();
                     $fb->insert();
-                    $profile->setData(3, 'role_id');
+                    $profile->setData(array(
+                        'active'=>1,
+                        'role_id'=>3
+                    ));
                     $profile->insert();
                 } else {
                     $fb->update();
