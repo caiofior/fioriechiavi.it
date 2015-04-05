@@ -85,7 +85,7 @@ try{
       throw $e;
 }
 if ($facebookSession->facebook_id != '') {
-    $fb = new \login\user\Facebook($GLOBALS['db']);
-    $fb->loadFromId($facebookSession->facebook_id);
-    $profile = $fb->getProfile();
+    $user = new \login\user\Facebook($GLOBALS['db']);
+    $user->loadFromId($facebookSession->facebook_id);
+    $profile = $user->getProfile();
 }

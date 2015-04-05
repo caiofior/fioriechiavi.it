@@ -1,12 +1,12 @@
-<?php $role = $GLOBALS['profile']->getRole(); ?>
+<?php $role = $GLOBALS['profile']->getRole();?>
 <ul>
-   <?php if ($role->getData('id') <= 2) : ?>
+   <?php if ($role->getData('id') >0 && $role->getData('id') <= 2) : ?>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Taxa</a></li>
    <?php endif; ?>
-   <?php if ($role->getData('id') <= 1) : ?>
+   <?php if ($role->getData('id') >0 && $role->getData('id') <= 1) : ?>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa_category">Raggruppamenti sistematici</a></li>
    <?php endif; ?>
-   <?php if ($role->getData('id') <= 1) : ?>
+   <?php if ($role->getData('id') >0 && $role->getData('id') <= 1) : ?>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=attribute">Attributi</a></li>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=region">Regioni</a></li>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=user">Utenti</a></li>

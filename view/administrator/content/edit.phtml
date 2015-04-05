@@ -7,7 +7,7 @@ if (array_key_exists('id', $_REQUEST)) {
 }
 ?>
 <div id="breadcrump">
-   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=content">Elenco dei contenuti</a></p> &gt; <h2>Modifica contenuto</h2>
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=content">Elenco dei contenuti</a></p> &gt; <h2>Modifica contenuto</h2>
 </div>
 <form method="post" action="#">
    <input type="hidden" id="id" name="id" value="<?php echo $content->getData('id')?>">

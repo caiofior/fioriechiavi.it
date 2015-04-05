@@ -3,11 +3,11 @@
 <link rel="stylesheet" href="js/datatables/media/css/jquery.dataTables.css">
 -->
 <div id="breadcrump">
-   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category">Elenco delle categorie</a></p> &gt; <h2>Categorie taxa</h2>
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa_category">Elenco delle categorie</a></p> &gt; <h2>Categorie taxa</h2>
 </div>
 <p>Trascia i ragruppamenti sistematici nella posizione desiderata</p>
 <div id="saved" style="display: none;">I dati sono stati salvati</div>
-<a id="addCategoryTaxa" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa_category&amp;action=edit">Aggiungi una categoria</a>
+<a id="addCategoryTaxa" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa_category&amp;action=edit">Aggiungi una categoria</a>
 <ul id="sortCategoryTaxaList">
 <?php
 $taxaKindColl = new \flora\taxa\TaxaKindColl($GLOBALS['db']);

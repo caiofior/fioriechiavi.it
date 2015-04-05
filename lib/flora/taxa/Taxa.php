@@ -95,7 +95,7 @@ class Taxa extends \Content {
          WHERE `id_taxa`=' . intval($this->data['id'])
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('DELETE FROM `taxa_region` 
-         WHERE `parent_taxa_id`=' . intval($this->data['id'])
+         WHERE `id_taxa`=' . intval($this->data['id'])
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('UPDATE `dico_item` SET `taxa_id`=NULL 
          WHERE `taxa_id`=' . intval($this->data['id'])

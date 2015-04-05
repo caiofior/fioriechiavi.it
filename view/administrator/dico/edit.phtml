@@ -1,5 +1,5 @@
 <div id="breadcrump">
-   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica chiave dicotomica</h2>
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica chiave dicotomica</h2>
 </div>
 <?php
 $taxa = $this->object;
@@ -15,7 +15,7 @@ $taxa = $this->object;
 <a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
 <a class="downloadButton actions download" href="#" title="Download">Download</a>
 <a class="uploadButton actions upload" href="#" title="Upload">Upload</a>
-<a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>
+<a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>
 <form class="downloadForm" style="display:none;" method="post" action="?task=dico&amp;action=download&amp;id=<?php echo $taxa->getData('id');?>">
    <label for="download_format">Formato</label>
    <select id="download_format" name="download_format">
@@ -66,7 +66,7 @@ foreach ($taxaItemColl->getItems() as $taxaItem):
    <a class="editDicoItem actions edit" href="#"title="Modifica">Modifica</a>
    <?php if($taxaItem->getRawData('possible_taxa') === true) : ?>
    <a class="addTaxaButton actions add" href="#"title="Aggiungi Taxa">Aggiungi Taxa</a>
-   <a class="deleteTaxaItem actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=deletetaxaitem&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $taxaItem->getData('id');?>" title="Cancella voce">Cancella voce</a>
+   <a class="deleteTaxaItem actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=deletetaxaitem&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $taxaItem->getData('id');?>" title="Cancella voce">Cancella voce</a>
    <form style="display:none;" class="addTaxa" method="post" action="?task=taxa&amp;action=edit">
       <input type="hidden" name="children_dico_id" value="<?php echo $taxa->getData('id');?>"/>
       <input type="hidden" name="children_dico_item_id" value="<?php echo $taxaItem->getData('id');?>"/>
@@ -76,8 +76,8 @@ foreach ($taxaItemColl->getItems() as $taxaItem):
    </form>
    <?php else: 
       if ($taxaItem->getRawData('name') != ''):  ?>
-   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $taxaItem->getData('taxa_id');?>"><?php echo $taxaItem->getRawData('initials');?> <?php echo $taxaItem->getRawData('name');?></a>
-   <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $taxaItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $taxaItem->getData('taxa_id');?>"><?php echo $taxaItem->getRawData('initials');?> <?php echo $taxaItem->getRawData('name');?></a>
+   <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $taxaItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
       <?php endif; 
       endif; ?>
 </div>
@@ -85,4 +85,4 @@ foreach ($taxaItemColl->getItems() as $taxaItem):
 </div>
 <a class="actions update" href="#" title="Aggiorna">Aggiorna</a>
 <a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
-<a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>
+<a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>
