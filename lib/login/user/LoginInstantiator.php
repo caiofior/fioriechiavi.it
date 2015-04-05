@@ -31,7 +31,7 @@ class LoginInstantiator {
       if (is_object ($user) && $user->getData('username') != '') {
          throw new \Exception('Username already used '.$login,1409011238);
       }
-      $adminColl = new \login\user\UserColl($db);
+      $adminColl = new \login\user\LoginColl($db);
       $adminColl->loadAll(array('role_id'=>3));
       $role_id = 3;
       $role_description='User';

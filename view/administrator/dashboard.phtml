@@ -1,4 +1,4 @@
-<?php $role = $GLOBALS['user']->getProfile()->getRole(); ?>
+<?php $role = $GLOBALS['profile']->getRole(); ?>
 <ul>
    <?php if ($role->getData('id') <= 2) : ?>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Taxa</a></li>

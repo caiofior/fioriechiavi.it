@@ -39,7 +39,7 @@ case 'backuputenti':
    if ($GLOBALS['config']->database->password != '') {
        $command .= ' -p'.$GLOBALS['config']->database->password;
    }
-   $command .= ' '.$GLOBALS['config']->database->database.' profile_kind profile login facebook facebook_graph contact contact_parent --replace --no-create-db --no-create-info ';
+   $command .= ' '.$GLOBALS['config']->database->database.' profile_role profile login facebook facebook_graph contact --replace --no-create-db --no-create-info ';
    $temporaryFileName= tempnam(sys_get_temp_dir(),'');
    $command .= ' -r '.$temporaryFileName;
    exec($command);

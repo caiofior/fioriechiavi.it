@@ -5,9 +5,9 @@ namespace login\user;
  *
  * @author caiofior
  */
-class LoginColl extends \ContentColl {
+class FacebookColl extends \ContentColl {
       public function __construct($db) {
-         parent::__construct(new \login\user\Login($db));
+         parent::__construct(new \login\user\Facebook($db));
       }
     /**
       * Customizes select statement

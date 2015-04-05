@@ -5,7 +5,7 @@ namespace login\user;
  *
  * @author caiofior
  */
-class Login extends \Content
+class Login extends \Content implements \login\user\User
 {
    /**
     * Associates the database table

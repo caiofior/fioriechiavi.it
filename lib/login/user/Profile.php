@@ -31,8 +31,8 @@ class Profile extends \Content
      *     
      */
     public function getUserColl() {
-        $userColl = new \login\user\UserColl($this->db);
-        $userColl->loadAll(array('profile_id'=>$this->data['id']));
+        $userColl = new \login\user\UserColl($this);
+        $userColl->loadAll();
         return $userColl;
     }
     /**

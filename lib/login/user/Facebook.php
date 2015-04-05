@@ -1,11 +1,11 @@
 <?php
 namespace login\user;
 /**
- * User class
+ * Facebook class
  *
  * @author caiofior
  */
-class Facebook extends \Content
+class Facebook extends \Content implements \login\user\User
 {
    /**
     * Associates the database table

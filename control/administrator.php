@@ -3,9 +3,9 @@ if (!array_key_exists('task', $_REQUEST)) {
    $_REQUEST['task']=null;
 }
 if (
-      !isset($GLOBALS['user']) ||
-      !is_object($GLOBALS['user']) ||
-      !$GLOBALS['user'] instanceof \login\user\Login
+      !isset($GLOBALS['profile']) ||
+      !is_object($GLOBALS['profile']) ||
+      !$GLOBALS['profile'] instanceof \login\user\Profile
       ) {
    header('Location: '.$GLOBALS['db']->config->baseUrl.'user.php');
    exit;
