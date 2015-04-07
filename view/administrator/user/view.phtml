@@ -23,4 +23,24 @@
    <div>
    Telefono: <?php echo $this->object->getData('phone'); ?>
    </div>
+<?php foreach($this->object->getUserColl()->getItems() as $user) : 
+switch (get_class($user)) {
+case 'login\user\Facebook' : ?>
+<h3>Profilo facebook</h3>
+<?php foreach ($user->getGraphValues() as $graphValue) : ?>
+<div>
+    <?php echo $graphValue['label']; ?>:<?php echo $graphValue['value']; ?>
+</div>
+<?php endforeach;
+break;
+case 'login\user\Login' : ?>
+<h3>Profilo login</h3>
+<?php foreach ($user->getData() as $graphLabel=>$graphValue) : ?>
+<div>
+    <?php echo $graphLabel; ?>:<?php echo $graphValue; ?>
+</div>
+<?php endforeach;
+break;
+}
+endforeach; ?>
 

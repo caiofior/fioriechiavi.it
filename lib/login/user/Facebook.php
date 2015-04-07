@@ -75,4 +75,12 @@ class Facebook extends \Content implements \login\user\User
             `last_update_datetime`=NOW()
             ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
+    /**
+     * Gets graph data
+     * @return array
+     */
+    public function getGraphValues() {
+        return $this->db->query('SELECT * FROM `facebook_graph` 
+        WHERE `userId`="' . $this->data['userID'].'"', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->toArray();
+    }
 }

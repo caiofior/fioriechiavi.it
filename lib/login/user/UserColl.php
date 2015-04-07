@@ -57,5 +57,10 @@ class UserColl {
         }
         return $this->items[0];
     }
-    
+    /**
+     * Gets items
+     */
+    public function getItems() {
+        return $this->items;
+    }
 }
