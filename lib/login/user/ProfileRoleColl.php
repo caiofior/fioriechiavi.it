@@ -5,9 +5,9 @@ namespace login\user;
  *
  * @author caiofior
  */
-class ProfileColl extends \ContentColl {
+class ProfileRoleColl extends \ContentColl {
       public function __construct($db) {
-         parent::__construct(new \login\user\Profile($db));
+         parent::__construct(new \login\user\ProfileRole($db));
       }
     /**
       * Customizes select statement
@@ -26,13 +26,6 @@ class ProfileColl extends \ContentColl {
      * @return \Zend\Db\Sql\Select
      */
     private function setFilter ($select,$criteria) {
-      $select->columns(array('*','role'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `description` FROM `profile_role` WHERE `profile_role`.`id`=`profile`.`role_id` )')));
-      if (array_key_exists('role_id', $criteria) && $criteria['role_id'] != '') {
-          $select->where('`profile`.`role_id` = '.intval($criteria['role_id']));
-      }
-      if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-         $select->where(' ( `profile`.`first_name` LIKE "'.addslashes($criteria['sSearch']).'%" OR `profile`.`last_name` LIKE "'.addslashes($criteria['sSearch']).'%" ) ');
-      }
       return $select;
     }
 }

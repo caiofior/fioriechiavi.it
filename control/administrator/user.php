@@ -52,6 +52,21 @@ switch ($_REQUEST['action']) {
    case 'view':
       $profile = new \login\user\Profile($GLOBALS['db']);
       $profile->loadFromId($_REQUEST['id']);
+      if (
+            array_key_exists('xhrValidate', $_REQUEST) ||
+            array_key_exists('submit', $_REQUEST)
+      ) {
+      if (!array_key_exists('role_id', $_REQUEST) ||$_REQUEST['role_id']=='') {
+          $this->addValidationMessage('role_id','Il ruolo è obbligatorio');
+      }
+      if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
+         $_REQUEST['active']=(array_key_exists('active', $_REQUEST)?1:0); 
+         $profile->setData($_REQUEST);
+         $profile->update();
+         header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=user&action=view&id='.$profile->getData('id'));
+         exit(); 
+      }
+   }
       $this->getTemplate()->setObjectData($profile);
       $this->getTemplate()->setBlock('middle','administrator/user/view.phtml');
       break;

@@ -36,7 +36,7 @@ class Profile extends \Content
         return $userColl;
     }
     /**
-     * Delets a prfile and associated users
+     * Deletes a profile and associated users
      */
     public function delete() {
         $this->db->query('DELETE FROM `login` 

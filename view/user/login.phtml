@@ -1,21 +1,24 @@
-<h2>Inserisci le tue credenziali</h2>
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+Accedi tramite facebook
+</fb:login-button>
+<p>o inserisci le tue credenziali</p>
 <form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
    <input type="hidden" name="action" value="login" />
    <div>
    <label for="username_login">Nome utente/Email</label>
    <input type="email" name="username" id="username_login" value="" />
+   <a href="#" id="lost_password_link">Hai dimenticato la password?</a>
    </div>
    <div>
    <label for="password_login">Password</label>
    <input type="password" name="password" id="password_login" value="" />
+   <a href="#" id="subscribe_link">Non sei iscritto?</a>
    </div>
    <input type="submit" name="login" value="Accedi">  
-   <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
-   </fb:login-button>
    <div id="status">
 </form>
-<h2>Dimenticato le credenziali? Crea una nuova password.</h2>
-<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
+<form id="lost_password_form" action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
+    <p>Dimenticato le credenziali? Crea una nuova password.</p>
    <input type="hidden" name="task" value="recover" />
    <div>
    <label for="recover_login">Email</label>
@@ -23,9 +26,9 @@
    </div>
    <input type="submit" name="submit" value="Recupera">
 </form>
-<h2>Non sei registrato, iscriviti.</h2>
-<p>Potrai raccogliere le tue osservazioni botaniche, segnalare eventuali errori e collaborare a la chiave della Flora d'Italia</p>
-<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
+<form id="subscribe_form" action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
+   <p>Non sei registrato, iscriviti.</p>
+   <p>Potrai raccogliere le tue osservazioni botaniche, segnalare eventuali errori e collaborare a la chiave della Flora d'Italia</p>
    <input type="hidden" name="action" value="register" />
    <div>
    <label for="username_register">Nome utente/Email</label>
@@ -40,5 +43,5 @@
    <input type="password" name="passwordr" id="passwordr_register" value="" />
    </div>
    <input type="submit" name="register" value="Registrati">
+   <p>Attiva il tuo utente, segui istruzioni nella mail che ti verrà inviata</p>
 </form>
-<p>Attiva il tuo utente, segui istruzioni nella mail che ti verrà inviata</p>

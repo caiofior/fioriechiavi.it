@@ -45,6 +45,7 @@ class Autoload {
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'Profile.php';
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'ProfileColl.php';
       require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'ProfileRole.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'ProfileRoleColl.php';
 
       return self::$instance;
    }

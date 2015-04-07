@@ -43,4 +43,38 @@ case 'login\user\Login' : ?>
 break;
 }
 endforeach; ?>
+<h3>Stato</h3>
+<form method="post" action="#">
+    <input type="hidden" id="id" name="id" value="<?php echo $this->object->getData('id')?>">
+    <div>
+        <?php
+        $checked = '';
+        if ($this->object->getData('active') == 1) {
+            $checked = ' checked="checked"';
+        }
+        ?>
+        Attivo <input type="checkbox" name="active" id="active"<?php echo $checked;?>/>
+    </div>
+    <div>
+    <select name="role_id" id="role_id">
+    <?php
+    if ($this->object->getData('role_id') == '') :?>
+    <option>Seleziona un ruolo</option>
+    <?php
+    endif;
+    $profileRoleColl = new \login\user\ProfileRoleColl($GLOBALS['db']); 
+    $profileRoleColl->loadAll();
+    foreach($profileRoleColl->getItems() as $profileRole): 
+        $selected = '';
+        if ($this->object->getData('role_id')==$profileRole->getData('id')){
+            $selected = ' selected="selected"';    
+        }?>
+        <option value="<?php echo $profileRole->getData('id');?>"<?php echo $selected;?>><?php echo $profileRole->getData('description');?></option>    
+    <?php endforeach;  ?>
+    </select>
+    <div>
+      <input type="submit" name="submit" value="Salva">
+    </div>
+    </div>
+</form>
 

@@ -22,7 +22,6 @@
       statusChangeCallback(response);
     });
   }
-  FB.getLoginStatus(function(response) {
-    statusChangeCallback(response);
-  });
-
+  $("#subscribe_form, #lost_password_form").hide();
+  $("#lost_password_link").click(function(e) {$("#lost_password_form").toggle();e.preventDefault();});
+  $("#subscribe_link").click(function(e) {$("#subscribe_form").toggle();e.preventDefault();});
