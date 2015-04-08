@@ -90,7 +90,7 @@ case 'restore' :
    } else {
            $fileName = uniqid('file_');
    }
-
+   
    $filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
 
    $chunk = isset($_REQUEST['chunk']) ? intval($_REQUEST['chunk']) : 0;

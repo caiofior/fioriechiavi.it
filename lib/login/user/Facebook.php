@@ -38,9 +38,6 @@ class Facebook extends \Content implements \login\user\User
     * Create the profile before saving the user
     */
    public function insert() {
-      $profile = new \login\user\Profile($this->db);
-      $profile->insert();
-      $this->setData($profile->getData('id'), 'profile_id');
       $this->data['creation_datetime']=date('Y-m-d H:i:s');
       $this->data['last_login_datetime']=date('Y-m-d H:i:s');
       if (array_key_exists('expiresIn', $this->rawData) && $this->rawData['expiresIn'] != '')  {

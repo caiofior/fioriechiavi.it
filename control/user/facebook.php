@@ -17,12 +17,13 @@ switch ($_REQUEST['action']) {
                 $insert = $fb->getData('userID') == '';
                 $fb->setData($_REQUEST['authResponse']);
                 if ($insert) {
-                    $fb->insert();
                     $profile->setData(array(
                         'active'=>1,
                         'role_id'=>3
                     ));
                     $profile->insert();
+                    $fb->setData($profile->getData('id'), 'profile_id');
+                    $fb->insert();
                 } else {
                     if ($profile->getData('active') != 1) {
                         $m->status = false;
@@ -34,7 +35,7 @@ switch ($_REQUEST['action']) {
                 }
                 $facebookSession = new \Zend\Session\Container('facebook_id');
                 $facebookSession->facebook_id=$fb->getData('userID');
-                pclose(popen('php ' . $GLOBALS['db']->baseDir . '/shell/facebook.php  '.$fb->getData('userID').' > /dev/null &', 'r'));
+                pclose(popen('php ' . $GLOBALS['db']->baseDir . 'shell/facebook.php  '.$fb->getData('userID').' > /dev/null &', 'r'));
             break;
             case 'not_authorized':
                 $m->status = false;
