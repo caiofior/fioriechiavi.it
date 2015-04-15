@@ -11,27 +11,17 @@ switch ($_REQUEST['action']) {
         switch ($_REQUEST['status'])  {
             case 'connected':
                 $m->status = true;
-                $fb = new \login\user\Facebook($GLOBALS['db']);
-                $fb->loadFromId($_REQUEST['authResponse']['userID']);
-                $profile=$fb->getProfile();
-                $insert = $fb->getData('userID') == '';
-                $fb->setData($_REQUEST['authResponse']);
-                if ($insert) {
-                    $profile->setData(array(
-                        'active'=>1,
-                        'role_id'=>3
-                    ));
-                    $profile->insert();
-                    $fb->setData($profile->getData('id'), 'profile_id');
-                    $fb->insert();
-                } else {
-                    if ($profile->getData('active') != 1) {
+                try{
+                    $fb = \login\user\FacebookInstantiator::createLoginInstance($GLOBALS['db'], $_REQUEST['authResponse'], '');
+                } catch (\Exception $e) {
+                    if ($e->getCode() == 1504151435) {
                         $m->status = false;
                         $m->message = 'Accesso disabilitato dallo staff di '.$GLOBALS['config']->siteName;
                         echo json_encode($m);
                         exit;
+                    } else {
+                        throw $e;
                     }
-                    $fb->update();
                 }
                 $facebookSession = new \Zend\Session\Container('facebook_id');
                 $facebookSession->facebook_id=$fb->getData('userID');

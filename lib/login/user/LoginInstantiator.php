@@ -5,12 +5,12 @@ namespace login\user;
  *
  * @author caiofior
  */
-class LoginInstantiator {
+class LoginInstantiator implements \login\user\UserInstantiator {
    /**
     * Instantiates the user class
     * @param \Zend\Db\Adapter\Adapter $db
     * @param String $login
-    * @return \login\user\Login
+    * @return \login\user\User
     */
    public static function getLoginInstance(\Zend\Db\Adapter\Adapter $db ,$login) {
       $user = new \login\user\Login($db);
@@ -24,7 +24,7 @@ class LoginInstantiator {
     * @param \Zend\Db\Adapter\Adapter $db
     * @param type $login
     * @param type $password
-    * @return \login\user\Login
+    * @return \login\user\User
     */
    public static function createLoginInstance(\Zend\Db\Adapter\Adapter $db ,$login,$password) {
       $user = self::getLoginInstance($db, $login);
@@ -91,7 +91,7 @@ class LoginInstantiator {
       
       if ($adminColl->count() > 0 ) {
          ob_start();
-         require $db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'register.php';
+         require $db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_user.php';
          $html = new \Zend\Mime\Part(ob_get_clean());
          $html->type = 'text/html';
 
@@ -117,19 +117,19 @@ class LoginInstantiator {
     * @return \login\user\Login
     */
    public static function confirmLoginInstance(\Zend\Db\Adapter\Adapter $db ,$confirmCode) {
-      $user = new \login\user\Login($db);
-      $user->loadFromConfirmCode($confirmCode);
-      $profile = $user->getProfile();
-      if($user->getData('username') == '') {
-         throw new \Exception('Utente non valido '.$user->getData('username'),1409011509);
+      $login = new \login\user\Login($db);
+      $login->loadFromConfirmCode($confirmCode);
+      $profile = $login->getProfile();
+      if($login->getData('username') == '') {
+         throw new \Exception('Utente non valido '.$login->getData('username'),1409011509);
       }
       if($profile->getData('active') == '1') {
-         throw new \Exception('Utente già confermato '.$user->getData('username'),1409011510);
+         throw new \Exception('Utente già confermato '.$login->getData('username'),1409011510);
       }
       $profile->setData(array(
               'active'=>1
       ));
       $profile->update();
-      return $user;
+      return $login;
    }
 }

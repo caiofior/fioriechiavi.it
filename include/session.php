@@ -84,8 +84,7 @@ try{
    if ($e->getCode() != 1401231705)
       throw $e;
 }
-if ($facebookSession->facebook_id != '') {
-    $user = new \login\user\Facebook($GLOBALS['db']);
-    $user->loadFromId($facebookSession->facebook_id);
+if (!isset($user) && $facebookSession->facebook_id != '') {
+    $user = \login\user\FacebookInstantiator::getLoginInstance($GLOBALS['db'], $facebookSession->facebook_id);
     $profile = $user->getProfile();
 }

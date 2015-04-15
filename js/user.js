@@ -7,7 +7,7 @@
         data:response,
         success: function (data) {
             if (data.status == true) {
-                location.reeload(true);
+                location.reload(true);
             } else {
                 $("#fbstatus").html("<div class=\"validMessage\"><span>"+data.message+"</span></div>");
             }
