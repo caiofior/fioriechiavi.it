@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: fioriech65618
 -- ------------------------------------------------------
--- Server version	5.5.41-0ubuntu0.14.04.1
+-- Server version	5.5.41-0ubuntu0.14.10.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -109,8 +109,9 @@ CREATE TABLE `dico_item` (
   `text` text NOT NULL,
   `taxa_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`,`parent_taxa_id`),
-  KEY `fk_dico_item_taxa_idx` (`taxa_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Dicotomy item';
+  KEY `fk_dico_item_taxa_idx` (`taxa_id`),
+  FULLTEXT KEY `text` (`text`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Dicotomy item';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,10 +128,9 @@ CREATE TABLE `facebook` (
   `creation_datetime` datetime DEFAULT NULL,
   `last_login_datetime` datetime DEFAULT NULL,
   `expires_datetime` datetime DEFAULT NULL,
-  `profile_id` int(11) DEFAULT NULL,
+  `profile_id` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`userID`),
-  KEY `profile` (`profile_id`),
-  CONSTRAINT `fk_facebook_1` FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `profile` (`profile_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -145,10 +145,9 @@ CREATE TABLE `facebook_graph` (
   `userID` varchar(20) NOT NULL,
   `label` varchar(50) NOT NULL,
   `value` text,
-  `accessToken` text,
   `last_update_datetime` datetime DEFAULT NULL,
   PRIMARY KEY (`userID`,`label`),
-  CONSTRAINT `fk_facebook_graph_1` FOREIGN KEY (`userID`) REFERENCES `facebook` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_facebook_graph_1` FOREIGN KEY (`userID`) REFERENCES `facebook` (`userid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -169,9 +168,7 @@ CREATE TABLE `login` (
   `last_login_datetime` datetime DEFAULT NULL,
   `confirm_code` varchar(50) DEFAULT NULL COMMENT 'confirm code',
   `new_username` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`username`),
-  KEY `fk_login_1_idx` (`profile_id`),
-  CONSTRAINT `fk_login_1` FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='User data';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -196,7 +193,7 @@ CREATE TABLE `profile` (
   `email` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `role_id` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='Profile';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='Profile';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -245,7 +242,7 @@ CREATE TABLE `taxa` (
   KEY `fk_taxonomy_kind_idx` (`taxa_kind_id`),
   KEY `modidy_datetime` (`change_datetime`),
   FULLTEXT KEY `FullText` (`name`,`description`)
-) ENGINE=MyISAM AUTO_INCREMENT=395 DEFAULT CHARSET=utf8 COMMENT='Taxa';
+) ENGINE=MyISAM AUTO_INCREMENT=389 DEFAULT CHARSET=utf8 COMMENT='Taxa';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -261,7 +258,7 @@ CREATE TABLE `taxa_attribute` (
   `description` text COMMENT 'Taxa attribute desciption',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COMMENT='Taxa attribute';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa attribute';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -296,7 +293,7 @@ CREATE TABLE `taxa_image` (
   `filename` varchar(200) DEFAULT NULL COMMENT 'Filename',
   PRIMARY KEY (`id`),
   KEY `fk_taxa_image_1_idx` (`id_taxa`)
-) ENGINE=InnoDB AUTO_INCREMENT=191 DEFAULT CHARSET=utf8 COMMENT='Taxa images';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa images';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -314,7 +311,7 @@ CREATE TABLE `taxa_kind` (
   `description` text,
   PRIMARY KEY (`id`),
   KEY `order` (`ord`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='Taxa kind';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa kind';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -343,4 +340,4 @@ CREATE TABLE `taxa_region` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-04-03 19:26:30
+-- Dump completed on 2015-04-17 15:46:19

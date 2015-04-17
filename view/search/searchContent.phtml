@@ -1,0 +1,44 @@
+<?php
+if (!isset($floraSearch)) {
+    $floraSearch = $this->object;
+}
+$pageBuffer=5;
+$lastPage = intval($floraSearch->getTaxaCountAll()/$_REQUEST['pagelength']);
+$GLOBALS['lastPage']=$lastPage;
+$currentpage=min($lastPage,intval($_REQUEST['start']/$_REQUEST['pagelength']));
+$pages =array(0,$lastPage);
+$pages = array_merge($pages,range($currentpage-$pageBuffer,$currentpage+$pageBuffer));
+$pages=array_unique($pages);
+$pages=array_filter($pages, function($val){return $val >= 0 && $val <=$GLOBALS['lastPage'];});
+sort($pages);
+?>
+<div id="paginationContainer">
+<?php foreach($pages as $page):
+    $class='';
+    if ($page == $currentpage) {
+        $class=' selectedPage';
+    }
+    ?>
+    <a href="#" class="pageSelector<?php echo $class;?>" data-page="<?php echo $page*$_REQUEST['pagelength'];?>"><?php echo $page+1;?></a>
+    <?php if ($page <$lastPage && !in_array($page+1, $pages)) :?>…<?php endif;?>
+<?php endforeach; ?>
+</div>
+<div id="taxaContainer">
+<?php
+$taxaColl = $floraSearch->getTaxaColl();
+foreach($taxaColl->getItems() as $taxa):?>
+    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxa->getData('id');?>">
+    <div>
+        <div><?php echo $taxa->getRawData('taxa_kind_initials');?> <?php echo $taxa->getData('name');?></div>
+        <div>
+        <?php
+        $image= $taxa->getTaxaImgeColl()->getFirst();
+        if ($image->getUrl() != '') :
+        $imageUrl = $GLOBALS['db']->config->staticUrl.$image->getUrl(); 
+        ?>
+        <img src="<?php echo $imageUrl;?>" alt="Immagine <?php echo $taxa->getData('name');?>"/>
+        <?php endif; ?></div>
+    </div>
+    </a>
+<?php endforeach;?>
+</div>

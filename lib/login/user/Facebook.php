@@ -68,7 +68,6 @@ class Facebook extends \Content implements \login\user\User
         SET `userId`="' . $this->data['userID'].'",
             `label` ="' . addslashes($label).'",
             `value` ="' . addslashes($value).'",
-            `accessToken` ="' . addslashes($accessToken).'",
             `last_update_datetime`=NOW()
             ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }

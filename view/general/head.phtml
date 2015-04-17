@@ -3,6 +3,7 @@ $title = $GLOBALS['db']->config->siteName;
 $taxa = $this->object;
 if (
         is_object($taxa) &&
+        $taxa instanceof \flora\taxa\Taxa &&
         $taxa->getData('id') != 1 &&
         $taxa->getData('name') != '') :
    $title .= ' :: '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>

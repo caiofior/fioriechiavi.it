@@ -1,0 +1,11 @@
+<form method="post" action="<?php echo $GLOBALS['db']->config->baseUrl;?>search.php" id="searchForm">
+<input type="hidden" id="start" name="start" value="<?php echo $_REQUEST['start'];?>">
+<input type="hidden" id="pagelength" name="pagelength" value="<?php echo $_REQUEST['pagelength'];?>">
+<div>
+    Testo:
+    <input id="text" name="text">
+</div>
+</form>    
+<div id="searchContent">
+    <?php require __DIR__.'/searchContent.phtml';?>
+</div>

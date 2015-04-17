@@ -18,7 +18,7 @@ case 'backuptaxa':
    if ($GLOBALS['config']->database->password != '') {
        $command .= ' -p'.$GLOBALS['config']->database->password;
    }
-   $command .= ' '.$GLOBALS['config']->database->database.' taxa_kind region taxa taxa_region taxa_attribute taxa_attribute_value taxa_image --replace --no-create-db --no-create-info ';
+   $command .= ' '.$GLOBALS['config']->database->database.' taxa_kind region taxa taxa_region taxa_attribute taxa_attribute_value taxa_image --replace --no-create-db --no-create-info --compact --skip-extended-insert ';
    $temporaryFileName= tempnam(sys_get_temp_dir(),'');
    $command .= ' -r '.$temporaryFileName;
    exec($command);
@@ -39,7 +39,7 @@ case 'backuputenti':
    if ($GLOBALS['config']->database->password != '') {
        $command .= ' -p'.$GLOBALS['config']->database->password;
    }
-   $command .= ' '.$GLOBALS['config']->database->database.' profile_role profile login facebook facebook_graph contact --replace --no-create-db --no-create-info ';
+   $command .= ' '.$GLOBALS['config']->database->database.' profile_role profile login facebook facebook_graph contact --replace --no-create-db --no-create-info --compact --skip-extended-insert ';
    $temporaryFileName= tempnam(sys_get_temp_dir(),'');
    $command .= ' -r '.$temporaryFileName;
    exec($command);
