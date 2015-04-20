@@ -5,7 +5,15 @@
     Testo:
     <input id="text" name="text">
 </div>
-</form>    
+<a href="#" class="showNext">Filtra per regione</a>
+<div id="regionFilterContainer" style="display: none;">
+    <a href="#" class="selectAll">Seleziona tutti</a><br/>
+    <div id="regionFilter">
+        <?php require __DIR__.'/regionFilter.phtml';?>
+    </div>
+</div>
 <div id="searchContent">
     <?php require __DIR__.'/searchContent.phtml';?>
 </div>
+<input id="searchButton" type="submit" name="action" value="Cerca"/>
+</form>

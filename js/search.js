@@ -1,8 +1,21 @@
+$("#searchButton").hide();
 $("#searchContent").on("click","#paginationContainer a.pageSelector",function(e){
     $("#start").val($(this).data("page")).trigger("change",{dontReset:true});
     e.preventDefault();
 });
-$("#searchForm input").on("change keyup",function (e,data) {
+$( "#text" ).autocomplete({
+      source: "?action=autocomplete"
+});
+$("#searchForm").on("click","a.showNext",function (e) {
+    $(this).next().toggle();
+    e.preventDefault();
+});
+$("#searchForm").on("click","a.selectAll",function (e) {
+    $(this).parent().find("div select option").attr("selected","selected");
+    $(this).parent().find("div select").trigger("change",{dontReset:true});
+    e.preventDefault();
+});
+$("#searchForm").on("change","input,select",function (e,data) {
     if (
             typeof data !== 'object' ||
             !data.hasOwnProperty("dontReset") || 
@@ -16,7 +29,9 @@ $("#searchForm input").on("change keyup",function (e,data) {
         method:"post",
         async : false,
         success : function (data) {
-            $("#searchContent").html(data);
+            $.each(data,function(name,value) {
+                $("#"+name).html(value);    
+            });
         }
     });  
 });

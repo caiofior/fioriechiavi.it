@@ -71,6 +71,8 @@ else if (
    $auth->getStorage()->clear();
    $facebookSession->getManager()->getStorage()->clear('facebook_id');
    if (is_numeric(session_id())) session_destroy();
+   header('Location: '.$GLOBALS['db']->config->baseUrl);
+   exit;
 }
 $profile = null;
 try{

@@ -78,7 +78,7 @@ CREATE TABLE `content` (
   UNIQUE KEY `label_UNIQUE` (`label`),
   KEY `fk_content_1_idx` (`category_id`),
   CONSTRAINT `fk_content_1` FOREIGN KEY (`category_id`) REFERENCES `content_category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -193,7 +193,7 @@ CREATE TABLE `profile` (
   `email` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `role_id` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='Profile';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Profile';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -242,7 +242,7 @@ CREATE TABLE `taxa` (
   KEY `fk_taxonomy_kind_idx` (`taxa_kind_id`),
   KEY `modidy_datetime` (`change_datetime`),
   FULLTEXT KEY `FullText` (`name`,`description`)
-) ENGINE=MyISAM AUTO_INCREMENT=389 DEFAULT CHARSET=utf8 COMMENT='Taxa';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Taxa';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -340,4 +340,4 @@ CREATE TABLE `taxa_region` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-04-17 15:46:19
+-- Dump completed on 2015-04-20 15:03:48

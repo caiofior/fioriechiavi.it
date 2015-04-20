@@ -1,0 +1,20 @@
+<?php
+if (!isset($floraSearch)) {
+    $floraSearch = $this->object;
+}
+$regionColl = $floraSearch->getFilteredRegionColl();
+?>
+<select id="region" name="region[]" multiple="multiple" size="<?php echo $regionColl->count();?>">
+<?php foreach ($regionColl->getItems() as $region) :
+    $selected='';
+    if ($region->getRawData('selected') != '') {
+        $selected=' selected="selected"';
+    }
+    $count = '';
+    if ($region->getRawData('count') != '') {
+         $count = ' ('.$region->getRawData('count').')';
+    }
+    ?>
+    <option value="<?php echo $region->getData('id')?>"<?php echo $selected;?>><?php echo $region->getData('name').$count?></option>
+<?php endforeach; ?>
+</select>

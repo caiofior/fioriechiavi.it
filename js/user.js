@@ -4,10 +4,16 @@
         async:false,
         cache: true,
         method:"post",
+	dataType:"json",
         data:response,
         success: function (data) {
             if (data.status == true) {
+                url = document.referrer;
+                if (url != '') {
+                    window.location.href = url;
+                }
                 location.reload(true);
+                
             } else {
                 $("#fbstatus").html("<div class=\"validMessage\"><span>"+data.message+"</span></div>");
             }
