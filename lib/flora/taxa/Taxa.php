@@ -67,6 +67,8 @@ class Taxa extends \Content {
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
         parent::insert();
+        $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 
     /**
@@ -79,6 +81,8 @@ class Taxa extends \Content {
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
         parent::update();
+        $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 
     /**
