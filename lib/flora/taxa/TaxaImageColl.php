@@ -27,7 +27,7 @@ class TaxaImageColl extends \ContentColl {
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
        if (array_key_exists('taxa_id', $criteria)) {
           $this->taxa_id=intval($criteria['taxa_id']);
-          $select->where('`taxa_image`.`id_taxa` = '.intval($criteria['taxa_id']));
+          $select->where('`taxa_image`.`taxa_id` = '.intval($criteria['taxa_id']));
        }
        return $select;
     }
@@ -37,7 +37,7 @@ class TaxaImageColl extends \ContentColl {
    */
      public function addItem($key = null) {
         $item = parent::addItem($key);
-        $item->setData($this->taxa_id, 'id_taxa');
+        $item->setData($this->taxa_id, 'taxa_id');
         return $item;
      }
 }

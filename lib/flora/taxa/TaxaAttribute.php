@@ -65,7 +65,7 @@ class TaxaAttribute extends \Content
             ) {
                   $sql .= ' AND `value` LIKE "'.  addslashes($criteria['sSearch']).'%"';
             }
-      $sql .= ' AND `id_taxa_attribute`='.intval($this->data['id']);
+      $sql .= ' AND `taxa_attribute_id`='.intval($this->data['id']);
       $sql .= ' GROUP BY `value`';
       return $sql;
    }
@@ -76,7 +76,7 @@ class TaxaAttribute extends \Content
    public function deleteValue ($value) {
        $this->db->query('
           DELETE FROM `taxa_attribute_value`
-          WHERE  `id_taxa_attribute`='.intval($this->data['id']).'
+          WHERE  `taxa_attribute_id`='.intval($this->data['id']).'
           AND `value` = "'.addslashes($value).'"
           ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
    }
@@ -90,7 +90,7 @@ class TaxaAttribute extends \Content
           $this->db->query('
           UPDATE `taxa_attribute_value`
           SET `value` = "'.addslashes($value).'"
-          WHERE  `id_taxa_attribute`='.intval($this->data['id']).'
+          WHERE  `taxa_attribute_id`='.intval($this->data['id']).'
           AND `value` = "'.addslashes($oldValue).'"
           ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
           return $value;
@@ -102,7 +102,7 @@ class TaxaAttribute extends \Content
     */
    public function getValues(array $request=array()) {
       $sql = 'SELECT DISTINCT `value` FROM `taxa_attribute_value` WHERE
-         `id_taxa_attribute`='.intval($this->data['id']);
+         `taxa_attribute_id`='.intval($this->data['id']);
       if (is_array($request) && array_key_exists('term', $request)) {
          $sql .= ' AND `value` LIKE "'.addslashes($request['term']).'%"';
       }

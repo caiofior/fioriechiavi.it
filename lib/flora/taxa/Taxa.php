@@ -33,8 +33,8 @@ class Taxa extends \Content {
                     'status' => new \Zend\Db\Sql\Predicate\Expression('
                 (               
                     IFNULL(LENGTH(taxa.description),0)+
-                    IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`id_taxa`=`taxa`.`id`),0)+
-                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`id_taxa`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa`.`id`),0)+
                     IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)
                 ) > 0
                '))
@@ -67,6 +67,18 @@ class Taxa extends \Content {
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
         parent::insert();
+        try {
+            $this->updateSearch();
+        } catch (\Exception $e) {
+        switch($e->getCode()) {
+            case 3004409 :
+                echo $e->getMessage().PHP_EOL;
+            break;
+            default:
+                throw $e;
+            break;
+        }
+        }
         $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
@@ -81,6 +93,18 @@ class Taxa extends \Content {
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
         parent::update();
+        try {
+            $this->updateSearch();
+        } catch (\Exception $e) {
+        switch($e->getCode()) {
+            case 3004409 :
+                echo $e->getMessage().PHP_EOL;
+            break;
+            default:
+                throw $e;
+            break;
+        }
+        }
         $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
@@ -96,15 +120,14 @@ class Taxa extends \Content {
             $attribute->delete();
         }
         $this->db->query('DELETE FROM `taxa_region` 
-         WHERE `id_taxa`=' . intval($this->data['id'])
-                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-        $this->db->query('DELETE FROM `taxa_region` 
-         WHERE `id_taxa`=' . intval($this->data['id'])
+         WHERE `taxa_id`=' . intval($this->data['id'])
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('UPDATE `dico_item` SET `taxa_id`=NULL 
          WHERE `taxa_id`=' . intval($this->data['id'])
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $this->deleteSearch();
         parent::delete();
+        
     }
 
     /**
@@ -115,11 +138,11 @@ class Taxa extends \Content {
         $regionColl = new \flora\region\RegionColl($this->db);
         $regionColl->loadAll();
         if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
-            $resultSet = $this->db->query('SELECT `id_region` FROM `taxa_region` 
-                WHERE `id_taxa`=' . intval($this->data['id'])
+            $resultSet = $this->db->query('SELECT `region_id` FROM `taxa_region` 
+                WHERE `taxa_id`=' . intval($this->data['id'])
                     , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
             foreach ($resultSet->toArray() as $region) {
-                $filteredRegionColl = $regionColl->filterByAttributeValue($region['id_region'], 'id');
+                $filteredRegionColl = $regionColl->filterByAttributeValue($region['region_id'], 'id');
                 $filteredRegion = $filteredRegionColl->getFirst();
                 $filteredRegion->setData('1', 'selected');
             }
@@ -134,11 +157,11 @@ class Taxa extends \Content {
     public function setRegions(array $regions) {
         if (array_key_exists('id', $this->data) && $this->data['id'] != '')
             $this->db->query('DELETE FROM `taxa_region` 
-              WHERE `id_taxa`=' . intval($this->data['id'])
+              WHERE `taxa_id`=' . intval($this->data['id'])
                     , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         foreach ($regions as $region) {
             $this->db->query('INSERT INTO `taxa_region` 
-              (id_taxa,id_region)
+              (`taxa_id`,`region_id`)
               VALUES
               (' . intval($this->data['id']) . ',"' . addslashes($region) . '")'
                     , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
@@ -171,7 +194,7 @@ class Taxa extends \Content {
             $attibute->loadFromName($name);
         }
         $this->db->query('REPLACE INTO `taxa_attribute_value` 
-         (`id_taxa`,`id_taxa_attribute`,`value`)
+         (`taxa_id`,`taxa_attribute_id`,`value`)
          VALUES
          (' . intval($this->data['id']) . ',' . intval($attibute->getData('id')) . ',"' . addslashes($value) . '")'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
@@ -189,7 +212,7 @@ class Taxa extends \Content {
             throw new \Exception('The id does not exists ' . $id, 1410011528);
         }
         $this->db->query('REPLACE INTO `taxa_attribute_value` 
-         (`id_taxa`,`id_taxa_attribute`,`value`)
+         (`taxa_id`,`taxa_attribute_id`,`value`)
          VALUES
          (' . intval($this->data['id']) . ',' . intval($id) . ',"' . addslashes($value) . '")'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
@@ -208,7 +231,7 @@ class Taxa extends \Content {
             throw new \Exception('The id does not exists ' . $id, 1410011528);
         }
         $value = $this->db->query('SELECT `value` FROM `taxa_attribute_value` 
-         WHERE `id_taxa` = ' . intval($this->data['id']) . ' AND `id_taxa_attribute` =' . intval($id)
+         WHERE `taxa_id` = ' . intval($this->data['id']) . ' AND `taxa_attribute_id` =' . intval($id)
                         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
         $value = $value->value;
         return $value;
@@ -219,7 +242,7 @@ class Taxa extends \Content {
      */
     public function deleteAllTaxaAttributes() {
         $this->db->query('DELETE FROM  `taxa_attribute_value` 
-         WHERE `id_taxa`=' . intval($this->data['id'])
+         WHERE `taxa_id`=' . intval($this->data['id'])
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 
@@ -229,7 +252,7 @@ class Taxa extends \Content {
      */
     public function deleteTaxaAttributeById($id) {
         $this->db->query('DELETE FROM  `taxa_attribute_value` 
-         WHERE `id_taxa`=' . intval($this->data['id']) . ' AND `id_taxa_attribute` = ' . intval($id)
+         WHERE `taxa_id`=' . intval($this->data['id']) . ' AND `taxa_attribute_id` = ' . intval($id)
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 
@@ -337,6 +360,30 @@ class Taxa extends \Content {
             }
         }
         return $dicoItemColl;
+    }
+    /**
+     * Upadates search table data
+     */
+    public function updateSearch() {
+        $taxaSearch = $this->getTaxaSearch();
+        $taxaSearch->update();
+    }
+    /**
+     * Upadates search table data
+     */
+    public function deleteSearch() {
+        $taxaSearch = $this->getTaxaSearch();
+        $taxaSearch->delete();
+    }
+    /**
+     * Instantiates the taxa search object
+     * @param \flora\taxa\Taxa $taxa
+     * @return \flora\taxa\TaxaSearch
+     */
+    private function getTaxaSearch() {
+        $taxaSearch = new \flora\taxa\TaxaSearch($this->db);
+        $taxaSearch->loadFromTaxa($this);
+        return $taxaSearch;
     }
 
 }

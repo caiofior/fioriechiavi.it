@@ -17,6 +17,12 @@ if (
    ) {
     $_REQUEST['region']=$floraSearch->getRegionColl()->getFieldsAsArray('id');
 }
+if (
+    !array_key_exists('altitude', $_REQUEST)||
+    !is_array($_REQUEST['altitude'])
+   ) {
+    $_REQUEST['altitude']=$floraSearch->getAltitudeArray();
+}
 $floraSearch->setRequest($_REQUEST);
 switch ($_REQUEST['action']) {
     case 'autocomplete':

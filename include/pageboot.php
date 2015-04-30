@@ -54,14 +54,21 @@ $db->getDriver()->getConnection()->connect();
 }
 restore_error_handler();
 if (!$connected) {
-   header('HTTP/1.1 503 Service Temporarily Unavailable');
-   header('Status: 503 Service Temporarily Unavailable');
-   header('Retry-After: 300');
-   $GLOBALS['user']=null;
-   $control->addValidationMessage('error','errore nelle nostre macchine');
-   $template->setBlock('middle','error/middle.phtml');
-   $template->setBlock('navigation','error/navigation.phtml');
-   $template->render();
+   switch(php_sapi_name()) {
+   case 'cli':
+        throw new Exception('Db connection error',2404150924);
+   break;
+   default:
+        header('HTTP/1.1 503 Service Temporarily Unavailable');
+        header('Status: 503 Service Temporarily Unavailable');
+        header('Retry-After: 300');
+        $GLOBALS['user']=null;
+        $control->addValidationMessage('error','errore nelle nostre macchine');
+        $template->setBlock('middle','error/middle.phtml');
+        $template->setBlock('navigation','error/navigation.phtml');
+        $template->render();
+   break;
+   }
    exit;
 }
 if ($config->mail_from == '') {

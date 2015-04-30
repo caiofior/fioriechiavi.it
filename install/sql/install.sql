@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.41, for debian-linux-gnu (i686)
+-- MySQL dump 10.13  Distrib 5.6.24, for debian-linux-gnu (i686)
 --
 -- Host: localhost    Database: fioriech65618
 -- ------------------------------------------------------
--- Server version	5.5.41-0ubuntu0.14.10.1
+-- Server version	5.6.24-0ubuntu2
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -109,9 +109,8 @@ CREATE TABLE `dico_item` (
   `text` text NOT NULL,
   `taxa_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`,`parent_taxa_id`),
-  KEY `fk_dico_item_taxa_idx` (`taxa_id`),
-  FULLTEXT KEY `text` (`text`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Dicotomy item';
+  KEY `fk_dico_item_taxa_idx` (`taxa_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Dicotomy item';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -240,9 +239,8 @@ CREATE TABLE `taxa` (
   `change_datetime` datetime DEFAULT NULL COMMENT 'Last change datetime',
   PRIMARY KEY (`id`),
   KEY `fk_taxonomy_kind_idx` (`taxa_kind_id`),
-  KEY `modidy_datetime` (`change_datetime`),
-  FULLTEXT KEY `FullText` (`name`,`description`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Taxa';
+  KEY `modidy_datetime` (`change_datetime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -269,15 +267,16 @@ DROP TABLE IF EXISTS `taxa_attribute_value`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `taxa_attribute_value` (
-  `id_taxa` int(11) NOT NULL COMMENT 'Id of taxa',
-  `id_taxa_attribute` int(11) NOT NULL COMMENT 'Id of taxa attribute',
+  `taxa_id` int(11) NOT NULL COMMENT 'Id of taxa',
+  `taxa_attribute_id` int(11) NOT NULL COMMENT 'Id of taxa attribute',
   `value` varchar(100) DEFAULT NULL COMMENT 'Value',
-  PRIMARY KEY (`id_taxa`,`id_taxa_attribute`),
-  KEY `fk_taxa_attribute_value_taxa_id` (`id_taxa`),
-  KEY `fk_taxa_attribute_value_taxa_attribute` (`id_taxa_attribute`),
+  PRIMARY KEY (`taxa_id`,`taxa_attribute_id`),
+  KEY `fk_taxa_attribute_value_taxa_id` (`taxa_id`),
+  KEY `fk_taxa_attribute_value_taxa_attribute` (`taxa_attribute_id`),
   KEY `taxa_attribute_value` (`value`),
-  FULLTEXT KEY `FullText` (`value`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Taxa attribute value';
+  CONSTRAINT `fk_taxa_attribute_value_1` FOREIGN KEY (`taxa_id`) REFERENCES `taxa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_taxa_attribute_value_2` FOREIGN KEY (`taxa_attribute_id`) REFERENCES `taxa_attribute` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa attribute value';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -289,10 +288,10 @@ DROP TABLE IF EXISTS `taxa_image`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `taxa_image` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id of taxa image',
-  `id_taxa` int(11) DEFAULT NULL COMMENT 'Id of taxa',
+  `taxa_id` int(11) DEFAULT NULL COMMENT 'Id of taxa',
   `filename` varchar(200) DEFAULT NULL COMMENT 'Filename',
   PRIMARY KEY (`id`),
-  KEY `fk_taxa_image_1_idx` (`id_taxa`)
+  KEY `fk_taxa_image_1_idx` (`taxa_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Taxa images';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -322,13 +321,48 @@ DROP TABLE IF EXISTS `taxa_region`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `taxa_region` (
-  `id_taxa` int(11) NOT NULL,
-  `id_region` varchar(20) NOT NULL,
-  PRIMARY KEY (`id_taxa`,`id_region`),
-  KEY `fk_taxa_region_region_idx` (`id_region`),
-  KEY `fk_taxa_region_taxa_idx` (`id_taxa`),
-  CONSTRAINT `fk_taxa_region_region` FOREIGN KEY (`id_region`) REFERENCES `region` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `taxa_id` int(11) NOT NULL,
+  `region_id` varchar(20) NOT NULL,
+  PRIMARY KEY (`taxa_id`,`region_id`),
+  KEY `fk_taxa_region_region_idx` (`region_id`),
+  KEY `fk_taxa_region_taxa_idx` (`taxa_id`),
+  CONSTRAINT `fk_taxa_region_region` FOREIGN KEY (`region_id`) REFERENCES `region` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Association between taxa and region';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `taxa_search`
+--
+
+DROP TABLE IF EXISTS `taxa_search`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `taxa_search` (
+  `taxa_id` int(11) NOT NULL,
+  `lft` int(11) DEFAULT NULL,
+  `rgt` int(11) DEFAULT NULL,
+  `text` longtext,
+  PRIMARY KEY (`taxa_id`),
+  KEY `lft` (`lft`),
+  KEY `rgt` (`rgt`),
+  FULLTEXT KEY `text` (`text`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `taxa_search_attribute`
+--
+
+DROP TABLE IF EXISTS `taxa_search_attribute`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `taxa_search_attribute` (
+  `taxa_id` int(11) NOT NULL,
+  `attribute_id` int(11) NOT NULL,
+  `value` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`taxa_id`,`attribute_id`),
+  KEY `value` (`value`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -340,4 +374,4 @@ CREATE TABLE `taxa_region` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-04-20 15:03:48
+-- Dump completed on 2015-04-30 17:16:58
