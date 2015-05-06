@@ -6,20 +6,7 @@
    <img class="flowerMonth" src="<?php echo $GLOBALS['db']->config->staticUrl;?>/images/flower/months.png" alt="Mesi"/>
    <?php
    $months = array();
-   $nameToNumber=array(
-       'Gennaio'=>1,
-       'Febbraio'=>2,
-       'Marzo'=>3,
-       'Aprile'=>4,
-       'Maggio'=>5,
-       'Giugno'=>6,
-       'Luglio'=>7,
-       'Agosto'=>8,
-       'Settembre'=>9,
-       'Ottobre'=>10,
-       'Novembre'=>11,
-       'Dicembre'=>12
-   );
+   $nameToNumber=$GLOBALS['db']->config->attributes->floweringNames->toArray();
    $from = $nameToNumber[$attributeColl->filterByAttributeValue('Inizio fioritura','name')->getFirst()->getRawData('value')];
    $to = $nameToNumber[$attributeColl->filterByAttributeValue('Fine fioritura','name')->getFirst()->getRawData('value')];
    for($c = $from ; $c <= $to ;$c++) : ?>

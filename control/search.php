@@ -43,6 +43,9 @@ switch ($_REQUEST['action']) {
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'regionFilter.phtml';
       $result['regionFilter']=  ob_get_clean();
       ob_start();
+      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'altitudeFilter.phtml';
+      $result['altitudeFilter']=  ob_get_clean();
+      ob_start();
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'searchContent.phtml';
       $result['searchContent']=  ob_get_clean();
       header('Content-Type: application/json');

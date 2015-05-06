@@ -67,18 +67,7 @@ class Taxa extends \Content {
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
         parent::insert();
-        try {
-            $this->updateSearch();
-        } catch (\Exception $e) {
-        switch($e->getCode()) {
-            case 3004409 :
-                echo $e->getMessage().PHP_EOL;
-            break;
-            default:
-                throw $e;
-            break;
-        }
-        }
+        $this->updateSearch();
         $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
@@ -93,18 +82,7 @@ class Taxa extends \Content {
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
         parent::update();
-        try {
-            $this->updateSearch();
-        } catch (\Exception $e) {
-        switch($e->getCode()) {
-            case 3004409 :
-                echo $e->getMessage().PHP_EOL;
-            break;
-            default:
-                throw $e;
-            break;
-        }
-        }
+        $this->updateSearch();
         $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }

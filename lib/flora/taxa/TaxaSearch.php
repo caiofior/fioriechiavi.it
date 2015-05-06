@@ -26,46 +26,30 @@ class TaxaSearch extends \Content {
     }
     /**
      * Updates the search data
+     * @return string
      */
     public function update() {
+        $message = '';
+        
         if(!array_key_exists('taxa_id', $this->data) || $this->data['taxa_id'] == '') {
             $this->db->query('INSERT INTO `taxa_search` SET `taxa_id` = ' . intval($this->taxa->getData('id'))
             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         }
         
-        $this->db->query('LOCK TABLES `taxa_search` WRITE,`dico_item` WRITE', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-        $taxaSearchObj = $this->db->query('SELECT `lft` FROM `taxa_search` WHERE `taxa_id` IN (SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id` ='.intval($this->taxa->getData('id')).')'
-            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
-        if (is_object($taxaSearchObj) && property_exists($taxaSearchObj,'lft')) {
-            $parLft = $taxaSearchObj->lft;
-            $this->db->query('UPDATE `taxa_search` SET 
-            `rgt` = `rgt`+2
-            WHERE `rgt` > '.intval($parLft), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);      
-            $this->db->query('UPDATE `taxa_search` SET 
-            `lft` = `lft`+2
-            WHERE `lft` > '.intval($parLft), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);      
-            
-        } else {
-            $taxaSearchObj = $this->db->query('SELECT MAX(`lft`) as lft FROM `taxa_search`'
-            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
-            $parLft = intval($taxaSearchObj->lft);
-            if ($parLft > 0) {
-                $taxaParentSearchObj = $this->db->query('SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id` ='.intval($this->taxa->getData('id'))
-                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
-                if(!is_object($taxaParentSearchObj)) {
-                    $this->db->query('UNLOCK TABLES', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-                    $this->db->query('DELETE FROM `taxa_search` WHERE `taxa_id` = ' . intval($this->taxa->getData('id'))
-                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-                    throw new \Exception('Taxa id '.$this->taxa->getData('id').' has no parent', 3004409);
-                }
-            }
-        }
-        $this->db->query('UPDATE `taxa_search` SET 
-            `lft` = '.intval($parLft+1).',
-            `rgt`= '.intval($parLft+2).'
-             WHERE `taxa_id` = ' . intval($this->taxa->getData('id')), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-        unset($taxaSearchObj);
-        $this->db->query('UNLOCK TABLES', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $this->updateFullText();
+        
+        $this->db->query('DELETE FROM `taxa_search_attribute` WHERE `taxa_id` = ' . intval($this->taxa->getData('id')), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        
+        $this->updateAltitudeAttribute();
+        $message .=$this->updateFloweringAttribute();
+        $message .=$this->updateNsm();
+        
+        return $message;
+    }
+    /**
+     * Updates full text data
+     */
+    private function updateFullText() {
         $this->db->query('UPDATE `taxa_search` SET 
             `text` = CONCAT(
             COALESCE((SELECT `name` FROM `taxa` WHERE `id` = ' . intval($this->taxa->getData('id')).'),""),
@@ -77,74 +61,141 @@ class TaxaSearch extends \Content {
             COALESCE((SELECT GROUP_CONCAT(`text` SEPARATOR " ") FROM `dico_item` WHERE `parent_taxa_id` = ' . intval($this->taxa->getData('id')).'),""),
             " "    
             ) WHERE `taxa_id` = ' . intval($this->taxa->getData('id')), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-        
-        
-        $this->db->query('DELETE FROM `taxa_search_attribute` WHERE `taxa_id` = ' . intval($this->taxa->getData('id')), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-        $altitudeValues = array();
-        $altitude = $this->db->query('
-            SELECT `value`
-            FROM `taxa_attribute_value` WHERE
-            `taxa_attribute_id` IN (SELECT `id` FROM `taxa_attribute` WHERE `name` = "Limite altitudinale inferiore" OR  `name` = "Limite altitudinale superiore") AND
-            `taxa_id` ='.intval($this->taxa->getData('id'))
-        , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-        foreach($altitude->toArray() as $altitudeValue) {
-            $altitudeValues[]= $altitudeValue['value'];
-        }
-        array_unique($altitudeValues);
-        if(sizeof($altitudeValues)>1) {
-            $step = 500;
-            $min = floor(min($altitudeValues)/$step)*$step;
-            $max = ceil(max($altitudeValues)/$step)*$step;
-            
-            foreach (range($min,$max,$step) as $altitudeStep) {
-                $this->db->query('INSERT IGNORE INTO `taxa_search_attribute` 
-                    SET `taxa_id` = ' . intval($this->taxa->getData('id')).',
-                        `attribute_id`=1,
-                        `value`= '.$altitudeStep.'
-                        ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);        
+    }
+    /**
+     * Prepares altitude attribute for indexing
+     */
+    private function updateAltitudeAttribute() {
+        if (is_array($this->db->config->attributes->altitude->toArray())) {        
+            $altitudeValues = array();
+            $altitude = $this->db->query('
+                SELECT `value`
+                FROM `taxa_attribute_value` WHERE
+                `taxa_attribute_id` IN ('.implode(',',$this->db->config->attributes->altitude->toArray()).') AND
+                `taxa_id` ='.intval($this->taxa->getData('id'))
+            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+            foreach($altitude->toArray() as $altitudeValue) {
+                $altitudeValues[]= $altitudeValue['value'];
             }
-        }
-        $nameToNumber=array(
-            'Gennaio'=>1,
-            'Febbraio'=>2,
-            'Marzo'=>3,
-            'Aprile'=>4,
-            'Maggio'=>5,
-            'Giugno'=>6,
-            'Luglio'=>7,
-            'Agosto'=>8,
-            'Settembre'=>9,
-            'Ottobre'=>10,
-            'Novembre'=>11,
-            'Dicembre'=>12
-        );
-        $floweringValues = array();
-        $flowering = $this->db->query('
-            SELECT `value`
-            FROM `taxa_attribute_value` WHERE
-            `taxa_attribute_id` IN (SELECT `id` FROM `taxa_attribute` WHERE `name` = "Inizio fioritura" OR  `name` = "Fine fioritura") AND
-            `taxa_id` ='.intval($this->taxa->getData('id'))
-        , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-        foreach($flowering->toArray() as $floweringValue) {
-            if (array_key_exists($floweringValue['value'],$nameToNumber)){
-                $floweringValues[]= $nameToNumber[$floweringValue['value']];    
-            }
-        }
-        $floweringValues = array_filter($floweringValues);
-        array_unique($floweringValues);
-        
-        if(sizeof($floweringValues)>1) {
-            $min = min($floweringValues);
-            $max = max($floweringValues);           
-            foreach (range($min,$max,1) as $floweringStep) {
-                $this->db->query('INSERT IGNORE INTO `taxa_search_attribute` 
-                    SET `taxa_id` = ' . intval($this->taxa->getData('id')).',
-                        `attribute_id`=1,
-                        `value`= '.$floweringStep.'
-                        ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);        
-            }
-        }
+            array_unique($altitudeValues);
+            if(sizeof($altitudeValues)>1) {
+                $step = $this->db->config->attributes->altitudeStep;
+                $min = floor(min($altitudeValues)/$step)*$step;
+                $max = ceil(max($altitudeValues)/$step)*$step;
 
+                foreach (range($min,$max,$step) as $altitudeStep) {
+                    $this->db->query('INSERT IGNORE INTO `taxa_search_attribute` 
+                        SET `taxa_id` = ' . intval($this->taxa->getData('id')).',
+                            `attribute_id`=1,
+                            `value`= '.$altitudeStep.'
+                            ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);        
+                }
+            }
+        }
+    }
+    /**
+     * Prepares flowering attribute for indexing
+     * @return string
+     */
+    private function updateFloweringAttribute() {
+        $message = '';
+        if (is_array($this->db->config->attributes->flowering->toArray())) { 
+            $nameToNumber=$this->db->config->attributes->floweringNames->toArray();
+            $floweringValues = array();
+            $flowering = $this->db->query('
+                SELECT `value`
+                FROM `taxa_attribute_value` WHERE
+                `taxa_attribute_id` IN ('.implode(',',$this->db->config->attributes->flowering->toArray()).') AND
+                `taxa_id` ='.intval($this->taxa->getData('id'))
+            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+            foreach($flowering->toArray() as $floweringValue) {
+                if (array_key_exists($floweringValue['value'],$nameToNumber)){
+                    $floweringValues[]= $nameToNumber[$floweringValue['value']];    
+                } else {
+                    $message .= 'Taxa '.$this->taxa->getData('name').' '.$this->taxa->getData('id').' has a wrong flowering attributes <br/>';
+                }
+            }
+            $floweringValues = array_filter($floweringValues);
+            array_unique($floweringValues);
+            if(sizeof($floweringValues)>1) {
+                $min = min($floweringValues);
+                $max = max($floweringValues);           
+                foreach (range($min,$max,1) as $floweringStep) {
+                    $this->db->query('INSERT IGNORE INTO `taxa_search_attribute` 
+                        SET `taxa_id` = ' . intval($this->taxa->getData('id')).',
+                            `attribute_id`=2,
+                            `value`= '.$floweringStep.'
+                            ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);        
+                }
+            }
+        }
+        return $message;
+    }
+    /**
+     * Updates nested sets module
+     * @return string
+     */
+    private function updateNsm() {
+        $message = '';
+        $taxaSearchObj=null;
+        $updateFtr =true;
+        
+        $taxaParentObj = $this->db->query('SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id` ='.intval($this->taxa->getData('id'))
+            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+        
+        
+        if (is_object($taxaParentObj) && is_numeric($taxaParentObj->parent_taxa_id)) {
+            $parentTaxaId = intval($taxaParentObj->parent_taxa_id);
+            $taxaSearchObj = $this->db->query('SELECT `lft`,`rgt` FROM `taxa_search` WHERE `taxa_id` = '.$parentTaxaId
+            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+            $taxaParentNsmObj = $this->db->query('SELECT `taxa_id` FROM `taxa_search` WHERE
+                `lft` <='.intval($taxaSearchObj->lft).' AND `rgt` >='.intval($taxaSearchObj->lft).' 
+                 ORDER BY `rgt`-`lft` ASC
+                 LIMIT 1 '
+            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+            if(method_exists($taxaParentNsmObj,'taxa_id')) {
+                $parentTaxaIdNsm =  $taxaParentNsmObj->taxa_id;
+                $updateFtr = $parentTaxaId != $parentTaxaIdNsm;
+            }
+            unset($taxaParentNsmObj);
+        }
+        
+        $this->db->query('LOCK TABLES `taxa_search` WRITE,`dico_item` WRITE', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        if (is_object($taxaSearchObj)) {
+            $parLft = $taxaSearchObj->lft;
+            $this->db->query('UPDATE `taxa_search` SET 
+            `rgt` = `rgt`+2
+            WHERE `rgt` > '.intval($parLft), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);      
+            $this->db->query('UPDATE `taxa_search` SET 
+            `lft` = `lft`+2
+            WHERE `lft` > '.intval($parLft), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);      
+
+        } else {
+            $taxaSearchObj = $this->db->query('SELECT MAX(`lft`) as lft FROM `taxa_search`'
+            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+            $parLft = intval($taxaSearchObj->lft);
+            if ($parLft > 0) {
+                $taxaParentSearchObj = $this->db->query('SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id` ='.intval($this->taxa->getData('id'))
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+                if(!is_object($taxaParentSearchObj)) {
+                    $this->db->query('UNLOCK TABLES', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+                    $this->db->query('DELETE FROM `taxa_search` WHERE `taxa_id` = ' . intval($this->taxa->getData('id'))
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+                    $message .= 'Taxa '.$this->taxa->getData('name').' '.$this->taxa->getData('id').' has no parent <br/>';
+                }
+            }
+            $updateFtr =true;
+        }
+        
+        if ($updateFtr) {
+            $this->db->query('UPDATE `taxa_search` SET 
+                `lft` = '.intval($parLft+1).',
+                `rgt`= '.intval($parLft+2).'
+                 WHERE `taxa_id` = ' . intval($this->taxa->getData('id')), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+            unset($taxaSearchObj);
+        }
+        $this->db->query('UNLOCK TABLES', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        return $message;
     }
     /**
      * Updates the data

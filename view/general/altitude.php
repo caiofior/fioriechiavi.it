@@ -9,7 +9,7 @@ $to = preg_replace('/[^0-9]/','',$attributeColl->filterByAttributeValue('Limite 
 <div class="altitudeContainer">
    <img class="altitudeBase" src="<?php echo $GLOBALS['db']->config->staticUrl;?>/images/altitude/altitudine.png" alt="Altitudine"/>
    <?php
-   for($c = intval(1+($from/500)); $c <= intval(1+($to/500));$c++) : ?>
-   <img class="altitude" src="<?php echo $GLOBALS['db']->config->staticUrl;?>/images/altitude/<?php echo $c*500;?>.png" alt="<?php echo $c*500;?>"/>
+   for($c = intval(1+($from/$GLOBALS['db']->config->attributes->altitudeStep)); $c <= intval(1+($to/$GLOBALS['db']->config->attributes->altitudeStep));$c++) : ?>
+   <img class="altitude" src="<?php echo $GLOBALS['db']->config->staticUrl;?>/images/altitude/<?php echo $c*$GLOBALS['db']->config->attributes->altitudeStep;?>.png" alt="<?php echo $c*$GLOBALS['db']->config->attributes->altitudeStep;?>"/>
    <?php endfor; ?>
 </div>

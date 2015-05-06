@@ -14,4 +14,12 @@
     <input type="hidden" id="filename" name="filename" value=""/>
     </form>
     </li>
+    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=backup&action=reindex" class="reindex" >Indicizza</a></li>
 </ul>
+<?php 
+$logFilename = $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR.'reindex.txt';
+if (is_file($logFilename)) : ?>
+<p>Ultima indicizzazione</p>
+<pre><?php echo file_get_contents($logFilename); ?></pre>
+<?php endif; ?>
+ 

@@ -44,10 +44,13 @@ class Search {
      */
     public function __construct(\Zend\Db\Adapter\Adapter $db) {
         $this->db = $db;
-        $this->content = new \flora\taxa\Taxa($this->db);
+        $this->content = new \flora\taxa\TaxaSearch($this->db);
         $this->regionColl = new \flora\region\RegionColl($this->db);
         $this->regionColl->loadAll();
         $this->altitude= array_flip(range(0,2500,500));
+        foreach($this->altitude as $altitude=>$value) {
+            $this->altitude[$altitude]=array('count'=>0);
+        }
         foreach($this->db->query('SELECT `name`,`id` FROM `taxa_attribute`'
         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->toArray() as $attribute) {
             $this->attributeId[$attribute['name']]=$attribute['id'];
@@ -66,7 +69,7 @@ class Search {
      */
     public function getTaxaCountAll() {
         $select=$this->createSelect();
-        $select->columns(array('count'=>new \Zend\Db\Sql\Expression('COUNT(taxa.id)')));
+        $select->columns(array('count'=>new \Zend\Db\Sql\Expression('COUNT(`taxa_search`.`taxa_id`)')));
         try{
                 $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
                 $results = $statement->execute();
@@ -90,10 +93,20 @@ class Search {
         $data = array();
         $select=$this->createSelect();
         $select->columns(array(
-            '*',
-            'taxa_kind_initials'=>new \Zend\Db\Sql\Expression('taxa_kind.initials'),
-            'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('taxa_kind.name')
+            'taxa_id'
         ));
+        $sql = $select->getSqlString($this->db->getPlatform());
+        $table = new \Zend\Db\TableGateway\TableGateway('taxa',$this->db);
+        $select = $table->getSql()->select();
+        $select->join('taxa_kind', 'taxa_kind.id=taxa.taxa_kind_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
+        $select->columns(array(
+            'id'=>new \Zend\Db\Sql\Expression('`taxa`.`id`'),
+            'name'=>new \Zend\Db\Sql\Expression('`taxa`.`name`'),
+            'taxa_kind_initials'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`initials`'),
+            'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`name`')
+        ));
+        $select->where('`taxa`.`id` IN ('.$sql.')');
+        
         if (
                 array_key_exists('start', $this->request) &&
                 $this->request['start']!= '' &&
@@ -144,14 +157,19 @@ class Search {
     public function getFilteredRegionColl(){
         $select=$this->createSelect(array('region'));
         $select->columns(array(
-            'id'=>new \Zend\Db\Sql\Expression('taxa_region.id_region'),
-            'name'=>new \Zend\Db\Sql\Expression('region.name'),
-            'count'=>new \Zend\Db\Sql\Expression('COUNT(taxa_region.id_taxa)')
-            ));
-        $select->reset(\Zend\Db\Sql\Select::JOINS);
-        $select->join('taxa_region', 'taxa.id=taxa_region.id_taxa',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-        $select->join('region', 'region.id=taxa_region.id_region',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-        $select->group('taxa_region.id_region');
+            'taxa_id'
+        ));
+        $sql = $select->getSqlString($this->db->getPlatform());
+        $table = new \Zend\Db\TableGateway\TableGateway('taxa_region',$this->db);
+        $select = $table->getSql()->select();
+        $select->join('region', 'region.id=taxa_region.region_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
+        $select->columns(array(
+            'id'=>new \Zend\Db\Sql\Expression('`taxa_region`.`region_id`'),
+            'name'=>new \Zend\Db\Sql\Expression('`region`.`name`'),
+            'count'=>new \Zend\Db\Sql\Expression('COUNT(`taxa_region`.`taxa_id`)')
+        ));
+        $select->where('`taxa_region`.`taxa_id` IN ('.$sql.')');
+        $select->group('taxa_region.region_id');
         try{
                $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
                $results = $statement->execute();
@@ -196,22 +214,34 @@ class Search {
     public function getFilteredAltitudeArray() {
         $select=$this->createSelect(array('altitude'));
         $select->columns(array(
-            'count'=>new \Zend\Db\Sql\Expression('taxa.id')
+            'taxa_id'
          ));
-        /*try{
+        $sql = $select->getSqlString($this->db->getPlatform());
+        $table = new \Zend\Db\TableGateway\TableGateway('taxa_search_attribute',$this->db);
+        $select = $table->getSql()->select();
+        $select->columns(array(
+            'count'=>new \Zend\Db\Sql\Expression('COUNT(`taxa_search_attribute`.`taxa_id`)'),
+            'altitude'=>'value',
+        ));
+        $select->where('`attribute_id` = 1');
+        $select->where('`taxa_id` IN ('.$sql.')');
+        $select->group('value');
+        
+        try {
                $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
                $results = $statement->execute();
                $resultSet = new \Zend\Db\ResultSet\ResultSet();
                $resultSet->initialize($results);
-               $data = $resultSet->toArray(); 
-               var_dump($data);die();
-           }
+               foreach($resultSet->toArray() as $data) {
+                   $this->altitude[$data['altitude']]=array('count'=>$data['count']);
+               } 
+        }
            catch (\Exception $e) {
               $mysqli = $this->db->getDriver()->getConnection()->getResource();  
               if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
                   $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
               throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
-           }*/
+        }
         
         if(array_key_exists('altitude', $this->request) && is_array($this->request['altitude'])) {
              foreach ($this->request['altitude'] as $altitude) {
@@ -231,15 +261,9 @@ class Search {
      */
     private function createSelect(array $avoid=array()) {
         $select = $this->content->getTable()->getSql()->select();
-        $select->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-        $select->join('dico_item', 'taxa.id=dico_item.taxa_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-        $select->join('taxa_attribute_value', 'taxa.id=taxa_attribute_value.id_taxa',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-        $select->join('taxa_image', 'taxa.id=taxa_image.id_taxa',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
         if (array_key_exists('text', $this->request) && $this->request['text']!= '') {
             $select->where('
-                MATCH (`taxa`.`name`,`taxa`.`description`) AGAINST ( "'.addslashes($this->request['text']).'" IN NATURAL LANGUAGE MODE) OR
-                MATCH (`dico_item`.`text`) AGAINST ( "'.addslashes($this->request['text']).'" IN NATURAL LANGUAGE MODE) OR
-                MATCH (`taxa_attribute_value`.`value`) AGAINST ( "'.addslashes($this->request['text']).'" IN NATURAL LANGUAGE MODE)
+                MATCH (`taxa_search`.`text`) AGAINST ( "'.addslashes($this->request['text']).'" IN NATURAL LANGUAGE MODE)
                 ');            
         }
         if  (
@@ -248,8 +272,9 @@ class Search {
                 $this->regionColl->count() != sizeof($this->request['region']) &&
                 !in_array('region',$avoid)
             ) {
-            $select->join('taxa_region', 'taxa.id=taxa_region.id_taxa',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-            $select->where('`taxa_region`.`id_region` IN ("'.implode('","',$this->request['region']).'")');
+            $this->request['region']=array_map('intval',$this->request['region']);
+            $select->join('taxa_region', 'taxa_search.taxa_id=taxa_region.taxa_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
+            $select->where('`taxa_region`.`region_id` IN ("'.implode('","',$this->request['region']).'")');
         }
         if  (
                 array_key_exists('altitude', $this->request) && 
@@ -257,23 +282,15 @@ class Search {
                 sizeof($this->request['altitude']) < sizeof($this->altitude) &&
                 !in_array('altitude',$avoid)
             ) {
-            $altitudes =array();
-            foreach($this->request['altitude'] as $lowerAltitude) {
-                $altitudes= array_merge($altitudes,range($lowerAltitude,$lowerAltitude+500,100));
-            }
+            $this->request['altitude']=array_map('intval',$this->request['altitude']);
             $select->where('
-                  `taxa_attribute_value`.`id_taxa_attribute` = '.$this->attributeId['Limite altitudinale inferiore'].' AND
-                  `taxa_attribute_value`.`value` IN ("'.implode('","',$altitudes).'") AND
-                  `taxa_attribute_value`.`id_taxa_attribute` = '.$this->attributeId['Limite altitudinale superiore'].' AND
-                  `taxa_attribute_value`.`value` IN ("'.implode('","',$altitudes).'") 
+                  `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_search_attribute` WHERE `attribute_id`=1 AND `value` IN ('.implode(',',$this->request['altitude']).'))
             ');
         }
         $select->where('
                 (               
-                    IFNULL(LENGTH(taxa.description),0)+
-                    IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`id_taxa`=`taxa`.`id`),0)+
-                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`id_taxa`=`taxa`.`id`),0)+
-                    IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)
+                    IFNULL(LENGTH(`taxa_search`.`text`),0)+
+                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa_search`.`taxa_id`),0)
                 ) > 0
              '); 
         return $select;
