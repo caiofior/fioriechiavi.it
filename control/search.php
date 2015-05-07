@@ -23,20 +23,26 @@ if (
    ) {
     $_REQUEST['altitude']=$floraSearch->getAltitudeArray();
 }
+if (
+    !array_key_exists('flowering', $_REQUEST)||
+    !is_array($_REQUEST['flowering'])
+   ) {
+    $_REQUEST['flowering']=$floraSearch->getFloweringArray();
+}
 $floraSearch->setRequest($_REQUEST);
 switch ($_REQUEST['action']) {
     case 'autocomplete':
-      $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
-      $_REQUEST['iDisplayStart']=0;
-      $_REQUEST['iDisplayLength']=10;
-      $taxaColl->loadAll($_REQUEST);
+      $taxaColl = $floraSearch->getTaxaParentColl();
       $result = array();
       foreach ($taxaColl->getItems() as $taxa) {
-          $result[] = $taxa->getData('name');     
+         $result[] = array(
+             'label'=>$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name').' ('.$taxa->getRawData('count').')',
+             'value'=>$taxa->getData('id')
+         );
       } 
       header('Content-Type: application/json');
       echo json_encode($result);
-   exit;
+      exit;
    case 'search' :
       $result = array();
       ob_start();
@@ -45,6 +51,9 @@ switch ($_REQUEST['action']) {
       ob_start();
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'altitudeFilter.phtml';
       $result['altitudeFilter']=  ob_get_clean();
+      ob_start();
+      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'floweringFilter.phtml';
+      $result['floweringFilter']=  ob_get_clean();
       ob_start();
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'searchContent.phtml';
       $result['searchContent']=  ob_get_clean();

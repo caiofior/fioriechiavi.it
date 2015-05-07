@@ -4,7 +4,7 @@ if (!isset($floraSearch)) {
 }
 $altitudeArray = $floraSearch-> getFilteredAltitudeArray();
 ?>
-<select id="region" name="altitude[]" multiple="multiple" size="<?php echo sizeof($altitudeArray);?>">
+<select id="altitude" name="altitude[]" multiple="multiple" size="<?php echo sizeof($altitudeArray);?>">
 <?php foreach ($altitudeArray as $altitude=>$altitudeData) :
     $selected='';
     if (is_array($altitudeData) && array_key_exists('selected', $altitudeData) && $altitudeData['selected'] != '') {
@@ -15,6 +15,6 @@ $altitudeArray = $floraSearch-> getFilteredAltitudeArray();
          $count = ' ('.$altitudeData['count'].')';
     }
     ?>
-    <option value="<?php echo $altitude?>"<?php echo $selected;?>><?php echo $altitude.'-'.($altitude+500).$count?></option>
+    <option value="<?php echo $altitude;?>"<?php echo $selected;?>><?php echo $altitude.'-'.($altitude+500).$count?></option>
 <?php endforeach; ?>
 </select>

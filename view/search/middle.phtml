@@ -2,7 +2,13 @@
 <input type="hidden" id="start" name="start" value="<?php echo $_REQUEST['start'];?>">
 <input type="hidden" id="pagelength" name="pagelength" value="<?php echo $_REQUEST['pagelength'];?>">
 <div>
-    Testo:
+   <label for="taxasearch">Appartenenti al taxa</label>
+   <input id="taxasearch" name="taxasearch" value="">
+   <input type="hidden" id="taxasearchid" name="taxasearchid" value="">
+   <a id="emtpytaxasearch" href="#" title="Cancella">◀</a>
+</div>
+<div>
+    <label for="text">Testo</label>
     <input id="text" name="text">
 </div>
 <a href="#" class="showNext">Filtra per regione</a>
@@ -17,6 +23,13 @@
     <a href="#" class="selectAll">Seleziona tutti</a><br/>
     <div id="altitudeFilter">
         <?php require __DIR__.'/altitudeFilter.phtml';?>
+    </div>
+</div>
+<a href="#" class="showNext">Filtra per periodo di fioritura</a>
+<div id="floweringFilterContainer" style="display: none;">
+    <a href="#" class="selectAll">Seleziona tutti</a><br/>
+    <div id="floweringFilter">
+        <?php require __DIR__.'/floweringFilter.phtml';?>
     </div>
 </div>
 <div id="searchContent">

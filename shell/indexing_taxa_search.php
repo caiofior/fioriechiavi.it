@@ -33,4 +33,6 @@ $statement = $GLOBALS['db']->query($sql);
 $tableData = $statement->execute();
 $tableData = $tableData->current();
 echo 'Table size '.$tableData['size'].' Mb'.PHP_EOL;
+$GLOBALS['db']->query('ALTER TABLE `taxa_search` ORDER BY `taxa_id` DESC'
+, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
 echo 'End at '.date('d/m/Y H:i:s').PHP_EOL;

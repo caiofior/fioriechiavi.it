@@ -70,6 +70,8 @@ class Taxa extends \Content {
         $this->updateSearch();
         $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $this->db->query('ALTER TABLE `taxa_search` ORDER BY `taxa_id` DESC'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 
     /**
@@ -84,6 +86,8 @@ class Taxa extends \Content {
         parent::update();
         $this->updateSearch();
         $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $this->db->query('ALTER TABLE `taxa_search` ORDER BY `taxa_id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 

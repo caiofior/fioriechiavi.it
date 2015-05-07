@@ -3,8 +3,24 @@ $("#searchContent").on("click","#paginationContainer a.pageSelector",function(e)
     $("#start").val($(this).data("page")).trigger("change",{dontReset:true});
     e.preventDefault();
 });
-$( "#text" ).autocomplete({
-      source: "?action=autocomplete"
+$("#emtpytaxasearch").click(function(e){
+     $("#taxasearch").val("");
+     $("#taxasearchid").val("");
+     $("#taxasearchid").trigger("change",{dontReset:true});
+     e.preventDefault();
+});
+$( "#taxasearch" ).autocomplete({
+      source: "?action=autocomplete",
+      select: function( e, ui ) {
+         $("#taxasearch").val(ui.item.label);
+         $("#taxasearchid").val(ui.item.value);
+         $("#taxasearchid").trigger("change",{dontReset:true});
+         e.preventDefault();
+      },
+      change: function (e, ui) {
+          if (!ui.item)
+              $(this).val("");
+      }
 });
 $("#searchForm").on("click","a.showNext",function (e) {
     $(this).next().toggle();

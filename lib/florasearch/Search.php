@@ -32,6 +32,11 @@ class Search {
      */
     private $altitude=array();
     /**
+     * Flowering array
+     * @var array
+     */
+    private $flowering=array();
+    /**
      *Array of attributes ids
      * @var array
      */
@@ -47,9 +52,12 @@ class Search {
         $this->content = new \flora\taxa\TaxaSearch($this->db);
         $this->regionColl = new \flora\region\RegionColl($this->db);
         $this->regionColl->loadAll();
-        $this->altitude= array_flip(range(0,2500,500));
+        $this->altitude= array_flip(range(0,2500,$this->db->config->attributes->altitudeStep));
         foreach($this->altitude as $altitude=>$value) {
             $this->altitude[$altitude]=array('count'=>0);
+        }
+        foreach($this->db->config->attributes->floweringNames->toArray() as $flowerLabel=>$flowerCode) {
+            $this->flowering[$flowerCode]=array('label'=>$flowerLabel);
         }
         foreach($this->db->query('SELECT `name`,`id` FROM `taxa_attribute`'
         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->toArray() as $attribute) {
@@ -92,12 +100,7 @@ class Search {
     public function getTaxaColl() {
         $data = array();
         $select=$this->createSelect();
-        $select->columns(array(
-            'taxa_id'
-        ));
-        $sql = $select->getSqlString($this->db->getPlatform());
-        $table = new \Zend\Db\TableGateway\TableGateway('taxa',$this->db);
-        $select = $table->getSql()->select();
+        $select->join('taxa', 'taxa.id=taxa_search.taxa_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
         $select->join('taxa_kind', 'taxa_kind.id=taxa.taxa_kind_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
         $select->columns(array(
             'id'=>new \Zend\Db\Sql\Expression('`taxa`.`id`'),
@@ -105,8 +108,6 @@ class Search {
             'taxa_kind_initials'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`initials`'),
             'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`name`')
         ));
-        $select->where('`taxa`.`id` IN ('.$sql.')');
-        
         if (
                 array_key_exists('start', $this->request) &&
                 $this->request['start']!= '' &&
@@ -134,6 +135,53 @@ class Search {
                    $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
                throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
             }
+        $taxaColl = new \flora\taxa\TaxaColl($this->db);
+        foreach($data as $taxaData) {
+            $taxa = $taxaColl->addItem();
+            $taxa->setData($taxaData);
+        }
+        return $taxaColl;
+    }
+     /**
+     * Gets the parent taxa collection
+     * @return \flora\taxa\TaxaColl
+     */
+    public function getTaxaParentColl() {
+        $select = $this->content->getTable()->getSql()->select();
+        $select->join('taxa', 'taxa.id=taxa_search.taxa_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
+        $select->join('taxa_kind', 'taxa_kind.id=taxa.taxa_kind_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
+        $select->columns(array(
+            'id'=>new \Zend\Db\Sql\Expression('`taxa`.`id`'),
+            'name'=>new \Zend\Db\Sql\Expression('`taxa`.`name`'),
+            'taxa_kind_initials'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`initials`'),
+            'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`name`'),
+            'count'=>new \Zend\Db\Sql\Expression('( 
+                SELECT COUNT(`p`.`taxa_id`) FROM `taxa_search` AS `p`
+                WHERE p.`lft` >= `taxa_search`.`lft`
+                AND p.`rgt` <= `taxa_search`.`rgt`
+                ) ')
+        ));
+        $select->limit(10);
+        if (array_key_exists('term', $this->request) && $this->request['term'] != '') {
+           $this->request['sSearch']=$this->request['term'];
+        }
+        if (array_key_exists('sSearch', $this->request) && $this->request['sSearch'] != '') {
+           $select->where(' ( `taxa`.`name` LIKE "'.addslashes($this->request['sSearch']).'%" OR `taxa`.`description` LIKE "'.addslashes($this->request['sSearch']).'%" ) ');
+        }
+        $select->where(' (`taxa_search`.`rgt` - `taxa_search`.`lft`) > 2 ');
+        try{
+               $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
+               $results = $statement->execute();
+               $resultSet = new \Zend\Db\ResultSet\ResultSet();
+               $resultSet->initialize($results);
+               $data = $resultSet->toArray();
+        }
+        catch (\Exception $e) {
+           $mysqli = $this->db->getDriver()->getConnection()->getResource();  
+           if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
+               $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
+           throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+        }
         $taxaColl = new \flora\taxa\TaxaColl($this->db);
         foreach($data as $taxaData) {
             $taxa = $taxaColl->addItem();
@@ -256,6 +304,63 @@ class Search {
         return $this->altitude;
     }
     /**
+     * Gets flowering array
+     * @return array
+     */
+    public function getFloweringArray() {
+        return array_keys($this->flowering);
+    }
+    /**
+     * Gets filtered flowering array
+     * @return array
+     */
+    public function getFilteredFloweringArray() {
+        $select=$this->createSelect(array('flowering'));
+        $select->columns(array(
+            'taxa_id'
+         ));
+        $sql = $select->getSqlString($this->db->getPlatform());
+        $table = new \Zend\Db\TableGateway\TableGateway('taxa_search_attribute',$this->db);
+        $select = $table->getSql()->select();
+        $select->columns(array(
+            'count'=>new \Zend\Db\Sql\Expression('COUNT(`taxa_search_attribute`.`taxa_id`)'),
+            'flowering'=>'value',
+        ));
+        $select->where('`attribute_id` = 2');
+        $select->where('`taxa_id` IN ('.$sql.')');
+        $select->group('value');
+        
+        try {
+               $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
+               $results = $statement->execute();
+               $resultSet = new \Zend\Db\ResultSet\ResultSet();
+               $resultSet->initialize($results);
+               foreach($resultSet->toArray() as $data) {
+                   if (!is_array($this->flowering[intval($data['flowering'])])) {
+                       $this->flowering[intval($data['flowering'])]=array();
+                   }
+                   $this->flowering[intval($data['flowering'])]['count']=$data['count'];
+               } 
+        }
+           catch (\Exception $e) {
+              $mysqli = $this->db->getDriver()->getConnection()->getResource();  
+              if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
+                  $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
+              throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+        }
+        if(array_key_exists('flowering', $this->request) && is_array($this->request['flowering'])) {
+             foreach ($this->request['flowering'] as $flowering) {
+                 if (array_key_exists($flowering, $this->flowering)) {
+                     if (!is_array($this->flowering[$flowering])) {
+                         $this->flowering[$flowering]=array();
+                     }
+                     $this->flowering[$flowering]['selected']=true;
+                 }
+             }
+        }
+        return $this->flowering;
+    }
+    /**
      * Create the select
      * @return \Zend\Db\Sql\Select
      */
@@ -267,14 +372,20 @@ class Search {
                 ');            
         }
         if  (
+                array_key_exists('taxasearchid', $this->request) && 
+                is_numeric($this->request['taxasearchid'])
+            ) {
+            $select->where('`taxa_search`.`lft` >= (SELECT `lft` FROM `taxa_search` WHERE `taxa_id` = '.intval($this->request['taxasearchid']).')');
+            $select->where('`taxa_search`.`rgt` <= (SELECT `rgt` FROM `taxa_search` WHERE `taxa_id` = '.intval($this->request['taxasearchid']).')');
+        }
+        if  (
                 array_key_exists('region', $this->request) && 
                 is_array($this->request['region']) && 
                 $this->regionColl->count() != sizeof($this->request['region']) &&
                 !in_array('region',$avoid)
             ) {
             $this->request['region']=array_map('intval',$this->request['region']);
-            $select->join('taxa_region', 'taxa_search.taxa_id=taxa_region.taxa_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-            $select->where('`taxa_region`.`region_id` IN ("'.implode('","',$this->request['region']).'")');
+            $select->where('`taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_region` WHERE `region_id` IN('.implode(',',$this->request['region']).'))');
         }
         if  (
                 array_key_exists('altitude', $this->request) && 
@@ -287,11 +398,25 @@ class Search {
                   `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_search_attribute` WHERE `attribute_id`=1 AND `value` IN ('.implode(',',$this->request['altitude']).'))
             ');
         }
+        if  (
+                array_key_exists('flowering', $this->request) && 
+                is_array($this->request['flowering']) && 
+                sizeof($this->request['flowering']) < sizeof($this->flowering) &&
+                !in_array('flowering',$avoid)
+            ) {
+            $this->request['flowering']=array_map('intval',$this->request['flowering']);
+            $select->where('
+                  `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_search_attribute` WHERE `attribute_id`=2 AND `value` IN ('.implode(',',$this->request['flowering']).'))
+            ');
+        }
         $select->where('
                 (               
                     IFNULL(LENGTH(`taxa_search`.`text`),0)+
                     IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa_search`.`taxa_id`),0)
                 ) > 0
+             '); 
+        $select->where('
+                `taxa_search`.`taxa_id` <> 1
              '); 
         return $select;
     }

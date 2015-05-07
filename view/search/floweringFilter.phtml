@@ -1,0 +1,20 @@
+<?php
+if (!isset($floraSearch)) {
+    $floraSearch = $this->object;
+}
+$floweringArray = $floraSearch-> getFilteredFloweringArray();
+?>
+<select id="flowering" name="flowering[]" multiple="multiple" size="<?php echo sizeof($floweringArray);?>">
+<?php foreach ($floweringArray as $flowering=>$floweringData) :
+    $selected='';
+    if (is_array($floweringData) && array_key_exists('selected', $floweringData) && $floweringData['selected'] != '') {
+        $selected=' selected="selected"';
+    }
+    $count = '';
+    if (is_array($floweringData) && array_key_exists('count', $floweringData) && $floweringData['count'] != '') {
+         $count = ' ('.$floweringData['count'].')';
+    }
+    ?>
+    <option value="<?php echo $flowering;?>"<?php echo $selected;?>><?php echo $floweringData['label'].$count?></option>
+<?php endforeach; ?>
+</select>
