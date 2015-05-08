@@ -396,13 +396,6 @@ class Config implements Countable, Iterator, ArrayAccess
     protected $allowModifications;
 
     /**
-     * Number of elements in configuration data.
-     *
-     * @var int
-     */
-    protected $count;
-
-    /**
      * Data within the configuration.
      *
      * @var array
@@ -436,8 +429,6 @@ class Config implements Countable, Iterator, ArrayAccess
             } else {
                 $this->data[$key] = $value;
             }
-
-            $this->count++;
         }
     }
 
@@ -491,8 +482,6 @@ class Config implements Countable, Iterator, ArrayAccess
             } else {
                 $this->data[$name] = $value;
             }
-
-            $this->count++;
         } else {
             throw new Exception\RuntimeException('Config is read only');
         }
@@ -565,7 +554,6 @@ class Config implements Countable, Iterator, ArrayAccess
             throw new Exception\InvalidArgumentException('Config is read only');
         } elseif (isset($this->data[$name])) {
             unset($this->data[$name]);
-            $this->count--;
             $this->skipNextIteration = true;
         }
     }
@@ -578,7 +566,7 @@ class Config implements Countable, Iterator, ArrayAccess
      */
     public function count()
     {
-        return $this->count;
+        return count($this->data);
     }
 
     /**
@@ -725,8 +713,6 @@ class Config implements Countable, Iterator, ArrayAccess
                 } else {
                     $this->data[$key] = $value;
                 }
-
-                $this->count++;
             }
         }
 
@@ -804,6 +790,9 @@ namespace Zend\Db\Adapter\Profiler;
 
 interface ProfilerAwareInterface
 {
+    /**
+     * @param  ProfilerInterface $profiler
+     */
     public function setProfiler(ProfilerInterface $profiler);
 }
 
@@ -1205,85 +1194,6 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
 
 namespace Zend\Db\Adapter\Driver;
 
-interface DriverInterface
-{
-    const PARAMETERIZATION_POSITIONAL = 'positional';
-    const PARAMETERIZATION_NAMED = 'named';
-    const NAME_FORMAT_CAMELCASE = 'camelCase';
-    const NAME_FORMAT_NATURAL = 'natural';
-
-    /**
-     * Get database platform name
-     *
-     * @param string $nameFormat
-     * @return string
-     */
-    public function getDatabasePlatformName($nameFormat = self::NAME_FORMAT_CAMELCASE);
-
-    /**
-     * Check environment
-     *
-     * @return bool
-     */
-    public function checkEnvironment();
-
-    /**
-     * Get connection
-     *
-     * @return ConnectionInterface
-     */
-    public function getConnection();
-
-    /**
-     * Create statement
-     *
-     * @param string|resource $sqlOrResource
-     * @return StatementInterface
-     */
-    public function createStatement($sqlOrResource = null);
-
-    /**
-     * Create result
-     *
-     * @param resource $resource
-     * @return ResultInterface
-     */
-    public function createResult($resource);
-
-    /**
-     * Get prepare type
-     *
-     * @return array
-     */
-    public function getPrepareType();
-
-    /**
-     * Format parameter name
-     *
-     * @param string $name
-     * @param mixed  $type
-     * @return string
-     */
-    public function formatParameterName($name, $type = null);
-
-    /**
-     * Get last generated value
-     *
-     * @return mixed
-     */
-    public function getLastGeneratedValue();
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Db\Adapter\Driver;
-
 interface ConnectionInterface
 {
     /**
@@ -1357,6 +1267,220 @@ interface ConnectionInterface
      * @return int
      */
     public function getLastGeneratedValue($name = null);
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Adapter\Driver;
+
+use Zend\Db\Adapter\Profiler\ProfilerAwareInterface;
+use Zend\Db\Adapter\Profiler\ProfilerInterface;
+
+abstract class AbstractConnection implements ConnectionInterface, ProfilerAwareInterface
+{
+    /**
+     * @var array
+     */
+    protected $connectionParameters = array();
+
+    /**
+     * @var string|null
+     */
+    protected $driverName;
+
+    /**
+     * @var boolean
+     */
+    protected $inTransaction = false;
+
+    /**
+     * Nested transactions count.
+     *
+     * @var integer
+     */
+    protected $nestedTransactionsCount = 0;
+
+    /**
+     * @var ProfilerInterface|null
+     */
+    protected $profiler;
+
+    /**
+     * @var resource|null
+     */
+    protected $resource;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function disconnect()
+    {
+        if ($this->isConnected()) {
+            $this->resource = null;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get connection parameters
+     *
+     * @return array
+     */
+    public function getConnectionParameters()
+    {
+        return $this->connectionParameters;
+    }
+
+    /**
+     * Get driver name
+     *
+     * @return null|string
+     */
+    public function getDriverName()
+    {
+        return $this->driverName;
+    }
+
+    /**
+     * @return null|ProfilerInterface
+     */
+    public function getProfiler()
+    {
+        return $this->profiler;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return resource
+     */
+    public function getResource()
+    {
+        if (!$this->isConnected()) {
+            $this->connect();
+        }
+
+        return $this->resource;
+    }
+
+    /**
+     * Checks whether the connection is in transaction state.
+     *
+     * @return boolean
+     */
+    public function inTransaction()
+    {
+        return $this->inTransaction;
+    }
+
+    /**
+     * @param  array $connectionParameters
+     * @return self
+     */
+    public function setConnectionParameters(array $connectionParameters)
+    {
+        $this->connectionParameters = $connectionParameters;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return self
+     */
+    public function setProfiler(ProfilerInterface $profiler)
+    {
+        $this->profiler = $profiler;
+
+        return $this;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Adapter\Driver;
+
+interface DriverInterface
+{
+    const PARAMETERIZATION_POSITIONAL = 'positional';
+    const PARAMETERIZATION_NAMED = 'named';
+    const NAME_FORMAT_CAMELCASE = 'camelCase';
+    const NAME_FORMAT_NATURAL = 'natural';
+
+    /**
+     * Get database platform name
+     *
+     * @param string $nameFormat
+     * @return string
+     */
+    public function getDatabasePlatformName($nameFormat = self::NAME_FORMAT_CAMELCASE);
+
+    /**
+     * Check environment
+     *
+     * @return bool
+     */
+    public function checkEnvironment();
+
+    /**
+     * Get connection
+     *
+     * @return ConnectionInterface
+     */
+    public function getConnection();
+
+    /**
+     * Create statement
+     *
+     * @param string|resource $sqlOrResource
+     * @return StatementInterface
+     */
+    public function createStatement($sqlOrResource = null);
+
+    /**
+     * Create result
+     *
+     * @param resource $resource
+     * @return ResultInterface
+     */
+    public function createResult($resource);
+
+    /**
+     * Get prepare type
+     *
+     * @return array
+     */
+    public function getPrepareType();
+
+    /**
+     * Format parameter name
+     *
+     * @param string $name
+     * @param mixed  $type
+     * @return string
+     */
+    public function formatParameterName($name, $type = null);
+
+    /**
+     * Get last generated value
+     *
+     * @return mixed
+     */
+    public function getLastGeneratedValue();
 }
 
 /**
@@ -1625,11 +1749,10 @@ class Mysqli implements DriverInterface, Profiler\ProfilerAwareInterface
 
 namespace Zend\Db\Adapter\Driver\Mysqli;
 
-use Zend\Db\Adapter\Driver\ConnectionInterface;
+use Zend\Db\Adapter\Driver\AbstractConnection;
 use Zend\Db\Adapter\Exception;
-use Zend\Db\Adapter\Profiler;
 
-class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
+class Connection extends AbstractConnection
 {
     /**
      * @var Mysqli
@@ -1637,33 +1760,14 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
     protected $driver = null;
 
     /**
-     * @var Profiler\ProfilerInterface
-     */
-    protected $profiler = null;
-
-    /**
-     * Connection parameters
-     *
-     * @var array
-     */
-    protected $connectionParameters = array();
-
-    /**
      * @var \mysqli
      */
     protected $resource = null;
 
     /**
-     * In transaction
-     *
-     * @var bool
-     */
-    protected $inTransaction = false;
-
-    /**
      * Constructor
      *
-     * @param array|mysqli|null $connectionInfo
+     * @param  array|mysqli|null                                   $connectionInfo
      * @throws \Zend\Db\Adapter\Exception\InvalidArgumentException
      */
     public function __construct($connectionInfo = null)
@@ -1678,59 +1782,18 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
     }
 
     /**
-     * @param Mysqli $driver
-     * @return Connection
+     * @param  Mysqli $driver
+     * @return self
      */
     public function setDriver(Mysqli $driver)
     {
         $this->driver = $driver;
+
         return $this;
     }
 
     /**
-     * @param Profiler\ProfilerInterface $profiler
-     * @return Connection
-     */
-    public function setProfiler(Profiler\ProfilerInterface $profiler)
-    {
-        $this->profiler = $profiler;
-        return $this;
-    }
-
-    /**
-     * @return null|Profiler\ProfilerInterface
-     */
-    public function getProfiler()
-    {
-        return $this->profiler;
-    }
-
-    /**
-     * Set connection parameters
-     *
-     * @param  array $connectionParameters
-     * @return Connection
-     */
-    public function setConnectionParameters(array $connectionParameters)
-    {
-        $this->connectionParameters = $connectionParameters;
-        return $this;
-    }
-
-    /**
-     * Get connection parameters
-     *
-     * @return array
-     */
-    public function getConnectionParameters()
-    {
-        return $this->connectionParameters;
-    }
-
-    /**
-     * Get current schema
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getCurrentSchema()
     {
@@ -1741,6 +1804,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
         /** @var $result \mysqli_result */
         $result = $this->resource->query('SELECT DATABASE()');
         $r = $result->fetch_row();
+
         return $r[0];
     }
 
@@ -1748,30 +1812,17 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
      * Set resource
      *
      * @param  \mysqli $resource
-     * @return Connection
+     * @return self
      */
     public function setResource(\mysqli $resource)
     {
         $this->resource = $resource;
+
         return $this;
     }
 
     /**
-     * Get resource
-     *
-     * @return \mysqli
-     */
-    public function getResource()
-    {
-        $this->connect();
-        return $this->resource;
-    }
-
-    /**
-     * Connect
-     *
-     * @throws Exception\RuntimeException
-     * @return Connection
+     * {@inheritDoc}
      */
     public function connect()
     {
@@ -1789,6 +1840,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
                     return $p[$name];
                 }
             }
+
             return;
         };
 
@@ -1833,9 +1885,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
     }
 
     /**
-     * Is connected
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function isConnected()
     {
@@ -1843,9 +1893,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
     }
 
     /**
-     * Disconnect
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function disconnect()
     {
@@ -1856,9 +1904,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
     }
 
     /**
-     * Begin transaction
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function beginTransaction()
     {
@@ -1868,43 +1914,32 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
 
         $this->resource->autocommit(false);
         $this->inTransaction = true;
+
+        return $this;
     }
 
     /**
-     * In transaction
-     *
-     * @return bool
-     */
-    public function inTransaction()
-    {
-        return $this->inTransaction;
-    }
-
-    /**
-     * Commit
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function commit()
     {
-        if (!$this->resource) {
+        if (!$this->isConnected()) {
             $this->connect();
         }
 
         $this->resource->commit();
         $this->inTransaction = false;
         $this->resource->autocommit(true);
+
+        return $this;
     }
 
     /**
-     * Rollback
-     *
-     * @throws Exception\RuntimeException
-     * @return Connection
+     * {@inheritDoc}
      */
     public function rollback()
     {
-        if (!$this->resource) {
+        if (!$this->isConnected()) {
             throw new Exception\RuntimeException('Must be connected before you can rollback.');
         }
 
@@ -1914,15 +1949,15 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
 
         $this->resource->rollback();
         $this->resource->autocommit(true);
+        $this->inTransaction = false;
+
         return $this;
     }
 
     /**
-     * Execute
+     * {@inheritDoc}
      *
-     * @param  string $sql
      * @throws Exception\InvalidQueryException
-     * @return Result
      */
     public function execute($sql)
     {
@@ -1946,14 +1981,12 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
         }
 
         $resultPrototype = $this->driver->createResult(($resultResource === true) ? $this->resource : $resultResource);
+
         return $resultPrototype;
     }
 
     /**
-     * Get last generated id
-     *
-     * @param  null $name Ignored
-     * @return int
+     * {@inheritDoc}
      */
     public function getLastGeneratedValue($name = null)
     {
@@ -2014,6 +2047,7 @@ interface StatementContainerInterface
 
 namespace Zend\Db\Adapter\Driver;
 
+use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\StatementContainerInterface;
 
 interface StatementInterface extends StatementContainerInterface
@@ -2042,7 +2076,7 @@ interface StatementInterface extends StatementContainerInterface
     /**
      * Execute
      *
-     * @param null $parameters
+     * @param null|array|ParameterContainer $parameters
      * @return ResultInterface
      */
     public function execute($parameters = null);
@@ -2268,7 +2302,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
     /**
      * Execute
      *
-     * @param  ParameterContainer|array $parameters
+     * @param null|array|ParameterContainer $parameters
      * @throws Exception\RuntimeException
      * @return mixed
      */
@@ -2618,7 +2652,6 @@ class Result implements
      */
     protected function loadDataFromMysqliStatement()
     {
-        $data = null;
         // build the default reference based bind structure, if it does not already exist
         if ($this->statementBindValues['keys'] === null) {
             $this->statementBindValues['keys'] = array();
@@ -2875,16 +2908,168 @@ interface PlatformInterface
 
 namespace Zend\Db\Adapter\Platform;
 
+abstract class AbstractPlatform implements PlatformInterface
+{
+    /**
+     * @var string[]
+     */
+    protected $quoteIdentifier = array('"', '"');
+
+    /**
+     * @var string
+     */
+    protected $quoteIdentifierTo = '\'';
+
+    /**
+     * @var bool
+     */
+    protected $quoteIdentifiers = true;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function quoteIdentifierInFragment($identifier, array $safeWords = array())
+    {
+        if (! $this->quoteIdentifiers) {
+            return $identifier;
+        }
+
+        $safeWordsInt = array('*' => true, ' ' => true, '.' => true, 'as' => true);
+
+        foreach ($safeWords as $sWord) {
+            $safeWordsInt[strtolower($sWord)] = true;
+        }
+
+        $parts = preg_split(
+            '/([^0-9,a-z,A-Z$_:])/i',
+            $identifier,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+        );
+
+        $identifier = '';
+
+        foreach ($parts as $part) {
+            $identifier .= isset($safeWordsInt[strtolower($part)])
+                ? $part
+                : $this->quoteIdentifier[0]
+                . str_replace($this->quoteIdentifier[0], $this->quoteIdentifierTo, $part)
+                . $this->quoteIdentifier[1];
+        }
+
+        return $identifier;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function quoteIdentifier($identifier)
+    {
+        if (! $this->quoteIdentifiers) {
+            return $identifier;
+        }
+
+        return $this->quoteIdentifier[0]
+            . str_replace($this->quoteIdentifier[0], $this->quoteIdentifierTo, $identifier)
+            . $this->quoteIdentifier[1];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function quoteIdentifierChain($identifierChain)
+    {
+        return '"' . implode('"."', (array) str_replace('"', '\\"', $identifierChain)) . '"';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getQuoteIdentifierSymbol()
+    {
+        return $this->quoteIdentifier[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getQuoteValueSymbol()
+    {
+        return '\'';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function quoteValue($value)
+    {
+        trigger_error(
+            'Attempting to quote a value in ' . get_class($this) .
+            ' without extension/driver support can introduce security vulnerabilities in a production environment'
+        );
+        return '\'' . addcslashes((string) $value, "\x00\n\r\\'\"\x1a") . '\'';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function quoteTrustedValue($value)
+    {
+        return '\'' . addcslashes((string) $value, "\x00\n\r\\'\"\x1a") . '\'';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function quoteValueList($valueList)
+    {
+        return implode(', ', array_map(array($this, 'quoteValue'), (array) $valueList));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getIdentifierSeparator()
+    {
+        return '.';
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Adapter\Platform;
+
 use Zend\Db\Adapter\Driver\DriverInterface;
 use Zend\Db\Adapter\Driver\Mysqli;
 use Zend\Db\Adapter\Driver\Pdo;
 use Zend\Db\Adapter\Exception;
 
-class Mysql implements PlatformInterface
+class Mysql extends AbstractPlatform
 {
-    /** @var \mysqli|\PDO */
+    /**
+     * {@inheritDoc}
+     */
+    protected $quoteIdentifier = array('`', '`');
+
+    /**
+     * {@inheritDoc}
+     */
+    protected $quoteIdentifierTo = '``';
+
+    /**
+     * @var \mysqli|\PDO
+     */
     protected $resource = null;
 
+    /**
+     * @param null|\Zend\Db\Adapter\Driver\Mysqli\Mysqli|\Zend\Db\Adapter\Driver\Pdo\Pdo|\mysqli|\PDO $driver
+     */
     public function __construct($driver = null)
     {
         if ($driver) {
@@ -2893,9 +3078,10 @@ class Mysql implements PlatformInterface
     }
 
     /**
-     * @param \Zend\Db\Adapter\Driver\Mysqli\Mysqli|\Zend\Db\Adapter\Driver\Pdo\Pdo||\mysqli|\PDO $driver
+     * @param \Zend\Db\Adapter\Driver\Mysqli\Mysqli|\Zend\Db\Adapter\Driver\Pdo\Pdo|\mysqli|\PDO $driver
      * @throws \Zend\Db\Adapter\Exception\InvalidArgumentException
-     * @return $this
+     *
+     * @return self
      */
     public function setDriver($driver)
     {
@@ -2913,9 +3099,7 @@ class Mysql implements PlatformInterface
     }
 
     /**
-     * Get name
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getName()
     {
@@ -2923,56 +3107,15 @@ class Mysql implements PlatformInterface
     }
 
     /**
-     * Get quote identifier symbol
-     *
-     * @return string
-     */
-    public function getQuoteIdentifierSymbol()
-    {
-        return '`';
-    }
-
-    /**
-     * Quote identifier
-     *
-     * @param  string $identifier
-     * @return string
-     */
-    public function quoteIdentifier($identifier)
-    {
-        return '`' . str_replace('`', '``', $identifier) . '`';
-    }
-
-    /**
-     * Quote identifier chain
-     *
-     * @param string|string[] $identifierChain
-     * @return string
+     * {@inheritDoc}
      */
     public function quoteIdentifierChain($identifierChain)
     {
-        $identifierChain = str_replace('`', '``', $identifierChain);
-        if (is_array($identifierChain)) {
-            $identifierChain = implode('`.`', $identifierChain);
-        }
-        return '`' . $identifierChain . '`';
+        return '`' . implode('`.`', (array) str_replace('`', '``', $identifierChain)) . '`';
     }
 
     /**
-     * Get quote value symbol
-     *
-     * @return string
-     */
-    public function getQuoteValueSymbol()
-    {
-        return '\'';
-    }
-
-    /**
-     * Quote value
-     *
-     * @param  string $value
-     * @return string
+     * {@inheritDoc}
      */
     public function quoteValue($value)
     {
@@ -2985,20 +3128,11 @@ class Mysql implements PlatformInterface
         if ($this->resource instanceof \PDO) {
             return $this->resource->quote($value);
         }
-        trigger_error(
-            'Attempting to quote a value in ' . __CLASS__ . ' without extension/driver support '
-                . 'can introduce security vulnerabilities in a production environment.'
-        );
-        return '\'' . addcslashes($value, "\x00\n\r\\'\"\x1a") . '\'';
+        return parent::quoteValue($value);
     }
 
     /**
-     * Quote Trusted Value
-     *
-     * The ability to quote values without notices
-     *
-     * @param $value
-     * @return mixed
+     * {@inheritDoc}
      */
     public function quoteTrustedValue($value)
     {
@@ -3011,71 +3145,7 @@ class Mysql implements PlatformInterface
         if ($this->resource instanceof \PDO) {
             return $this->resource->quote($value);
         }
-        return '\'' . addcslashes($value, "\x00\n\r\\'\"\x1a") . '\'';
-    }
-
-    /**
-     * Quote value list
-     *
-     * @param string|string[] $valueList
-     * @return string
-     */
-    public function quoteValueList($valueList)
-    {
-        if (!is_array($valueList)) {
-            return $this->quoteValue($valueList);
-        }
-
-        $value = reset($valueList);
-        do {
-            $valueList[key($valueList)] = $this->quoteValue($value);
-        } while ($value = next($valueList));
-        return implode(', ', $valueList);
-    }
-
-    /**
-     * Get identifier separator
-     *
-     * @return string
-     */
-    public function getIdentifierSeparator()
-    {
-        return '.';
-    }
-
-    /**
-     * Quote identifier in fragment
-     *
-     * @param  string $identifier
-     * @param  array $safeWords
-     * @return string
-     */
-    public function quoteIdentifierInFragment($identifier, array $safeWords = array())
-    {
-        // regex taken from @link http://dev.mysql.com/doc/refman/5.0/en/identifiers.html
-        $parts = preg_split('#([^0-9,a-z,A-Z$_])#', $identifier, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-        if ($safeWords) {
-            $safeWords = array_flip($safeWords);
-            $safeWords = array_change_key_case($safeWords, CASE_LOWER);
-        }
-        foreach ($parts as $i => $part) {
-            if ($safeWords && isset($safeWords[strtolower($part)])) {
-                continue;
-            }
-            switch ($part) {
-                case ' ':
-                case '.':
-                case '*':
-                case 'AS':
-                case 'As':
-                case 'aS':
-                case 'as':
-                    break;
-                default:
-                    $parts[$i] = '`' . str_replace('`', '``', $part) . '`';
-            }
-        }
-        return implode('', $parts);
+        return parent::quoteTrustedValue($value);
     }
 }
 
@@ -3163,7 +3233,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
     /**
      * Set the data source for the result set
      *
-     * @param  Iterator|IteratorAggregate|ResultInterface $dataSource
+     * @param  array|Iterator|IteratorAggregate|ResultInterface $dataSource
      * @return ResultSet
      * @throws Exception\InvalidArgumentException
      */
@@ -3929,6 +3999,11 @@ class ServiceManager implements ServiceLocatorInterface
     protected $canonicalNamesReplacements = array('-' => '', '_' => '', ' ' => '', '\\' => '', '/' => '');
 
     /**
+     * @var ServiceLocatorInterface
+     */
+    protected $serviceManagerCaller;
+
+    /**
      * Constructor
      *
      * @param ConfigInterface $config
@@ -4260,7 +4335,7 @@ class ServiceManager implements ServiceLocatorInterface
         if (!isset($this->shared[$cName])) {
             return $this->shareByDefault();
         }
-        
+
         return $this->shared[$cName];
     }
 
@@ -4532,10 +4607,21 @@ class ServiceManager implements ServiceLocatorInterface
         }
 
         if ($usePeeringServiceManagers) {
+            $caller = $this->serviceManagerCaller;
             foreach ($this->peeringServiceManagers as $peeringServiceManager) {
+                // ignore peering service manager if they are the same instance
+                if ($caller === $peeringServiceManager) {
+                    continue;
+                }
+
+                $peeringServiceManager->serviceManagerCaller = $this;
+
                 if ($peeringServiceManager->has($name)) {
+                    $peeringServiceManager->serviceManagerCaller = null;
                     return true;
                 }
+
+                $peeringServiceManager->serviceManagerCaller = null;
             }
         }
 
@@ -4801,11 +4887,8 @@ class ServiceManager implements ServiceLocatorInterface
      */
     protected function retrieveFromPeeringManager($name)
     {
-        foreach ($this->peeringServiceManagers as $peeringServiceManager) {
-            if ($peeringServiceManager->has($name)) {
-                $this->shared[$name] = $peeringServiceManager->isShared($name);
-                return $peeringServiceManager->get($name);
-            }
+        if (null !== ($service = $this->loopPeeringServiceManagers($name))) {
+            return $service;
         }
 
         $name = $this->canonicalizeName($name);
@@ -4816,14 +4899,43 @@ class ServiceManager implements ServiceLocatorInterface
             } while ($this->hasAlias($name));
         }
 
-        foreach ($this->peeringServiceManagers as $peeringServiceManager) {
-            if ($peeringServiceManager->has($name)) {
-                $this->shared[$name] = $peeringServiceManager->isShared($name);
-                return $peeringServiceManager->get($name);
-            }
+        if (null !== ($service = $this->loopPeeringServiceManagers($name))) {
+            return $service;
         }
 
-        return null;
+        return;
+    }
+
+    /**
+     * Loop over peering service managers.
+     *
+     * @param string $name
+     * @return mixed
+     */
+    protected function loopPeeringServiceManagers($name)
+    {
+        $caller = $this->serviceManagerCaller;
+
+        foreach ($this->peeringServiceManagers as $peeringServiceManager) {
+            // ignore peering service manager if they are the same instance
+            if ($caller === $peeringServiceManager) {
+                continue;
+            }
+
+            // pass this instance to peering service manager
+            $peeringServiceManager->serviceManagerCaller = $this;
+
+            if ($peeringServiceManager->has($name)) {
+                $this->shared[$name] = $peeringServiceManager->isShared($name);
+                $instance = $peeringServiceManager->get($name);
+                $peeringServiceManager->serviceManagerCaller = null;
+                return $instance;
+            }
+
+            $peeringServiceManager->serviceManagerCaller = null;
+        }
+
+        return;
     }
 
     /**
@@ -4915,7 +5027,7 @@ class ServiceManager implements ServiceLocatorInterface
                 );
             }
         }
-        return null;
+        return;
     }
 
     /**
@@ -5054,6 +5166,8 @@ class ServiceManager implements ServiceLocatorInterface
 
 namespace Zend\ServiceManager;
 
+use Exception as BaseException;
+
 /**
  * ServiceManager implementation for managing plugins
  *
@@ -5100,7 +5214,7 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
      * Add a default initializer to ensure the plugin is valid after instance
      * creation.
      *
-     * @param  null|ConfigInterface $configuration
+     * @param null|ConfigInterface $configuration
      */
     public function __construct(ConfigInterface $configuration = null)
     {
@@ -5119,7 +5233,7 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
      * Checks that the filter loaded is either a valid callback or an instance
      * of FilterInterface.
      *
-     * @param  mixed $plugin
+     * @param  mixed                      $plugin
      * @return void
      * @throws Exception\RuntimeException if invalid
      */
@@ -5133,21 +5247,44 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
      * constructor if not null and a non-empty array.
      *
      * @param  string $name
-     * @param  array $options
-     * @param  bool $usePeeringServiceManagers
+     * @param  array  $options
+     * @param  bool   $usePeeringServiceManagers
+     *
      * @return object
+     *
+     * @throws Exception\ServiceNotFoundException
+     * @throws Exception\ServiceNotCreatedException
+     * @throws Exception\RuntimeException
      */
     public function get($name, $options = array(), $usePeeringServiceManagers = true)
     {
+        $isAutoInvokable = false;
+
         // Allow specifying a class name directly; registers as an invokable class
         if (!$this->has($name) && $this->autoAddInvokableClass && class_exists($name)) {
+            $isAutoInvokable = true;
+
             $this->setInvokableClass($name, $name);
         }
 
         $this->creationOptions = $options;
-        $instance = parent::get($name, $usePeeringServiceManagers);
+
+        try {
+            $instance = parent::get($name, $usePeeringServiceManagers);
+        } catch (Exception\ServiceNotFoundException $exception) {
+            $this->tryThrowingServiceLocatorUsageException($name, $isAutoInvokable, $exception);
+        } catch (Exception\ServiceNotCreatedException $exception) {
+            $this->tryThrowingServiceLocatorUsageException($name, $isAutoInvokable, $exception);
+        }
+
         $this->creationOptions = null;
-        $this->validatePlugin($instance);
+
+        try {
+            $this->validatePlugin($instance);
+        } catch (Exception\RuntimeException $exception) {
+            $this->tryThrowingServiceLocatorUsageException($name, $isAutoInvokable, $exception);
+        }
+
         return $instance;
     }
 
@@ -5157,9 +5294,9 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
      * Validates that the service object via validatePlugin() prior to
      * attempting to register it.
      *
-     * @param  string $name
-     * @param  mixed $service
-     * @param  bool $shared
+     * @param  string                                $name
+     * @param  mixed                                 $service
+     * @param  bool                                  $shared
      * @return AbstractPluginManager
      * @throws Exception\InvalidServiceNameException
      */
@@ -5169,18 +5306,20 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
             $this->validatePlugin($service);
         }
         parent::setService($name, $service, $shared);
+
         return $this;
     }
 
     /**
      * Set the main service locator so factories can have access to it to pull deps
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param  ServiceLocatorInterface $serviceLocator
      * @return AbstractPluginManager
      */
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
         $this->serviceLocator = $serviceLocator;
+
         return $this;
     }
 
@@ -5200,8 +5339,8 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
      * Overrides parent implementation by passing $creationOptions to the
      * constructor, if non-null.
      *
-     * @param  string $canonicalName
-     * @param  string $requestedName
+     * @param  string                               $canonicalName
+     * @param  string                               $requestedName
      * @return null|\stdClass
      * @throws Exception\ServiceNotCreatedException If resolved class does not exist
      */
@@ -5236,8 +5375,8 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
      * Overrides parent implementation by passing $creationOptions to the
      * constructor, if non-null.
      *
-     * @param  string $canonicalName
-     * @param  string $requestedName
+     * @param  string                               $canonicalName
+     * @param  string                               $requestedName
      * @return mixed
      * @throws Exception\ServiceNotCreatedException If factory is not callable
      */
@@ -5261,13 +5400,11 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
         } elseif (is_callable($factory)) {
             $instance = $this->createServiceViaCallback($factory, $canonicalName, $requestedName);
         } else {
-            throw new Exception\ServiceNotCreatedException(
-                sprintf(
-                    'While attempting to create %s%s an invalid factory was registered for this instance type.',
-                    $canonicalName,
-                    ($requestedName ? '(alias: ' . $requestedName . ')' : '')
-                )
-            );
+            throw new Exception\ServiceNotCreatedException(sprintf(
+                'While attempting to create %s%s an invalid factory was registered for this instance type.',
+                $canonicalName,
+                ($requestedName ? '(alias: ' . $requestedName . ')' : '')
+            ));
         }
 
         return $instance;
@@ -5276,9 +5413,9 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
     /**
      * Create service via callback
      *
-     * @param  callable $callable
-     * @param  string   $cName
-     * @param  string   $rName
+     * @param  callable                                   $callable
+     * @param  string                                     $cName
+     * @param  string                                     $rName
      * @throws Exception\ServiceNotCreatedException
      * @throws Exception\ServiceNotFoundException
      * @throws Exception\CircularDependencyFoundException
@@ -5302,6 +5439,37 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
         }
 
         return parent::createServiceViaCallback($callable, $cName, $rName);
+    }
+
+    /**
+     * @param string        $serviceName
+     * @param bool          $isAutoInvokable
+     * @param BaseException $exception
+     *
+     * @throws BaseException
+     * @throws Exception\ServiceLocatorUsageException
+     */
+    private function tryThrowingServiceLocatorUsageException(
+        $serviceName,
+        $isAutoInvokable,
+        BaseException $exception
+    ) {
+        if ($isAutoInvokable) {
+            $this->unregisterService($this->canonicalizeName($serviceName));
+        }
+
+        $serviceLocator = $this->getServiceLocator();
+
+        if ($serviceLocator && $serviceLocator->has($serviceName)) {
+            throw Exception\ServiceLocatorUsageException::fromInvalidPluginManagerRequestedServiceName(
+                $this,
+                $serviceLocator,
+                $serviceName,
+                $exception
+            );
+        }
+
+        throw $exception;
     }
 }
 
@@ -5340,6 +5508,7 @@ class AdapterPluginManager extends AbstractPluginManager
         'memcache'       => 'Zend\Cache\Storage\Adapter\Memcache',
         'memcached'      => 'Zend\Cache\Storage\Adapter\Memcached',
         'memory'         => 'Zend\Cache\Storage\Adapter\Memory',
+        'mongodb'        => 'Zend\Cache\Storage\Adapter\MongoDb',
         'redis'          => 'Zend\Cache\Storage\Adapter\Redis',
         'session'        => 'Zend\Cache\Storage\Adapter\Session',
         'xcache'         => 'Zend\Cache\Storage\Adapter\XCache',
@@ -5868,11 +6037,10 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     {
         $postEvent = new PostEvent($eventName . '.post', $this, $args, $result);
         $eventRs   = $this->getEventManager()->trigger($postEvent);
-        if ($eventRs->stopped()) {
-            return $eventRs->last();
-        }
 
-        return $postEvent->getResult();
+        return $eventRs->stopped()
+            ? $eventRs->last()
+            : $postEvent->getResult();
     }
 
     /**
@@ -5897,11 +6065,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
             throw $exceptionEvent->getException();
         }
 
-        if ($eventRs->stopped()) {
-            return $eventRs->last();
-        }
-
-        return $exceptionEvent->getResult();
+        return $eventRs->stopped()
+            ? $eventRs->last()
+            : $exceptionEvent->getResult();
     }
 
     /**
@@ -5989,7 +6155,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     {
         if (!$this->getOptions()->getReadable()) {
             $success = false;
-            return null;
+            return;
         }
 
         $this->normalizeKey($key);
@@ -6008,20 +6174,21 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            if ($args->offsetExists('success') && $args->offsetExists('casToken')) {
+            if ($eventRs->stopped()) {
+                $result = $eventRs->last();
+            } elseif ($args->offsetExists('success') && $args->offsetExists('casToken')) {
                 $result = $this->internalGetItem($args['key'], $args['success'], $args['casToken']);
             } elseif ($args->offsetExists('success')) {
                 $result = $this->internalGetItem($args['key'], $args['success']);
             } else {
                 $result = $this->internalGetItem($args['key']);
             }
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
-            $result = false;
+            $result = null;
+            $success = false;
             return $this->triggerException(__FUNCTION__, $args, $result, $e);
         }
     }
@@ -6061,11 +6228,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalGetItems($args['keys']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalGetItems($args['keys']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = array();
@@ -6118,11 +6285,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalHasItem($args['key']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalHasItem($args['key']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6168,11 +6335,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalHasItems($args['keys']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalHasItems($args['keys']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = array();
@@ -6222,11 +6389,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalGetMetadata($args['key']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalGetMetadata($args['key']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6274,11 +6441,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalGetMetadatas($args['keys']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalGetMetadatas($args['keys']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = array();
@@ -6333,11 +6500,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalSetItem($args['key'], $args['value']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalSetItem($args['key'], $args['value']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6379,11 +6546,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalSetItems($args['keyValuePairs']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalSetItems($args['keyValuePairs']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = array_keys($keyValuePairs);
@@ -6435,11 +6602,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalAddItem($args['key'], $args['value']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalAddItem($args['key'], $args['value']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6487,11 +6654,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalAddItems($args['keyValuePairs']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalAddItems($args['keyValuePairs']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = array_keys($keyValuePairs);
@@ -6543,11 +6710,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalReplaceItem($args['key'], $args['value']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalReplaceItem($args['key'], $args['value']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6596,11 +6763,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalReplaceItems($args['keyValuePairs']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalReplaceItems($args['keyValuePairs']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = array_keys($keyValuePairs);
@@ -6655,11 +6822,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalCheckAndSetItem($args['token'], $args['key'], $args['value']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalCheckAndSetItem($args['token'], $args['key'], $args['value']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6712,11 +6879,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalTouchItem($args['key']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalTouchItem($args['key']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6766,11 +6933,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalTouchItems($args['keys']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalTouchItems($args['keys']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             return $this->triggerException(__FUNCTION__, $args, $keys, $e);
@@ -6819,11 +6986,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalRemoveItem($args['key']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalRemoveItem($args['key']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6864,11 +7031,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalRemoveItems($args['keys']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalRemoveItems($args['keys']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             return $this->triggerException(__FUNCTION__, $args, $keys, $e);
@@ -6919,11 +7086,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalIncrementItem($args['key'], $args['value']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalIncrementItem($args['key'], $args['value']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -6979,11 +7146,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalIncrementItems($args['keyValuePairs']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalIncrementItems($args['keyValuePairs']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = array();
@@ -7036,11 +7203,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalDecrementItem($args['key'], $args['value']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalDecrementItem($args['key'], $args['value']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -7096,11 +7263,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalDecrementItems($args['keyValuePairs']);
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalDecrementItems($args['keyValuePairs']);
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = array();
@@ -7143,11 +7310,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
-            if ($eventRs->stopped()) {
-                return $eventRs->last();
-            }
 
-            $result = $this->internalGetCapabilities();
+            $result = $eventRs->stopped()
+                ? $eventRs->last()
+                : $this->internalGetCapabilities();
+
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
             $result = false;
@@ -7869,7 +8036,7 @@ class Filesystem extends AbstractAdapter implements
      * Get available space in bytes
      *
      * @throws Exception\RuntimeException
-     * @return int|float
+     * @return float
      */
     public function getAvailableSpace()
     {
@@ -7944,14 +8111,15 @@ class Filesystem extends AbstractAdapter implements
      * @param  string  $normalizedKey
      * @param  bool $success
      * @param  mixed   $casToken
-     * @return mixed Data on success, null on failure
+     * @return null|mixed Data on success, null on failure
      * @throws Exception\ExceptionInterface
+     * @throws BaseException
      */
     protected function internalGetItem(& $normalizedKey, & $success = null, & $casToken = null)
     {
         if (!$this->internalHasItem($normalizedKey)) {
             $success = false;
-            return null;
+            return;
         }
 
         try {
@@ -8351,8 +8519,6 @@ class Filesystem extends AbstractAdapter implements
      */
     protected function internalSetItems(array & $normalizedKeyValuePairs)
     {
-        $oldUmask    = null;
-
         // create an associated array of files and contents to write
         $contents = array();
         foreach ($normalizedKeyValuePairs as $key => & $value) {
@@ -8935,6 +9101,11 @@ class Filesystem extends AbstractAdapter implements
      */
     protected function putFileContent($file, $data, $nonBlocking = false, & $wouldblock = null)
     {
+        if (! is_string($data)) {
+            // Ensure we have a string
+            $data = (string) $data;
+        }
+
         $options     = $this->getOptions();
         $locking     = $options->getFileLocking();
         $nonBlocking = $locking && $nonBlocking;
@@ -9190,7 +9361,7 @@ abstract class AbstractOptions implements ParameterObjectInterface
     {
         $setter = 'set' . str_replace('_', '', $key);
 
-        if (method_exists($this, $setter)) {
+        if (is_callable(array($this, $setter))) {
             $this->{$setter}($value);
 
             return;
@@ -9198,9 +9369,10 @@ abstract class AbstractOptions implements ParameterObjectInterface
 
         if ($this->__strictMode__) {
             throw new Exception\BadMethodCallException(sprintf(
-                'The option "%s" does not have a matching "%s" setter method which must be defined',
+                'The option "%s" does not have a callable "%s" ("%s") setter method which must be defined',
                 $key,
-                'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))
+                'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key))),
+                $setter
             ));
         }
     }
@@ -9217,12 +9389,12 @@ abstract class AbstractOptions implements ParameterObjectInterface
     {
         $getter = 'get' . str_replace('_', '', $key);
 
-        if (method_exists($this, $getter)) {
+        if (is_callable(array($this, $getter))) {
             return $this->{$getter}();
         }
 
         throw new Exception\BadMethodCallException(sprintf(
-            'The option "%s" does not have a matching "%s" getter method which must be defined',
+            'The option "%s" does not have a callable "%s" getter method which must be defined',
             $key,
             'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))
         ));
@@ -9236,7 +9408,9 @@ abstract class AbstractOptions implements ParameterObjectInterface
      */
     public function __isset($key)
     {
-        return null !== $this->__get($key);
+        $getter = 'get' . str_replace('_', '', $key);
+
+        return method_exists($this, $getter) && null !== $this->__get($key);
     }
 
     /**
@@ -10047,10 +10221,9 @@ interface EventManagerInterface extends SharedEventManagerAwareInterface
      * - Passing event name and Event object only
      * - Passing event name, target, and Event object
      * - Passing event name, target, and array|ArrayAccess of arguments
+     * - Passing event name, target, array|ArrayAccess of arguments, and callback
      *
-     * Can emulate triggerUntil() if the last argument provided is a callback.
-     *
-     * @param  string $event
+     * @param  string|EventInterface $event
      * @param  object|string $target
      * @param  array|object $argv
      * @param  null|callable $callback
@@ -10067,11 +10240,12 @@ interface EventManagerInterface extends SharedEventManagerAwareInterface
      * - Passing event name, target, Event object, and callback
      * - Passing event name, target, array|ArrayAccess of arguments, and callback
      *
-     * @param  string $event
+     * @param  string|EventInterface $event
      * @param  object|string $target
      * @param  array|object $argv
      * @param  callable $callback
      * @return ResponseCollection
+     * @deprecated Please use trigger()
      */
     public function triggerUntil($event, $target, $argv = null, $callback = null);
 
@@ -10703,12 +10877,10 @@ class EventManager implements EventManagerInterface
     /**
      * Trigger all listeners for a given event
      *
-     * Can emulate triggerUntil() if the last argument provided is a callback.
-     *
-     * @param  string $event
-     * @param  string|object $target Object calling emit, or symbol describing target (such as static method name)
-     * @param  array|ArrayAccess $argv Array of arguments; typically, should be associative
-     * @param  null|callable $callback
+     * @param  string|EventInterface $event
+     * @param  string|object     $target   Object calling emit, or symbol describing target (such as static method name)
+     * @param  array|ArrayAccess $argv     Array of arguments; typically, should be associative
+     * @param  null|callable     $callback Trigger listeners until return value of this callback evaluate to true
      * @return ResponseCollection All listener return values
      * @throws Exception\InvalidCallbackException
      */
@@ -10750,42 +10922,21 @@ class EventManager implements EventManagerInterface
      * Triggers listeners until the provided callback evaluates the return
      * value of one as true, or until all listeners have been executed.
      *
-     * @param  string $event
+     * @param  string|EventInterface $event
      * @param  string|object $target Object calling emit, or symbol describing target (such as static method name)
      * @param  array|ArrayAccess $argv Array of arguments; typically, should be associative
      * @param  callable $callback
      * @return ResponseCollection
+     * @deprecated Please use trigger()
      * @throws Exception\InvalidCallbackException if invalid callable provided
      */
     public function triggerUntil($event, $target, $argv = null, $callback = null)
     {
-        if ($event instanceof EventInterface) {
-            $e        = $event;
-            $event    = $e->getName();
-            $callback = $target;
-        } elseif ($target instanceof EventInterface) {
-            $e = $target;
-            $e->setName($event);
-            $callback = $argv;
-        } elseif ($argv instanceof EventInterface) {
-            $e = $argv;
-            $e->setName($event);
-            $e->setTarget($target);
-        } else {
-            $e = new $this->eventClass();
-            $e->setName($event);
-            $e->setTarget($target);
-            $e->setParams($argv);
-        }
-
-        if (!is_callable($callback)) {
-            throw new Exception\InvalidCallbackException('Invalid callback provided');
-        }
-
-        // Initial value of stop propagation flag should be false
-        $e->stopPropagation(false);
-
-        return $this->triggerListeners($event, $e, $callback);
+        trigger_error(
+            'This method is deprecated and will be removed in the future. Please use trigger() instead.',
+            E_USER_DEPRECATED
+        );
+        return $this->trigger($event, $target, $argv, $callback);
     }
 
     /**
@@ -10952,7 +11103,7 @@ class EventManager implements EventManagerInterface
      *
      * Use this method if you want to be able to modify arguments from within a
      * listener. It returns an ArrayObject of the arguments, which may then be
-     * passed to trigger() or triggerUntil().
+     * passed to trigger().
      *
      * @param  array $args
      * @return ArrayObject
@@ -10965,8 +11116,7 @@ class EventManager implements EventManagerInterface
     /**
      * Trigger listeners
      *
-     * Actual functionality for triggering listeners, to which both trigger() and triggerUntil()
-     * delegate.
+     * Actual functionality for triggering listeners, to which trigger() delegate.
      *
      * @param  string           $event Event name
      * @param  EventInterface $e
@@ -11147,7 +11297,7 @@ class ResponseCollection extends SplStack
     public function last()
     {
         if (count($this) === 0) {
-            return null;
+            return;
         }
         return parent::top();
     }
@@ -11378,7 +11528,6 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
         switch ($flag) {
             case self::EXTR_BOTH:
                 return $this->items;
-                break;
             case self::EXTR_PRIORITY:
                 return array_map(function ($item) {
                     return $item['priority'];
@@ -11761,7 +11910,7 @@ namespace Zend\EventManager;
 class StaticEventManager extends SharedEventManager
 {
     /**
-     * @var StaticEventManager
+     * @var SharedEventManagerInterface
      */
     protected static $instance;
 
@@ -12419,7 +12568,7 @@ class PluginOptions extends AbstractOptions
     /**
      * Used by:
      * - ExceptionHandler
-     * @var callable
+     * @var null|callable
      */
     protected $exceptionCallback;
 
@@ -12492,7 +12641,7 @@ class PluginOptions extends AbstractOptions
      * Used by:
      * - ExceptionHandler
      *
-     * @param  callable $exceptionCallback
+     * @param  null|callable $exceptionCallback
      * @throws Exception\InvalidArgumentException
      * @return PluginOptions
      */
@@ -12511,7 +12660,7 @@ class PluginOptions extends AbstractOptions
      * Used by:
      * - ExceptionHandler
      *
-     * @return callable
+     * @return null|callable
      */
     public function getExceptionCallback()
     {
@@ -12860,7 +13009,7 @@ class CallbackHandler
         if (array_key_exists($name, $this->metadata)) {
             return $this->metadata[$name];
         }
-        return null;
+        return;
     }
 
     /**
@@ -13009,15 +13158,25 @@ abstract class AbstractManager implements Manager
     protected $saveHandler;
 
     /**
+     * @var array
+     */
+    protected $validators;
+
+    /**
      * Constructor
      *
-     * @param  Config|null $config
-     * @param  Storage|null $storage
+     * @param  Config|null      $config
+     * @param  Storage|null     $storage
      * @param  SaveHandler|null $saveHandler
+     * @param  array            $validators
      * @throws Exception\RuntimeException
      */
-    public function __construct(Config $config = null, Storage $storage = null, SaveHandler $saveHandler = null)
-    {
+    public function __construct(
+        Config $config = null,
+        Storage $storage = null,
+        SaveHandler $saveHandler = null,
+        array $validators = array()
+    ) {
         // init config
         if ($config === null) {
             if (!class_exists($this->defaultConfigClass)) {
@@ -13066,6 +13225,8 @@ abstract class AbstractManager implements Manager
         if ($saveHandler !== null) {
             $this->saveHandler = $saveHandler;
         }
+
+        $this->validators = $validators;
     }
 
     /**
@@ -13177,14 +13338,19 @@ class SessionManager extends AbstractManager
     /**
      * Constructor
      *
-     * @param  Config\ConfigInterface|null $config
-     * @param  Storage\StorageInterface|null $storage
+     * @param  Config\ConfigInterface|null           $config
+     * @param  Storage\StorageInterface|null         $storage
      * @param  SaveHandler\SaveHandlerInterface|null $saveHandler
+     * @param  array                                 $validators
      * @throws Exception\RuntimeException
      */
-    public function __construct(Config\ConfigInterface $config = null, Storage\StorageInterface $storage = null, SaveHandler\SaveHandlerInterface $saveHandler = null)
-    {
-        parent::__construct($config, $storage, $saveHandler);
+    public function __construct(
+        Config\ConfigInterface $config = null,
+        Storage\StorageInterface $storage = null,
+        SaveHandler\SaveHandlerInterface $saveHandler = null,
+        array $validators = array()
+    ) {
+        parent::__construct($config, $storage, $saveHandler, $validators);
         register_shutdown_function(array($this, 'writeClose'));
     }
 
@@ -13229,7 +13395,10 @@ class SessionManager extends AbstractManager
             $this->registerSaveHandler($saveHandler);
         }
 
-        $oldSessionData = $_SESSION;
+        $oldSessionData = array();
+        if (isset($_SESSION)) {
+            $oldSessionData = $_SESSION;
+        }
 
         session_start();
 
@@ -13252,8 +13421,34 @@ class SessionManager extends AbstractManager
             $storage->init($_SESSION);
         }
 
+        $this->initializeValidatorChain();
+
         if (!$this->isValid()) {
             throw new Exception\RuntimeException('Session validation failed');
+        }
+    }
+
+    /**
+     * Create validators, insert reference value and add them to the validator chain
+     */
+    protected function initializeValidatorChain()
+    {
+        $validatorChain  = $this->getValidatorChain();
+        $validatorValues = $this->getStorage()->getMetadata('_VALID');
+
+        foreach ($this->validators as $validator) {
+            // Ignore validators which are already present in Storage
+            if (is_array($validatorValues) && array_key_exists($validator, $validatorValues)) {
+                continue;
+            }
+
+            $referenceValue = null;
+            if (is_array($validatorValues) && array_key_exists($validator, $validatorValues)) {
+                $referenceValue = $validatorValues[$validator];
+            }
+
+            $validator = new $validator($referenceValue);
+            $validatorChain->attach('session.validate', array($validator, 'isValid'));
         }
     }
 
@@ -13476,7 +13671,7 @@ class SessionManager extends AbstractManager
     public function isValid()
     {
         $validator = $this->getValidatorChain();
-        $responses = $validator->triggerUntil('session.validate', $this, array($this), function ($test) {
+        $responses = $validator->trigger('session.validate', $this, array($this), function ($test) {
             return false === $test;
         });
         if ($responses->stopped()) {
@@ -13784,7 +13979,7 @@ class StandardConfig implements ConfigInterface
             return $value;
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -13824,7 +14019,7 @@ class StandardConfig implements ConfigInterface
      */
     public function getStorageOption($storageOption)
     {
-        return null;
+        return;
     }
 
     /**
@@ -14502,7 +14697,7 @@ class SessionConfig extends StandardConfig
                 break;
         }
 
-        $result = ini_set($key, $storageValue);
+        $result = ini_set($key, (string) $storageValue);
         if (false === $result) {
             throw new Exception\InvalidArgumentException(
                 "'{$key}' is not a valid sessions-related ini setting."
@@ -14896,7 +15091,7 @@ abstract class AbstractSessionArrayStorage implements
             return $_SESSION[$key];
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -15729,6 +15924,8 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
 namespace Zend\Stdlib;
 
 use Traversable;
+use Zend\Stdlib\ArrayUtils\MergeRemoveKey;
+use Zend\Stdlib\ArrayUtils\MergeReplaceKeyInterface;
 
 /**
  * Utility class for testing and manipulation of PHP arrays.
@@ -15737,6 +15934,16 @@ use Traversable;
  */
 abstract class ArrayUtils
 {
+    /**
+     * Compatibility Flag for ArrayUtils::filter
+     */
+    const ARRAY_FILTER_USE_BOTH = 1;
+
+    /**
+     * Compatibility Flag for ArrayUtils::filter
+     */
+    const ARRAY_FILTER_USE_KEY  = 2;
+
     /**
      * Test whether an array contains one or more string keys
      *
@@ -15976,8 +16183,12 @@ abstract class ArrayUtils
     public static function merge(array $a, array $b, $preserveNumericKeys = false)
     {
         foreach ($b as $key => $value) {
-            if (isset($a[$key]) || array_key_exists($key, $a)) {
-                if (!$preserveNumericKeys && is_int($key)) {
+            if ($value instanceof MergeReplaceKeyInterface) {
+                $a[$key] = $value->getData();
+            } elseif (isset($a[$key]) || array_key_exists($key, $a)) {
+                if ($value instanceof MergeRemoveKey) {
+                    unset($a[$key]);
+                } elseif (!$preserveNumericKeys && is_int($key)) {
                     $a[] = $value;
                 } elseif (is_array($value) && is_array($a[$key])) {
                     $a[$key] = static::merge($a[$key], $value, $preserveNumericKeys);
@@ -15985,11 +16196,55 @@ abstract class ArrayUtils
                     $a[$key] = $value;
                 }
             } else {
-                $a[$key] = $value;
+                if (!$value instanceof MergeRemoveKey) {
+                    $a[$key] = $value;
+                }
             }
         }
 
         return $a;
+    }
+
+    /**
+     * Compatibility Method for array_filter on <5.6 systems
+     *
+     * @param array $data
+     * @param callable $callback
+     * @param null|int $flag
+     * @return array
+     */
+    public static function filter(array $data, $callback, $flag = null)
+    {
+        if (! is_callable($callback)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Second parameter of %s must be callable',
+                __METHOD__
+            ));
+        }
+
+        if (version_compare(PHP_VERSION, '5.6.0') >= 0) {
+            return array_filter($data, $callback, $flag);
+        }
+
+        $output = array();
+        foreach ($data as $key => $value) {
+            $params = array($value);
+
+            if ($flag === static::ARRAY_FILTER_USE_BOTH) {
+                $params[] = $key;
+            }
+
+            if ($flag === static::ARRAY_FILTER_USE_KEY) {
+                $params = array($key);
+            }
+
+            $response = call_user_func_array($callback, $params);
+            if ($response) {
+                $output[$key] = $value;
+            }
+        }
+
+        return $output;
     }
 }
 
@@ -16123,7 +16378,7 @@ class PriorityList implements Iterator, Countable
     public function get($name)
     {
         if (!isset($this->items[$name])) {
-            return null;
+            return;
         }
 
         return $this->items[$name]['data'];
@@ -16191,6 +16446,7 @@ class PriorityList implements Iterator, Countable
      */
     public function current()
     {
+        $this->sorted || $this->sort();
         $node = current($this->items);
 
         return $node ? $node['data'] : false;
@@ -16201,6 +16457,7 @@ class PriorityList implements Iterator, Countable
      */
     public function key()
     {
+        $this->sorted || $this->sort();
         return key($this->items);
     }
 
@@ -16220,6 +16477,14 @@ class PriorityList implements Iterator, Countable
     public function valid()
     {
         return current($this->items) !== false;
+    }
+
+    /**
+     * @return self
+     */
+    public function getIterator()
+    {
+        return clone $this;
     }
 
     /**
@@ -16680,7 +16945,7 @@ abstract class AbstractContainer extends ArrayObject
     public function offsetGet($key)
     {
         if (!$this->offsetExists($key)) {
-            return null;
+            return;
         }
         $storage = $this->getStorage();
         $name = $this->getName();
@@ -16783,7 +17048,7 @@ abstract class AbstractContainer extends ArrayObject
 
             // Map item keys => timestamp
             $expires   = array_flip($expires);
-            $expires   = array_map(function ($value) use ($ts) {
+            $expires   = array_map(function () use ($ts) {
                 return $ts;
             }, $expires);
 
@@ -16834,7 +17099,7 @@ abstract class AbstractContainer extends ArrayObject
 
             // Map item keys => timestamp
             $expires   = array_flip($expires);
-            $expires   = array_map(function ($value) use ($hops, $ts) {
+            $expires   = array_map(function () use ($hops, $ts) {
                 return array('hops' => $hops, 'ts' => $ts);
             }, $expires);
 
@@ -17097,7 +17362,7 @@ class AuthenticationService implements AuthenticationServiceInterface
         $storage = $this->getStorage();
 
         if ($storage->isEmpty()) {
-            return null;
+            return;
         }
 
         return $storage->read();
@@ -17374,7 +17639,7 @@ class Result
      */
     public function isValid()
     {
-        return ($this->code > 0) ? true : false;
+        return ($this->code > 0);
     }
 
     /**
@@ -17671,6 +17936,13 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
     protected $errata = array();
 
     /**
+     * Max length
+     *
+     * @var array
+     */
+    protected $maxLength = array();
+
+    /**
      * Constructor
      *
      * @param array $data
@@ -17719,8 +17991,10 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      * @param string|int $name
      * @param mixed $value
      * @param mixed $errata
+     * @param mixed $maxLength
+     * @throws Exception\InvalidArgumentException
      */
-    public function offsetSet($name, $value, $errata = null)
+    public function offsetSet($name, $value, $errata = null, $maxLength = null)
     {
         $position = false;
 
@@ -17749,6 +18023,10 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
 
         if ($errata) {
             $this->offsetSetErrata($name, $errata);
+        }
+
+        if ($maxLength) {
+            $this->offsetSetMaxLength($name, $maxLength);
         }
     }
 
@@ -17779,6 +18057,79 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
             $this->offsetSet($n, $v);
         }
         return $this;
+    }
+
+    /**
+     * Offset set max length
+     *
+     * @param string|int $name
+     * @param mixed $maxLength
+     */
+    public function offsetSetMaxLength($name, $maxLength)
+    {
+        if (is_int($name)) {
+            $name = $this->positions[$name];
+        }
+        $this->maxLength[$name] = $maxLength;
+    }
+
+    /**
+     * Offset get max length
+     *
+     * @param  string|int $name
+     * @throws Exception\InvalidArgumentException
+     * @return mixed
+     */
+    public function offsetGetMaxLength($name)
+    {
+        if (is_int($name)) {
+            $name = $this->positions[$name];
+        }
+        if (!array_key_exists($name, $this->data)) {
+            throw new Exception\InvalidArgumentException('Data does not exist for this name/position');
+        }
+        return $this->maxLength[$name];
+    }
+
+    /**
+     * Offset has max length
+     *
+     * @param  string|int $name
+     * @return bool
+     */
+    public function offsetHasMaxLength($name)
+    {
+        if (is_int($name)) {
+            $name = $this->positions[$name];
+        }
+        return (isset($this->maxLength[$name]));
+    }
+
+    /**
+     * Offset unset max length
+     *
+     * @param string|int $name
+     * @throws Exception\InvalidArgumentException
+     */
+    public function offsetUnsetMaxLength($name)
+    {
+        if (is_int($name)) {
+            $name = $this->positions[$name];
+        }
+        if (!array_key_exists($name, $this->maxLength)) {
+            throw new Exception\InvalidArgumentException('Data does not exist for this name/position');
+        }
+        $this->maxLength[$name] = null;
+    }
+
+    /**
+     * Get max length iterator
+     *
+     * @return \ArrayIterator
+     */
+    public function getMaxLengthIterator()
+    {
+        return new \ArrayIterator($this->maxLength);
     }
 
     /**
@@ -18092,7 +18443,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
     protected $adapter = null;
 
     /**
-     * @var string
+     * @var string|array|TableIdentifier
      */
     protected $table = null;
 
@@ -18268,8 +18619,13 @@ abstract class AbstractTableGateway implements TableGatewayInterface
     protected function executeSelect(Select $select)
     {
         $selectState = $select->getRawState();
-        if ($selectState['table'] != $this->table && (is_array($selectState['table']) && end($selectState['table']) != $this->table)) {
-            throw new Exception\RuntimeException('The table name of the provided select object must match that of the table');
+        if ($selectState['table'] != $this->table
+            && (is_array($selectState['table'])
+                && end($selectState['table']) != $this->table)
+        ) {
+            throw new Exception\RuntimeException(
+                'The table name of the provided select object must match that of the table'
+            );
         }
 
         if ($selectState['columns'] == array(Select::SQL_STAR)
@@ -18333,11 +18689,22 @@ abstract class AbstractTableGateway implements TableGatewayInterface
     {
         $insertState = $insert->getRawState();
         if ($insertState['table'] != $this->table) {
-            throw new Exception\RuntimeException('The table name of the provided Insert object must match that of the table');
+            throw new Exception\RuntimeException(
+                'The table name of the provided Insert object must match that of the table'
+            );
         }
 
         // apply preInsert features
         $this->featureSet->apply(EventFeature::EVENT_PRE_INSERT, array($insert));
+
+        // Most RDBMS solutions do not allow using table aliases in INSERTs
+        // See https://github.com/zendframework/zf2/issues/7311
+        $unaliasedTable = false;
+        if (is_array($insertState['table'])) {
+            $tableData      = array_values($insertState['table']);
+            $unaliasedTable = array_shift($tableData);
+            $insert->into($unaliasedTable);
+        }
 
         $statement = $this->sql->prepareStatementForSqlObject($insert);
         $result = $statement->execute();
@@ -18346,7 +18713,13 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         // apply postInsert features
         $this->featureSet->apply(EventFeature::EVENT_POST_INSERT, array($statement, $result));
 
-        return $result->getAffectedRows();
+        // Reset original table information in Insert instance, if necessary
+        if ($unaliasedTable) {
+            $insert->into($insertState['table']);
+        }
+
+        $return = $result->getAffectedRows();
+        return $return;
     }
 
     /**
@@ -18393,7 +18766,9 @@ abstract class AbstractTableGateway implements TableGatewayInterface
     {
         $updateState = $update->getRawState();
         if ($updateState['table'] != $this->table) {
-            throw new Exception\RuntimeException('The table name of the provided Update object must match that of the table');
+            throw new Exception\RuntimeException(
+                'The table name of the provided Update object must match that of the table'
+            );
         }
 
         // apply preUpdate features
@@ -18449,7 +18824,9 @@ abstract class AbstractTableGateway implements TableGatewayInterface
     {
         $deleteState = $delete->getRawState();
         if ($deleteState['table'] != $this->table) {
-            throw new Exception\RuntimeException('The table name of the provided Update object must match that of the table');
+            throw new Exception\RuntimeException(
+                'The table name of the provided Update object must match that of the table'
+            );
         }
 
         // pre delete update
@@ -18522,7 +18899,11 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         if ($this->featureSet->canCallMagicCall($method)) {
             return $this->featureSet->callMagicCall($method, $arguments);
         }
-        throw new Exception\InvalidArgumentException('Invalid method (' . $method . ') called, caught by ' . __CLASS__ . '::__call()');
+        throw new Exception\InvalidArgumentException(sprintf(
+            'Invalid method (%s) called, caught by %s::__call()',
+            $method,
+            __CLASS__
+        ));
     }
 
     /**
@@ -18567,11 +18948,12 @@ class TableGateway extends AbstractTableGateway
     /**
      * Constructor
      *
-     * @param string $table
-     * @param AdapterInterface $adapter
-     * @param Feature\AbstractFeature|Feature\FeatureSet|Feature\AbstractFeature[] $features
-     * @param ResultSetInterface $resultSetPrototype
-     * @param Sql $sql
+     * @param string|TableIdentifier|array                                              $table
+     * @param AdapterInterface                                                          $adapter
+     * @param Feature\AbstractFeature|Feature\FeatureSet|Feature\AbstractFeature[]|null $features
+     * @param ResultSetInterface|null                                                   $resultSetPrototype
+     * @param Sql|null                                                                  $sql
+     *
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($table, AdapterInterface $adapter, $features = null, ResultSetInterface $resultSetPrototype = null, Sql $sql = null)
@@ -19116,13 +19498,18 @@ class Sql
     /** @var Platform\Platform */
     protected $sqlPlatform = null;
 
+    /**
+     * @param AdapterInterface                  $adapter
+     * @param null|string|array|TableIdentifier $table
+     * @param null|Platform\AbstractPlatform    $sqlPlatform @deprecated since version 3.0
+     */
     public function __construct(AdapterInterface $adapter, $table = null, Platform\AbstractPlatform $sqlPlatform = null)
     {
         $this->adapter = $adapter;
         if ($table) {
             $this->setTable($table);
         }
-        $this->sqlPlatform = ($sqlPlatform) ?: new Platform\Platform($adapter);
+        $this->sqlPlatform = $sqlPlatform ?: new Platform\Platform($adapter);
     }
 
     /**
@@ -19204,57 +19591,50 @@ class Sql
 
     /**
      * @param PreparableSqlInterface $sqlObject
-     * @param StatementInterface|null $statement
+     * @param StatementInterface     $statement
+     * @param AdapterInterface       $adapter
+     *
      * @return StatementInterface
      */
-    public function prepareStatementForSqlObject(PreparableSqlInterface $sqlObject, StatementInterface $statement = null)
+    public function prepareStatementForSqlObject(PreparableSqlInterface $sqlObject, StatementInterface $statement = null, AdapterInterface $adapter = null)
     {
-        $statement = ($statement) ?: $this->adapter->getDriver()->createStatement();
+        $adapter   = $adapter ?: $this->adapter;
+        $statement = $statement ?: $adapter->getDriver()->createStatement();
 
-        if ($this->sqlPlatform) {
-            $this->sqlPlatform->setSubject($sqlObject);
-            $this->sqlPlatform->prepareStatement($this->adapter, $statement);
-        } else {
-            $sqlObject->prepareStatement($this->adapter, $statement);
-        }
-
-        return $statement;
+        return $this->sqlPlatform->setSubject($sqlObject)->prepareStatement($adapter, $statement);
     }
 
     /**
      * Get sql string using platform or sql object
      *
-     * @param SqlInterface      $sqlObject
-     * @param PlatformInterface $platform
+     * @param SqlInterface           $sqlObject
+     * @param PlatformInterface|null $platform
      *
      * @return string
+     *
+     * @deprecated Deprecated in 2.4. Use buildSqlString() instead
      */
     public function getSqlStringForSqlObject(SqlInterface $sqlObject, PlatformInterface $platform = null)
     {
         $platform = ($platform) ?: $this->adapter->getPlatform();
-
-        if ($this->sqlPlatform) {
-            $this->sqlPlatform->setSubject($sqlObject);
-            return $this->sqlPlatform->getSqlString($platform);
-        }
-
-        return $sqlObject->getSqlString($platform);
+        return $this->sqlPlatform->setSubject($sqlObject)->getSqlString($platform);
     }
-}
 
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Db\Sql\Platform;
-
-interface PlatformDecoratorInterface
-{
-    public function setSubject($subject);
+    /**
+     * @param SqlInterface     $sqlObject
+     * @param AdapterInterface $adapter
+     *
+     * @return string
+     *
+     * @throws Exception\InvalidArgumentException
+     */
+    public function buildSqlString(SqlInterface $sqlObject, AdapterInterface $adapter = null)
+    {
+        return $this
+            ->sqlPlatform
+            ->setSubject($sqlObject)
+            ->getSqlString($adapter ? $adapter->getPlatform() : $this->adapter->getPlatform());
+    }
 }
 
 /**
@@ -19273,11 +19653,32 @@ use Zend\Db\Adapter\StatementContainerInterface;
 interface PreparableSqlInterface
 {
     /**
-     * @param AdapterInterface $adapter
+     * @param AdapterInterface            $adapter
      * @param StatementContainerInterface $statementContainer
+     *
      * @return void
      */
     public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer);
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform;
+
+interface PlatformDecoratorInterface
+{
+    /**
+     * @param $subject
+     *
+     * @return self
+     */
+    public function setSubject($subject);
 }
 
 /**
@@ -19295,7 +19696,9 @@ use Zend\Db\Adapter\Platform\PlatformInterface;
 interface SqlInterface
 {
     /**
-     * @param PlatformInterface $adapterPlatform
+     * Get SQL string for statement
+     *
+     * @param null|PlatformInterface $adapterPlatform
      *
      * @return string
      */
@@ -19322,9 +19725,9 @@ use Zend\Db\Sql\SqlInterface;
 class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInterface, SqlInterface
 {
     /**
-     * @var object
+     * @var object|null
      */
-    protected $subject = null;
+    protected $subject;
 
     /**
      * @var PlatformDecoratorInterface[]
@@ -19332,20 +19735,41 @@ class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInter
     protected $decorators = array();
 
     /**
-     * @param $subject
+     * {@inheritDoc}
      */
     public function setSubject($subject)
     {
         $this->subject = $subject;
+
+        return $this;
     }
 
     /**
-     * @param $type
+     * @param string                     $type
      * @param PlatformDecoratorInterface $decorator
+     *
+     * @return void
      */
     public function setTypeDecorator($type, PlatformDecoratorInterface $decorator)
     {
         $this->decorators[$type] = $decorator;
+    }
+
+    /**
+     * @param PreparableSqlInterface|SqlInterface $subject
+     * @return PlatformDecoratorInterface|PreparableSqlInterface|SqlInterface
+     */
+    public function getTypeDecorator($subject)
+    {
+        foreach ($this->decorators as $type => $decorator) {
+            if ($subject instanceof $type) {
+                $decorator->setSubject($subject);
+
+                return $decorator;
+            }
+        }
+
+        return $subject;
     }
 
     /**
@@ -19357,58 +19781,54 @@ class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInter
     }
 
     /**
-     * @param AdapterInterface $adapter
-     * @param StatementContainerInterface $statementContainer
+     * {@inheritDoc}
+     *
      * @throws Exception\RuntimeException
-     * @return void
      */
     public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
     {
-        if (!$this->subject instanceof PreparableSqlInterface) {
+        if (! $this->subject instanceof PreparableSqlInterface) {
             throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\PreparableSqlInterface, thus calling prepareStatement() has no effect');
         }
 
-        $decoratorForType = false;
-        foreach ($this->decorators as $type => $decorator) {
-            if ($this->subject instanceof $type && $decorator instanceof PreparableSqlInterface) {
-                /** @var $decoratorForType PreparableSqlInterface|PlatformDecoratorInterface */
-                $decoratorForType = $decorator;
-                break;
-            }
-        }
-        if ($decoratorForType) {
-            $decoratorForType->setSubject($this->subject);
-            $decoratorForType->prepareStatement($adapter, $statementContainer);
-        } else {
-            $this->subject->prepareStatement($adapter, $statementContainer);
-        }
+        $this->getTypeDecorator($this->subject)->prepareStatement($adapter, $statementContainer);
+
+        return $statementContainer;
     }
 
     /**
-     * @param null|\Zend\Db\Adapter\Platform\PlatformInterface $adapterPlatform
-     * @return mixed
+     * {@inheritDoc}
+     *
      * @throws Exception\RuntimeException
      */
     public function getSqlString(PlatformInterface $adapterPlatform = null)
     {
-        if (!$this->subject instanceof SqlInterface) {
-            throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\PreparableSqlInterface, thus calling prepareStatement() has no effect');
+        if (! $this->subject instanceof SqlInterface) {
+            throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\SqlInterface, thus calling prepareStatement() has no effect');
         }
 
-        $decoratorForType = false;
-        foreach ($this->decorators as $type => $decorator) {
-            if ($this->subject instanceof $type && $decorator instanceof SqlInterface) {
-                /** @var $decoratorForType SqlInterface|PlatformDecoratorInterface */
-                $decoratorForType = $decorator;
-                break;
-            }
-        }
-        if ($decoratorForType) {
-            $decoratorForType->setSubject($this->subject);
-            return $decoratorForType->getSqlString($adapterPlatform);
-        }
+        return $this->getTypeDecorator($this->subject)->getSqlString($adapterPlatform);
+    }
+}
 
-        return $this->subject->getSqlString($adapterPlatform);
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\SqlServer;
+
+use Zend\Db\Sql\Platform\AbstractPlatform;
+
+class SqlServer extends AbstractPlatform
+{
+    public function __construct(SelectDecorator $selectDecorator = null)
+    {
+        $this->setTypeDecorator('Zend\Db\Sql\Select', ($selectDecorator) ?: new SelectDecorator());
+        $this->setTypeDecorator('Zend\Db\Sql\Ddl\CreateTable', new Ddl\CreateTableDecorator());
     }
 }
 
@@ -19423,6 +19843,11 @@ class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInter
 namespace Zend\Db\Sql\Platform;
 
 use Zend\Db\Adapter\AdapterInterface;
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Adapter\StatementContainerInterface;
+use Zend\Db\Sql\Exception;
+use Zend\Db\Sql\PreparableSqlInterface;
+use Zend\Db\Sql\SqlInterface;
 
 class Platform extends AbstractPlatform
 {
@@ -19431,30 +19856,187 @@ class Platform extends AbstractPlatform
      */
     protected $adapter = null;
 
+    /**
+     * @var PlatformInterface|null
+     */
+    protected $defaultPlatform;
+
     public function __construct(AdapterInterface $adapter)
     {
-        $this->adapter = $adapter;
-        $platform = $adapter->getPlatform();
-        switch (strtolower($platform->getName())) {
-            case 'mysql':
-                $platform = new Mysql\Mysql();
-                $this->decorators = $platform->decorators;
-                break;
-            case 'sqlserver':
-                $platform = new SqlServer\SqlServer();
-                $this->decorators = $platform->decorators;
-                break;
-            case 'oracle':
-                $platform = new Oracle\Oracle();
-                $this->decorators = $platform->decorators;
-                break;
-            case 'ibm db2':
-            case 'ibm_db2':
-            case 'ibmdb2':
-                $platform = new IbmDb2\IbmDb2();
-                $this->decorators = $platform->decorators;
-            default:
+        $this->defaultPlatform = $adapter->getPlatform();
+
+        $mySqlPlatform     = new Mysql\Mysql();
+        $sqlServerPlatform = new SqlServer\SqlServer();
+        $oraclePlatform    = new Oracle\Oracle();
+        $ibmDb2Platform    = new IbmDb2\IbmDb2();
+
+        $this->decorators['mysql']     = $mySqlPlatform->getDecorators();
+        $this->decorators['sqlserver'] = $sqlServerPlatform->getDecorators();
+        $this->decorators['oracle']    = $oraclePlatform->getDecorators();
+        $this->decorators['ibmdb2']    = $ibmDb2Platform->getDecorators();
+    }
+
+    /**
+     * @param string                             $type
+     * @param PlatformDecoratorInterface         $decorator
+     * @param AdapterInterface|PlatformInterface $adapterOrPlatform
+     */
+    public function setTypeDecorator($type, PlatformDecoratorInterface $decorator, $adapterOrPlatform = null)
+    {
+        $platformName = $this->resolvePlatformName($adapterOrPlatform);
+        $this->decorators[$platformName][$type] = $decorator;
+    }
+
+    /**
+     * @param PreparableSqlInterface|SqlInterface     $subject
+     * @param AdapterInterface|PlatformInterface|null $adapterOrPlatform
+     * @return PlatformDecoratorInterface|PreparableSqlInterface|SqlInterface
+     */
+    public function getTypeDecorator($subject, $adapterOrPlatform = null)
+    {
+        $platformName = $this->resolvePlatformName($adapterOrPlatform);
+
+        if (isset($this->decorators[$platformName])) {
+            foreach ($this->decorators[$platformName] as $type => $decorator) {
+                if ($subject instanceof $type && is_a($decorator, $type, true)) {
+                    $decorator->setSubject($subject);
+                    return $decorator;
+                }
+            }
         }
+
+        return $subject;
+    }
+
+    /**
+     * @return array|PlatformDecoratorInterface[]
+     */
+    public function getDecorators()
+    {
+        $platformName = $this->resolvePlatformName($this->getDefaultPlatform());
+        return $this->decorators[$platformName];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception\RuntimeException
+     */
+    public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
+    {
+        if (! $this->subject instanceof PreparableSqlInterface) {
+            throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\PreparableSqlInterface, thus calling prepareStatement() has no effect');
+        }
+
+        $this->getTypeDecorator($this->subject, $adapter)->prepareStatement($adapter, $statementContainer);
+
+        return $statementContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception\RuntimeException
+     */
+    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    {
+        if (! $this->subject instanceof SqlInterface) {
+            throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\SqlInterface, thus calling prepareStatement() has no effect');
+        }
+
+        $adapterPlatform = $this->resolvePlatform($adapterPlatform);
+
+        return $this->getTypeDecorator($this->subject, $adapterPlatform)->getSqlString($adapterPlatform);
+    }
+
+    protected function resolvePlatformName($adapterOrPlatform)
+    {
+        $platformName = $this->resolvePlatform($adapterOrPlatform)->getName();
+        return str_replace(array(' ', '_'), '', strtolower($platformName));
+    }
+    /**
+     * @param null|PlatformInterface|AdapterInterface $adapterOrPlatform
+     *
+     * @return PlatformInterface
+     *
+     * @throws Exception\InvalidArgumentException
+     */
+    protected function resolvePlatform($adapterOrPlatform)
+    {
+        if (! $adapterOrPlatform) {
+            return $this->getDefaultPlatform();
+        }
+
+        if ($adapterOrPlatform instanceof AdapterInterface) {
+            return $adapterOrPlatform->getPlatform();
+        }
+
+        if ($adapterOrPlatform instanceof PlatformInterface) {
+            return $adapterOrPlatform;
+        }
+
+        throw new Exception\InvalidArgumentException(sprintf(
+            '$adapterOrPlatform should be null, %s, or %s',
+            'Zend\Db\Adapter\AdapterInterface',
+            'Zend\Db\Adapter\Platform\PlatformInterface'
+        ));
+    }
+
+    /**
+     * @return PlatformInterface
+     *
+     * @throws Exception\RuntimeException
+     */
+    protected function getDefaultPlatform()
+    {
+        if (! $this->defaultPlatform) {
+            throw new Exception\RuntimeException('$this->defaultPlatform was not set');
+        }
+
+        return $this->defaultPlatform;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\IbmDb2;
+
+use Zend\Db\Sql\Platform\AbstractPlatform;
+
+class IbmDb2 extends AbstractPlatform
+{
+    /**
+     * @param SelectDecorator $selectDecorator
+     */
+    public function __construct(SelectDecorator $selectDecorator = null)
+    {
+        $this->setTypeDecorator('Zend\Db\Sql\Select', ($selectDecorator) ?: new SelectDecorator());
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\Oracle;
+
+use Zend\Db\Sql\Platform\AbstractPlatform;
+
+class Oracle extends AbstractPlatform
+{
+    public function __construct(SelectDecorator $selectDecorator = null)
+    {
+        $this->setTypeDecorator('Zend\Db\Sql\Select', ($selectDecorator) ?: new SelectDecorator());
     }
 }
 
@@ -19476,6 +20058,7 @@ class Mysql extends AbstractPlatform
     {
         $this->setTypeDecorator('Zend\Db\Sql\Select', new SelectDecorator());
         $this->setTypeDecorator('Zend\Db\Sql\Ddl\CreateTable', new Ddl\CreateTableDecorator());
+        $this->setTypeDecorator('Zend\Db\Sql\Ddl\AlterTable', new Ddl\AlterTableDecorator());
     }
 }
 
@@ -19489,17 +20072,18 @@ class Mysql extends AbstractPlatform
 
 namespace Zend\Db\Sql;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\Driver\DriverInterface;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Adapter\StatementContainer;
 use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
+use Zend\Db\Adapter\Platform\Sql92 as DefaultAdapterPlatform;
 
-abstract class AbstractSql
+abstract class AbstractSql implements SqlInterface
 {
     /**
-     * @var array
+     * Specifications for Sql String generation
+     *
+     * @var string[]|array[]
      */
     protected $specifications = array();
 
@@ -19513,23 +20097,74 @@ abstract class AbstractSql
      */
     protected $instanceParameterIndex = array();
 
-    protected function processExpression(ExpressionInterface $expression, PlatformInterface $platform, DriverInterface $driver = null, $namedParameterPrefix = null)
+    /**
+     * {@inheritDoc}
+     */
+    public function getSqlString(PlatformInterface $adapterPlatform = null)
     {
+        $adapterPlatform = ($adapterPlatform) ?: new DefaultAdapterPlatform;
+        return $this->buildSqlString($adapterPlatform);
+    }
+
+    /**
+     * @param PlatformInterface $platform
+     * @param null|DriverInterface $driver
+     * @param null|ParameterContainer $parameterContainer
+     *
+     * @return string
+     */
+    protected function buildSqlString(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    {
+        $this->localizeVariables();
+
+        $sqls       = array();
+        $parameters = array();
+
+        foreach ($this->specifications as $name => $specification) {
+            $parameters[$name] = $this->{'process' . $name}($platform, $driver, $parameterContainer, $sqls, $parameters);
+
+            if ($specification && is_array($parameters[$name])) {
+                $sqls[$name] = $this->createSqlFromSpecificationAndParameters($specification, $parameters[$name]);
+
+                continue;
+            }
+
+            if (is_string($parameters[$name])) {
+                $sqls[$name] = $parameters[$name];
+            }
+        }
+        return rtrim(implode(' ', $sqls), "\n ,");
+    }
+
+    /**
+     *
+     * @staticvar int $runtimeExpressionPrefix
+     * @param ExpressionInterface $expression
+     * @param PlatformInterface $platform
+     * @param null|DriverInterface $driver
+     * @param null|ParameterContainer $parameterContainer
+     * @param null|string $namedParameterPrefix
+     *
+     * @return string
+     *
+     * @throws Exception\RuntimeException
+     */
+    protected function processExpression(ExpressionInterface $expression, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, $namedParameterPrefix = null)
+    {
+        $namedParameterPrefix = !$namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] . $namedParameterPrefix;
         // static counter for the number of times this method was invoked across the PHP runtime
         static $runtimeExpressionPrefix = 0;
 
-        if ($driver && ((!is_string($namedParameterPrefix) || $namedParameterPrefix == ''))) {
+        if ($parameterContainer && ((!is_string($namedParameterPrefix) || $namedParameterPrefix == ''))) {
             $namedParameterPrefix = sprintf('expr%04dParam', ++$runtimeExpressionPrefix);
         }
 
         $sql = '';
-        $statementContainer = new StatementContainer;
-        $parameterContainer = $statementContainer->getParameterContainer();
 
         // initialize variables
         $parts = $expression->getExpressionData();
 
-        if (!isset($this->instanceParameterIndex[$namedParameterPrefix])) {
+        if (! isset($this->instanceParameterIndex[$namedParameterPrefix])) {
             $this->instanceParameterIndex[$namedParameterPrefix] = 1;
         }
 
@@ -19539,37 +20174,36 @@ abstract class AbstractSql
             // if it is a string, simply tack it onto the return sql "specification" string
             if (is_string($part)) {
                 $sql .= $part;
+
                 continue;
             }
 
-            if (!is_array($part)) {
-                throw new Exception\RuntimeException('Elements returned from getExpressionData() array must be a string or array.');
+            if (! is_array($part)) {
+                throw new Exception\RuntimeException(
+                    'Elements returned from getExpressionData() array must be a string or array.'
+                );
             }
 
             // process values and types (the middle and last position of the expression data)
             $values = $part[1];
-            $types = (isset($part[2])) ? $part[2] : array();
+            $types = isset($part[2]) ? $part[2] : array();
             foreach ($values as $vIndex => $value) {
-                if (isset($types[$vIndex]) && $types[$vIndex] == ExpressionInterface::TYPE_IDENTIFIER) {
-                    $values[$vIndex] = $platform->quoteIdentifierInFragment($value);
-                } elseif (isset($types[$vIndex]) && $types[$vIndex] == ExpressionInterface::TYPE_VALUE && $value instanceof Select) {
+                if (!isset($types[$vIndex])) {
+                    continue;
+                }
+                $type = $types[$vIndex];
+                if ($value instanceof Select) {
                     // process sub-select
-                    if ($driver) {
-                        $values[$vIndex] = '(' . $this->processSubSelect($value, $platform, $driver, $parameterContainer) . ')';
-                    } else {
-                        $values[$vIndex] = '(' . $this->processSubSelect($value, $platform) . ')';
-                    }
-                } elseif (isset($types[$vIndex]) && $types[$vIndex] == ExpressionInterface::TYPE_VALUE && $value instanceof ExpressionInterface) {
+                    $values[$vIndex] = '(' . $this->processSubSelect($value, $platform, $driver, $parameterContainer) . ')';
+                } elseif ($value instanceof ExpressionInterface) {
                     // recursive call to satisfy nested expressions
-                    $innerStatementContainer = $this->processExpression($value, $platform, $driver, $namedParameterPrefix . $vIndex . 'subpart');
-                    $values[$vIndex] = $innerStatementContainer->getSql();
-                    if ($driver) {
-                        $parameterContainer->merge($innerStatementContainer->getParameterContainer());
-                    }
-                } elseif (isset($types[$vIndex]) && $types[$vIndex] == ExpressionInterface::TYPE_VALUE) {
+                    $values[$vIndex] = $this->processExpression($value, $platform, $driver, $parameterContainer, $namedParameterPrefix . $vIndex . 'subpart');
+                } elseif ($type == ExpressionInterface::TYPE_IDENTIFIER) {
+                    $values[$vIndex] = $platform->quoteIdentifierInFragment($value);
+                } elseif ($type == ExpressionInterface::TYPE_VALUE) {
                     // if prepareType is set, it means that this particular value must be
                     // passed back to the statement in a way it can be used as a placeholder value
-                    if ($driver) {
+                    if ($parameterContainer) {
                         $name = $namedParameterPrefix . $expressionParamIndex++;
                         $parameterContainer->offsetSet($name, $value);
                         $values[$vIndex] = $driver->formatParameterName($name);
@@ -19578,7 +20212,7 @@ abstract class AbstractSql
 
                     // if not a preparable statement, simply quote the value and move on
                     $values[$vIndex] = $platform->quoteValue($value);
-                } elseif (isset($types[$vIndex]) && $types[$vIndex] == ExpressionInterface::TYPE_LITERAL) {
+                } elseif ($type == ExpressionInterface::TYPE_LITERAL) {
                     $values[$vIndex] = $value;
                 }
             }
@@ -19587,14 +20221,15 @@ abstract class AbstractSql
             $sql .= vsprintf($part[0], $values);
         }
 
-        $statementContainer->setSql($sql);
-        return $statementContainer;
+        return $sql;
     }
 
     /**
-     * @param $specifications
-     * @param $parameters
+     * @param string|array $specifications
+     * @param string|array $parameters
+     *
      * @return string
+     *
      * @throws Exception\RuntimeException
      */
     protected function createSqlFromSpecificationAndParameters($specifications, $parameters)
@@ -19604,10 +20239,12 @@ abstract class AbstractSql
         }
 
         $parametersCount = count($parameters);
+
         foreach ($specifications as $specificationString => $paramSpecs) {
             if ($parametersCount == count($paramSpecs)) {
                 break;
             }
+
             unset($specificationString, $paramSpecs);
         }
 
@@ -19642,41 +20279,114 @@ abstract class AbstractSql
         return vsprintf($specificationString, $topParameters);
     }
 
+    /**
+     * @param Select $subselect
+     * @param PlatformInterface $platform
+     * @param null|DriverInterface $driver
+     * @param null|ParameterContainer $parameterContainer
+     * @return string
+     */
     protected function processSubSelect(Select $subselect, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
-        if ($driver) {
-            $stmtContainer = new StatementContainer;
+        if ($this instanceof PlatformDecoratorInterface) {
+            $decorator = clone $this;
+            $decorator->setSubject($subselect);
+        } else {
+            $decorator = $subselect;
+        }
 
+        if ($parameterContainer) {
             // Track subselect prefix and count for parameters
+            $processInfoContext = ($decorator instanceof PlatformDecoratorInterface) ? $subselect : $decorator;
             $this->processInfo['subselectCount']++;
-            $subselect->processInfo['subselectCount'] = $this->processInfo['subselectCount'];
-            $subselect->processInfo['paramPrefix'] = 'subselect' . $subselect->processInfo['subselectCount'];
+            $processInfoContext->processInfo['subselectCount'] = $this->processInfo['subselectCount'];
+            $processInfoContext->processInfo['paramPrefix'] = 'subselect' . $processInfoContext->processInfo['subselectCount'];
 
-            // call subselect
-            if ($this instanceof PlatformDecoratorInterface) {
-                /** @var Select|PlatformDecoratorInterface $subselectDecorator */
-                $subselectDecorator = clone $this;
-                $subselectDecorator->setSubject($subselect);
-                $subselectDecorator->prepareStatement(new Adapter($driver, $platform), $stmtContainer);
-            } else {
-                $subselect->prepareStatement(new Adapter($driver, $platform), $stmtContainer);
-            }
+            $sql = $decorator->buildSqlString($platform, $driver, $parameterContainer);
 
             // copy count
-            $this->processInfo['subselectCount'] = $subselect->processInfo['subselectCount'];
-
-            $parameterContainer->merge($stmtContainer->getParameterContainer()->getNamedArray());
-            $sql = $stmtContainer->getSql();
-        } else {
-            if ($this instanceof PlatformDecoratorInterface) {
-                $subselectDecorator = clone $this;
-                $subselectDecorator->setSubject($subselect);
-                $sql = $subselectDecorator->getSqlString($platform);
-            } else {
-                $sql = $subselect->getSqlString($platform);
-            }
+            $this->processInfo['subselectCount'] = $decorator->processInfo['subselectCount'];
+            return $sql;
         }
-        return $sql;
+
+        return $decorator->buildSqlString($platform, $driver, $parameterContainer);
+    }
+
+    /**
+     * @param null|array|ExpressionInterface|Select $column
+     * @param PlatformInterface $platform
+     * @param null|DriverInterface $driver
+     * @param null|string $namedParameterPrefix
+     * @param null|ParameterContainer $parameterContainer
+     * @return string
+     */
+    protected function resolveColumnValue($column, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, $namedParameterPrefix = null)
+    {
+        $namedParameterPrefix = !$namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] . $namedParameterPrefix;
+        $isIdentifier = false;
+        $fromTable = '';
+        if (is_array($column)) {
+            if (isset($column['isIdentifier'])) {
+                $isIdentifier = (bool) $column['isIdentifier'];
+            }
+            if (isset($column['fromTable']) && $column['fromTable'] !== null) {
+                $fromTable = $column['fromTable'];
+            }
+            $column = $column['column'];
+        }
+
+        if ($column instanceof ExpressionInterface) {
+            return $this->processExpression($column, $platform, $driver, $parameterContainer, $namedParameterPrefix);
+        }
+        if ($column instanceof Select) {
+            return '(' . $this->processSubSelect($column, $platform, $driver, $parameterContainer) . ')';
+        }
+        if ($column === null) {
+            return 'NULL';
+        }
+        return $isIdentifier
+                ? $fromTable . $platform->quoteIdentifierInFragment($column)
+                : $platform->quoteValue($column);
+    }
+
+    /**
+     * @param string|TableIdentifier|Select $table
+     * @param PlatformInterface $platform
+     * @param DriverInterface $driver
+     * @param ParameterContainer $parameterContainer
+     * @return string
+     */
+    protected function resolveTable($table, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    {
+        $schema = null;
+        if ($table instanceof TableIdentifier) {
+            list($table, $schema) = $table->getTableAndSchema();
+        }
+
+        if ($table instanceof Select) {
+            $table = '(' . $this->processSubselect($table, $platform, $driver, $parameterContainer) . ')';
+        } elseif ($table) {
+            $table = $platform->quoteIdentifier($table);
+        }
+
+        if ($schema && $table) {
+            $table = $platform->quoteIdentifier($schema) . $platform->getIdentifierSeparator() . $table;
+        }
+        return $table;
+    }
+
+    /**
+     * Copy variables from the subject into the local properties
+     */
+    protected function localizeVariables()
+    {
+        if (! $this instanceof PlatformDecoratorInterface) {
+            return;
+        }
+
+        foreach (get_object_vars($this->subject) as $name => $value) {
+            $this->{$name} = $value;
+        }
     }
 }
 
@@ -19690,19 +20400,55 @@ abstract class AbstractSql
 
 namespace Zend\Db\Sql;
 
-use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\Adapter\Driver\DriverInterface;
 use Zend\Db\Adapter\StatementContainerInterface;
+use Zend\Db\Adapter\AdapterInterface;
+use Zend\Db\Adapter\ParameterContainer;
+
+abstract class AbstractPreparableSql extends AbstractSql implements PreparableSqlInterface
+{
+    /**
+     * {@inheritDoc}
+     *
+     * @return StatementContainerInterface
+     */
+    public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
+    {
+        $parameterContainer = $statementContainer->getParameterContainer();
+
+        if (! $parameterContainer instanceof ParameterContainer) {
+            $parameterContainer = new ParameterContainer();
+
+            $statementContainer->setParameterContainer($parameterContainer);
+        }
+
+        $statementContainer->setSql(
+            $this->buildSqlString($adapter->getPlatform(), $adapter->getDriver(), $parameterContainer)
+        );
+
+        return $statementContainer;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql;
+
+use Zend\Db\Adapter\Driver\DriverInterface;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Adapter\Platform\Sql92 as AdapterSql92Platform;
 
 /**
  *
  * @property Where $where
  * @property Having $having
  */
-class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
+class Select extends AbstractPreparableSql
 {
     /**#@+
      * Constant
@@ -19725,6 +20471,8 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
     const JOIN_OUTER = 'outer';
     const JOIN_LEFT = 'left';
     const JOIN_RIGHT = 'right';
+    const JOIN_OUTER_RIGHT = 'outer right';
+    const JOIN_OUTER_LEFT  = 'outer left';
     const SQL_STAR = '*';
     const ORDER_ASCENDING = 'ASC';
     const ORDER_DESCENDING = 'DESC';
@@ -20157,65 +20905,6 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
     }
 
     /**
-     * Prepare statement
-     *
-     * @param AdapterInterface $adapter
-     * @param StatementContainerInterface $statementContainer
-     * @return void
-     */
-    public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
-    {
-        // ensure statement has a ParameterContainer
-        $parameterContainer = $statementContainer->getParameterContainer();
-        if (!$parameterContainer instanceof ParameterContainer) {
-            $parameterContainer = new ParameterContainer();
-            $statementContainer->setParameterContainer($parameterContainer);
-        }
-
-        $sqls = array();
-        $parameters = array();
-        $platform = $adapter->getPlatform();
-        $driver = $adapter->getDriver();
-
-        foreach ($this->specifications as $name => $specification) {
-            $parameters[$name] = $this->{'process' . $name}($platform, $driver, $parameterContainer, $sqls, $parameters);
-            if ($specification && is_array($parameters[$name])) {
-                $sqls[$name] = $this->createSqlFromSpecificationAndParameters($specification, $parameters[$name]);
-            }
-        }
-
-        $sql = implode(' ', $sqls);
-
-        $statementContainer->setSql($sql);
-        return;
-    }
-
-    /**
-     * Get SQL string for statement
-     *
-     * @param  null|PlatformInterface $adapterPlatform If null, defaults to Sql92
-     * @return string
-     */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
-    {
-        // get platform, or create default
-        $adapterPlatform = ($adapterPlatform) ?: new AdapterSql92Platform;
-
-        $sqls = array();
-        $parameters = array();
-
-        foreach ($this->specifications as $name => $specification) {
-            $parameters[$name] = $this->{'process' . $name}($adapterPlatform, null, null, $sqls, $parameters);
-            if ($specification && is_array($parameters[$name])) {
-                $sqls[$name] = $this->createSqlFromSpecificationAndParameters($specification, $parameters[$name]);
-            }
-        }
-
-        $sql = implode(' ', $sqls);
-        return $sql;
-    }
-
-    /**
      * Returns whether the table is read only or not.
      *
      * @return bool
@@ -20235,11 +20924,7 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     protected function renderTable($table, $alias = null)
     {
-        $sql = $table;
-        if ($alias) {
-            $sql .= ' AS ' . $alias;
-        }
-        return $sql;
+        return $table . ($alias ? ' AS ' . $alias : '');
     }
 
     protected function processStatementStart(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
@@ -20268,70 +20953,26 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
     {
         $expr = 1;
 
-        if ($this->table) {
-            $table = $this->table;
-            $schema = $alias = null;
-
-            if (is_array($table)) {
-                $alias = key($this->table);
-                $table = current($this->table);
-            }
-
-            // create quoted table name to use in columns processing
-            if ($table instanceof TableIdentifier) {
-                list($table, $schema) = $table->getTableAndSchema();
-            }
-
-            if ($table instanceof Select) {
-                $table = '(' . $this->processSubselect($table, $platform, $driver, $parameterContainer) . ')';
-            } else {
-                $table = $platform->quoteIdentifier($table);
-            }
-
-            if ($schema) {
-                $table = $platform->quoteIdentifier($schema) . $platform->getIdentifierSeparator() . $table;
-            }
-
-            if ($alias) {
-                $fromTable = $platform->quoteIdentifier($alias);
-                $table = $this->renderTable($table, $fromTable);
-            } else {
-                $fromTable = $table;
-            }
-        } else {
-            $fromTable = '';
-        }
-
-        if ($this->prefixColumnsWithTable) {
-            $fromTable .= $platform->getIdentifierSeparator();
-        } else {
-            $fromTable = '';
-        }
-
+        list($table, $fromTable) = $this->resolveTable($this->table, $platform, $driver, $parameterContainer);
         // process table columns
         $columns = array();
         foreach ($this->columns as $columnIndexOrAs => $column) {
-            $columnName = '';
             if ($column === self::SQL_STAR) {
                 $columns[] = array($fromTable . self::SQL_STAR);
                 continue;
             }
 
-            if ($column instanceof ExpressionInterface) {
-                $columnParts = $this->processExpression(
-                    $column,
-                    $platform,
-                    $driver,
-                    $this->processInfo['paramPrefix'] . ((is_string($columnIndexOrAs)) ? $columnIndexOrAs : 'column')
-                );
-                if ($parameterContainer) {
-                    $parameterContainer->merge($columnParts->getParameterContainer());
-                }
-                $columnName .= $columnParts->getSql();
-            } else {
-                $columnName .= $fromTable . $platform->quoteIdentifier($column);
-            }
-
+            $columnName = $this->resolveColumnValue(
+                array(
+                    'column'       => $column,
+                    'fromTable'    => $fromTable,
+                    'isIdentifier' => true,
+                ),
+                $platform,
+                $driver,
+                $parameterContainer,
+                (is_string($columnIndexOrAs) ? $columnIndexOrAs : 'column')
+            );
             // process As portion
             if (is_string($columnIndexOrAs)) {
                 $columnAs = $platform->quoteIdentifier($columnIndexOrAs);
@@ -20341,32 +20982,27 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
             $columns[] = (isset($columnAs)) ? array($columnName, $columnAs) : array($columnName);
         }
 
-        $separator = $platform->getIdentifierSeparator();
-
         // process join columns
         foreach ($this->joins as $join) {
+            $joinName = (is_array($join['name'])) ? key($join['name']) : $join['name'];
+            $joinName = parent::resolveTable($joinName, $platform, $driver, $parameterContainer);
+
             foreach ($join['columns'] as $jKey => $jColumn) {
                 $jColumns = array();
-                if ($jColumn instanceof ExpressionInterface) {
-                    $jColumnParts = $this->processExpression(
-                        $jColumn,
-                        $platform,
-                        $driver,
-                        $this->processInfo['paramPrefix'] . ((is_string($jKey)) ? $jKey : 'column')
-                    );
-                    if ($parameterContainer) {
-                        $parameterContainer->merge($jColumnParts->getParameterContainer());
-                    }
-                    $jColumns[] = $jColumnParts->getSql();
-                } else {
-                    $name = (is_array($join['name'])) ? key($join['name']) : $name = $join['name'];
-                    if ($name instanceof TableIdentifier) {
-                        $name = ($name->hasSchema() ? $platform->quoteIdentifier($name->getSchema()) . $separator : '') . $platform->quoteIdentifier($name->getTable());
-                    } else {
-                        $name = $platform->quoteIdentifier($name);
-                    }
-                    $jColumns[] = $name . $separator . $platform->quoteIdentifierInFragment($jColumn);
-                }
+                $jFromTable = is_scalar($jColumn)
+                            ? $joinName . $platform->getIdentifierSeparator()
+                            : '';
+                $jColumns[] = $this->resolveColumnValue(
+                    array(
+                        'column'       => $jColumn,
+                        'fromTable'    => $jFromTable,
+                        'isIdentifier' => true,
+                    ),
+                    $platform,
+                    $driver,
+                    $parameterContainer,
+                    (is_string($jKey) ? $jKey : 'column')
+                );
                 if (is_string($jKey)) {
                     $jColumns[] = $platform->quoteIdentifier($jKey);
                 } elseif ($jColumn !== self::SQL_STAR) {
@@ -20377,15 +21013,9 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
         }
 
         if ($this->quantifier) {
-            if ($this->quantifier instanceof ExpressionInterface) {
-                $quantifierParts = $this->processExpression($this->quantifier, $platform, $driver, 'quantifier');
-                if ($parameterContainer) {
-                    $parameterContainer->merge($quantifierParts->getParameterContainer());
-                }
-                $quantifier = $quantifierParts->getSql();
-            } else {
-                $quantifier = $this->quantifier;
-            }
+            $quantifier = ($this->quantifier instanceof ExpressionInterface)
+                    ? $this->processExpression($this->quantifier, $platform, $driver, $parameterContainer, 'quantifier')
+                    : $this->quantifier;
         }
 
         if (!isset($table)) {
@@ -20400,18 +21030,14 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
     protected function processJoins(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if (!$this->joins) {
-            return null;
+            return;
         }
 
         // process joins
         $joinSpecArgArray = array();
         foreach ($this->joins as $j => $join) {
-            $joinSpecArgArray[$j] = array();
             $joinName = null;
             $joinAs = null;
-
-            // type
-            $joinSpecArgArray[$j][] = strtoupper($join['type']);
 
             // table name
             if (is_array($join['name'])) {
@@ -20420,31 +21046,30 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
             } else {
                 $joinName = $join['name'];
             }
-            if ($joinName instanceof ExpressionInterface) {
+
+            if ($joinName instanceof Expression) {
                 $joinName = $joinName->getExpression();
             } elseif ($joinName instanceof TableIdentifier) {
                 $joinName = $joinName->getTableAndSchema();
                 $joinName = ($joinName[1] ? $platform->quoteIdentifier($joinName[1]) . $platform->getIdentifierSeparator() : '') . $platform->quoteIdentifier($joinName[0]);
+            } elseif ($joinName instanceof Select) {
+                $joinName = '(' . $this->processSubSelect($joinName, $platform, $driver, $parameterContainer) . ')';
+            } elseif (is_string($joinName) || (is_object($joinName) && is_callable(array($joinName, '__toString')))) {
+                $joinName = $platform->quoteIdentifier($joinName);
             } else {
-                if ($joinName instanceof Select) {
-                    $joinName = '(' . $this->processSubSelect($joinName, $platform, $driver, $parameterContainer) . ')';
-                } else {
-                    $joinName = $platform->quoteIdentifier($joinName);
-                }
+                throw new Exception\InvalidArgumentException(sprintf('Join name expected to be Expression|TableIdentifier|Select|string, "%s" given', gettype($joinName)));
             }
-            $joinSpecArgArray[$j][] = (isset($joinAs)) ? $joinName . ' AS ' . $joinAs : $joinName;
+
+            $joinSpecArgArray[$j] = array(
+                strtoupper($join['type']),
+                $this->renderTable($joinName, $joinAs),
+            );
 
             // on expression
             // note: for Expression objects, pass them to processExpression with a prefix specific to each join (used for named parameters)
             $joinSpecArgArray[$j][] = ($join['on'] instanceof ExpressionInterface)
-                ? $this->processExpression($join['on'], $platform, $driver, $this->processInfo['paramPrefix'] . 'join' . ($j+1) . 'part')
+                ? $this->processExpression($join['on'], $platform, $driver, $parameterContainer, 'join' . ($j+1) . 'part')
                 : $platform->quoteIdentifierInFragment($join['on'], array('=', 'AND', 'OR', '(', ')', 'BETWEEN', '<', '>')); // on
-            if ($joinSpecArgArray[$j][2] instanceof StatementContainerInterface) {
-                if ($parameterContainer) {
-                    $parameterContainer->merge($joinSpecArgArray[$j][2]->getParameterContainer());
-                }
-                $joinSpecArgArray[$j][2] = $joinSpecArgArray[$j][2]->getSql();
-            }
         }
 
         return array($joinSpecArgArray);
@@ -20453,34 +21078,31 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
     protected function processWhere(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if ($this->where->count() == 0) {
-            return null;
+            return;
         }
-        $whereParts = $this->processExpression($this->where, $platform, $driver, $this->processInfo['paramPrefix'] . 'where');
-        if ($parameterContainer) {
-            $parameterContainer->merge($whereParts->getParameterContainer());
-        }
-        return array($whereParts->getSql());
+        return array(
+            $this->processExpression($this->where, $platform, $driver, $parameterContainer, 'where')
+        );
     }
 
     protected function processGroup(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if ($this->group === null) {
-            return null;
+            return;
         }
         // process table columns
         $groups = array();
         foreach ($this->group as $column) {
-            $columnSql = '';
-            if ($column instanceof Expression) {
-                $columnParts = $this->processExpression($column, $platform, $driver, $this->processInfo['paramPrefix'] . 'group');
-                if ($parameterContainer) {
-                    $parameterContainer->merge($columnParts->getParameterContainer());
-                }
-                $columnSql .= $columnParts->getSql();
-            } else {
-                $columnSql .= $platform->quoteIdentifierInFragment($column);
-            }
-            $groups[] = $columnSql;
+            $groups[] = $this->resolveColumnValue(
+                array(
+                    'column'       => $column,
+                    'isIdentifier' => true,
+                ),
+                $platform,
+                $driver,
+                $parameterContainer,
+                'group'
+            );
         }
         return array($groups);
     }
@@ -20488,29 +21110,24 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
     protected function processHaving(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if ($this->having->count() == 0) {
-            return null;
+            return;
         }
-        $whereParts = $this->processExpression($this->having, $platform, $driver, $this->processInfo['paramPrefix'] . 'having');
-        if ($parameterContainer) {
-            $parameterContainer->merge($whereParts->getParameterContainer());
-        }
-        return array($whereParts->getSql());
+        return array(
+            $this->processExpression($this->having, $platform, $driver, $parameterContainer, 'having')
+        );
     }
 
     protected function processOrder(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if (empty($this->order)) {
-            return null;
+            return;
         }
         $orders = array();
         foreach ($this->order as $k => $v) {
             if ($v instanceof ExpressionInterface) {
-                /** @var $orderParts \Zend\Db\Adapter\StatementContainer */
-                $orderParts = $this->processExpression($v, $platform, $driver);
-                if ($parameterContainer) {
-                    $parameterContainer->merge($orderParts->getParameterContainer());
-                }
-                $orders[] = array($orderParts->getSql());
+                $orders[] = array(
+                    $this->processExpression($v, $platform, $driver, $parameterContainer)
+                );
                 continue;
             }
             if (is_int($k)) {
@@ -20533,56 +21150,42 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
     protected function processLimit(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if ($this->limit === null) {
-            return null;
+            return;
         }
-
-        $limit = $this->limit;
-
-        if ($driver) {
-            $sql = $driver->formatParameterName('limit');
-            $parameterContainer->offsetSet('limit', $limit, ParameterContainer::TYPE_INTEGER);
-        } else {
-            $sql = $platform->quoteValue($limit);
+        if ($parameterContainer) {
+            $parameterContainer->offsetSet('limit', $this->limit, ParameterContainer::TYPE_INTEGER);
+            return array($driver->formatParameterName('limit'));
         }
-
-        return array($sql);
+        return array($platform->quoteValue($this->limit));
     }
 
     protected function processOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if ($this->offset === null) {
-            return null;
+            return;
         }
-
-        $offset = $this->offset;
-
-        if ($driver) {
-            $parameterContainer->offsetSet('offset', $offset, ParameterContainer::TYPE_INTEGER);
+        if ($parameterContainer) {
+            $parameterContainer->offsetSet('offset', $this->offset, ParameterContainer::TYPE_INTEGER);
             return array($driver->formatParameterName('offset'));
         }
 
-        return array($platform->quoteValue($offset));
+        return array($platform->quoteValue($this->offset));
     }
 
     protected function processCombine(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if ($this->combine == array()) {
-            return null;
+            return;
         }
 
         $type = $this->combine['type'];
         if ($this->combine['modifier']) {
             $type .= ' ' . $this->combine['modifier'];
         }
-        $type = strtoupper($type);
 
-        if ($driver) {
-            $sql = $this->processSubSelect($this->combine['select'], $platform, $driver, $parameterContainer);
-            return array($type, $sql);
-        }
         return array(
-            $type,
-            $this->processSubSelect($this->combine['select'], $platform)
+            strtoupper($type),
+            $this->processSubSelect($this->combine['select'], $platform, $driver, $parameterContainer),
         );
     }
 
@@ -20617,6 +21220,43 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
         $this->where  = clone $this->where;
         $this->having = clone $this->having;
     }
+
+    /**
+     * @param string|TableIdentifier|Select $table
+     * @param PlatformInterface $platform
+     * @param DriverInterface $driver
+     * @param ParameterContainer $parameterContainer
+     * @return string
+     */
+    protected function resolveTable($table, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    {
+        $alias = null;
+
+        if (is_array($table)) {
+            $alias = key($table);
+            $table = current($table);
+        }
+
+        $table = parent::resolveTable($table, $platform, $driver, $parameterContainer);
+
+        if ($alias) {
+            $fromTable = $platform->quoteIdentifier($alias);
+            $table = $this->renderTable($table, $fromTable);
+        } else {
+            $fromTable = $table;
+        }
+
+        if ($this->prefixColumnsWithTable && $fromTable) {
+            $fromTable .= $platform->getIdentifierSeparator();
+        } else {
+            $fromTable = '';
+        }
+
+        return array(
+            $table,
+            $fromTable
+        );
+    }
 }
 
 /**
@@ -20629,18 +21269,16 @@ class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
 
 namespace Zend\Db\Sql;
 
-use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Adapter\Platform\Sql92;
-use Zend\Db\Adapter\StatementContainerInterface;
+use Zend\Db\Adapter\Driver\DriverInterface;
 use Zend\Stdlib\PriorityList;
 
 /**
  *
  * @property Where $where
  */
-class Update extends AbstractSql implements SqlInterface, PreparableSqlInterface
+class Update extends AbstractPreparableSql
 {
     /**@#++
      * @const
@@ -20737,7 +21375,7 @@ class Update extends AbstractSql implements SqlInterface, PreparableSqlInterface
      * @param  Where|\Closure|string|array $predicate
      * @param  string $combination One of the OP_* constants from Predicate\PredicateSet
      * @throws Exception\InvalidArgumentException
-     * @return Select
+     * @return Update
      */
     public function where($predicate, $combination = Predicate\PredicateSet::OP_AND)
     {
@@ -20760,104 +21398,40 @@ class Update extends AbstractSql implements SqlInterface, PreparableSqlInterface
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 
-    /**
-     * Prepare statement
-     *
-     * @param AdapterInterface $adapter
-     * @param StatementContainerInterface $statementContainer
-     * @return void
-     */
-    public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
+    protected function processUpdate(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
-        $driver   = $adapter->getDriver();
-        $platform = $adapter->getPlatform();
-        $parameterContainer = $statementContainer->getParameterContainer();
-
-        if (!$parameterContainer instanceof ParameterContainer) {
-            $parameterContainer = new ParameterContainer();
-            $statementContainer->setParameterContainer($parameterContainer);
-        }
-
-        $table = $this->table;
-        $schema = null;
-
-        // create quoted table name to use in update processing
-        if ($table instanceof TableIdentifier) {
-            list($table, $schema) = $table->getTableAndSchema();
-        }
-
-        $table = $platform->quoteIdentifier($table);
-
-        if ($schema) {
-            $table = $platform->quoteIdentifier($schema) . $platform->getIdentifierSeparator() . $table;
-        }
-
         $setSql = array();
         foreach ($this->set as $column => $value) {
-            if ($value instanceof Expression) {
-                $exprData = $this->processExpression($value, $platform, $driver);
-                $setSql[] = $platform->quoteIdentifier($column) . ' = ' . $exprData->getSql();
-                $parameterContainer->merge($exprData->getParameterContainer());
-            } else {
-                $setSql[] = $platform->quoteIdentifier($column) . ' = ' . $driver->formatParameterName($column);
+            $prefix = $platform->quoteIdentifier($column) . ' = ';
+            if (is_scalar($value) && $parameterContainer) {
+                $setSql[] = $prefix . $driver->formatParameterName($column);
                 $parameterContainer->offsetSet($column, $value);
+            } else {
+                $setSql[] = $prefix . $this->resolveColumnValue(
+                    $value,
+                    $platform,
+                    $driver,
+                    $parameterContainer
+                );
             }
         }
-        $set = implode(', ', $setSql);
 
-        $sql = sprintf($this->specifications[static::SPECIFICATION_UPDATE], $table, $set);
-
-        // process where
-        if ($this->where->count() > 0) {
-            $whereParts = $this->processExpression($this->where, $platform, $driver, 'where');
-            $parameterContainer->merge($whereParts->getParameterContainer());
-            $sql .= ' ' . sprintf($this->specifications[static::SPECIFICATION_WHERE], $whereParts->getSql());
-        }
-        $statementContainer->setSql($sql);
+        return sprintf(
+            $this->specifications[static::SPECIFICATION_UPDATE],
+            $this->resolveTable($this->table, $platform, $driver, $parameterContainer),
+            implode(', ', $setSql)
+        );
     }
 
-    /**
-     * Get SQL string for statement
-     *
-     * @param  null|PlatformInterface $adapterPlatform If null, defaults to Sql92
-     * @return string
-     */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    protected function processWhere(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
-        $adapterPlatform = ($adapterPlatform) ?: new Sql92;
-        $table = $this->table;
-        $schema = null;
-
-        // create quoted table name to use in update processing
-        if ($table instanceof TableIdentifier) {
-            list($table, $schema) = $table->getTableAndSchema();
+        if ($this->where->count() == 0) {
+            return;
         }
-
-        $table = $adapterPlatform->quoteIdentifier($table);
-
-        if ($schema) {
-            $table = $adapterPlatform->quoteIdentifier($schema) . $adapterPlatform->getIdentifierSeparator() . $table;
-        }
-
-        $setSql = array();
-        foreach ($this->set as $column => $value) {
-            if ($value instanceof ExpressionInterface) {
-                $exprData = $this->processExpression($value, $adapterPlatform);
-                $setSql[] = $adapterPlatform->quoteIdentifier($column) . ' = ' . $exprData->getSql();
-            } elseif ($value === null) {
-                $setSql[] = $adapterPlatform->quoteIdentifier($column) . ' = NULL';
-            } else {
-                $setSql[] = $adapterPlatform->quoteIdentifier($column) . ' = ' . $adapterPlatform->quoteValue($value);
-            }
-        }
-        $set = implode(', ', $setSql);
-
-        $sql = sprintf($this->specifications[static::SPECIFICATION_UPDATE], $table, $set);
-        if ($this->where->count() > 0) {
-            $whereParts = $this->processExpression($this->where, $adapterPlatform, null, 'where');
-            $sql .= ' ' . sprintf($this->specifications[static::SPECIFICATION_WHERE], $whereParts->getSql());
-        }
-        return $sql;
+        return sprintf(
+            $this->specifications[static::SPECIFICATION_WHERE],
+            $this->processExpression($this->where, $platform, $driver, $parameterContainer, 'where')
+        );
     }
 
     /**
@@ -20870,9 +21444,8 @@ class Update extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     public function __get($name)
     {
-        switch (strtolower($name)) {
-            case 'where':
-                return $this->where;
+        if (strtolower($name) == 'where') {
+            return $this->where;
         }
     }
 
@@ -20900,13 +21473,11 @@ class Update extends AbstractSql implements SqlInterface, PreparableSqlInterface
 
 namespace Zend\Db\Sql;
 
-use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Adapter\Platform\Sql92;
-use Zend\Db\Adapter\StatementContainerInterface;
+use Zend\Db\Adapter\Driver\DriverInterface;
 
-class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
+class Insert extends AbstractPreparableSql
 {
     /**#@+
      * Constants
@@ -20936,7 +21507,7 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
     /**
      * @var array|Select
      */
-    protected $values           = null;
+    protected $select           = null;
 
     /**
      * Constructor
@@ -20970,7 +21541,7 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     public function columns(array $columns)
     {
-        $this->columns = $columns;
+        $this->columns = array_flip($columns);
         return $this;
     }
 
@@ -20984,48 +21555,34 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     public function values($values, $flag = self::VALUES_SET)
     {
-        if (!is_array($values) && !$values instanceof Select) {
-            throw new Exception\InvalidArgumentException('values() expects an array of values or Zend\Db\Sql\Select instance');
-        }
-
         if ($values instanceof Select) {
-            if ($flag == self::VALUES_MERGE && (is_array($this->values) && !empty($this->values))) {
+            if ($flag == self::VALUES_MERGE) {
                 throw new Exception\InvalidArgumentException(
-                    'A Zend\Db\Sql\Select instance cannot be provided with the merge flag when values already exist.'
+                    'A Zend\Db\Sql\Select instance cannot be provided with the merge flag'
                 );
             }
-            $this->values = $values;
+            $this->select = $values;
             return $this;
         }
 
-        // determine if this is assoc or a set of values
-        $keys = array_keys($values);
-        $firstKey = current($keys);
-
-        if ($flag == self::VALUES_SET) {
-            $this->columns = array();
-            $this->values = array();
-        } elseif ($this->values instanceof Select) {
+        if (!is_array($values)) {
             throw new Exception\InvalidArgumentException(
-                'An array of values cannot be provided with the merge flag when a Zend\Db\Sql\Select'
-                . ' instance already exists as the value source.'
+                'values() expects an array of values or Zend\Db\Sql\Select instance'
+            );
+        }
+        if ($this->select && $flag == self::VALUES_MERGE) {
+            throw new Exception\InvalidArgumentException(
+                'An array of values cannot be provided with the merge flag when a Zend\Db\Sql\Select instance already exists as the value source'
             );
         }
 
-        if (is_string($firstKey)) {
-            foreach ($keys as $key) {
-                if (($index = array_search($key, $this->columns)) !== false) {
-                    $this->values[$index] = $values[$key];
-                } else {
-                    $this->columns[] = $key;
-                    $this->values[] = $values[$key];
-                }
+        if ($flag == self::VALUES_SET) {
+            $this->columns = $values;
+        } else {
+            foreach ($values as $column=>$value) {
+                $this->columns[$column] = $value;
             }
-        } elseif (is_int($firstKey)) {
-            // determine if count of columns should match count of values
-            $this->values = array_merge($this->values, array_values($values));
         }
-
         return $this;
     }
 
@@ -21050,145 +21607,61 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
     {
         $rawState = array(
             'table' => $this->table,
-            'columns' => $this->columns,
-            'values' => $this->values
+            'columns' => array_keys($this->columns),
+            'values' => array_values($this->columns)
         );
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 
-    /**
-     * Prepare statement
-     *
-     * @param  AdapterInterface $adapter
-     * @param  StatementContainerInterface $statementContainer
-     * @return void
-     */
-    public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
+    protected function processInsert(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
-        $driver   = $adapter->getDriver();
-        $platform = $adapter->getPlatform();
-        $parameterContainer = $statementContainer->getParameterContainer();
-
-        if (!$parameterContainer instanceof ParameterContainer) {
-            $parameterContainer = new ParameterContainer();
-            $statementContainer->setParameterContainer($parameterContainer);
+        if ($this->select) {
+            return;
         }
-
-        $table = $this->table;
-        $schema = null;
-
-        // create quoted table name to use in insert processing
-        if ($table instanceof TableIdentifier) {
-            list($table, $schema) = $table->getTableAndSchema();
-        }
-
-        $table = $platform->quoteIdentifier($table);
-
-        if ($schema) {
-            $table = $platform->quoteIdentifier($schema) . $platform->getIdentifierSeparator() . $table;
+        if (!$this->columns) {
+            throw new Exception\InvalidArgumentException('values or select should be present');
         }
 
         $columns = array();
         $values  = array();
-
-        if (is_array($this->values)) {
-            foreach ($this->columns as $cIndex => $column) {
-                $columns[$cIndex] = $platform->quoteIdentifier($column);
-                if (isset($this->values[$cIndex]) && $this->values[$cIndex] instanceof Expression) {
-                    $exprData = $this->processExpression($this->values[$cIndex], $platform, $driver);
-                    $values[$cIndex] = $exprData->getSql();
-                    $parameterContainer->merge($exprData->getParameterContainer());
-                } else {
-                    $values[$cIndex] = $driver->formatParameterName($column);
-                    if (isset($this->values[$cIndex])) {
-                        $parameterContainer->offsetSet($column, $this->values[$cIndex]);
-                    } else {
-                        $parameterContainer->offsetSet($column, null);
-                    }
-                }
+        foreach ($this->columns as $column=>$value) {
+            $columns[] = $platform->quoteIdentifier($column);
+            if (is_scalar($value) && $parameterContainer) {
+                $values[] = $driver->formatParameterName($column);
+                $parameterContainer->offsetSet($column, $value);
+            } else {
+                $values[] = $this->resolveColumnValue(
+                    $value,
+                    $platform,
+                    $driver,
+                    $parameterContainer
+                );
             }
-            $sql = sprintf(
-                $this->specifications[static::SPECIFICATION_INSERT],
-                $table,
-                implode(', ', $columns),
-                implode(', ', $values)
-            );
-        } elseif ($this->values instanceof Select) {
-            $this->values->prepareStatement($adapter, $statementContainer);
-
-            $columns = array_map(array($platform, 'quoteIdentifier'), $this->columns);
-            $columns = implode(', ', $columns);
-
-            $sql = sprintf(
-                $this->specifications[static::SPECIFICATION_SELECT],
-                $table,
-                $columns ? "($columns)" : "",
-                $statementContainer->getSql()
-            );
-        } else {
-            throw new Exception\InvalidArgumentException('values or select should be present');
         }
-        $statementContainer->setSql($sql);
+        return sprintf(
+            $this->specifications[static::SPECIFICATION_INSERT],
+            $this->resolveTable($this->table, $platform, $driver, $parameterContainer),
+            implode(', ', $columns),
+            implode(', ', $values)
+        );
     }
 
-    /**
-     * Get SQL string for this statement
-     *
-     * @param  null|PlatformInterface $adapterPlatform Defaults to Sql92 if none provided
-     * @return string
-     */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    protected function processSelect(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
-        $adapterPlatform = ($adapterPlatform) ?: new Sql92;
-        $table = $this->table;
-        $schema = null;
-
-        // create quoted table name to use in insert processing
-        if ($table instanceof TableIdentifier) {
-            list($table, $schema) = $table->getTableAndSchema();
+        if (!$this->select) {
+            return;
         }
+        $selectSql = $this->processSubSelect($this->select, $platform, $driver, $parameterContainer);
 
-        $table = $adapterPlatform->quoteIdentifier($table);
-
-        if ($schema) {
-            $table = $adapterPlatform->quoteIdentifier($schema) . $adapterPlatform->getIdentifierSeparator() . $table;
-        }
-
-        $columns = array_map(array($adapterPlatform, 'quoteIdentifier'), $this->columns);
+        $columns = array_map(array($platform, 'quoteIdentifier'), array_keys($this->columns));
         $columns = implode(', ', $columns);
 
-        if (is_array($this->values)) {
-            $values = array();
-            foreach ($this->values as $value) {
-                if ($value instanceof Expression) {
-                    $exprData = $this->processExpression($value, $adapterPlatform);
-                    $values[] = $exprData->getSql();
-                } elseif ($value === null) {
-                    $values[] = 'NULL';
-                } else {
-                    $values[] = $adapterPlatform->quoteValue($value);
-                }
-            }
-            return sprintf(
-                $this->specifications[static::SPECIFICATION_INSERT],
-                $table,
-                $columns,
-                implode(', ', $values)
-            );
-        } elseif ($this->values instanceof Select) {
-            $selectString = $this->values->getSqlString($adapterPlatform);
-            if ($columns) {
-                $columns = "($columns)";
-            }
-            return sprintf(
-                $this->specifications[static::SPECIFICATION_SELECT],
-                $table,
-                $columns,
-                $selectString
-            );
-        } else {
-            throw new Exception\InvalidArgumentException('values or select should be present');
-        }
+        return sprintf(
+            $this->specifications[static::SPECIFICATION_SELECT],
+            $this->resolveTable($this->table, $platform, $driver, $parameterContainer),
+            $columns ? "($columns)" : "",
+            $selectSql
+        );
     }
 
     /**
@@ -21202,8 +21675,7 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     public function __set($name, $value)
     {
-        $values = array($name => $value);
-        $this->values($values, self::VALUES_MERGE);
+        $this->columns[$name] = $value;
         return $this;
     }
 
@@ -21218,14 +21690,11 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     public function __unset($name)
     {
-        if (($position = array_search($name, $this->columns)) === false) {
+        if (!isset($this->columns[$name])) {
             throw new Exception\InvalidArgumentException('The key ' . $name . ' was not found in this objects column list');
         }
 
-        unset($this->columns[$position]);
-        if (is_array($this->values)) {
-            unset($this->values[$position]);
-        }
+        unset($this->columns[$name]);
     }
 
     /**
@@ -21238,7 +21707,7 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     public function __isset($name)
     {
-        return in_array($name, $this->columns);
+        return isset($this->columns[$name]);
     }
 
     /**
@@ -21252,13 +21721,10 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
      */
     public function __get($name)
     {
-        if (!is_array($this->values)) {
-            return null;
-        }
-        if (($position = array_search($name, $this->columns)) === false) {
+        if (!isset($this->columns[$name])) {
             throw new Exception\InvalidArgumentException('The key ' . $name . ' was not found in this objects column list');
         }
-        return $this->values[$position];
+        return $this->columns[$name];
     }
 }
 
@@ -21272,17 +21738,15 @@ class Insert extends AbstractSql implements SqlInterface, PreparableSqlInterface
 
 namespace Zend\Db\Sql;
 
-use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Adapter\Platform\Sql92;
-use Zend\Db\Adapter\StatementContainerInterface;
+use Zend\Db\Adapter\Driver\DriverInterface;
 
 /**
  *
  * @property Where $where
  */
-class Delete extends AbstractSql implements SqlInterface, PreparableSqlInterface
+class Delete extends AbstractPreparableSql
 {
     /**@#+
      * @const
@@ -21292,7 +21756,7 @@ class Delete extends AbstractSql implements SqlInterface, PreparableSqlInterface
     /**@#-*/
 
     /**
-     * @var array Specifications
+     * {@inheritDoc}
      */
     protected $specifications = array(
         self::SPECIFICATION_DELETE => 'DELETE FROM %1$s',
@@ -21344,6 +21808,11 @@ class Delete extends AbstractSql implements SqlInterface, PreparableSqlInterface
         return $this;
     }
 
+    /**
+     * @param null $key
+     *
+     * @return mixed
+     */
     public function getRawState($key = null)
     {
         $rawState = array(
@@ -21360,6 +21829,7 @@ class Delete extends AbstractSql implements SqlInterface, PreparableSqlInterface
      *
      * @param  Where|\Closure|string|array $predicate
      * @param  string $combination One of the OP_* constants from Predicate\PredicateSet
+     *
      * @return Delete
      */
     public function where($predicate, $combination = Predicate\PredicateSet::OP_AND)
@@ -21373,81 +21843,37 @@ class Delete extends AbstractSql implements SqlInterface, PreparableSqlInterface
     }
 
     /**
-     * Prepare the delete statement
+     * @param PlatformInterface       $platform
+     * @param DriverInterface|null    $driver
+     * @param ParameterContainer|null $parameterContainer
      *
-     * @param  AdapterInterface $adapter
-     * @param  StatementContainerInterface $statementContainer
-     * @return void
+     * @return string
      */
-    public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
+    protected function processDelete(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
-        $driver = $adapter->getDriver();
-        $platform = $adapter->getPlatform();
-        $parameterContainer = $statementContainer->getParameterContainer();
-
-        if (!$parameterContainer instanceof ParameterContainer) {
-            $parameterContainer = new ParameterContainer();
-            $statementContainer->setParameterContainer($parameterContainer);
-        }
-
-        $table = $this->table;
-        $schema = null;
-
-        // create quoted table name to use in delete processing
-        if ($table instanceof TableIdentifier) {
-            list($table, $schema) = $table->getTableAndSchema();
-        }
-
-        $table = $platform->quoteIdentifier($table);
-
-        if ($schema) {
-            $table = $platform->quoteIdentifier($schema) . $platform->getIdentifierSeparator() . $table;
-        }
-
-        $sql = sprintf($this->specifications[static::SPECIFICATION_DELETE], $table);
-
-        // process where
-        if ($this->where->count() > 0) {
-            $whereParts = $this->processExpression($this->where, $platform, $driver, 'where');
-            $parameterContainer->merge($whereParts->getParameterContainer());
-            $sql .= ' ' . sprintf($this->specifications[static::SPECIFICATION_WHERE], $whereParts->getSql());
-        }
-        $statementContainer->setSql($sql);
+        return sprintf(
+            $this->specifications[static::SPECIFICATION_DELETE],
+            $this->resolveTable($this->table, $platform, $driver, $parameterContainer)
+        );
     }
 
     /**
-     * Get the SQL string, based on the platform
+     * @param PlatformInterface       $platform
+     * @param DriverInterface|null    $driver
+     * @param ParameterContainer|null $parameterContainer
      *
-     * Platform defaults to Sql92 if none provided
-     *
-     * @param  null|PlatformInterface $adapterPlatform
-     * @return string
+     * @return null|string
      */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    protected function processWhere(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
-        $adapterPlatform = ($adapterPlatform) ?: new Sql92;
-        $table = $this->table;
-        $schema = null;
-
-        // create quoted table name to use in delete processing
-        if ($table instanceof TableIdentifier) {
-            list($table, $schema) = $table->getTableAndSchema();
+        if ($this->where->count() == 0) {
+            return;
         }
 
-        $table = $adapterPlatform->quoteIdentifier($table);
-
-        if ($schema) {
-            $table = $adapterPlatform->quoteIdentifier($schema) . $adapterPlatform->getIdentifierSeparator() . $table;
-        }
-
-        $sql = sprintf($this->specifications[static::SPECIFICATION_DELETE], $table);
-
-        if ($this->where->count() > 0) {
-            $whereParts = $this->processExpression($this->where, $adapterPlatform, null, 'where');
-            $sql .= ' ' . sprintf($this->specifications[static::SPECIFICATION_WHERE], $whereParts->getSql());
-        }
-
-        return $sql;
+        return sprintf(
+            $this->specifications[static::SPECIFICATION_WHERE],
+            $this->processExpression($this->where, $platform, $driver, $parameterContainer, 'where')
+        );
     }
 
     /**
@@ -21456,7 +21882,8 @@ class Delete extends AbstractSql implements SqlInterface, PreparableSqlInterface
      * Overloads "where" only.
      *
      * @param  string $name
-     * @return mixed
+     *
+     * @return Where|null
      */
     public function __get($name)
     {
@@ -21475,13 +21902,11 @@ class Delete extends AbstractSql implements SqlInterface, PreparableSqlInterface
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Zend\Db\Sql\Platform\Mysql;
+namespace Zend\Db\Sql\Platform\SqlServer;
 
-use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Adapter\Driver\DriverInterface;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Adapter\StatementContainerInterface;
 use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
 use Zend\Db\Sql\Select;
 
@@ -21490,46 +21915,1347 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
     /**
      * @var Select
      */
-    protected $select = null;
+    protected $subject = null;
 
     /**
      * @param Select $select
      */
     public function setSubject($select)
     {
-        $this->select = $select;
+        $this->subject = $select;
     }
 
-    /**
-     * @param AdapterInterface $adapter
-     * @param StatementContainerInterface $statementContainer
-     */
-    public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
+    protected function localizeVariables()
     {
-        // localize variables
-        foreach (get_object_vars($this->select) as $name => $value) {
-            $this->{$name} = $value;
-        }
-        if ($this->limit === null && $this->offset !== null) {
-            $this->specifications[self::LIMIT] = 'LIMIT 18446744073709551615';
-        }
-        parent::prepareStatement($adapter, $statementContainer);
+        parent::localizeVariables();
+        // set specifications
+        unset($this->specifications[self::LIMIT]);
+        unset($this->specifications[self::OFFSET]);
+
+        $this->specifications['LIMITOFFSET'] = null;
     }
 
     /**
      * @param PlatformInterface $platform
+     * @param DriverInterface $driver
+     * @param ParameterContainer $parameterContainer
+     * @param $sqls
+     * @param $parameters
+     * @return null
+     */
+    protected function processLimitOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, &$sqls, &$parameters)
+    {
+        if ($this->limit === null && $this->offset === null) {
+            return;
+        }
+
+        $selectParameters = $parameters[self::SELECT];
+
+        $starSuffix = $platform->getIdentifierSeparator() . self::SQL_STAR;
+        foreach ($selectParameters[0] as $i => $columnParameters) {
+            if ($columnParameters[0] == self::SQL_STAR || (isset($columnParameters[1]) && $columnParameters[1] == self::SQL_STAR) || strpos($columnParameters[0], $starSuffix)) {
+                $selectParameters[0] = array(array(self::SQL_STAR));
+                break;
+            }
+            if (isset($columnParameters[1])) {
+                array_shift($columnParameters);
+                $selectParameters[0][$i] = $columnParameters;
+            }
+        }
+
+        // first, produce column list without compound names (using the AS portion only)
+        array_unshift($sqls, $this->createSqlFromSpecificationAndParameters(
+            array('SELECT %1$s FROM (' => current($this->specifications[self::SELECT])),
+            $selectParameters
+        ));
+
+        if ($parameterContainer) {
+            // create bottom part of query, with offset and limit using row_number
+            $limitParamName = $driver->formatParameterName('limit');
+            $offsetParamName = $driver->formatParameterName('offset');
+            $offsetForSumParamName = $driver->formatParameterName('offsetForSum');
+            array_push($sqls, ') AS [ZEND_SQL_SERVER_LIMIT_OFFSET_EMULATION] WHERE [ZEND_SQL_SERVER_LIMIT_OFFSET_EMULATION].[__ZEND_ROW_NUMBER] BETWEEN '
+                . $offsetParamName . '+1 AND ' . $limitParamName . '+' . $offsetForSumParamName);
+            $parameterContainer->offsetSet('offset', $this->offset);
+            $parameterContainer->offsetSet('limit', $this->limit);
+            $parameterContainer->offsetSetReference('offsetForSum', 'offset');
+        } else {
+            array_push($sqls, ') AS [ZEND_SQL_SERVER_LIMIT_OFFSET_EMULATION] WHERE [ZEND_SQL_SERVER_LIMIT_OFFSET_EMULATION].[__ZEND_ROW_NUMBER] BETWEEN '
+                . (int) $this->offset . '+1 AND '
+                . (int) $this->limit . '+' . (int) $this->offset
+            );
+        }
+
+        if (isset($sqls[self::ORDER])) {
+            $orderBy = $sqls[self::ORDER];
+            unset($sqls[self::ORDER]);
+        } else {
+            $orderBy = 'ORDER BY (SELECT 1)';
+        }
+
+        // add a column for row_number() using the order specification
+        $parameters[self::SELECT][0][] = array('ROW_NUMBER() OVER (' . $orderBy . ')', '[__ZEND_ROW_NUMBER]');
+
+        $sqls[self::SELECT] = $this->createSqlFromSpecificationAndParameters(
+            $this->specifications[self::SELECT],
+            $parameters[self::SELECT]
+        );
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Ddl;
+
+use Zend\Db\Sql\SqlInterface as BaseSqlInterface;
+
+interface SqlInterface extends BaseSqlInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Ddl;
+
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\AbstractSql;
+
+class CreateTable extends AbstractSql implements SqlInterface
+{
+    const COLUMNS     = 'columns';
+    const CONSTRAINTS = 'constraints';
+    const TABLE       = 'table';
+
+    /**
+     * @var Column\ColumnInterface[]
+     */
+    protected $columns = array();
+
+    /**
+     * @var string[]
+     */
+    protected $constraints = array();
+
+    /**
+     * @var bool
+     */
+    protected $isTemporary = false;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected $specifications = array(
+        self::TABLE => 'CREATE %1$sTABLE %2$s (',
+        self::COLUMNS  => array(
+            "\n    %1\$s" => array(
+                array(1 => '%1$s', 'combinedby' => ",\n    ")
+            )
+        ),
+        'combinedBy' => ",",
+        self::CONSTRAINTS => array(
+            "\n    %1\$s" => array(
+                array(1 => '%1$s', 'combinedby' => ",\n    ")
+            )
+        ),
+        'statementEnd' => '%1$s',
+    );
+
+    /**
+     * @var string
+     */
+    protected $table = '';
+
+    /**
+     * @param string $table
+     * @param bool   $isTemporary
+     */
+    public function __construct($table = '', $isTemporary = false)
+    {
+        $this->table = $table;
+        $this->setTemporary($isTemporary);
+    }
+
+    /**
+     * @param  bool $temporary
+     * @return self
+     */
+    public function setTemporary($temporary)
+    {
+        $this->isTemporary = (bool) $temporary;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTemporary()
+    {
+        return $this->isTemporary;
+    }
+
+    /**
+     * @param  string $name
+     * @return self
+     */
+    public function setTable($name)
+    {
+        $this->table = $name;
+        return $this;
+    }
+
+    /**
+     * @param  Column\ColumnInterface $column
+     * @return self
+     */
+    public function addColumn(Column\ColumnInterface $column)
+    {
+        $this->columns[] = $column;
+        return $this;
+    }
+
+    /**
+     * @param  Constraint\ConstraintInterface $constraint
+     * @return self
+     */
+    public function addConstraint(Constraint\ConstraintInterface $constraint)
+    {
+        $this->constraints[] = $constraint;
+        return $this;
+    }
+
+    /**
+     * @param  string|null $key
+     * @return array
+     */
+    public function getRawState($key = null)
+    {
+        $rawState = array(
+            self::COLUMNS     => $this->columns,
+            self::CONSTRAINTS => $this->constraints,
+            self::TABLE       => $this->table,
+        );
+
+        return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
+    }
+
+    /**
+     * @param PlatformInterface $adapterPlatform
+     *
+     * @return string[]
+     */
+    protected function processTable(PlatformInterface $adapterPlatform = null)
+    {
+        return array(
+            $this->isTemporary ? 'TEMPORARY ' : '',
+            $adapterPlatform->quoteIdentifier($this->table),
+        );
+    }
+
+    /**
+     * @param PlatformInterface $adapterPlatform
+     *
+     * @return string[][]|null
+     */
+    protected function processColumns(PlatformInterface $adapterPlatform = null)
+    {
+        if (! $this->columns) {
+            return;
+        }
+
+        $sqls = array();
+
+        foreach ($this->columns as $column) {
+            $sqls[] = $this->processExpression($column, $adapterPlatform);
+        }
+
+        return array($sqls);
+    }
+
+    /**
+     * @param PlatformInterface $adapterPlatform
+     *
+     * @return array|string
+     */
+    protected function processCombinedby(PlatformInterface $adapterPlatform = null)
+    {
+        if ($this->constraints && $this->columns) {
+            return $this->specifications['combinedBy'];
+        }
+    }
+
+    /**
+     * @param PlatformInterface $adapterPlatform
+     *
+     * @return string[][]|null
+     */
+    protected function processConstraints(PlatformInterface $adapterPlatform = null)
+    {
+        if (!$this->constraints) {
+            return;
+        }
+
+        $sqls = array();
+
+        foreach ($this->constraints as $constraint) {
+            $sqls[] = $this->processExpression($constraint, $adapterPlatform);
+        }
+
+        return array($sqls);
+    }
+
+    /**
+     * @param PlatformInterface $adapterPlatform
+     *
+     * @return string[]
+     */
+    protected function processStatementEnd(PlatformInterface $adapterPlatform = null)
+    {
+        return array("\n)");
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\SqlServer\Ddl;
+
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\Ddl\CreateTable;
+use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
+
+class CreateTableDecorator extends CreateTable implements PlatformDecoratorInterface
+{
+    /**
+     * @var CreateTable
+     */
+    protected $subject;
+
+    /**
+     * @param CreateTable $subject
+     * @return self
+     */
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+        return $this;
+    }
+
+    /**
+     * @param PlatformInterface $adapterPlatform
+     * @return array
+     */
+    protected function processTable(PlatformInterface $adapterPlatform = null)
+    {
+        $table = ($this->isTemporary ? '#' : '') . ltrim($this->table, '#');
+        return array(
+            '',
+            $adapterPlatform->quoteIdentifier($table),
+        );
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Ddl;
+
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\AbstractSql;
+
+class AlterTable extends AbstractSql implements SqlInterface
+{
+    const ADD_COLUMNS      = 'addColumns';
+    const ADD_CONSTRAINTS  = 'addConstraints';
+    const CHANGE_COLUMNS   = 'changeColumns';
+    const DROP_COLUMNS     = 'dropColumns';
+    const DROP_CONSTRAINTS = 'dropConstraints';
+    const TABLE            = 'table';
+
+    /**
+     * @var array
+     */
+    protected $addColumns = array();
+
+    /**
+     * @var array
+     */
+    protected $addConstraints = array();
+
+    /**
+     * @var array
+     */
+    protected $changeColumns = array();
+
+    /**
+     * @var array
+     */
+    protected $dropColumns = array();
+
+    /**
+     * @var array
+     */
+    protected $dropConstraints = array();
+
+    /**
+     * Specifications for Sql String generation
+     * @var array
+     */
+    protected $specifications = array(
+        self::TABLE => "ALTER TABLE %1\$s\n",
+        self::ADD_COLUMNS  => array(
+            "%1\$s" => array(
+                array(1 => "ADD COLUMN %1\$s,\n", 'combinedby' => "")
+            )
+        ),
+        self::CHANGE_COLUMNS  => array(
+            "%1\$s" => array(
+                array(2 => "CHANGE COLUMN %1\$s %2\$s,\n", 'combinedby' => ""),
+            )
+        ),
+        self::DROP_COLUMNS  => array(
+            "%1\$s" => array(
+                array(1 => "DROP COLUMN %1\$s,\n", 'combinedby' => ""),
+            )
+        ),
+        self::ADD_CONSTRAINTS  => array(
+            "%1\$s" => array(
+                array(1 => "ADD %1\$s,\n", 'combinedby' => ""),
+            )
+        ),
+        self::DROP_CONSTRAINTS  => array(
+            "%1\$s" => array(
+                array(1 => "DROP CONSTRAINT %1\$s,\n", 'combinedby' => ""),
+            )
+        )
+    );
+
+    /**
+     * @var string
+     */
+    protected $table = '';
+
+    /**
+     * @param string $table
+     */
+    public function __construct($table = '')
+    {
+        ($table) ? $this->setTable($table) : null;
+    }
+
+    /**
+     * @param  string $name
+     * @return self
+     */
+    public function setTable($name)
+    {
+        $this->table = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param  Column\ColumnInterface $column
+     * @return self
+     */
+    public function addColumn(Column\ColumnInterface $column)
+    {
+        $this->addColumns[] = $column;
+
+        return $this;
+    }
+
+    /**
+     * @param  string $name
+     * @param  Column\ColumnInterface $column
+     * @return self
+     */
+    public function changeColumn($name, Column\ColumnInterface $column)
+    {
+        $this->changeColumns[$name] = $column;
+
+        return $this;
+    }
+
+    /**
+     * @param  string $name
+     * @return self
+     */
+    public function dropColumn($name)
+    {
+        $this->dropColumns[] = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param  string $name
+     * @return self
+     */
+    public function dropConstraint($name)
+    {
+        $this->dropConstraints[] = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param  Constraint\ConstraintInterface $constraint
+     * @return self
+     */
+    public function addConstraint(Constraint\ConstraintInterface $constraint)
+    {
+        $this->addConstraints[] = $constraint;
+
+        return $this;
+    }
+
+    /**
+     * @param  string|null $key
+     * @return array
+     */
+    public function getRawState($key = null)
+    {
+        $rawState = array(
+            self::TABLE => $this->table,
+            self::ADD_COLUMNS => $this->addColumns,
+            self::DROP_COLUMNS => $this->dropColumns,
+            self::CHANGE_COLUMNS => $this->changeColumns,
+            self::ADD_CONSTRAINTS => $this->addConstraints,
+            self::DROP_CONSTRAINTS => $this->dropConstraints,
+        );
+
+        return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
+    }
+
+    protected function processTable(PlatformInterface $adapterPlatform = null)
+    {
+        return array($adapterPlatform->quoteIdentifier($this->table));
+    }
+
+    protected function processAddColumns(PlatformInterface $adapterPlatform = null)
+    {
+        $sqls = array();
+        foreach ($this->addColumns as $column) {
+            $sqls[] = $this->processExpression($column, $adapterPlatform);
+        }
+
+        return array($sqls);
+    }
+
+    protected function processChangeColumns(PlatformInterface $adapterPlatform = null)
+    {
+        $sqls = array();
+        foreach ($this->changeColumns as $name => $column) {
+            $sqls[] = array(
+                $adapterPlatform->quoteIdentifier($name),
+                $this->processExpression($column, $adapterPlatform)
+            );
+        }
+
+        return array($sqls);
+    }
+
+    protected function processDropColumns(PlatformInterface $adapterPlatform = null)
+    {
+        $sqls = array();
+        foreach ($this->dropColumns as $column) {
+            $sqls[] = $adapterPlatform->quoteIdentifier($column);
+        }
+
+        return array($sqls);
+    }
+
+    protected function processAddConstraints(PlatformInterface $adapterPlatform = null)
+    {
+        $sqls = array();
+        foreach ($this->addConstraints as $constraint) {
+            $sqls[] = $this->processExpression($constraint, $adapterPlatform);
+        }
+
+        return array($sqls);
+    }
+
+    protected function processDropConstraints(PlatformInterface $adapterPlatform = null)
+    {
+        $sqls = array();
+        foreach ($this->dropConstraints as $constraint) {
+            $sqls[] = $adapterPlatform->quoteIdentifier($constraint);
+        }
+
+        return array($sqls);
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\Mysql\Ddl;
+
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\Ddl\AlterTable;
+use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
+
+class AlterTableDecorator extends AlterTable implements PlatformDecoratorInterface
+{
+    /**
+     * @var AlterTable
+     */
+    protected $subject;
+
+    /**
+     * @var int[]
+     */
+    protected $columnOptionSortOrder = array(
+        'unsigned'      => 0,
+        'zerofill'      => 1,
+        'identity'      => 2,
+        'serial'        => 2,
+        'autoincrement' => 2,
+        'comment'       => 3,
+        'columnformat'  => 4,
+        'format'        => 4,
+        'storage'       => 5,
+    );
+
+    /**
+     * @param AlterTable $subject
+     * @return \Zend\Db\Sql\Platform\PlatformDecoratorInterface
+     */
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @param string $sql
+     * @return array
+     */
+    protected function getSqlInsertOffsets($sql)
+    {
+        $sqlLength   = strlen($sql);
+        $insertStart = array();
+
+        foreach (array('NOT NULL', 'NULL', 'DEFAULT', 'UNIQUE', 'PRIMARY', 'REFERENCES') as $needle) {
+            $insertPos = strpos($sql, ' ' . $needle);
+
+            if ($insertPos !== false) {
+                switch ($needle) {
+                    case 'REFERENCES':
+                        $insertStart[2] = !isset($insertStart[2]) ? $insertPos : $insertStart[2];
+                    // no break
+                    case 'PRIMARY':
+                    case 'UNIQUE':
+                        $insertStart[1] = !isset($insertStart[1]) ? $insertPos : $insertStart[1];
+                    // no break
+                    default:
+                        $insertStart[0] = !isset($insertStart[0]) ? $insertPos : $insertStart[0];
+                }
+            }
+        }
+
+        foreach (range(0, 3) as $i) {
+            $insertStart[$i] = isset($insertStart[$i]) ? $insertStart[$i] : $sqlLength;
+        }
+
+        return $insertStart;
+    }
+
+    /**
+     * @param PlatformInterface $adapterPlatform
+     * @return array
+     */
+    protected function processAddColumns(PlatformInterface $adapterPlatform = null)
+    {
+        $sqls = array();
+
+        foreach ($this->addColumns as $i => $column) {
+            $sql           = $this->processExpression($column, $adapterPlatform);
+            $insertStart   = $this->getSqlInsertOffsets($sql);
+            $columnOptions = $column->getOptions();
+
+            uksort($columnOptions, array($this, 'compareColumnOptions'));
+
+            foreach ($columnOptions as $coName => $coValue) {
+                $insert = '';
+
+                if (! $coValue) {
+                    continue;
+                }
+
+                switch ($this->normalizeColumnOption($coName)) {
+                    case 'unsigned':
+                        $insert = ' UNSIGNED';
+                        $j = 0;
+                        break;
+                    case 'zerofill':
+                        $insert = ' ZEROFILL';
+                        $j = 0;
+                        break;
+                    case 'identity':
+                    case 'serial':
+                    case 'autoincrement':
+                        $insert = ' AUTO_INCREMENT';
+                        $j = 1;
+                        break;
+                    case 'comment':
+                        $insert = ' COMMENT ' . $adapterPlatform->quoteValue($coValue);
+                        $j = 2;
+                        break;
+                    case 'columnformat':
+                    case 'format':
+                        $insert = ' COLUMN_FORMAT ' . strtoupper($coValue);
+                        $j = 2;
+                        break;
+                    case 'storage':
+                        $insert = ' STORAGE ' . strtoupper($coValue);
+                        $j = 2;
+                        break;
+                }
+
+                if ($insert) {
+                    $j = isset($j) ? $j : 0;
+                    $sql = substr_replace($sql, $insert, $insertStart[$j], 0);
+                    for (; $j < count($insertStart); ++$j) {
+                        $insertStart[$j] += strlen($insert);
+                    }
+                }
+            }
+            $sqls[$i] = $sql;
+        }
+        return array($sqls);
+    }
+
+    /**
+     * @param PlatformInterface $adapterPlatform
+     * @return array
+     */
+    protected function processChangeColumns(PlatformInterface $adapterPlatform = null)
+    {
+        $sqls = array();
+        foreach ($this->changeColumns as $name => $column) {
+            $sql           = $this->processExpression($column, $adapterPlatform);
+            $insertStart   = $this->getSqlInsertOffsets($sql);
+            $columnOptions = $column->getOptions();
+
+            uksort($columnOptions, array($this, 'compareColumnOptions'));
+
+            foreach ($columnOptions as $coName => $coValue) {
+                $insert = '';
+
+                if (! $coValue) {
+                    continue;
+                }
+
+                switch ($this->normalizeColumnOption($coName)) {
+                    case 'unsigned':
+                        $insert = ' UNSIGNED';
+                        $j = 0;
+                        break;
+                    case 'zerofill':
+                        $insert = ' ZEROFILL';
+                        $j = 0;
+                        break;
+                    case 'identity':
+                    case 'serial':
+                    case 'autoincrement':
+                        $insert = ' AUTO_INCREMENT';
+                        $j = 1;
+                        break;
+                    case 'comment':
+                        $insert = ' COMMENT ' . $adapterPlatform->quoteValue($coValue);
+                        $j = 2;
+                        break;
+                    case 'columnformat':
+                    case 'format':
+                        $insert = ' COLUMN_FORMAT ' . strtoupper($coValue);
+                        $j = 2;
+                        break;
+                    case 'storage':
+                        $insert = ' STORAGE ' . strtoupper($coValue);
+                        $j = 2;
+                        break;
+                }
+
+                if ($insert) {
+                    $j = isset($j) ? $j : 0;
+                    $sql = substr_replace($sql, $insert, $insertStart[$j], 0);
+                    for (; $j < count($insertStart); ++$j) {
+                        $insertStart[$j] += strlen($insert);
+                    }
+                }
+            }
+            $sqls[] = array(
+                $adapterPlatform->quoteIdentifier($name),
+                $sql
+            );
+        }
+
+        return array($sqls);
+    }
+
+    /**
+     * @param string $name
+     *
      * @return string
      */
-    public function getSqlString(PlatformInterface $platform = null)
+    private function normalizeColumnOption($name)
     {
-        // localize variables
-        foreach (get_object_vars($this->select) as $name => $value) {
-            $this->{$name} = $value;
+        return strtolower(str_replace(array('-', '_', ' '), '', $name));
+    }
+
+    /**
+     * @internal @private this method is only public for PHP 5.3 compatibility purposes.
+     *
+     * @param string $columnA
+     * @param string $columnB
+     *
+     * @return int
+     */
+    public function compareColumnOptions($columnA, $columnB)
+    {
+        $columnA = $this->normalizeColumnOption($columnA);
+        $columnA = isset($this->columnOptionSortOrder[$columnA])
+            ? $this->columnOptionSortOrder[$columnA] : count($this->columnOptionSortOrder);
+
+        $columnB = $this->normalizeColumnOption($columnB);
+        $columnB = isset($this->columnOptionSortOrder[$columnB])
+            ? $this->columnOptionSortOrder[$columnB] : count($this->columnOptionSortOrder);
+
+        return $columnA - $columnB;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\Mysql\Ddl;
+
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\Ddl\CreateTable;
+use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
+
+class CreateTableDecorator extends CreateTable implements PlatformDecoratorInterface
+{
+    /**
+     * @var CreateTable
+     */
+    protected $subject;
+
+    /**
+     * @var int[]
+     */
+    protected $columnOptionSortOrder = array(
+        'unsigned'      => 0,
+        'zerofill'      => 1,
+        'identity'      => 2,
+        'serial'        => 2,
+        'autoincrement' => 2,
+        'comment'       => 3,
+        'columnformat'  => 4,
+        'format'        => 4,
+        'storage'       => 5,
+    );
+
+    /**
+     * @param CreateTable $subject
+     *
+     * @return self
+     */
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @param string $sql
+     * @return array
+     */
+    protected function getSqlInsertOffsets($sql)
+    {
+        $sqlLength   = strlen($sql);
+        $insertStart = array();
+
+        foreach (array('NOT NULL', 'NULL', 'DEFAULT', 'UNIQUE', 'PRIMARY', 'REFERENCES') as $needle) {
+            $insertPos = strpos($sql, ' ' . $needle);
+
+            if ($insertPos !== false) {
+                switch ($needle) {
+                    case 'REFERENCES':
+                        $insertStart[2] = !isset($insertStart[2]) ? $insertPos : $insertStart[2];
+                        // no break
+                    case 'PRIMARY':
+                    case 'UNIQUE':
+                        $insertStart[1] = !isset($insertStart[1]) ? $insertPos : $insertStart[1];
+                        // no break
+                    default:
+                        $insertStart[0] = !isset($insertStart[0]) ? $insertPos : $insertStart[0];
+                }
+            }
         }
+
+        foreach (range(0, 3) as $i) {
+            $insertStart[$i] = isset($insertStart[$i]) ? $insertStart[$i] : $sqlLength;
+        }
+
+        return $insertStart;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function processColumns(PlatformInterface $platform = null)
+    {
+        if (! $this->columns) {
+            return;
+        }
+
+        $sqls = array();
+
+        foreach ($this->columns as $i => $column) {
+            $sql           = $this->processExpression($column, $platform);
+            $insertStart   = $this->getSqlInsertOffsets($sql);
+            $columnOptions = $column->getOptions();
+
+            uksort($columnOptions, array($this, 'compareColumnOptions'));
+
+            foreach ($columnOptions as $coName => $coValue) {
+                $insert = '';
+
+                if (! $coValue) {
+                    continue;
+                }
+
+                switch ($this->normalizeColumnOption($coName)) {
+                    case 'unsigned':
+                        $insert = ' UNSIGNED';
+                        $j = 0;
+                        break;
+                    case 'zerofill':
+                        $insert = ' ZEROFILL';
+                        $j = 0;
+                        break;
+                    case 'identity':
+                    case 'serial':
+                    case 'autoincrement':
+                        $insert = ' AUTO_INCREMENT';
+                        $j = 1;
+                        break;
+                    case 'comment':
+                        $insert = ' COMMENT ' . $platform->quoteValue($coValue);
+                        $j = 2;
+                        break;
+                    case 'columnformat':
+                    case 'format':
+                        $insert = ' COLUMN_FORMAT ' . strtoupper($coValue);
+                        $j = 2;
+                        break;
+                    case 'storage':
+                        $insert = ' STORAGE ' . strtoupper($coValue);
+                        $j = 2;
+                        break;
+                }
+
+                if ($insert) {
+                    $j = isset($j) ? $j : 0;
+                    $sql = substr_replace($sql, $insert, $insertStart[$j], 0);
+                    for (; $j < count($insertStart); ++$j) {
+                        $insertStart[$j] += strlen($insert);
+                    }
+                }
+            }
+
+            $sqls[$i] = $sql;
+        }
+
+        return array($sqls);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    private function normalizeColumnOption($name)
+    {
+        return strtolower(str_replace(array('-', '_', ' '), '', $name));
+    }
+
+    /**
+     * @internal @private this method is only public for PHP 5.3 compatibility purposes.
+     *
+     * @param string $columnA
+     * @param string $columnB
+     *
+     * @return int
+     */
+    public function compareColumnOptions($columnA, $columnB)
+    {
+        $columnA = $this->normalizeColumnOption($columnA);
+        $columnA = isset($this->columnOptionSortOrder[$columnA])
+            ? $this->columnOptionSortOrder[$columnA] : count($this->columnOptionSortOrder);
+
+        $columnB = $this->normalizeColumnOption($columnB);
+        $columnB = isset($this->columnOptionSortOrder[$columnB])
+            ? $this->columnOptionSortOrder[$columnB] : count($this->columnOptionSortOrder);
+
+        return $columnA - $columnB;
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\IbmDb2;
+
+use Zend\Db\Adapter\Driver\DriverInterface;
+use Zend\Db\Adapter\ParameterContainer;
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
+use Zend\Db\Sql\Select;
+
+class SelectDecorator extends Select implements PlatformDecoratorInterface
+{
+    /**
+     * @var bool
+     */
+    protected $isSelectContainDistinct= false;
+
+    /**
+     * @var Select
+     */
+    protected $subject = null;
+
+    /**
+     * @return bool
+     */
+    public function getIsSelectContainDistinct()
+    {
+        return $this->isSelectContainDistinct;
+    }
+
+    /**
+     * @param boolean $isSelectContainDistinct
+     */
+    public function setIsSelectContainDistinct($isSelectContainDistinct)
+    {
+        $this->isSelectContainDistinct = $isSelectContainDistinct;
+    }
+
+    /**
+     * @param Select $select
+     */
+    public function setSubject($select)
+    {
+        $this->subject = $select;
+    }
+
+    /**
+     * @see Select::renderTable
+     */
+    protected function renderTable($table, $alias = null)
+    {
+        return $table . ' ' . $alias;
+    }
+
+    protected function localizeVariables()
+    {
+        parent::localizeVariables();
+        // set specifications
+        unset($this->specifications[self::LIMIT]);
+        unset($this->specifications[self::OFFSET]);
+
+        $this->specifications['LIMITOFFSET'] = null;
+    }
+
+    /**
+     * @param  PlatformInterface  $platform
+     * @param  DriverInterface    $driver
+     * @param  ParameterContainer $parameterContainer
+     * @param  array              $sqls
+     * @param  array              $parameters
+     */
+    protected function processLimitOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, &$sqls, &$parameters)
+    {
+        if ($this->limit === null && $this->offset === null) {
+            return;
+        }
+
+        $selectParameters = $parameters[self::SELECT];
+
+        $starSuffix = $platform->getIdentifierSeparator() . self::SQL_STAR;
+        foreach ($selectParameters[0] as $i => $columnParameters) {
+            if ($columnParameters[0] == self::SQL_STAR
+                || (isset($columnParameters[1]) && $columnParameters[1] == self::SQL_STAR)
+                || strpos($columnParameters[0], $starSuffix)
+            ) {
+                $selectParameters[0] = array(array(self::SQL_STAR));
+                break;
+            }
+
+            if (isset($columnParameters[1])) {
+                array_shift($columnParameters);
+                $selectParameters[0][$i] = $columnParameters;
+            }
+        }
+
+        // first, produce column list without compound names (using the AS portion only)
+        array_unshift($sqls, $this->createSqlFromSpecificationAndParameters(
+            array('SELECT %1$s FROM (' => current($this->specifications[self::SELECT])),
+            $selectParameters
+        ));
+
+        if (preg_match('/DISTINCT/i', $sqls[0])) {
+            $this->setIsSelectContainDistinct(true);
+        }
+
+        if ($parameterContainer) {
+            // create bottom part of query, with offset and limit using row_number
+            $limitParamName        = $driver->formatParameterName('limit');
+            $offsetParamName       = $driver->formatParameterName('offset');
+
+            array_push($sqls, sprintf(
+                ") AS ZEND_IBMDB2_SERVER_LIMIT_OFFSET_EMULATION WHERE ZEND_IBMDB2_SERVER_LIMIT_OFFSET_EMULATION.ZEND_DB_ROWNUM BETWEEN %s AND %s",
+                $offsetParamName,
+                $limitParamName
+            ));
+
+            if ((int) $this->offset > 0) {
+                $parameterContainer->offsetSet('offset', (int) $this->offset + 1);
+            } else {
+                $parameterContainer->offsetSet('offset', (int) $this->offset);
+            }
+
+            $parameterContainer->offsetSet('limit', (int) $this->limit + (int) $this->offset);
+        } else {
+            if ((int) $this->offset > 0) {
+                $offset = (int) $this->offset + 1;
+            } else {
+                $offset = (int) $this->offset;
+            }
+
+            array_push($sqls, sprintf(
+                ") AS ZEND_IBMDB2_SERVER_LIMIT_OFFSET_EMULATION WHERE ZEND_IBMDB2_SERVER_LIMIT_OFFSET_EMULATION.ZEND_DB_ROWNUM BETWEEN %d AND %d",
+                $offset,
+                (int) $this->limit + (int) $this->offset
+            ));
+        }
+
+        if (isset($sqls[self::ORDER])) {
+            $orderBy = $sqls[self::ORDER];
+            unset($sqls[self::ORDER]);
+        } else {
+            $orderBy = '';
+        }
+
+        // add a column for row_number() using the order specification //dense_rank()
+        if ($this->getIsSelectContainDistinct()) {
+            $parameters[self::SELECT][0][] = array('DENSE_RANK() OVER (' . $orderBy . ')', 'ZEND_DB_ROWNUM');
+        } else {
+            $parameters[self::SELECT][0][] = array('ROW_NUMBER() OVER (' . $orderBy . ')', 'ZEND_DB_ROWNUM');
+        }
+
+        $sqls[self::SELECT] = $this->createSqlFromSpecificationAndParameters(
+            $this->specifications[self::SELECT],
+            $parameters[self::SELECT]
+        );
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\Oracle;
+
+use Zend\Db\Adapter\Driver\DriverInterface;
+use Zend\Db\Adapter\ParameterContainer;
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
+use Zend\Db\Sql\Select;
+
+class SelectDecorator extends Select implements PlatformDecoratorInterface
+{
+    /**
+     * @var Select
+     */
+    protected $subject = null;
+
+    /**
+     * @param Select $select
+     */
+    public function setSubject($select)
+    {
+        $this->subject = $select;
+    }
+
+    /**
+     * @see \Zend\Db\Sql\Select::renderTable
+     */
+    protected function renderTable($table, $alias = null)
+    {
+        return $table . ($alias ? ' ' . $alias : '');
+    }
+
+    protected function localizeVariables()
+    {
+        parent::localizeVariables();
+        unset($this->specifications[self::LIMIT]);
+        unset($this->specifications[self::OFFSET]);
+
+        $this->specifications['LIMITOFFSET'] = null;
+    }
+
+    /**
+     * @param PlatformInterface $platform
+     * @param DriverInterface $driver
+     * @param ParameterContainer $parameterContainer
+     * @param $sqls
+     * @param $parameters
+     * @return null
+     */
+    protected function processLimitOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, &$sqls, &$parameters)
+    {
+        if ($this->limit === null && $this->offset === null) {
+            return;
+        }
+
+        $selectParameters = $parameters[self::SELECT];
+
+        $starSuffix = $platform->getIdentifierSeparator() . self::SQL_STAR;
+        foreach ($selectParameters[0] as $i => $columnParameters) {
+            if ($columnParameters[0] == self::SQL_STAR || (isset($columnParameters[1]) && $columnParameters[1] == self::SQL_STAR) || strpos($columnParameters[0], $starSuffix)) {
+                $selectParameters[0] = array(array(self::SQL_STAR));
+                break;
+            }
+            if (isset($columnParameters[1])) {
+                array_shift($columnParameters);
+                $selectParameters[0][$i] = $columnParameters;
+            }
+        }
+
+        if ($this->offset === null) {
+            $this->offset = 0;
+        }
+
+        // first, produce column list without compound names (using the AS portion only)
+        array_unshift($sqls, $this->createSqlFromSpecificationAndParameters(
+            array('SELECT %1$s FROM (SELECT b.%1$s, rownum b_rownum FROM (' => current($this->specifications[self::SELECT])), $selectParameters
+        ));
+
+        if ($parameterContainer) {
+            if ($this->limit === null) {
+                array_push($sqls, ') b ) WHERE b_rownum > (:offset)');
+                $parameterContainer->offsetSet('offset', $this->offset, $parameterContainer::TYPE_INTEGER);
+            } else {
+                // create bottom part of query, with offset and limit using row_number
+                array_push($sqls, ') b WHERE rownum <= (:offset+:limit)) WHERE b_rownum >= (:offset + 1)');
+                $parameterContainer->offsetSet('offset', $this->offset, $parameterContainer::TYPE_INTEGER);
+                $parameterContainer->offsetSet('limit', $this->limit, $parameterContainer::TYPE_INTEGER);
+            }
+        } else {
+            if ($this->limit === null) {
+                array_push($sqls, ') b ) WHERE b_rownum > ('. (int) $this->offset. ')'
+                );
+            } else {
+                array_push($sqls, ') b WHERE rownum <= ('
+                        . (int) $this->offset
+                        . '+'
+                        . (int) $this->limit
+                        . ')) WHERE b_rownum >= ('
+                        . (int) $this->offset
+                        . ' + 1)'
+                );
+            }
+        }
+
+        $sqls[self::SELECT] = $this->createSqlFromSpecificationAndParameters(
+            $this->specifications[self::SELECT], $parameters[self::SELECT]
+        );
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Platform\Mysql;
+
+use Zend\Db\Adapter\Driver\DriverInterface;
+use Zend\Db\Adapter\ParameterContainer;
+use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
+use Zend\Db\Sql\Select;
+
+class SelectDecorator extends Select implements PlatformDecoratorInterface
+{
+    /**
+     * @var Select
+     */
+    protected $subject = null;
+
+    /**
+     * @param Select $select
+     */
+    public function setSubject($select)
+    {
+        $this->subject = $select;
+    }
+
+    protected function localizeVariables()
+    {
+        parent::localizeVariables();
         if ($this->limit === null && $this->offset !== null) {
             $this->specifications[self::LIMIT] = 'LIMIT 18446744073709551615';
         }
-        return parent::getSqlString($platform);
     }
 
     protected function processLimit(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
@@ -21538,24 +23264,22 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
             return array('');
         }
         if ($this->limit === null) {
-            return null;
+            return;
         }
-        if ($driver) {
-            $sql = $driver->formatParameterName('limit');
+        if ($parameterContainer) {
             $parameterContainer->offsetSet('limit', $this->limit, ParameterContainer::TYPE_INTEGER);
-        } else {
-            $sql = $this->limit;
+            return array($driver->formatParameterName('limit'));
         }
 
-        return array($sql);
+        return array($this->limit);
     }
 
     protected function processOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
     {
         if ($this->offset === null) {
-            return null;
+            return;
         }
-        if ($driver) {
+        if ($parameterContainer) {
             $parameterContainer->offsetSet('offset', $this->offset, ParameterContainer::TYPE_INTEGER);
             return array($driver->formatParameterName('offset'));
         }
@@ -21579,6 +23303,7 @@ interface ExpressionInterface
     const TYPE_IDENTIFIER = 'identifier';
     const TYPE_VALUE = 'value';
     const TYPE_LITERAL = 'literal';
+    const TYPE_SELECT = 'select';
 
     /**
      * @abstract
@@ -21678,6 +23403,13 @@ class PredicateSet implements PredicateInterface, Countable
         return $this;
     }
 
+    /**
+     * Add predicates to set
+     *
+     * @param PredicateInterface|\Closure|string|array $predicates
+     * @param string $combination
+     * @return PredicateSet
+     */
     public function addPredicates($predicates, $combination = self::OP_AND)
     {
         if ($predicates === null) {
@@ -21708,7 +23440,7 @@ class PredicateSet implements PredicateInterface, Countable
                         $predicates = new Expression($pkey, $pvalue);
                     } elseif ($pvalue === null) { // Otherwise, if still a string, do something intelligent with the PHP type provided
                         // map PHP null to SQL IS NULL expression
-                        $predicates = new IsNull($pkey, $pvalue);
+                        $predicates = new IsNull($pkey);
                     } elseif (is_array($pvalue)) {
                         // if the value is an array, assume IN() is desired
                         $predicates = new In($pkey, $pvalue);
@@ -22192,6 +23924,27 @@ class Predicate extends PredicateSet
     }
 
     /**
+     * Use given predicate directly
+     *
+     * Contrary to {@link addPredicate()} this method respects formerly set
+     * AND / OR combination operator, thus allowing generic predicates to be
+     * used fluently within where chains as any other concrete predicate.
+     *
+     * @param  PredicateInterface $predicate
+     * @return Predicate
+     */
+    public function predicate(PredicateInterface $predicate)
+    {
+        $this->addPredicate(
+            $predicate,
+            $this->nextPredicateCombineOperator ?: $this->defaultCombination
+        );
+        $this->nextPredicateCombineOperator = null;
+
+        return $this;
+    }
+
+    /**
      * Overloading
      *
      * Overloads "or", "and", "nest", and "unnest"
@@ -22225,9 +23978,104 @@ class Predicate extends PredicateSet
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
+namespace Zend\Db\Sql;
+
+abstract class AbstractExpression implements ExpressionInterface
+{
+    /**
+     * @var string[]
+     */
+    protected $allowedTypes = array(
+        self::TYPE_IDENTIFIER,
+        self::TYPE_LITERAL,
+        self::TYPE_SELECT,
+        self::TYPE_VALUE,
+    );
+
+    /**
+     * Normalize Argument
+     *
+     * @param mixed $argument
+     * @param string $defaultType
+     *
+     * @return array
+     *
+     * @throws Exception\InvalidArgumentException
+     */
+    protected function normalizeArgument($argument, $defaultType = self::TYPE_VALUE)
+    {
+        if ($argument instanceof ExpressionInterface || $argument instanceof SqlInterface) {
+            return $this->buildNormalizedArgument($argument, self::TYPE_VALUE);
+        }
+
+        if (is_scalar($argument) || $argument === null) {
+            return $this->buildNormalizedArgument($argument, $defaultType);
+        }
+
+        if (is_array($argument)) {
+            $value = current($argument);
+
+            if ($value instanceof ExpressionInterface || $value instanceof SqlInterface) {
+                return $this->buildNormalizedArgument($value, self::TYPE_VALUE);
+            }
+
+            $key = key($argument);
+
+            if (is_integer($key) && ! in_array($value, $this->allowedTypes)) {
+                return $this->buildNormalizedArgument($value, $defaultType);
+            }
+
+            return $this->buildNormalizedArgument($key, $value);
+        }
+
+        throw new Exception\InvalidArgumentException(sprintf(
+            '$argument should be %s or %s or %s or %s or %s, "%s" given',
+            'null',
+            'scalar',
+            'array',
+            'Zend\Db\Sql\ExpressionInterface',
+            'Zend\Db\Sql\SqlInterface',
+            is_object($argument) ? get_class($argument) : gettype($argument)
+        ));
+    }
+
+    /**
+     * @param mixed  $argument
+     * @param string $argumentType
+     *
+     * @return array
+     *
+     * @throws Exception\InvalidArgumentException
+     */
+    private function buildNormalizedArgument($argument, $argumentType)
+    {
+        if (! in_array($argumentType, $this->allowedTypes)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Argument type should be in array(%s)',
+                implode(',', $this->allowedTypes)
+            ));
+        }
+
+        return array(
+            $argument,
+            $argumentType,
+        );
+    }
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
 namespace Zend\Db\Sql\Predicate;
 
-class IsNull implements PredicateInterface
+use Zend\Db\Sql\AbstractExpression;
+
+class IsNull extends AbstractExpression implements PredicateInterface
 {
     /**
      * @var string
@@ -22302,10 +24150,11 @@ class IsNull implements PredicateInterface
      */
     public function getExpressionData()
     {
+        $identifier = $this->normalizeArgument($this->identifier, self::TYPE_IDENTIFIER);
         return array(array(
             $this->getSpecification(),
-            array($this->identifier),
-            array(self::TYPE_IDENTIFIER),
+            array($identifier[0]),
+            array($identifier[1]),
         ));
     }
 }
@@ -22321,8 +24170,9 @@ class IsNull implements PredicateInterface
 namespace Zend\Db\Sql\Predicate;
 
 use Zend\Db\Sql\Exception;
+use Zend\Db\Sql\AbstractExpression;
 
-class Operator implements PredicateInterface
+class Operator extends AbstractExpression implements PredicateInterface
 {
     const OPERATOR_EQUAL_TO                  = '=';
     const OP_EQ                              = '=';
@@ -22342,28 +24192,55 @@ class Operator implements PredicateInterface
     const OPERATOR_GREATER_THAN_OR_EQUAL_TO  = '>=';
     const OP_GTE                             = '>=';
 
+    /**
+     * {@inheritDoc}
+     */
     protected $allowedTypes  = array(
         self::TYPE_IDENTIFIER,
         self::TYPE_VALUE,
     );
 
-    protected $left          = null;
-    protected $leftType      = self::TYPE_IDENTIFIER;
-    protected $operator      = self::OPERATOR_EQUAL_TO;
-    protected $right         = null;
-    protected $rightType     = self::TYPE_VALUE;
+    /**
+     * @var int|float|bool|string
+     */
+    protected $left;
+
+    /**
+     * @var int|float|bool|string
+     */
+    protected $right;
+
+    /**
+     * @var string
+     */
+    protected $leftType = self::TYPE_IDENTIFIER;
+
+    /**
+     * @var string
+     */
+    protected $rightType = self::TYPE_VALUE;
+
+    /**
+     * @var string
+     */
+    protected $operator = self::OPERATOR_EQUAL_TO;
 
     /**
      * Constructor
      *
-     * @param  int|float|bool|string $left
-     * @param  string $operator
-     * @param  int|float|bool|string $right
-     * @param  string $leftType TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
-     * @param  string $rightType TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
+     * @param int|float|bool|string $left
+     * @param string $operator
+     * @param int|float|bool|string $right
+     * @param string $leftType TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
+     * @param string $rightType TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      */
-    public function __construct($left = null, $operator = self::OPERATOR_EQUAL_TO, $right = null, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE)
-    {
+    public function __construct(
+        $left = null,
+        $operator = self::OPERATOR_EQUAL_TO,
+        $right = null,
+        $leftType = self::TYPE_IDENTIFIER,
+        $rightType = self::TYPE_VALUE
+    ) {
         if ($left !== null) {
             $this->setLeft($left);
         }
@@ -22389,11 +24266,18 @@ class Operator implements PredicateInterface
      * Set left side of operator
      *
      * @param  int|float|bool|string $left
+     *
      * @return Operator
      */
     public function setLeft($left)
     {
         $this->left = $left;
+
+        if (is_array($left)) {
+            $left = $this->normalizeArgument($left, $this->leftType);
+            $this->leftType = $left[1];
+        }
+
         return $this;
     }
 
@@ -22411,8 +24295,10 @@ class Operator implements PredicateInterface
      * Set parameter type for left side of operator
      *
      * @param  string $type TYPE_IDENTIFIER or TYPE_VALUE {@see allowedTypes}
-     * @throws Exception\InvalidArgumentException
+     *
      * @return Operator
+     *
+     * @throws Exception\InvalidArgumentException
      */
     public function setLeftType($type)
     {
@@ -22424,7 +24310,9 @@ class Operator implements PredicateInterface
                 __CLASS__ . '::TYPE_VALUE'
             ));
         }
+
         $this->leftType = $type;
+
         return $this;
     }
 
@@ -22447,6 +24335,7 @@ class Operator implements PredicateInterface
     public function setOperator($operator)
     {
         $this->operator = $operator;
+
         return $this;
     }
 
@@ -22463,12 +24352,19 @@ class Operator implements PredicateInterface
     /**
      * Set right side of operator
      *
-     * @param  int|float|bool|string $value
+     * @param  int|float|bool|string $right
+     *
      * @return Operator
      */
-    public function setRight($value)
+    public function setRight($right)
     {
-        $this->right = $value;
+        $this->right = $right;
+
+        if (is_array($right)) {
+            $right = $this->normalizeArgument($right, $this->rightType);
+            $this->rightType = $right[1];
+        }
+
         return $this;
     }
 
@@ -22499,7 +24395,9 @@ class Operator implements PredicateInterface
                 __CLASS__ . '::TYPE_VALUE'
             ));
         }
+
         $this->rightType = $type;
+
         return $this;
     }
 
@@ -22520,10 +24418,13 @@ class Operator implements PredicateInterface
      */
     public function getExpressionData()
     {
+        list($values[], $types[]) = $this->normalizeArgument($this->left, $this->leftType);
+        list($values[], $types[]) = $this->normalizeArgument($this->right, $this->rightType);
+
         return array(array(
             '%s ' . $this->operator . ' %s',
-            array($this->left, $this->right),
-            array($this->leftType, $this->rightType)
+            $values,
+            $types
         ));
     }
 }
@@ -22610,7 +24511,7 @@ class Literal extends BaseLiteral implements PredicateInterface
 
 namespace Zend\Db\Sql;
 
-class Expression implements ExpressionInterface
+class Expression extends AbstractExpression
 {
     /**
      * @const
@@ -22635,18 +24536,30 @@ class Expression implements ExpressionInterface
     /**
      * @param string $expression
      * @param string|array $parameters
-     * @param array $types
+     * @param array $types @deprecated will be dropped in version 3.0.0
      */
     public function __construct($expression = '', $parameters = null, array $types = array())
     {
-        if ($expression) {
+        if ($expression !== '') {
             $this->setExpression($expression);
         }
+
+        if ($types) { // should be deprecated and removed version 3.0.0
+            if (is_array($parameters)) {
+                foreach ($parameters as $i=>$parameter) {
+                    $parameters[$i] = array(
+                        $parameter => isset($types[$i]) ? $types[$i] : self::TYPE_VALUE,
+                    );
+                }
+            } elseif (is_scalar($parameters)) {
+                $parameters = array(
+                    $parameters => $types[0],
+                );
+            }
+        }
+
         if ($parameters) {
             $this->setParameters($parameters);
-        }
-        if ($types) {
-            $this->setTypes($types);
         }
     }
 
@@ -22695,6 +24608,7 @@ class Expression implements ExpressionInterface
     }
 
     /**
+     * @deprecated
      * @param array $types
      * @return Expression
      */
@@ -22705,6 +24619,7 @@ class Expression implements ExpressionInterface
     }
 
     /**
+     * @deprecated
      * @return array
      */
     public function getTypes()
@@ -22719,35 +24634,26 @@ class Expression implements ExpressionInterface
     public function getExpressionData()
     {
         $parameters = (is_scalar($this->parameters)) ? array($this->parameters) : $this->parameters;
-
-        $types = array();
         $parametersCount = count($parameters);
+        $expression = str_replace('%', '%%', $this->expression);
 
-        if ($parametersCount == 0 && strpos($this->expression, self::PLACEHOLDER) !== false) {
-            // if there are no parameters, but there is a placeholder
-            $parametersCount = substr_count($this->expression, self::PLACEHOLDER);
-            $parameters = array_fill(0, $parametersCount, null);
-        }
-
-        for ($i = 0; $i < $parametersCount; $i++) {
-            $types[$i] = (isset($this->types[$i]) && ($this->types[$i] == self::TYPE_IDENTIFIER || $this->types[$i] == self::TYPE_LITERAL))
-                ? $this->types[$i] : self::TYPE_VALUE;
+        if ($parametersCount == 0) {
+            return array(
+                str_ireplace(self::PLACEHOLDER, '', $expression)
+            );
         }
 
         // assign locally, escaping % signs
-        $expression = str_replace('%', '%%', $this->expression);
-
-        if ($parametersCount > 0) {
-            $count = 0;
-            $expression = str_replace(self::PLACEHOLDER, '%s', $expression, $count);
-            if ($count !== $parametersCount) {
-                throw new Exception\RuntimeException('The number of replacements in the expression does not match the number of parameters');
-            }
+        $expression = str_replace(self::PLACEHOLDER, '%s', $expression, $count);
+        if ($count !== $parametersCount) {
+            throw new Exception\RuntimeException('The number of replacements in the expression does not match the number of parameters');
         }
-
+        foreach ($parameters as $parameter) {
+            list($values[], $types[]) = $this->normalizeArgument($parameter, self::TYPE_VALUE);
+        }
         return array(array(
             $expression,
-            $parameters,
+            $values,
             $types
         ));
     }
@@ -22809,326 +24715,6 @@ namespace Zend\Db\Sql;
 
 class Having extends Predicate\Predicate
 {
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Db\Sql\Ddl;
-
-use Zend\Db\Sql\SqlInterface as BaseSqlInterface;
-
-interface SqlInterface extends BaseSqlInterface
-{
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Db\Sql\Ddl;
-
-use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Adapter\Platform\Sql92 as AdapterSql92Platform;
-use Zend\Db\Sql\AbstractSql;
-
-class CreateTable extends AbstractSql implements SqlInterface
-{
-    const COLUMNS     = 'columns';
-    const CONSTRAINTS = 'constraints';
-    const TABLE       = 'table';
-
-    /**
-     * @var array
-     */
-    protected $columns = array();
-
-    /**
-     * @var array
-     */
-    protected $constraints = array();
-
-    /**
-     * @var bool
-     */
-    protected $isTemporary = false;
-
-    /**
-     * Specifications for Sql String generation
-     * @var array
-     */
-    protected $specifications = array(
-        self::TABLE => 'CREATE %1$sTABLE %2$s (',
-        self::COLUMNS  => array(
-            "\n    %1\$s" => array(
-                array(1 => '%1$s', 'combinedby' => ",\n    ")
-            )
-        ),
-        self::CONSTRAINTS => array(
-            "\n    %1\$s" => array(
-                array(1 => '%1$s', 'combinedby' => ",\n    ")
-            )
-        ),
-    );
-
-    /**
-     * @var string
-     */
-    protected $table = '';
-
-    /**
-     * @param string $table
-     * @param bool   $isTemporary
-     */
-    public function __construct($table = '', $isTemporary = false)
-    {
-        $this->table = $table;
-        $this->setTemporary($isTemporary);
-    }
-
-    /**
-     * @param  bool $temporary
-     * @return self
-     */
-    public function setTemporary($temporary)
-    {
-        $this->isTemporary = (bool) $temporary;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTemporary()
-    {
-        return $this->isTemporary;
-    }
-
-    /**
-     * @param  string $name
-     * @return self
-     */
-    public function setTable($name)
-    {
-        $this->table = $name;
-        return $this;
-    }
-
-    /**
-     * @param  Column\ColumnInterface $column
-     * @return self
-     */
-    public function addColumn(Column\ColumnInterface $column)
-    {
-        $this->columns[] = $column;
-        return $this;
-    }
-
-    /**
-     * @param  Constraint\ConstraintInterface $constraint
-     * @return self
-     */
-    public function addConstraint(Constraint\ConstraintInterface $constraint)
-    {
-        $this->constraints[] = $constraint;
-        return $this;
-    }
-
-    /**
-     * @param  string|null $key
-     * @return array
-     */
-    public function getRawState($key = null)
-    {
-        $rawState = array(
-            self::COLUMNS     => $this->columns,
-            self::CONSTRAINTS => $this->constraints,
-            self::TABLE       => $this->table,
-        );
-
-        return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
-    }
-
-    /**
-     * @param  PlatformInterface $adapterPlatform
-     * @return string
-     */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
-    {
-        // get platform, or create default
-        $adapterPlatform = ($adapterPlatform) ?: new AdapterSql92Platform;
-
-        $sqls       = array();
-        $parameters = array();
-
-        foreach ($this->specifications as $name => $specification) {
-            if (is_int($name)) {
-                $sqls[] = $specification;
-                continue;
-            }
-
-            $parameters[$name] = $this->{'process' . $name}(
-                $adapterPlatform,
-                null,
-                null,
-                $sqls,
-                $parameters
-            );
-
-
-            if ($specification
-                && is_array($parameters[$name])
-                && ($parameters[$name] != array(array()))
-            ) {
-                $sqls[$name] = $this->createSqlFromSpecificationAndParameters(
-                    $specification,
-                    $parameters[$name]
-                );
-            }
-
-            if (stripos($name, 'table') === false
-                && $parameters[$name] !== array(array())
-            ) {
-                $sqls[] = ",\n";
-            }
-        }
-
-
-        // remove last ,
-        if (count($sqls) > 2) {
-            array_pop($sqls);
-        }
-
-        $sql = implode('', $sqls) . "\n)";
-
-        return $sql;
-    }
-
-    protected function processTable(PlatformInterface $adapterPlatform = null)
-    {
-        $ret = array();
-        if ($this->isTemporary) {
-            $ret[] = 'TEMPORARY ';
-        } else {
-            $ret[] = '';
-        }
-
-        $ret[] = $adapterPlatform->quoteIdentifier($this->table);
-        return $ret;
-    }
-
-    protected function processColumns(PlatformInterface $adapterPlatform = null)
-    {
-        $sqls = array();
-        foreach ($this->columns as $column) {
-            $sqls[] = $this->processExpression($column, $adapterPlatform)->getSql();
-        }
-        return array($sqls);
-    }
-
-    protected function processConstraints(PlatformInterface $adapterPlatform = null)
-    {
-        $sqls = array();
-        foreach ($this->constraints as $constraint) {
-            $sqls[] = $this->processExpression($constraint, $adapterPlatform)->getSql();
-        }
-        return array($sqls);
-    }
-}
-
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Zend\Db\Sql\Platform\Mysql\Ddl;
-
-use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Sql\Ddl\CreateTable;
-use Zend\Db\Sql\Platform\PlatformDecoratorInterface;
-
-class CreateTableDecorator extends CreateTable implements PlatformDecoratorInterface
-{
-    /**
-     * @var CreateTable
-     */
-    protected $createTable;
-
-    /**
-     * @param CreateTable $subject
-     */
-    public function setSubject($subject)
-    {
-        $this->createTable = $subject;
-    }
-
-    /**
-     * @param  null|PlatformInterface $platform
-     * @return string
-     */
-    public function getSqlString(PlatformInterface $platform = null)
-    {
-        // localize variables
-        foreach (get_object_vars($this->createTable) as $name => $value) {
-            $this->{$name} = $value;
-        }
-        return parent::getSqlString($platform);
-    }
-
-    protected function processColumns(PlatformInterface $platform = null)
-    {
-        $sqls = array();
-        foreach ($this->columns as $i => $column) {
-            $stmtContainer = $this->processExpression($column, $platform);
-            $sql           = $stmtContainer->getSql();
-            $columnOptions = $column->getOptions();
-
-            foreach ($columnOptions as $coName => $coValue) {
-                switch (strtolower(str_replace(array('-', '_', ' '), '', $coName))) {
-                    case 'identity':
-                    case 'serial':
-                    case 'autoincrement':
-                        $sql .= ' AUTO_INCREMENT';
-                        break;
-                    /*
-                    case 'primary':
-                    case 'primarykey':
-                        $sql .= ' PRIMARY KEY';
-                        break;
-                    case 'unique':
-                    case 'uniquekey':
-                        $sql .= ' UNIQUE KEY';
-                        break;
-                    */
-                    case 'comment':
-                        $sql .= ' COMMENT \'' . $coValue . '\'';
-                        break;
-                    case 'columnformat':
-                    case 'format':
-                        $sql .= ' COLUMN_FORMAT ' . strtoupper($coValue);
-                        break;
-                    case 'storage':
-                        $sql .= ' STORAGE ' . strtoupper($coValue);
-                        break;
-                }
-            }
-            $stmtContainer->setSql($sql);
-            $sqls[$i] = $stmtContainer;
-        }
-        return array($sqls);
-    }
 }
 
 /**
@@ -24191,7 +25777,7 @@ class Message
     {
         $headers = $this->getHeaders();
         if (!$headers->has('subject')) {
-            return null;
+            return;
         }
         $header = $headers->get('subject');
         return $header->getFieldValue();
@@ -24469,15 +26055,16 @@ class Headers implements Countable, Iterator
         // iterate the header lines, some might be continuations
         foreach (explode($EOL, $string) as $line) {
             // check if a header name is present
-            if (preg_match('/^(?P<name>[\x21-\x39\x3B-\x7E]+):.*$/', $line, $matches)) {
+            if (preg_match('/^[\x21-\x39\x3B-\x7E]+:.*$/', $line)) {
                 if ($currentLine) {
                     // a header name was present, then store the current complete line
                     $headers->addHeaderLine($currentLine);
                 }
                 $currentLine = trim($line);
-            } elseif (preg_match('/^\s+.*$/', $line, $matches)) {
+            } elseif (preg_match('/^\s+.*$/', $line)) {
                 // continuation: append to current line
-                $currentLine .= trim($line);
+                // recover the whitespace that break the line (unfolding, rfc2822#section-2.2.3)
+                $currentLine .= ' ' . trim($line);
             } elseif (preg_match('/^\s*$/', $line)) {
                 // empty line indicates end of headers
                 break;
@@ -24649,8 +26236,8 @@ class Headers implements Countable, Iterator
 
         if (!empty($indexes)) {
             foreach ($indexes as $index) {
-                unset ($this->headersKeys[$index]);
-                unset ($this->headers[$index]);
+                unset($this->headersKeys[$index]);
+                unset($this->headers[$index]);
             }
             return true;
         }
@@ -25395,7 +26982,7 @@ abstract class AbstractAddressList implements HeaderInterface
         }
         // split value on ","
         $fieldValue = str_replace(Headers::FOLDING, ' ', $fieldValue);
-        $values     = explode(',', $fieldValue);
+        $values     = str_getcsv($fieldValue, ',');
         array_walk(
             $values,
             function (&$value) {
@@ -25405,29 +26992,7 @@ abstract class AbstractAddressList implements HeaderInterface
 
         $addressList = $header->getAddressList();
         foreach ($values as $address) {
-            // split values into name/email
-            if (!preg_match('/^((?P<name>.*?)<(?P<namedEmail>[^>]+)>|(?P<email>.+))$/', $address, $matches)) {
-                // Should we raise an exception here?
-                continue;
-            }
-            $name = null;
-            if (isset($matches['name'])) {
-                $name  = trim($matches['name']);
-            }
-            if (empty($name)) {
-                $name = null;
-            }
-
-            if (isset($matches['namedEmail'])) {
-                $email = $matches['namedEmail'];
-            }
-            if (isset($matches['email'])) {
-                $email = $matches['email'];
-            }
-            $email = trim($email); // we may have leading whitespace
-
-            // populate address list
-            $addressList->add($email, $name);
+            $addressList->addFromString($address);
         }
         return $header;
     }
@@ -25907,6 +27472,8 @@ class ContentType implements HeaderInterface
         $header = new static();
         $header->setType($type);
 
+        $values = array_filter($values);
+
         if (count($values)) {
             foreach ($values as $keyValuePair) {
                 list($key, $value) = explode('=', $keyValuePair, 2);
@@ -26020,7 +27587,7 @@ class ContentType implements HeaderInterface
         if (isset($this->parameters[$name])) {
             return $this->parameters[$name];
         }
-        return null;
+        return;
     }
 
     /**
@@ -26062,9 +27629,9 @@ class ContentTransferEncoding implements HeaderInterface
         '8bit',
         'quoted-printable',
         'base64',
+        'binary',
         /*
          * not implemented:
-         * 'binary',
          * x-token: 'X-'
          */
     );
@@ -26327,6 +27894,40 @@ class AddressList implements Countable, Iterator
     }
 
     /**
+     * Add an address to the list from any valid string format, such as
+     *  - "ZF Dev" <dev@zf.com>
+     *  - dev@zf.com
+     *
+     * @param string $address
+     * @throws Exception\InvalidArgumentException
+     * @return AddressList
+     */
+    public function addFromString($address)
+    {
+        if (!preg_match('/^((?P<name>.*?)<(?P<namedEmail>[^>]+)>|(?P<email>.+))$/', $address, $matches)) {
+            throw new Exception\InvalidArgumentException('Invalid address format');
+        }
+
+        $name = null;
+        if (isset($matches['name'])) {
+            $name = trim($matches['name']);
+        }
+        if (empty($name)) {
+            $name = null;
+        }
+
+        if (isset($matches['namedEmail'])) {
+            $email = $matches['namedEmail'];
+        }
+        if (isset($matches['email'])) {
+            $email = $matches['email'];
+        }
+        $email = trim($email);
+
+        return $this->add($email, $name);
+    }
+
+    /**
      * Merge another address list into this one
      *
      * @param  AddressList $addressList
@@ -26518,6 +28119,11 @@ class Smtp implements TransportInterface
     protected $options;
 
     /**
+     * @var Envelope|null
+     */
+    protected $envelope;
+
+    /**
      * @var Protocol\Smtp
      */
     protected $connection;
@@ -26565,6 +28171,26 @@ class Smtp implements TransportInterface
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * Set options
+     *
+     * @param  Envelope $envelope
+     */
+    public function setEnvelope(Envelope $envelope)
+    {
+        $this->envelope = $envelope;
+    }
+
+    /**
+     * Get envelope
+     *
+     * @return Envelope|null
+     */
+    public function getEnvelope()
+    {
+        return $this->envelope;
     }
 
     /**
@@ -26734,13 +28360,18 @@ class Smtp implements TransportInterface
      */
     protected function prepareFromAddress(Message $message)
     {
+        if ($this->getEnvelope() && $this->getEnvelope()->getFrom()) {
+            return $this->getEnvelope()->getFrom();
+        }
+
         $sender = $message->getSender();
         if ($sender instanceof Address\AddressInterface) {
             return $sender->getEmail();
         }
 
         $from = $message->getFrom();
-        if (!count($from)) { // Per RFC 2822 3.6
+        if (!count($from)) {
+            // Per RFC 2822 3.6
             throw new Exception\RuntimeException(sprintf(
                 '%s transport expects either a Sender or at least one From address in the Message; none provided',
                 __CLASS__
@@ -26760,6 +28391,10 @@ class Smtp implements TransportInterface
      */
     protected function prepareRecipients(Message $message)
     {
+        if ($this->getEnvelope() && $this->getEnvelope()->getTo()) {
+            return (array) $this->getEnvelope()->getTo();
+        }
+
         $recipients = array();
         foreach ($message->getTo() as $address) {
             $recipients[] = $address->getEmail();
@@ -26770,6 +28405,7 @@ class Smtp implements TransportInterface
         foreach ($message->getBcc() as $address) {
             $recipients[] = $address->getEmail();
         }
+
         $recipients = array_unique($recipients);
         return $recipients;
     }
@@ -27528,7 +29164,6 @@ class Smtp extends AbstractProtocol
 
                 default:
                     throw new Exception\InvalidArgumentException($config['ssl'] . ' is unsupported SSL type');
-                    break;
             }
         }
 
@@ -27679,9 +29314,7 @@ class Smtp extends AbstractProtocol
         $this->_expect(354, 120); // Timeout set for 2 minutes as per RFC 2821 4.5.3.2
 
         // Ensure newlines are CRLF (\r\n)
-        if (PHP_EOL === "\n") {
-            $data = str_replace("\n", "\r\n", str_replace("\r", '', $data));
-        }
+        $data = str_replace("\n", "\r\n", str_replace("\r", '', $data));
 
         foreach (explode(self::EOL, $data) as $line) {
             if (strpos($line, '.') === 0) {
@@ -27967,9 +29600,17 @@ class Part
      * as a string or stream
      *
      * @param mixed $content  String or Stream containing the content
+     * @throws Exception\InvalidArgumentException
      */
-    public function __construct($content)
+    public function __construct($content = '')
     {
+        if (! is_string($content) && ! is_resource($content)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                "'%s' must be string or resource",
+                $content
+            ));
+        }
+
         $this->content = $content;
         if (is_resource($content)) {
             $this->isStream = true;
@@ -27977,10 +29618,271 @@ class Part
     }
 
     /**
-     * @todo setters/getters
      * @todo error checking for setting $type
      * @todo error checking for setting $encoding
      */
+
+    /**
+     * Set type
+     * @param string $type
+     * @return self
+     */
+    public function setType($type = Mime::TYPE_OCTETSTREAM)
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * Get type
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set encoding
+     * @param string $encoding
+     * @return self
+     */
+    public function setEncoding($encoding = Mime::ENCODING_8BIT)
+    {
+        $this->encoding = $encoding;
+        return $this;
+    }
+
+    /**
+     * Get encoding
+     * @return string
+     */
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * Set id
+     * @param string $id
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Get id
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set disposition
+     * @param string $disposition
+     * @return self
+     */
+    public function setDisposition($disposition)
+    {
+        $this->disposition = $disposition;
+        return $this;
+    }
+
+    /**
+     * Get disposition
+     * @return string
+     */
+    public function getDisposition()
+    {
+        return $this->disposition;
+    }
+
+    /**
+     * Set description
+     * @param string $description
+     * @return self
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * Get description
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set filename
+     * @param string $fileName
+     * @return self
+     */
+    public function setFileName($fileName)
+    {
+        $this->filename = $fileName;
+        return $this;
+    }
+
+    /**
+     * Get filename
+     * @return string
+     */
+    public function getFileName()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * Set charset
+     * @param string $type
+     * @return self
+     */
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+        return $this;
+    }
+
+    /**
+     * Get charset
+     * @return string
+     */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+
+    /**
+     * Set boundary
+     * @param string $boundary
+     * @return self
+     */
+    public function setBoundary($boundary)
+    {
+        $this->boundary = $boundary;
+        return $this;
+    }
+
+    /**
+     * Get boundary
+     * @return string
+     */
+    public function getBoundary()
+    {
+        return $this->boundary;
+    }
+
+    /**
+     * Set location
+     * @param string $location
+     * @return self
+     */
+    public function setLocation($location)
+    {
+        $this->location = $location;
+        return $this;
+    }
+
+    /**
+     * Get location
+     * @return string
+     */
+    public function getLocation()
+    {
+        return $this->location;
+    }
+
+    /**
+     * Set language
+     * @param string $language
+     * @return self
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+        return $this;
+    }
+
+    /**
+     * Get language
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * Set content
+     * @param mixed $content  String or Stream containing the content
+     * @throws Exception\InvalidArgumentException
+     * @return self
+     */
+    public function setContent($content)
+    {
+        if (! is_string($content) && ! is_resource($content)) {
+            throw new Exception\InvalidArgumentException(
+                "'%s' must be string or resource",
+                $content
+            );
+        }
+        $this->content = $content;
+        if (is_resource($content)) {
+            $this->isStream = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set isStream
+     * @param bool $isStream
+     * @return self
+     */
+    public function setIsStream($isStream = false)
+    {
+        $this->isStream = (bool) $isStream;
+        return $this;
+    }
+
+    /**
+     * Get isStream
+     * @return bool
+     */
+    public function getIsStream()
+    {
+        return $this->isStream;
+    }
+
+    /**
+     * Set filters
+     * @param array $filters
+     * @return self
+     */
+    public function setFilters($filters = array())
+    {
+        $this->filters = $filters;
+        return $this;
+    }
+
+    /**
+     * Get Filters
+     * @return array
+     */
+    public function getFilters()
+    {
+        return $this->filters;
+    }
 
     /**
      * check if this part can be read as a stream.
@@ -28005,7 +29907,7 @@ class Part
      */
     public function getEncodedStream($EOL = Mime::LINEEND)
     {
-        if (!$this->isStream) {
+        if (! $this->isStream) {
             throw new Exception\RuntimeException('Attempt to get a stream from a string part');
         }
 
@@ -28025,12 +29927,12 @@ class Part
                     )
                 );
                 $this->filters[Mime::ENCODING_QUOTEDPRINTABLE] = $filter;
-                if (!is_resource($filter)) {
+                if (! is_resource($filter)) {
                     throw new Exception\RuntimeException('Failed to append quoted-printable filter');
                 }
                 break;
             case Mime::ENCODING_BASE64:
-                if (array_key_exists(Mime::ENCODING_BASE64,$this->filters)) {
+                if (array_key_exists(Mime::ENCODING_BASE64, $this->filters)) {
                     stream_filter_remove($this->filters[Mime::ENCODING_BASE64]);
                 }
                 $filter = stream_filter_append(
@@ -28043,7 +29945,7 @@ class Part
                     )
                 );
                 $this->filters[Mime::ENCODING_BASE64] = $filter;
-                if (!is_resource($filter)) {
+                if (! is_resource($filter)) {
                     throw new Exception\RuntimeException('Failed to append base64 filter');
                 }
                 break;
@@ -28346,7 +30248,7 @@ class Mime
         while (strlen($str) > 0) {
             $currentLine = max(count($lines)-1, 0);
             $token       = static::getNextQuotedPrintableToken($str);
-            $str         = substr($str, strlen($token));
+            $str         = substr($str, strlen($token)) ?: '';
 
             $tmp .= $token;
             if ($token == '=20') {
@@ -28749,7 +30651,7 @@ class Message
                         $properties['encoding'] = $fieldValue;
                         break;
                     case 'content-id':
-                        $properties['id'] = trim($fieldValue,'<>');
+                        $properties['id'] = trim($fieldValue, '<>');
                         break;
                     case 'content-disposition':
                         $properties['disposition'] = $fieldValue;
@@ -29868,7 +31770,7 @@ abstract class AbstractValidator implements
     protected function createMessage($messageKey, $value)
     {
         if (!isset($this->abstractOptions['messageTemplates'][$messageKey])) {
-            return null;
+            return;
         }
 
         $message = $this->abstractOptions['messageTemplates'][$messageKey];
@@ -29999,7 +31901,7 @@ abstract class AbstractValidator implements
     public function getTranslator()
     {
         if (! $this->isTranslatorEnabled()) {
-            return null;
+            return;
         }
 
         if (null === $this->abstractOptions['translator']) {
@@ -30173,11 +32075,17 @@ abstract class AbstractValidator implements
 namespace Zend\Validator;
 
 use Countable;
+use Zend\Stdlib\PriorityQueue;
 
 class ValidatorChain implements
     Countable,
     ValidatorInterface
 {
+    /**
+     * Default priority at which validators are added
+     */
+    const DEFAULT_PRIORITY = 1;
+
     /**
      * @var ValidatorPluginManager
      */
@@ -30186,9 +32094,9 @@ class ValidatorChain implements
     /**
      * Validator chain
      *
-     * @var array
+     * @var PriorityQueue
      */
-    protected $validators = array();
+    protected $validators;
 
     /**
      * Array of validation failure messages
@@ -30196,6 +32104,14 @@ class ValidatorChain implements
      * @var array
      */
     protected $messages = array();
+
+    /**
+     * Initialize validator chain
+     */
+    public function __construct()
+    {
+        $this->validators = new PriorityQueue();
+    }
 
     /**
      * Return the count of attached validators
@@ -30251,16 +32167,28 @@ class ValidatorChain implements
      * If $breakChainOnFailure is true, then if the validator fails, the next validator in the chain,
      * if one exists, will not be executed.
      *
-     * @param  ValidatorInterface      $validator
-     * @param  bool                 $breakChainOnFailure
-     * @return ValidatorChain Provides a fluent interface
+     * @param  ValidatorInterface $validator
+     * @param  bool               $breakChainOnFailure
+     * @param  int                $priority            Priority at which to enqueue validator; defaults to
+     *                                                          1 (higher executes earlier)
+     *
+     * @throws Exception\InvalidArgumentException
+     *
+     * @return self
      */
-    public function attach(ValidatorInterface $validator, $breakChainOnFailure = false)
-    {
-        $this->validators[] = array(
-            'instance'            => $validator,
-            'breakChainOnFailure' => (bool) $breakChainOnFailure,
+    public function attach(
+        ValidatorInterface $validator,
+        $breakChainOnFailure = false,
+        $priority = self::DEFAULT_PRIORITY
+    ) {
+        $this->validators->insert(
+            array(
+                'instance'            => $validator,
+                'breakChainOnFailure' => (bool) $breakChainOnFailure,
+            ),
+            $priority
         );
+
         return $this;
     }
 
@@ -30270,11 +32198,12 @@ class ValidatorChain implements
      * @deprecated Please use attach()
      * @param  ValidatorInterface      $validator
      * @param  bool                 $breakChainOnFailure
+     * @param  int                  $priority
      * @return ValidatorChain Provides a fluent interface
      */
-    public function addValidator(ValidatorInterface $validator, $breakChainOnFailure = false)
+    public function addValidator(ValidatorInterface $validator, $breakChainOnFailure = false, $priority = self::DEFAULT_PRIORITY)
     {
-        return $this->attach($validator, $breakChainOnFailure);
+        return $this->attach($validator, $breakChainOnFailure, $priority);
     }
 
     /**
@@ -30289,12 +32218,21 @@ class ValidatorChain implements
      */
     public function prependValidator(ValidatorInterface $validator, $breakChainOnFailure = false)
     {
-        array_unshift(
-            $this->validators,
+        $priority = self::DEFAULT_PRIORITY;
+
+        if (!$this->validators->isEmpty()) {
+            $queue = $this->validators->getIterator();
+            $queue->setExtractFlags(PriorityQueue::EXTR_PRIORITY);
+            $extractedNode = $queue->extract();
+            $priority = $extractedNode[0] + 1;
+        }
+
+        $this->validators->insert(
             array(
-               'instance'            => $validator,
-               'breakChainOnFailure' => (bool) $breakChainOnFailure,
-            )
+                'instance'            => $validator,
+                'breakChainOnFailure' => (bool) $breakChainOnFailure,
+            ),
+            $priority
         );
         return $this;
     }
@@ -30303,11 +32241,12 @@ class ValidatorChain implements
      * Use the plugin manager to add a validator by name
      *
      * @param  string $name
-     * @param  array  $options
-     * @param  bool   $breakChainOnFailure
+     * @param  array $options
+     * @param  bool $breakChainOnFailure
+     * @param  int $priority
      * @return ValidatorChain
      */
-    public function attachByName($name, $options = array(), $breakChainOnFailure = false)
+    public function attachByName($name, $options = array(), $breakChainOnFailure = false, $priority = self::DEFAULT_PRIORITY)
     {
         if (isset($options['break_chain_on_failure'])) {
             $breakChainOnFailure = (bool) $options['break_chain_on_failure'];
@@ -30317,8 +32256,8 @@ class ValidatorChain implements
             $breakChainOnFailure = (bool) $options['breakchainonfailure'];
         }
 
-        $validator = $this->plugin($name, $options);
-        $this->attach($validator, $breakChainOnFailure);
+        $this->attach($this->plugin($name, $options), $breakChainOnFailure, $priority);
+
         return $this;
     }
 
@@ -30387,8 +32326,8 @@ class ValidatorChain implements
      */
     public function merge(ValidatorChain $validatorChain)
     {
-        foreach ($validatorChain->validators as $validator) {
-            $this->validators[] = $validator;
+        foreach ($validatorChain->validators->toArray(PriorityQueue::EXTR_BOTH) as $item) {
+            $this->attach($item['data']['instance'], $item['data']['breakChainOnFailure'], $item['priority']);
         }
 
         return $this;
@@ -30407,11 +32346,11 @@ class ValidatorChain implements
     /**
      * Get all the validators
      *
-     * @return array
+     * @return PriorityQueue
      */
     public function getValidators()
     {
-        return $this->validators;
+        return $this->validators->toArray(PriorityQueue::EXTR_DATA);
     }
 
     /**
@@ -30423,6 +32362,14 @@ class ValidatorChain implements
     public function __invoke($value)
     {
         return $this->isValid($value);
+    }
+
+    /**
+     * Deep clone handling
+     */
+    public function __clone()
+    {
+        $this->validators = clone $this->validators;
     }
 
     /**
@@ -30515,6 +32462,7 @@ class Hostname extends AbstractValidator
      * @var array
      */
     protected $validTlds = array(
+        'abbott',
         'abogado',
         'ac',
         'academy',
@@ -30522,6 +32470,7 @@ class Hostname extends AbstractValidator
         'active',
         'actor',
         'ad',
+        'adult',
         'ae',
         'aero',
         'af',
@@ -30533,10 +32482,13 @@ class Hostname extends AbstractValidator
         'allfinanz',
         'alsace',
         'am',
+        'amsterdam',
         'an',
         'android',
         'ao',
+        'apartments',
         'aq',
+        'aquarelle',
         'ar',
         'archi',
         'army',
@@ -30556,7 +32508,10 @@ class Hostname extends AbstractValidator
         'az',
         'ba',
         'band',
+        'bank',
         'bar',
+        'barclaycard',
+        'barclays',
         'bargains',
         'bayern',
         'bb',
@@ -30571,6 +32526,7 @@ class Hostname extends AbstractValidator
         'bi',
         'bid',
         'bike',
+        'bingo',
         'bio',
         'biz',
         'bj',
@@ -30583,6 +32539,7 @@ class Hostname extends AbstractValidator
         'bn',
         'bnpparibas',
         'bo',
+        'boats',
         'boo',
         'boutique',
         'br',
@@ -30605,6 +32562,7 @@ class Hostname extends AbstractValidator
         'camera',
         'camp',
         'cancerresearch',
+        'canon',
         'capetown',
         'capital',
         'caravan',
@@ -30612,20 +32570,26 @@ class Hostname extends AbstractValidator
         'care',
         'career',
         'careers',
+        'cartier',
         'casa',
         'cash',
+        'casino',
         'cat',
         'catering',
+        'cbn',
         'cc',
         'cd',
         'center',
         'ceo',
         'cern',
         'cf',
+        'cfd',
         'cg',
         'ch',
         'channel',
+        'chat',
         'cheap',
+        'chloe',
         'christmas',
         'chrome',
         'church',
@@ -30660,6 +32624,7 @@ class Hostname extends AbstractValidator
         'cool',
         'coop',
         'country',
+        'courses',
         'cr',
         'credit',
         'creditcard',
@@ -30674,10 +32639,13 @@ class Hostname extends AbstractValidator
         'cy',
         'cymru',
         'cz',
+        'dabur',
         'dad',
         'dance',
         'dating',
+        'datsun',
         'day',
+        'dclk',
         'de',
         'deals',
         'degree',
@@ -30686,6 +32654,8 @@ class Hostname extends AbstractValidator
         'dental',
         'dentist',
         'desi',
+        'design',
+        'dev',
         'diamonds',
         'diet',
         'digital',
@@ -30697,7 +32667,9 @@ class Hostname extends AbstractValidator
         'dm',
         'dnp',
         'do',
+        'docs',
         'domains',
+        'doosan',
         'durban',
         'dvag',
         'dz',
@@ -30713,13 +32685,16 @@ class Hostname extends AbstractValidator
         'engineer',
         'engineering',
         'enterprises',
+        'epson',
         'equipment',
         'er',
+        'erni',
         'es',
         'esq',
         'estate',
         'et',
         'eu',
+        'eurovision',
         'eus',
         'events',
         'everbank',
@@ -30727,7 +32702,10 @@ class Hostname extends AbstractValidator
         'expert',
         'exposed',
         'fail',
+        'fan',
+        'fans',
         'farm',
+        'fashion',
         'feedback',
         'fi',
         'finance',
@@ -30735,16 +32713,20 @@ class Hostname extends AbstractValidator
         'firmdale',
         'fish',
         'fishing',
+        'fit',
         'fitness',
         'fj',
         'fk',
         'flights',
         'florist',
+        'flowers',
         'flsmidth',
         'fly',
         'fm',
         'fo',
         'foo',
+        'football',
+        'forex',
         'forsale',
         'foundation',
         'fr',
@@ -30756,13 +32738,16 @@ class Hostname extends AbstractValidator
         'ga',
         'gal',
         'gallery',
+        'garden',
         'gb',
         'gbiz',
         'gd',
+        'gdn',
         'ge',
         'gent',
         'gf',
         'gg',
+        'ggee',
         'gh',
         'gi',
         'gift',
@@ -30778,6 +32763,9 @@ class Hostname extends AbstractValidator
         'gmo',
         'gmx',
         'gn',
+        'goldpoint',
+        'goo',
+        'goog',
         'google',
         'gop',
         'gov',
@@ -30797,10 +32785,12 @@ class Hostname extends AbstractValidator
         'gw',
         'gy',
         'hamburg',
+        'hangout',
         'haus',
         'healthcare',
         'help',
         'here',
+        'hermes',
         'hiphop',
         'hiv',
         'hk',
@@ -30820,12 +32810,14 @@ class Hostname extends AbstractValidator
         'ibm',
         'id',
         'ie',
+        'ifm',
         'il',
         'im',
         'immo',
         'immobilien',
         'in',
         'industries',
+        'infiniti',
         'info',
         'ing',
         'ink',
@@ -30837,8 +32829,12 @@ class Hostname extends AbstractValidator
         'io',
         'iq',
         'ir',
+        'irish',
         'is',
         'it',
+        'iwc',
+        'java',
+        'jcb',
         'je',
         'jetzt',
         'jm',
@@ -30848,6 +32844,7 @@ class Hostname extends AbstractValidator
         'jp',
         'juegos',
         'kaufen',
+        'kddi',
         'ke',
         'kg',
         'kh',
@@ -30864,18 +32861,23 @@ class Hostname extends AbstractValidator
         'kred',
         'kw',
         'ky',
+        'kyoto',
         'kz',
         'la',
         'lacaixa',
         'land',
+        'lat',
+        'latrobe',
         'lawyer',
         'lb',
         'lc',
         'lds',
         'lease',
+        'leclerc',
         'legal',
         'lgbt',
         'li',
+        'lidl',
         'life',
         'lighting',
         'limited',
@@ -30884,6 +32886,7 @@ class Hostname extends AbstractValidator
         'lk',
         'loans',
         'london',
+        'lotte',
         'lotto',
         'lr',
         'ls',
@@ -30896,11 +32899,14 @@ class Hostname extends AbstractValidator
         'ly',
         'ma',
         'madrid',
+        'maif',
         'maison',
         'management',
         'mango',
         'market',
         'marketing',
+        'markets',
+        'marriott',
         'mc',
         'md',
         'me',
@@ -30935,6 +32941,7 @@ class Hostname extends AbstractValidator
         'mr',
         'ms',
         'mt',
+        'mtpc',
         'mu',
         'museum',
         'mv',
@@ -30958,26 +32965,34 @@ class Hostname extends AbstractValidator
         'ngo',
         'nhk',
         'ni',
+        'nico',
         'ninja',
+        'nissan',
         'nl',
         'no',
         'np',
         'nr',
         'nra',
         'nrw',
+        'ntt',
         'nu',
         'nyc',
         'nz',
         'okinawa',
         'om',
+        'one',
         'ong',
         'onl',
+        'online',
         'ooo',
+        'oracle',
         'org',
         'organic',
+        'osaka',
         'otsuka',
         'ovh',
         'pa',
+        'page',
         'paris',
         'partners',
         'parts',
@@ -30991,7 +33006,9 @@ class Hostname extends AbstractValidator
         'photography',
         'photos',
         'physio',
+        'piaget',
         'pics',
+        'pictet',
         'pictures',
         'pink',
         'pizza',
@@ -31003,6 +33020,7 @@ class Hostname extends AbstractValidator
         'pn',
         'pohl',
         'poker',
+        'porn',
         'post',
         'pr',
         'praxi',
@@ -31051,27 +33069,36 @@ class Hostname extends AbstractValidator
         'ryukyu',
         'sa',
         'saarland',
+        'sale',
+        'samsung',
         'sarl',
+        'saxo',
         'sb',
         'sc',
         'sca',
         'scb',
         'schmidt',
+        'school',
         'schule',
+        'schwarz',
         'science',
         'scot',
         'sd',
         'se',
         'services',
+        'sew',
         'sexy',
         'sg',
         'sh',
         'shiksha',
         'shoes',
+        'shriram',
         'si',
         'singles',
+        'site',
         'sj',
         'sk',
+        'sky',
         'sl',
         'sm',
         'sn',
@@ -31084,9 +33111,13 @@ class Hostname extends AbstractValidator
         'soy',
         'space',
         'spiegel',
+        'spreadbetting',
         'sr',
         'st',
+        'study',
+        'style',
         'su',
+        'sucks',
         'supplies',
         'supply',
         'support',
@@ -31107,11 +33138,14 @@ class Hostname extends AbstractValidator
         'td',
         'technology',
         'tel',
+        'temasek',
+        'tennis',
         'tf',
         'tg',
         'th',
         'tienda',
         'tips',
+        'tires',
         'tirol',
         'tj',
         'tk',
@@ -31123,13 +33157,15 @@ class Hostname extends AbstractValidator
         'tokyo',
         'tools',
         'top',
+        'toshiba',
         'town',
         'toys',
-        'tp',
         'tr',
         'trade',
+        'trading',
         'training',
         'travel',
+        'trust',
         'tt',
         'tui',
         'tv',
@@ -31155,6 +33191,7 @@ class Hostname extends AbstractValidator
         'vg',
         'vi',
         'viajes',
+        'video',
         'villas',
         'vision',
         'vlaanderen',
@@ -31184,80 +33221,94 @@ class Hostname extends AbstractValidator
         'ws',
         'wtc',
         'wtf',
-        '测试',
-        'परीक्षा',
+        'xin',
+        '佛山',
         '集团',
         '在线',
         '한국',
         'ভারত',
-        'বাংলা',
+        '八卦',
+        'موقع',
         '公益',
         '公司',
         '移动',
         '我爱你',
-        'испытание',
+        'москва',
         'қаз',
         'онлайн',
         'сайт',
         'срб',
-        '테스트',
+        'бел',
+        '淡马锡',
+        'орг',
         '삼성',
         'சிங்கப்பூர்',
+        '商标',
+        '商店',
+        '商城',
         'дети',
-        'טעסט',
+        'мкд',
         '中文网',
         '中信',
         '中国',
         '中國',
+        '谷歌',
         'భారత్',
         'ලංකා',
-        '測試',
         'ભારત',
         'भारत',
-        'آزمایشی',
-         'பரிட்சை',
+        '网店',
+        'संगठन',
         '网络',
         'укр',
         '香港',
-        'δοκιμή',
-        'إختبار',
         '台湾',
         '台灣',
+        '手机',
         'мон',
-        'الجزا',
+        'الجزائر',
         'عمان',
         'ایران',
         'امارات',
         'بازار',
-        'پاکستا',
         'الاردن',
         'بھارت',
         'المغرب',
         'السعودية',
-        'سودان',
         'مليسيا',
+        '政府',
         'شبكة',
         'გე',
+        '机构',
+        '组织机构',
         'ไทย',
         'سورية',
+        'рус',
         'рф',
         'تونس',
         'みんな',
+        'グーグル',
+        '世界',
         'ਭਾਰਤ',
+        '网址',
         '游戏',
+        'vermögensberater',
+        'vermögensberatung',
+        '企业',
         'مصر',
         'قطر',
+        '广东',
         'இலங்கை',
         'இந்தியா',
         '新加坡',
         'فلسطين',
-        'テスト',
         '政务',
         'xxx',
         'xyz',
         'yachts',
         'yandex',
         'ye',
+        'yodobashi',
         'yoga',
         'yokohama',
         'youtube',
@@ -31266,7 +33317,8 @@ class Hostname extends AbstractValidator
         'zip',
         'zm',
         'zone',
-        'zw'
+        'zuerich',
+        'zw',
     );
 
     /**
@@ -31285,6 +33337,7 @@ class Hostname extends AbstractValidator
      * (.COM) International http://www.verisign.com/information-services/naming-services/internationalized-domain-names/index.html
      * (.DE) Germany http://www.denic.de/en/domains/idns/liste.html
      * (.DK) Danmark http://www.dk-hostmaster.dk/index.php?id=151
+     * (.EE) Estonia https://www.iana.org/domains/idn-tables/tables/pl_et-pl_1.0.html
      * (.ES) Spain https://www.nic.es/media/2008-05/1210147705287.pdf
      * (.FI) Finland http://www.ficora.fi/en/index/palvelut/fiverkkotunnukset/aakkostenkaytto.html
      * (.GR) Greece https://grweb.ics.forth.gr/CharacterTable1_en.jsp
@@ -31336,6 +33389,7 @@ class Hostname extends AbstractValidator
         'COM' => 'Hostname/Com.php',
         'DE'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),
         'DK'  => array(1 => '/^[\x{002d}0-9a-zäéöü]{1,63}$/iu'),
+        'EE'  => array(1 => '/^[\x{002d}0-9a-zäõöüšž]{1,63}$/iu'),
         'ES'  => array(1 => '/^[\x{002d}0-9a-zàáçèéíïñòóúü·]{1,63}$/iu'),
         'EU'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿ]{1,63}$/iu',
             2 => '/^[\x{002d}0-9a-zāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĺļľŀłńņňŉŋōŏőœŕŗřśŝšťŧũūŭůűųŵŷźżž]{1,63}$/iu',
@@ -31789,7 +33843,6 @@ class Hostname extends AbstractValidator
             }
         } elseif ($this->getAllow() & self::ALLOW_DNS) {
             $this->error(self::INVALID_HOSTNAME);
-            $status = false;
         }
 
         // Check for URI Syntax (RFC3986)
