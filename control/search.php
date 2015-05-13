@@ -29,6 +29,24 @@ if (
    ) {
     $_REQUEST['flowering']=$floraSearch->getFloweringArray();
 }
+if (
+    !array_key_exists('posture', $_REQUEST)||
+    !is_array($_REQUEST['posture'])
+   ) {
+    $_REQUEST['posture']=$floraSearch->getPostureArray();
+}
+if (
+    !array_key_exists('biologicForm', $_REQUEST)||
+    !is_array($_REQUEST['biologicForm'])
+   ) {
+    $_REQUEST['biologicForm']=$floraSearch->getBiologicFormArray();
+}
+if (
+    !array_key_exists('community', $_REQUEST)||
+    !is_array($_REQUEST['community'])
+   ) {
+    $_REQUEST['community']=$floraSearch->getCommunityArray();
+}
 $floraSearch->setRequest($_REQUEST);
 switch ($_REQUEST['action']) {
     case 'autocomplete':
@@ -55,6 +73,15 @@ switch ($_REQUEST['action']) {
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'floweringFilter.phtml';
       $result['floweringFilter']=  ob_get_clean();
       ob_start();
+      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'postureFilter.phtml';
+      $result['postureFilter']=  ob_get_clean();
+      ob_start();
+      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'biologicFormFilter.phtml';
+      $result['biologicFormFilter']=  ob_get_clean();
+      ob_start();
+      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'communityFilter.phtml';
+      $result['communityFilter']=  ob_get_clean();
+      ob_start();
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'searchContent.phtml';
       $result['searchContent']=  ob_get_clean();
       header('Content-Type: application/json');
@@ -63,6 +90,7 @@ switch ($_REQUEST['action']) {
    break;
 }
 $this->getTemplate()->setObjectData($floraSearch);
+$this->getTemplate()->setBlock('head','search/head.phtml');
 $this->getTemplate()->setBlock('middle','search/middle.phtml');
 $this->getTemplate()->setBlock('footer','search/footer.phtml');
 

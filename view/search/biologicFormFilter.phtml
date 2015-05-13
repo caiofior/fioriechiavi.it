@@ -1,0 +1,20 @@
+<?php
+if (!isset($floraSearch)) {
+    $floraSearch = $this->object;
+}
+$biologicFormArray = $floraSearch-> getFilteredBiologicFormArray();
+?>
+<select id="biologicForm" name="biologicForm[]" multiple="multiple" size="<?php echo sizeof($biologicFormArray);?>">
+<?php foreach ($biologicFormArray as $biologicFormData) :
+    $selected='';
+    if (is_array($biologicFormData) && array_key_exists('selected', $biologicFormData) && $biologicFormData['selected'] != '') {
+        $selected=' selected="selected"';
+    }
+    $count = '';
+    if (is_array($biologicFormData) && array_key_exists('count', $biologicFormData) && $biologicFormData['count'] != '') {
+         $count = ' ('.$biologicFormData['count'].')';
+    }
+    ?>
+    <option value="<?php echo $biologicFormData['label'];?>"<?php echo $selected;?>><?php echo $biologicFormData['label'].$count?></option>
+<?php endforeach; ?>
+</select>

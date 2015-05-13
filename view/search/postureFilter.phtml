@@ -1,0 +1,20 @@
+<?php
+if (!isset($floraSearch)) {
+    $floraSearch = $this->object;
+}
+$postureArray = $floraSearch-> getFilteredPostureArray();
+?>
+<select id="posture" name="posture[]" multiple="multiple" size="<?php echo sizeof($postureArray);?>">
+<?php foreach ($postureArray as $postureData) :
+    $selected='';
+    if (is_array($postureData) && array_key_exists('selected', $postureData) && $postureData['selected'] != '') {
+        $selected=' selected="selected"';
+    }
+    $count = '';
+    if (is_array($postureData) && array_key_exists('count', $postureData) && $postureData['count'] != '') {
+         $count = ' ('.$postureData['count'].')';
+    }
+    ?>
+    <option value="<?php echo $postureData['label'];?>"<?php echo $selected;?>><?php echo $postureData['label'].$count?></option>
+<?php endforeach; ?>
+</select>

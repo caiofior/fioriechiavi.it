@@ -37,6 +37,21 @@ class Search {
      */
     private $flowering=array();
     /**
+     *Posture array
+     * @var array
+     */
+    private $postureArray=null;
+    /**
+     *Biologic form array
+     * @var array
+     */
+    private $biologicFormArray=null;
+    /**
+     *Community array
+     * @var array
+     */
+    private $communityArray=null;
+    /**
      *Array of attributes ids
      * @var array
      */
@@ -342,7 +357,7 @@ class Search {
                    $this->flowering[intval($data['flowering'])]['count']=$data['count'];
                } 
         }
-           catch (\Exception $e) {
+        catch (\Exception $e) {
               $mysqli = $this->db->getDriver()->getConnection()->getResource();  
               if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
                   $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
@@ -359,6 +374,268 @@ class Search {
              }
         }
         return $this->flowering;
+    }
+    /**
+     * Gets posture array
+     * @return array
+     */
+    public function getPostureArray() {
+        if (!is_array($this->postureArray)) {
+            $this->postureArray=array();
+            $table = new \Zend\Db\TableGateway\TableGateway('taxa_attribute_value',$this->db);
+            $select = $table->getSql()->select();
+            $select->columns(array(
+                'value'
+            ));
+            $select->where('`taxa_attribute_id` = '.$this->attributeId['Portamento']);
+            $select->group('value');
+            $select->order('value');
+
+            try {
+                   $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
+                   $results = $statement->execute();
+                   $resultSet = new \Zend\Db\ResultSet\ResultSet();
+                   $resultSet->initialize($results);
+                   foreach($resultSet->toArray() as $data) {
+                       $this->postureArray[]=$data['value'];
+                   }
+            }
+            catch (\Exception $e) {
+                  $mysqli = $this->db->getDriver()->getConnection()->getResource();  
+                  if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
+                      $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
+                  throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+            }
+        }
+        return $this->postureArray;
+    }
+    /**
+     * Gets filtered posture array
+     * @return array
+     */
+    public function getFilteredPostureArray() {
+        $posture = array();
+        $select=$this->createSelect(array('posture'));
+        $select->columns(array(
+            'taxa_id'
+         ));
+        $sql = $select->getSqlString($this->db->getPlatform());
+        $table = new \Zend\Db\TableGateway\TableGateway('taxa_attribute_value',$this->db);
+        $select = $table->getSql()->select();
+        $select->columns(array(
+            'count'=>new \Zend\Db\Sql\Expression('COUNT(`taxa_attribute_value`.`taxa_id`)'),
+            'posture'=>'value',
+        ));
+        $select->where('`taxa_attribute_id` = '.$this->attributeId['Portamento']);
+        $select->where('`taxa_id` IN ('.$sql.')');
+        $select->group('value');
+        $select->order('value');
+        
+        try {
+               $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
+               $results = $statement->execute();
+               $resultSet = new \Zend\Db\ResultSet\ResultSet();
+               $resultSet->initialize($results);
+               foreach($resultSet->toArray() as $data) {
+                   if (array_key_exists($data['posture'],$posture)) {
+                       $posture[$data['posture']]=array();
+                   }
+                   $posture[$data['posture']]['label']=$data['posture'];
+                   $posture[$data['posture']]['count']=$data['count'];
+               } 
+        }
+        catch (\Exception $e) {
+              $mysqli = $this->db->getDriver()->getConnection()->getResource();  
+              if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
+                  $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
+              throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+        }
+        if(array_key_exists('posture', $this->request) && is_array($this->request['posture'])) {
+             foreach ($this->request['posture'] as $postureData) {
+                 if (array_key_exists($postureData, $posture)) {
+                     if (!is_array($posture[$postureData])) {
+                         continue;
+                     }
+                     $posture[$postureData]['selected']=true;
+                 }
+             }
+        }
+        return $posture;
+    }
+    /**
+     * Gets community array
+     * @return array
+     */
+    public function getCommunityArray() {
+        if (!is_array($this->communityArray)) {
+            $this->communityArray=array();
+            $table = new \Zend\Db\TableGateway\TableGateway('taxa_attribute_value',$this->db);
+            $select = $table->getSql()->select();
+            $select->columns(array(
+                'value'
+            ));
+            $select->where('`taxa_attribute_id` = '.$this->attributeId['Tipo di vegetazione']);
+            $select->group('value');
+            $select->order('value');
+            $select->limit(10);
+
+            try {
+                   $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
+                   $results = $statement->execute();
+                   $resultSet = new \Zend\Db\ResultSet\ResultSet();
+                   $resultSet->initialize($results);
+                   foreach($resultSet->toArray() as $data) {
+                       $this->communityArray[]=$data['value'];
+                   }
+            }
+            catch (\Exception $e) {
+                  $mysqli = $this->db->getDriver()->getConnection()->getResource();  
+                  if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
+                      $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
+                  throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+            }
+        }
+        return $this->communityArray;
+    }
+    /**
+     * Gets filtered community array
+     * @return array
+     */
+    public function getFilteredCommunityArray() {
+        $community = array();
+        $select=$this->createSelect(array('community'));
+        $select->columns(array(
+            'taxa_id'
+         ));
+        $sql = $select->getSqlString($this->db->getPlatform());
+        $table = new \Zend\Db\TableGateway\TableGateway('taxa_attribute_value',$this->db);
+        $select = $table->getSql()->select();
+        $select->columns(array(
+            'count'=>new \Zend\Db\Sql\Expression('COUNT(`taxa_attribute_value`.`taxa_id`)'),
+            'community'=>'value',
+        ));
+        $select->where('`taxa_attribute_id` = '.$this->attributeId['Tipo di vegetazione']);
+        $select->where('`taxa_id` IN ('.$sql.')');
+        $select->group('value');
+        $select->order('value');
+        $select->limit(10);
+        try {
+               $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
+               $results = $statement->execute();
+               $resultSet = new \Zend\Db\ResultSet\ResultSet();
+               $resultSet->initialize($results);
+               foreach($resultSet->toArray() as $data) {
+                   if (array_key_exists($data['community'],$community)) {
+                       $community[$data['community']]=array();
+                   }
+                   $community[$data['community']]['label']=$data['community'];
+                   $community[$data['community']]['count']=$data['count'];
+               } 
+        }
+        catch (\Exception $e) {
+              $mysqli = $this->db->getDriver()->getConnection()->getResource();  
+              if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
+                  $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
+              throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+        }
+        if(array_key_exists('community', $this->request) && is_array($this->request['community'])) {
+             foreach ($this->request['community'] as $communityData) {
+                 if (array_key_exists($communityData, $community)) {
+                     if (!is_array($community[$communityData])) {
+                         continue;
+                     }
+                     $community[$communityData]['selected']=true;
+                 }
+             }
+        }
+        return $community;
+    }
+    /**
+     * Gets biologic form array
+     * @return array
+     */
+    public function getBiologicFormArray() {
+        if (!is_array($this->biologicFormArray)) {
+            $this->postureArray=array();
+            $table = new \Zend\Db\TableGateway\TableGateway('taxa_attribute_value',$this->db);
+            $select = $table->getSql()->select();
+            $select->columns(array(
+                'value'
+            ));
+            $select->where('`taxa_attribute_id` = '.$this->attributeId['Forma biologica']);
+            $select->group('value');
+            $select->order('value');
+
+            try {
+                   $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
+                   $results = $statement->execute();
+                   $resultSet = new \Zend\Db\ResultSet\ResultSet();
+                   $resultSet->initialize($results);
+                   foreach($resultSet->toArray() as $data) {
+                       $this->biologicFormArray[]=$data['value'];
+                   }
+            }
+            catch (\Exception $e) {
+                  $mysqli = $this->db->getDriver()->getConnection()->getResource();  
+                  if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
+                      $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
+                  throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+            }
+        }
+        return $this->biologicFormArray;
+    }
+    /**
+     * Gets filtered biologic form array
+     * @return array
+     */
+    public function getFilteredBiologicFormArray() {
+        $biologicForm = array();
+        $select=$this->createSelect(array('biologicForm'));
+        $select->columns(array(
+            'taxa_id'
+         ));
+        $sql = $select->getSqlString($this->db->getPlatform());
+        $table = new \Zend\Db\TableGateway\TableGateway('taxa_attribute_value',$this->db);
+        $select = $table->getSql()->select();
+        $select->columns(array(
+            'count'=>new \Zend\Db\Sql\Expression('COUNT(`taxa_attribute_value`.`taxa_id`)'),
+            'biologicForm'=>'value',
+        ));
+        $select->where('`taxa_attribute_id` = '.$this->attributeId['Forma biologica']);
+        $select->where('`taxa_id` IN ('.$sql.')');
+        $select->group('value');
+        $select->order('value');
+        
+        try {
+               $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
+               $results = $statement->execute();
+               $resultSet = new \Zend\Db\ResultSet\ResultSet();
+               $resultSet->initialize($results);
+               foreach($resultSet->toArray() as $data) {
+                   if (array_key_exists($data['biologicForm'],$biologicForm)) {
+                       $biologicForm[$data['biologicForm']]=array();
+                   }
+                   $biologicForm[$data['biologicForm']]['label']=$data['biologicForm'];
+                   $biologicForm[$data['biologicForm']]['count']=$data['count'];
+               } 
+        }
+        catch (\Exception $e) {
+              $mysqli = $this->db->getDriver()->getConnection()->getResource();  
+              if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
+                  $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
+              throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+        }
+        if(array_key_exists('biologicForm', $this->request) && is_array($this->request['biologicForm'])) {
+             foreach ($this->request['biologicForm'] as $biologicFormData) {
+                 if (array_key_exists($biologicFormData, $biologicForm)) {
+                     if (!is_array($biologicForm[$biologicFormData])) {
+                         continue;
+                     }
+                     $biologicForm[$biologicFormData]['selected']=true;
+                 }
+             }
+        }
+        return $biologicForm;
     }
     /**
      * Create the select
@@ -407,6 +684,36 @@ class Search {
             $this->request['flowering']=array_map('intval',$this->request['flowering']);
             $select->where('
                   `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_search_attribute` WHERE `attribute_id`=2 AND `value` IN ('.implode(',',$this->request['flowering']).'))
+            ');
+        }
+        if  (
+                array_key_exists('posture', $this->request) && 
+                sizeof(array_diff($this->request['posture'],$this->getPostureArray())) == 0 &&
+                !in_array('posture',$avoid)
+            ) {
+            $this->request['posture']=array_map('addslashes',$this->request['posture']);
+            $select->where('
+                  `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_attribute_value` WHERE `taxa_attribute_id`='.$this->attributeId['Portamento'].' AND `value` IN ("'.implode('","',$this->request['posture']).'"))
+            ');
+        }
+        if  (
+                array_key_exists('biologicForm', $this->request) && 
+                sizeof(array_diff($this->request['biologicForm'],$this->getBiologicFormArray())) == 0 &&
+                !in_array('biologicForm',$avoid)
+            ) {
+            $this->request['biologicForm']=array_map('addslashes',$this->request['biologicForm']);
+            $select->where('
+                  `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_attribute_value` WHERE `taxa_attribute_id`='.$this->attributeId['Forma biologica'].' AND `value` IN ("'.implode('","',$this->request['biologicForm']).'"))
+            ');
+        }
+        if  (
+                array_key_exists('community', $this->request) && 
+                sizeof(array_diff($this->request['community'],$this->getCommunityArray())) == 0 &&
+                !in_array('community',$avoid)
+            ) {
+            $this->request['community']=array_map('addslashes',$this->request['community']);
+            $select->where('
+                  `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_attribute_value` WHERE `taxa_attribute_id`='.$this->attributeId['Tipo di vegetazione'].' AND `value` IN ("'.implode('","',$this->request['community']).'"))
             ');
         }
         $select->where('

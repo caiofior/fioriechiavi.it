@@ -5,7 +5,7 @@
    <label for="taxasearch">Appartenenti al taxa</label>
    <input id="taxasearch" name="taxasearch" value="">
    <input type="hidden" id="taxasearchid" name="taxasearchid" value="">
-   <a id="emtpytaxasearch" href="#" title="Cancella">◀</a>
+   <a id="emtpytaxasearch" title="Cancella">◀</a>
 </div>
 <div>
     <label for="text">Testo</label>
@@ -30,6 +30,27 @@
     <a href="#" class="selectAll">Seleziona tutti</a><br/>
     <div id="floweringFilter">
         <?php require __DIR__.'/floweringFilter.phtml';?>
+    </div>
+</div>
+<a href="#" class="showNext">Filtra per portamento</a>
+<div id="postureFilterContainer" style="display: none;">
+    <a href="#" class="selectAll">Seleziona tutti</a><br/>
+    <div id="postureFilter">
+        <?php require __DIR__.'/postureFilter.phtml';?>
+    </div>
+</div>
+<a href="#" class="showNext">Filtra per forma biologica</a>
+<div id="biologicFormFilterContainer" style="display: none;">
+    <a href="#" class="selectAll">Seleziona tutti</a><br/>
+    <div id="biologicFormFilter">
+        <?php require __DIR__.'/biologicFormFilter.phtml';?>
+    </div>
+</div>
+<a href="#" class="showNext">Filtra per cenosi</a>
+<div id="communityContainer" style="display: none;">
+    <a href="#" class="selectAll">Seleziona tutti</a><br/>
+    <div id="communityFilter">
+        <?php require __DIR__.'/communityFilter.phtml';?>
     </div>
 </div>
 <div id="searchContent">

@@ -1,0 +1,20 @@
+<?php
+if (!isset($floraSearch)) {
+    $floraSearch = $this->object;
+}
+$communityArray = $floraSearch-> getFilteredCommunityArray();
+?>
+<select id="community" name="community[]" multiple="multiple" size="<?php echo sizeof($communityArray);?>">
+<?php foreach ($communityArray as $communityData) :
+    $selected='';
+    if (is_array($communityData) && array_key_exists('selected', $communityData) && $communityData['selected'] != '') {
+        $selected=' selected="selected"';
+    }
+    $count = '';
+    if (is_array($communityData) && array_key_exists('count', $communityData) && $communityData['count'] != '') {
+         $count = ' ('.$communityData['count'].')';
+    }
+    ?>
+    <option value="<?php echo $communityData['label'];?>"<?php echo $selected;?>><?php echo $communityData['label'].$count?></option>
+<?php endforeach; ?>
+</select>
