@@ -1,4 +1,20 @@
 <?php
+$sessionDir = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'tmp';
+if (!is_dir($sessionDir)) {
+    mkdir($sessionDir); 
+}
+if (rand(0,10) == 0) {
+    if ($handle = opendir($sessionDir)) {
+        while (false !== ($file = readdir($handle))) { 
+            $filelastmodified = filemtime($sessionDir .DIRECTORY_SEPARATOR. $file);
+            if(is_file($sessionDir .DIRECTORY_SEPARATOR. $file) && (time() - $filelastmodified) > 24*60) {
+               unlink($sessionDir . DIRECTORY_SEPARATOR . $file);
+            }
+        }
+        closedir($handle); 
+    }
+}
+session_save_path($sessionDir);
 require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
 ini_set('display_errors',1);

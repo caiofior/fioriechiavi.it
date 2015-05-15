@@ -148,6 +148,8 @@ case 'edit':
              $dicoItem->setData($taxa->getData('id'), 'taxa_id');
              $dicoItem->replace();
          }
+         $log = new \log\Log($GLOBALS['db']);
+         $log->add($GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'));
          if (array_key_exists('children_dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
          } else if (array_key_exists('submit_create_key', $_REQUEST) && array_key_exists('dico_id', $_REQUEST)) {

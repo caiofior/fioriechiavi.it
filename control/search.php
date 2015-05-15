@@ -79,9 +79,6 @@ switch ($_REQUEST['action']) {
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'biologicFormFilter.phtml';
       $result['biologicFormFilter']=  ob_get_clean();
       ob_start();
-      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'communityFilter.phtml';
-      $result['communityFilter']=  ob_get_clean();
-      ob_start();
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'searchContent.phtml';
       $result['searchContent']=  ob_get_clean();
       header('Content-Type: application/json');

@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.3/css/jquery.dataTables.min.css">
+<!--
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/js/datatables/media/css/jquery.dataTables.css">
+-->
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <h2>Log</h2>
+</div>
+<table id="log">
+   	<thead>
+		<tr>
+			<th data-bSortable="false" data-sName="id" >Codice</th>
+                        <th data-sName="datetime" >Data e ora</th>
+                        <th data-sName="email" >Profilo</th>
+                        <th data-sName="url" >Elemento modificato</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>Codice</th>
+			<th>Data e ora</th>
+                        <th>Profilo</th>
+                        <th>Elemento modificato</th>
+		</tr>
+	</tfoot>
+</table>
