@@ -9,8 +9,11 @@ $(document).ready(function() {
         "bProcessing": true,
         "bServerSide": true,
         "sAjaxSource": "#",
-         "fnServerParams": function ( aoData ) {
+        "fnServerParams": function ( aoData ) {
             aoData.push({ "name": "task", "value": "log" });  
+         },
+         "drawCallback": function( ) {
+            $("a.blank").attr('target','_blank');    
          },
         "aoColumnDefs":  getDatatableMetadata(this)
     });

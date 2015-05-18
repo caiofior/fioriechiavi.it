@@ -24,9 +24,15 @@ class Log extends \Content {
      * Inserts a log with url and datetime
      * @param string $url
      */
-    public function add($url) {
+    public function add($url,$action='',$label='') {
         $this->data['datetime']= date('Y-m-d H:i:s');
         $this->data['url']=$url;
+        if ($action != '') {
+            $this->data['action']=$action;
+        }
+        if ($label != '') {
+            $this->data['label']=$label;
+        }
         parent::insert();
     }
     

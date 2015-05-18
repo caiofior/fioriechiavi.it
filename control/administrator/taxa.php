@@ -77,8 +77,9 @@ case 'edit':
          }
          $taxa->setData($_REQUEST);
 
-         
+         $action='Crea';
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
+            $action='Modifica';
             $taxa->update();
          } else {
             $taxa->insert();
@@ -149,7 +150,11 @@ case 'edit':
              $dicoItem->replace();
          }
          $log = new \log\Log($GLOBALS['db']);
-         $log->add($GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'));
+         $log->add(
+                 $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),
+                 $action,
+                 $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name')
+                );
          if (array_key_exists('children_dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
          } else if (array_key_exists('submit_create_key', $_REQUEST) && array_key_exists('dico_id', $_REQUEST)) {
@@ -165,6 +170,12 @@ case 'delete' :
    $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
       $taxa->loadFromId($_REQUEST['id']);
+      $log = new \log\Log($GLOBALS['db']);
+      $log->add(
+                 $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),
+                 'Cancella',
+                 $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name')
+                );
       $taxa->delete();
    }
    exit;
