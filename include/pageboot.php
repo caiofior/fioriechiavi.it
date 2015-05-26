@@ -50,8 +50,8 @@ $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
 }
 $db->config = $config;
 
-require __DIR__.'/../lib/flora/Autoload.php';
-flora\Autoload::getInstance();
+require __DIR__.'/../lib/floraobservation/Autoload.php';
+floraobservation\Autoload::getInstance();
 
 $template = new Template(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,$config->template);
 $template->setBlock('head','general/head.phtml');

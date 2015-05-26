@@ -263,6 +263,17 @@ class Taxa extends \Content {
     }
 
     /**
+     * Return a collection of taxa attributes
+     * @return \flora\taxa\TaxaAttributeColl
+     */
+    public function getTaxaObservationColl() {
+        $taxaObservationColl = new \floraobsercation\TaxaObservationColl($this->db);
+        if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
+            $taxaObservationColl->loadAll(array('taxa_id' => $this->data['id']));
+        }
+        return $taxaObservationColl;
+    }
+    /**
      * Returns a collection of the parents of a taxa
      * @return \flora\taxa\TaxaColl
      */
