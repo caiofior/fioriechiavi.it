@@ -1,0 +1,3 @@
+[submodule "lib/javascript-mobile-desktop-geolocation"]
+	path = lib/javascript-mobile-desktop-geolocation
+	url = https://github.com/estebanav/javascript-mobile-desktop-geolocation.git
