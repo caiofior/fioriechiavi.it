@@ -29,4 +29,10 @@ $(document).ready(function() {
         });
      });
    }
+   $("#signalObservationButton").click(function (e){
+       $("#signalObservation").load(window.location.href.replace("#","")+"&action=signalObservation",function(e ){
+           $("#signalObservationButton").hide();
+       });
+       e.preventDefault();
+   });
 });

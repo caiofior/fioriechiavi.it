@@ -12,7 +12,7 @@ if (
    <meta property="og:type" content="article" />
    <meta property="og:url" content="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxa->getData('id');?>" />
 <?php
-   $imageColl = $taxa->getTaxaImgeColl();
+   $imageColl = $taxa->getTaxaImageColl();
    if ($imageColl->count() > 0) : ?>
    <meta property="og:image" content="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $imageColl->getFirst()->getUrl()?>" />
 <?php 

@@ -95,7 +95,7 @@ class Taxa extends \Content {
      * Delets also the associated data
      */
     public function delete() {
-        foreach ($this->getTaxaImgeColl() as $image) {
+        foreach ($this->getTaxaImageColl() as $image) {
             $image->delete();
         }
         foreach ($this->getTaxaAttributeColl() as $attribute) {
@@ -242,7 +242,7 @@ class Taxa extends \Content {
      * Geths the associated taxa image collection
      * @return \flora\taxa\TaxaImageColl
      */
-    public function getTaxaImgeColl() {
+    public function getTaxaImageColl() {
         $taxaImageColl = new \flora\taxa\TaxaImageColl($this->db);
         if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
             $taxaImageColl->loadAll(array('taxa_id' => $this->data['id']));

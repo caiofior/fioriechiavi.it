@@ -1,0 +1,34 @@
+<p><strong>Segnala il ritrovamento</strong></p>
+<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/javascript-mobile-desktop-geolocation/js/geoPosition.js');?>"></script>
+<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/javascript-mobile-desktop-geolocation/js/geoPositionSimulator.js');?>"></script>
+<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/signalObservation.js');?>"></script>
+<!--<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/signalObservation.min.js.gz');?>"></script>-->
+<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>?action=signalObservation" enctype="multipart/form-data">
+    <div class="errorMessage">Non è stato possibile rilevare la posizione</div>
+    <div>
+        <input type="hidden" name="latitude" id="latitude"/>
+    </div>
+    <div>
+        <input type="hidden" name="longitude" id="longitude"/>
+    </div>
+    <div>
+        <label for="title">Titolo</label>
+        <input id="title" name="title" />
+    </div>
+    <div>
+        <label for="description">Testo</label>
+        <p>L'unica formattazione ammessa è <a class="blank" href="https://github.com/carwin/markdown-styleguide" rel="nofollow">markdown</a></p>
+    </div>
+    <div>
+        <textarea id="description" name="description" cols="30" rows="10"></textarea>
+    </div>
+    <div>
+        <label for="image">Immagini</label><a class="moreImage" href="#">+</a>
+    </div>   
+    <div class="imageContainer">
+        <input type="file" name="image[]" accept="image/*" capture/>
+    </div>
+    <div>
+        <input type="submit" value="Segnala"/>
+    </div>
+</form>

@@ -38,6 +38,8 @@ class Autoload {
       require __DIR__.DIRECTORY_SEPARATOR.'TaxaObservation.php';
       require __DIR__.DIRECTORY_SEPARATOR.'TaxaObservationColl.php';
       
+      require __DIR__.DIRECTORY_SEPARATOR.'TaxaObservationImage.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'TaxaObservationImageColl.php';
       return self::$instance;
    }
 }

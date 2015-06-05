@@ -37,6 +37,14 @@ if ($taxa->getData('name') != '') :
    endforeach;
 endif;
 ?>
+<div>
+    <?php  if ($GLOBALS['profile'] instanceof \login\user\Profile) : ?>
+    <a id="signalObservationButton" href="#">Segnala il ritrovamento di questa pianta</a>
+    <div id="signalObservation"></div>
+    <?php else: ?>
+    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>user.php?return_url=<?php echo $GLOBALS['control']->getPage();?>?id=<?php echo $taxa->getData('id');?>">Iscriviti per segnalare l'avvistamento di questa pianta</a>
+    <?php endif; ?>
+</div>
 <?php
 if ($taxa->getData('description') != '') :
 echo $taxa->getData('description');
@@ -140,7 +148,7 @@ if (
       require (__DIR__.DIRECTORY_SEPARATOR.'flowering.php');
    } ?>
    <?php endif;
-   $imageColl = $taxa->getTaxaImgeColl();
+   $imageColl = $taxa->getTaxaImageColl();
    if ($imageColl->count() > 0) : ?>
 <div class="image_list">
       <?php foreach($imageColl->getItems() as $key=>$image) : ?>
@@ -149,7 +157,7 @@ if (
       </div>
       <?php endforeach; ?>
 </div>
-   <?php endif; ?>
+<?php endif; ?>
 <div>
 <a class="blank" rel="nofollow" href="http://it.wikipedia.org/wiki/<?php echo urlencode(str_replace(' ', '_', $taxa->getData('name')));?>">Cerca su Wikipedia</a>
 <a class="blank" rel="nofollow" href="https://www.google.it/#q=site:www.actaplantarum.org+<?php echo urlencode($taxa->getData('name'));?>">Cerca scheda su Acta plantorum</a>
@@ -187,7 +195,7 @@ if($newTaxaColl->count() > 0): ?>
    <div class="latestTaxa">
    <?php foreach($newTaxaColl->getItems() as $newTaxa) : 
       $image = null;
-      $imageColl = $newTaxa->getTaxaImgeColl();
+      $imageColl = $newTaxa->getTaxaImageColl();
       $imageColl->shuffle();
       if ($imageColl->count() > 0) {
          $image = $imageColl->getFirst();

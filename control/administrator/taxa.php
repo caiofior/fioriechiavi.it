@@ -107,7 +107,7 @@ case 'edit':
                
             }   
          }
-         $taxaImageColl = $taxa->getTaxaImgeColl();
+         $taxaImageColl = $taxa->getTaxaImageColl();
          if (
                array_key_exists('image_id_list', $_REQUEST) &&
                is_array($_REQUEST['image_id_list'])
@@ -121,7 +121,7 @@ case 'edit':
             }
 
          }
-        $taxaImageColl = $taxa->getTaxaImgeColl();
+        $taxaImageColl = $taxa->getTaxaImageColl();
          
          
          if (

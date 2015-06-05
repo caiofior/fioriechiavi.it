@@ -18,6 +18,9 @@ if (!array_key_exists('action', $_REQUEST)) {
    $_REQUEST['action']=null;
 }
 switch ($_REQUEST['action']) {
+   case 'signalObservation':
+       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'general'.DIRECTORY_SEPARATOR.'signalObservation.phtml';
+   exit; 
    case 'taxasearch':
       $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
       $_REQUEST['iDisplayStart']=0;

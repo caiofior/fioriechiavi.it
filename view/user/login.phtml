@@ -4,6 +4,9 @@ Accedi tramite facebook
 <p>o inserisci le tue credenziali</p>
 <form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>" method="post">
    <input type="hidden" name="action" value="login" />
+   <?php if (array_key_exists('return_url', $_REQUEST) && $_REQUEST['return_url'] != '') : ?>
+   <input type="hidden" name="return_url" id="return_url" value="<?php echo $_REQUEST['return_url'];?>" />
+   <?php endif; ?>    
    <div>
    <label for="username_login">Nome utente/Email</label>
    <input type="email" name="username" id="username_login" tabindex="1" value="" />

@@ -34,7 +34,13 @@ $(document).ready(function() {
     tinymce.init({
          plugins: ["table","code"],
          tools: ["inserttable","code"],
-         selector: "textarea:not(.notEditable)"
+         selector: "textarea:not(.notEditable)",
+         setup: function(editor) {
+            editor.on('change', function(e) {
+                $("#"+e.target.id).trigger("change");
+            });
+    }
+
     });
     $( "#taxa_kind_id_name" ).autocomplete({
       source: "?task=taxa&action=taxakindlist",
@@ -82,11 +88,12 @@ $(document).ready(function() {
        $("#attribute_missing_name").hide();
        $("#attribute_error").hide();
        if ($("#attribute_name").val() != "" && $("#attribute_value").val() != "") {
-          el = $("#attribute_template div").clone(true);
+          el = $("#attribute_template div").clone(false);
           el.find("[name='attribute_name_list[]']").val($("#attribute_name").val());
           el.find("[name='attribute_value_list[]']").val($("#attribute_value").val());
           el.show();
           $("#attribute_list").append(el);
+          addAutocomplete(el.find("[name='attribute_value_list[]']"));
           $("#attribute_name").val("");
           $("#attribute_value").val("");
           $("#attribute_name").focus();
@@ -128,6 +135,26 @@ $(document).ready(function() {
          }
       }
     });
+    function addAutocomplete (el) {
+        
+    try{
+     el.autocomplete( "destroy" );
+    } catch (e) {}
+    el.autocomplete({
+      source: function (request, response) {
+         $.getJSON("#", {
+            task: "taxa",
+            action:"taxaattributelistvalue",
+            name:$(this.element).parents("span").siblings(".prevAttibuteName").val(),
+            term:$(this.element).val()
+         }, 
+         response);
+      }
+    });
+   }
+   
+   addAutocomplete($(".prevAttibuteValue"));
+   
    $(".attribute.actions.delete").click(function (e) {
       el =  $(this).parent("div.attContainer");
       $(this).dialog({
@@ -140,7 +167,7 @@ $(document).ready(function() {
       });
       e.preventDefault();
    });
-   $("input, select").change(function (e){
+   $("input, textarea, select").change(function (e){
       $(".saved").hide();
       $(".tosave").show();
    });
@@ -167,7 +194,7 @@ $(document).ready(function() {
                 $.each(files,function (id,value) {
                   el = $("#image_template div").clone(true);
                   el.find("img").attr("src","tmp/"+value["name"]);
-                  el.find("[name='image_name_list[]']").val(value["name"]);
+                  el.find("[name='image_name_list[]']").val(value["name"]).trigger("change");
                   el.show();
                   $("#image_list").append(el);
                 });
@@ -205,6 +232,7 @@ $(document).ready(function() {
          buttons: {
             "Confermi la cancellazione dell'immagine?": function() {
                $(this).dialog('destroy');
+               el.find("[name='image_name_list[]']").val(value["name"]).trigger("change");
                el.remove();
             }
          }

@@ -6,7 +6,7 @@ if($attribute->getData('name') == '') {
 ?>         
          <div class="attContainer attributeTable" <?php echo $display;?>>
             <input type="hidden" name="attribute_id_list[]" value="<?php echo $attribute->getData('id');?>" />
-            <input name="attribute_name_list[]" readonly="readonly" value="<?php echo $attribute->getData('name');?>" />
-            <span ><input name="attribute_value_list[]" value="<?php echo $attribute->getRawData('value');?>" /></span>
+            <input class="prevAttibuteName" name="attribute_name_list[]" readonly="readonly" value="<?php echo $attribute->getData('name');?>" />
+            <span ><input class="prevAttibuteValue" name="attribute_value_list[]" value="<?php echo $attribute->getRawData('value');?>" /></span>
             <a class="attribute actions delete" href="#">Cancella</a>
          </div>

@@ -32,7 +32,7 @@ foreach($taxaColl->getItems() as $taxa):?>
         <div><?php echo $taxa->getRawData('taxa_kind_initials');?> <?php echo $taxa->getData('name');?></div>
         <div>
         <?php
-        $image= $taxa->getTaxaImgeColl()->getFirst();
+        $image= $taxa->getTaxaImageColl()->getFirst();
         if ($image->getUrl() != '') :
         $imageUrl = $GLOBALS['db']->config->staticUrl.$image->getUrl(); 
         ?>

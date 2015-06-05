@@ -12,11 +12,6 @@ if (!class_exists('\Autoload')) {
 class TaxaObservation extends \Content
 {
     /**
-     * Conversion coordinate to point
-     */
-    const C2C=100000;
-
-    /**
     * Associates the database table
     * @param \Zend\Db\Adapter\Adapter $db
     */
@@ -50,7 +45,7 @@ class TaxaObservation extends \Content
     * Update the coordinates
     */
    private function updateCoordinates() {
-       $this->data['position']=new \Zend\Db\Sql\Expression('PointFromText("POINT('.intval($this->rawData['latitude']*self::C2C).' '.intval($this->rawData['longitude']*self::C2C).')")');
+       $this->data['position']=new \Zend\Db\Sql\Expression('PointFromText("POINT('.floatval($this->rawData['latitude']).' '.floatval($this->rawData['longitude']).')")');
    }
    /**
     * Gets coordinates from point data
@@ -60,7 +55,18 @@ class TaxaObservation extends \Content
        $point = $point->current()->getArrayCopy()['AsText("'];
        preg_match_all('/[[:digit:]]*/', $point, $matches);
        $matches = array_filter($matches[0]);      
-       $this->rawData['latitude']=current($matches)/self::C2C;
-       $this->rawData['longitude']=next($matches)/self::C2C;
+       $this->rawData['latitude']=current($matches);
+       $this->rawData['longitude']=next($matches);
    }
+    /**
+     * Geths the associated taxa onservation image collection
+     * @return \floraobservation\TaxaObservationImageColl
+     */
+    public function getTaxaObservationImageColl() {
+        $taxaObservationImageColl = new \flora\taxa\TaxaObservationImageColl($this->db);
+        if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
+            $taxaObservationImageColl->loadAll(array('taxa_observation_id' => $this->data['id']));
+        }
+        return $taxaObservationImageColl;
+    }
 }

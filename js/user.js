@@ -1,4 +1,4 @@
-  function statusChangeCallback(response) {
+function statusChangeCallback(response) {
     $("#fbstatus").empty();
     $.ajax($("form").first().attr("action")+"?task=facebook&action=login", {
         async:false,
@@ -8,12 +8,7 @@
         data:response,
         success: function (data) {
             if (data.status == true) {
-                url = document.referrer;
-                if (url != '') {
-                    window.location.href = url;
-                }
-                location.reload(true);
-                
+               location.reload(true); 
             } else {
                 $("#fbstatus").html("<div class=\"validMessage\"><span>"+data.message+"</span></div>");
             }
@@ -28,6 +23,58 @@
       statusChangeCallback(response);
     });
   }
+  $("input:submit").unbind("click").click(function (e) {
+   $("#ajaxLoader").show();
+   $(".notValid").removeClass("notValid");
+   $(".errorMessage").remove();
+   status = false;
+   form = $(this).parents("form").first();
+   data = form.serializeArray();
+   data.push({"name":"xhrValidate" ,"value": "1"});
+   request = $.ajax({
+      url: form.attr("action"),
+      type: "POST",
+      data: data,
+      async: false,
+      dataType: "json",
+      success: function (data) {
+          objectData = Object.keys(data);
+          if (objectData.length == 1 && objectData[0] == "validMessage") {
+             message = data.validMessage;
+             if (message == true)
+                status = true;
+             else {
+               $(form).find("input:submit").after("<div class=\"validMessage\"><span>"+data.validMessage+"</span></div>");
+            }
+          }
+          else {
+            $.each(data, function (elementId, content) {
+               try {
+                  el = $("#"+elementId);
+               } catch (err) {}
+               if (el.length > 0 ) {
+                  el.addClass("notValid").focus().after("<div class=\"errorMessage\"><span>"+content+"</span></div>");
+               }
+            });
+          }
+          $("#ajaxLoader").hide();
+      },
+      error: function (jqXHR, textStatus,errorThrown) {
+         $("#ajaxLoader").hide();
+         console.error(textStatus+" "+errorThrown);
+      }
+   });
+   if (status == "true" ) {
+       url = $("#return_url").val();
+       if (typeof url != 'undefined' && url != '') {
+           window.location.href = url;
+       } else {
+           window.location.reload(true);
+       }
+   }
+   e.preventDefault();
+   
+  });
   $("#subscribe_form, #lost_password_form").hide();
   $("#lost_password_link").click(function(e) {$("#lost_password_form").toggle();e.preventDefault();});
   $("#subscribe_link").click(function(e) {$("#subscribe_form").toggle();e.preventDefault();});
