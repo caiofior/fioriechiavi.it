@@ -720,6 +720,11 @@ a.hvr-shutter-in-horizontal:hover:before,a.hvr-shutter-in-horizontal:focus:befor
 .selectedPage {
     font-weight: bold;
 }
+#signalObservationButton {
+    background-color: #FF2D55;
+    font-size: 19.6px;
+    font-weight: 400;
+}
 /*-- responsive-design starts-here --*/
 
 @media screen and (max-width: 1440px) {
@@ -1147,6 +1152,9 @@ a.hvr-shutter-in-horizontal:hover:before,a.hvr-shutter-in-horizontal:focus:befor
 	.about-section-top-grid, .about-section-middle-grid, .about-section-bottom-grid {
 		padding: 2.2em 0;
 	}
+        .plantImage img {
+		width: 80%;
+	} 
 	.flat-phone img {
 		width: 70%;
 	}
@@ -1521,6 +1529,9 @@ a.hvr-shutter-in-horizontal:hover:before,a.hvr-shutter-in-horizontal:focus:befor
 		margin-left: 0.1em;
 		font-size: 0.9em;
 	}
+        .plantImage img {
+		width: 80%;
+	} 
 	.subscribe img {
 		width: 13%;
 	}

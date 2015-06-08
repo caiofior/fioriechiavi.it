@@ -1,0 +1,52 @@
+<?php
+$taxaObservation = new \floraobservation\TaxaObservation($GLOBALS['db']);
+if (array_key_exists('cid', $_REQUEST)) {
+    $vector_size = mcrypt_get_iv_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
+    $_REQUEST['id'] = mcrypt_decrypt($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->key,$_REQUEST['cid'],$GLOBALS['db']->config->crypt->mode,substr($GLOBALS['db']->config->crypt->iv,0,$vector_size));
+}
+if (array_key_exists('id', $_REQUEST)) {
+   $taxaObservation->loadFromId($_REQUEST['id']);
+}
+?><div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=observation">Elenco delle osservazioni</a></p> &gt; <h2>Osservazione</h2>
+</div>
+<form method="post" action="#">
+   <?php if (array_key_exists('cid', $_REQUEST)) : ?>
+    <input type="hidden" id="cid" name="cid" value="<?php echo urlencode($_REQUEST['cid']);?>">
+   <?php else : ?>
+   <input type="hidden" id="id" name="id" value="<?php echo $taxaObservation->getData('id')?>">
+   <?php endif; ?>
+   <div>
+   <label for="datetime">Data e ora</label>
+   <input id="datetime" name="datetime" readonly="readonly" value="<?php echo $taxaObservation->getData('datetime')?>">
+   </div>
+   <div>
+   <label for="title">Titolo</label>
+   <input id="title" name="title" value="<?php echo $taxaObservation->getData('title')?>">
+   </div>
+   <div>
+   <div>
+   <label for="description">Descrizione</label>
+   <textarea id="description" name="description"><?php echo $taxaObservation->getData('description')?></textarea>
+   </div>
+   <div>
+   <label for="valid">Validata</label>
+   <input type="checkbox" id="valid" name="valid" <?php echo ($taxaObservation->getData('valid')==1 ? 'checked' : '' );?>>
+   </div>
+   <div>
+   <?php
+   $taxaObservationImageColl = $taxaObservation->getTaxaObservationImageColl();
+   foreach($taxaObservationImageColl->getItems() as $taxaObservationImage): ?>
+   <img src="<?php echo $GLOBALS['db']->config->staticUrl.$taxaObservationImage->getUrl();?>" />
+   <?php endforeach; ?>
+   <div>
+      <input type="submit" name="submit" value="Salva">
+   </div>
+</form>
+<script>
+//<![CDATA[
+var latitude = <?php echo $taxaObservation->getData('latitude')?>;
+var longitude = <?php echo $taxaObservation->getData('longitude')?>;
+//]]>
+</script>
+<div id="map-canvas"></div>

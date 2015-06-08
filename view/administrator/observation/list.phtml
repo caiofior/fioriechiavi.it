@@ -1,0 +1,32 @@
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.3/css/jquery.dataTables.min.css">
+<!--
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/js/datatables/media/css/jquery.dataTables.css">
+-->
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <h2>Osservazioni</h2>
+</div>
+<table id="observation">
+   	<thead>
+		<tr>
+                        <th data-bSortable="false" data-sName="id" >Id</th>	
+                        <th data-bSortable="false" data-sName="datetime" >Data e ora</th>
+			<th data-bSortable="false" data-sName="taxa_name" >Taxa</th>
+			<th data-bSortable="false" data-sName="profile_email" >Utente</th>
+                        <th data-bSortable="false" data-sName="actions" >Azioni</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="5" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+                        <th>Id</th>	
+                        <th>Data e ora</th>
+			<th>Taxa</th>
+			<th>Utente</th>
+                        <th>Azioni</th>
+		</tr>
+	</tfoot>
+</table>

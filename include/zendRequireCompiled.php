@@ -884,7 +884,7 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
         $driver->checkEnvironment();
         $this->driver = $driver;
 
-        if ($platform == null) {
+        if ($platform === null) {
             $platform = $this->createPlatform($parameters);
         }
 
@@ -925,7 +925,7 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
      */
     public function getDriver()
     {
-        if ($this->driver == null) {
+        if ($this->driver === null) {
             throw new Exception\RuntimeException('Driver has not been set or configured for this adapter.');
         }
         return $this->driver;
@@ -1006,7 +1006,7 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
     public function createStatement($initialSql = null, $initialParameters = null)
     {
         $statement = $this->driver->createStatement($initialSql);
-        if ($initialParameters == null || !$initialParameters instanceof ParameterContainer && is_array($initialParameters)) {
+        if ($initialParameters === null || !$initialParameters instanceof ParameterContainer && is_array($initialParameters)) {
             $initialParameters = new ParameterContainer((is_array($initialParameters) ? $initialParameters : array()));
         }
         $statement->setParameterContainer($initialParameters);
@@ -3273,7 +3273,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
             throw new Exception\InvalidArgumentException('DataSource provided is not an array, nor does it implement Iterator or IteratorAggregate');
         }
 
-        if ($this->count == null && $this->dataSource instanceof Countable) {
+        if ($this->count === null && $this->dataSource instanceof Countable) {
             $this->count = $this->dataSource->count();
         }
 
@@ -13442,12 +13442,7 @@ class SessionManager extends AbstractManager
                 continue;
             }
 
-            $referenceValue = null;
-            if (is_array($validatorValues) && array_key_exists($validator, $validatorValues)) {
-                $referenceValue = $validatorValues[$validator];
-            }
-
-            $validator = new $validator($referenceValue);
+            $validator = new $validator(null);
             $validatorChain->attach('session.validate', array($validator, 'isValid'));
         }
     }
@@ -17822,6 +17817,20 @@ class UnexpectedValueException extends \UnexpectedValueException implements Exce
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
+namespace Zend\Db\Exception;
+
+class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
 namespace Zend\Db\Adapter\Exception;
 
 use Zend\Db\Exception;
@@ -19522,7 +19531,7 @@ class Sql
 
     public function hasTable()
     {
-        return ($this->table != null);
+        return ($this->table !== null);
     }
 
     public function setTable($table)
@@ -20110,18 +20119,26 @@ abstract class AbstractSql implements SqlInterface
      * @param PlatformInterface $platform
      * @param null|DriverInterface $driver
      * @param null|ParameterContainer $parameterContainer
-     *
      * @return string
      */
-    protected function buildSqlString(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
+    protected function buildSqlString(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
         $this->localizeVariables();
 
         $sqls       = array();
         $parameters = array();
 
         foreach ($this->specifications as $name => $specification) {
-            $parameters[$name] = $this->{'process' . $name}($platform, $driver, $parameterContainer, $sqls, $parameters);
+            $parameters[$name] = $this->{'process' . $name}(
+                $platform,
+                $driver,
+                $parameterContainer,
+                $sqls,
+                $parameters
+            );
 
             if ($specification && is_array($parameters[$name])) {
                 $sqls[$name] = $this->createSqlFromSpecificationAndParameters($specification, $parameters[$name]);
@@ -20137,26 +20154,32 @@ abstract class AbstractSql implements SqlInterface
     }
 
     /**
-     *
      * @staticvar int $runtimeExpressionPrefix
      * @param ExpressionInterface $expression
      * @param PlatformInterface $platform
      * @param null|DriverInterface $driver
      * @param null|ParameterContainer $parameterContainer
      * @param null|string $namedParameterPrefix
-     *
      * @return string
-     *
      * @throws Exception\RuntimeException
      */
-    protected function processExpression(ExpressionInterface $expression, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, $namedParameterPrefix = null)
-    {
-        $namedParameterPrefix = !$namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] . $namedParameterPrefix;
+    protected function processExpression(
+        ExpressionInterface $expression,
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null,
+        $namedParameterPrefix = null
+    ) {
+        $namedParameterPrefix = ! $namedParameterPrefix
+            ? $namedParameterPrefix
+            : $this->processInfo['paramPrefix'] . $namedParameterPrefix;
         // static counter for the number of times this method was invoked across the PHP runtime
         static $runtimeExpressionPrefix = 0;
 
         if ($parameterContainer && ((!is_string($namedParameterPrefix) || $namedParameterPrefix == ''))) {
             $namedParameterPrefix = sprintf('expr%04dParam', ++$runtimeExpressionPrefix);
+        } else {
+            $namedParameterPrefix = preg_replace('/\s/', '__', $namedParameterPrefix);
         }
 
         $sql = '';
@@ -20171,10 +20194,17 @@ abstract class AbstractSql implements SqlInterface
         $expressionParamIndex = &$this->instanceParameterIndex[$namedParameterPrefix];
 
         foreach ($parts as $part) {
-            // if it is a string, simply tack it onto the return sql "specification" string
+            // #7407: use $expression->getExpression() to get the unescaped
+            // version of the expression
+            if (is_string($part) && $expression instanceof Expression) {
+                $sql .= $expression->getExpression();
+                continue;
+            }
+
+            // If it is a string, simply tack it onto the return sql
+            // "specification" string
             if (is_string($part)) {
                 $sql .= $part;
-
                 continue;
             }
 
@@ -20184,7 +20214,8 @@ abstract class AbstractSql implements SqlInterface
                 );
             }
 
-            // process values and types (the middle and last position of the expression data)
+            // Process values and types (the middle and last position of the
+            // expression data)
             $values = $part[1];
             $types = isset($part[2]) ? $part[2] : array();
             foreach ($values as $vIndex => $value) {
@@ -20194,10 +20225,18 @@ abstract class AbstractSql implements SqlInterface
                 $type = $types[$vIndex];
                 if ($value instanceof Select) {
                     // process sub-select
-                    $values[$vIndex] = '(' . $this->processSubSelect($value, $platform, $driver, $parameterContainer) . ')';
+                    $values[$vIndex] = '('
+                        . $this->processSubSelect($value, $platform, $driver, $parameterContainer)
+                        . ')';
                 } elseif ($value instanceof ExpressionInterface) {
                     // recursive call to satisfy nested expressions
-                    $values[$vIndex] = $this->processExpression($value, $platform, $driver, $parameterContainer, $namedParameterPrefix . $vIndex . 'subpart');
+                    $values[$vIndex] = $this->processExpression(
+                        $value,
+                        $platform,
+                        $driver,
+                        $parameterContainer,
+                        $namedParameterPrefix . $vIndex . 'subpart'
+                    );
                 } elseif ($type == ExpressionInterface::TYPE_IDENTIFIER) {
                     $values[$vIndex] = $platform->quoteIdentifierInFragment($value);
                 } elseif ($type == ExpressionInterface::TYPE_VALUE) {
@@ -20217,7 +20256,8 @@ abstract class AbstractSql implements SqlInterface
                 }
             }
 
-            // after looping the values, interpolate them into the sql string (they might be placeholder names, or values)
+            // After looping the values, interpolate them into the sql string
+            // (they might be placeholder names, or values)
             $sql .= vsprintf($part[0], $values);
         }
 
@@ -20261,7 +20301,10 @@ abstract class AbstractSql implements SqlInterface
                 foreach ($paramsForPosition as $multiParamsForPosition) {
                     $ppCount = count($multiParamsForPosition);
                     if (!isset($paramSpecs[$position][$ppCount])) {
-                        throw new Exception\RuntimeException('A number of parameters (' . $ppCount . ') was found that is not supported by this specification');
+                        throw new Exception\RuntimeException(sprintf(
+                            'A number of parameters (%d) was found that is not supported by this specification',
+                            $ppCount
+                        ));
                     }
                     $multiParamValues[] = vsprintf($paramSpecs[$position][$ppCount], $multiParamsForPosition);
                 }
@@ -20269,7 +20312,10 @@ abstract class AbstractSql implements SqlInterface
             } elseif ($paramSpecs[$position] !== null) {
                 $ppCount = count($paramsForPosition);
                 if (!isset($paramSpecs[$position][$ppCount])) {
-                    throw new Exception\RuntimeException('A number of parameters (' . $ppCount . ') was found that is not supported by this specification');
+                    throw new Exception\RuntimeException(sprintf(
+                        'A number of parameters (%d) was found that is not supported by this specification',
+                        $ppCount
+                    ));
                 }
                 $topParameters[] = vsprintf($paramSpecs[$position][$ppCount], $paramsForPosition);
             } else {
@@ -20286,8 +20332,12 @@ abstract class AbstractSql implements SqlInterface
      * @param null|ParameterContainer $parameterContainer
      * @return string
      */
-    protected function processSubSelect(Select $subselect, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
+    protected function processSubSelect(
+        Select $subselect,
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
         if ($this instanceof PlatformDecoratorInterface) {
             $decorator = clone $this;
             $decorator->setSubject($subselect);
@@ -20300,7 +20350,8 @@ abstract class AbstractSql implements SqlInterface
             $processInfoContext = ($decorator instanceof PlatformDecoratorInterface) ? $subselect : $decorator;
             $this->processInfo['subselectCount']++;
             $processInfoContext->processInfo['subselectCount'] = $this->processInfo['subselectCount'];
-            $processInfoContext->processInfo['paramPrefix'] = 'subselect' . $processInfoContext->processInfo['subselectCount'];
+            $processInfoContext->processInfo['paramPrefix'] = 'subselect'
+                . $processInfoContext->processInfo['subselectCount'];
 
             $sql = $decorator->buildSqlString($platform, $driver, $parameterContainer);
 
@@ -20320,9 +20371,16 @@ abstract class AbstractSql implements SqlInterface
      * @param null|ParameterContainer $parameterContainer
      * @return string
      */
-    protected function resolveColumnValue($column, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, $namedParameterPrefix = null)
-    {
-        $namedParameterPrefix = !$namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] . $namedParameterPrefix;
+    protected function resolveColumnValue(
+        $column,
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null,
+        $namedParameterPrefix = null
+    ) {
+        $namedParameterPrefix = ! $namedParameterPrefix
+            ? $namedParameterPrefix
+            : $this->processInfo['paramPrefix'] . $namedParameterPrefix;
         $isIdentifier = false;
         $fromTable = '';
         if (is_array($column)) {
@@ -20356,8 +20414,12 @@ abstract class AbstractSql implements SqlInterface
      * @param ParameterContainer $parameterContainer
      * @return string
      */
-    protected function resolveTable($table, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
+    protected function resolveTable(
+        $table,
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
         $schema = null;
         if ($table instanceof TableIdentifier) {
             list($table, $schema) = $table->getTableAndSchema();
@@ -21352,7 +21414,7 @@ class Update extends AbstractPreparableSql
      */
     public function set(array $values, $flag = self::VALUES_SET)
     {
-        if ($values == null) {
+        if ($values === null) {
             throw new Exception\InvalidArgumentException('set() expects an array of values');
         }
 
@@ -22644,7 +22706,8 @@ class AlterTableDecorator extends AlterTable implements PlatformDecoratorInterfa
                 if ($insert) {
                     $j = isset($j) ? $j : 0;
                     $sql = substr_replace($sql, $insert, $insertStart[$j], 0);
-                    for (; $j < count($insertStart); ++$j) {
+                    $insertStartCount = count($insertStart);
+                    for (; $j < $insertStartCount; ++$j) {
                         $insertStart[$j] += strlen($insert);
                     }
                 }
@@ -22708,7 +22771,8 @@ class AlterTableDecorator extends AlterTable implements PlatformDecoratorInterfa
                 if ($insert) {
                     $j = isset($j) ? $j : 0;
                     $sql = substr_replace($sql, $insert, $insertStart[$j], 0);
-                    for (; $j < count($insertStart); ++$j) {
+                    $insertStartCount = count($insertStart);
+                    for (; $j < $insertStartCount; ++$j) {
                         $insertStart[$j] += strlen($insert);
                     }
                 }
@@ -22894,7 +22958,8 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
                 if ($insert) {
                     $j = isset($j) ? $j : 0;
                     $sql = substr_replace($sql, $insert, $insertStart[$j], 0);
-                    for (; $j < count($insertStart); ++$j) {
+                    $insertStartCount = count($insertStart);
+                    for (; $j < $insertStartCount; ++$j) {
                         $insertStart[$j] += strlen($insert);
                     }
                 }
@@ -23598,7 +23663,7 @@ class Predicate extends PredicateSet
      */
     public function unnest()
     {
-        if ($this->unnest == null) {
+        if ($this->unnest === null) {
             throw new RuntimeException('Not nested');
         }
         $unnest       = $this->unnest;
@@ -24725,6 +24790,38 @@ class Having extends Predicate\Predicate
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
+namespace Zend\Db\Sql\Exception;
+
+use Zend\Db\Exception;
+
+interface ExceptionInterface extends Exception\ExceptionInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
+namespace Zend\Db\Sql\Exception;
+
+use Zend\Db\Exception;
+
+class InvalidArgumentException extends Exception\InvalidArgumentException implements ExceptionInterface
+{
+}
+
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ */
+
 namespace Zend\Serializer;
 
 use Zend\Serializer\Adapter\AdapterInterface as Adapter;
@@ -25803,7 +25900,8 @@ class Message
             if (!$body instanceof Mime\Message) {
                 if (!method_exists($body, '__toString')) {
                     throw new Exception\InvalidArgumentException(sprintf(
-                        '%s expects object arguments of type Zend\Mime\Message or implementing __toString(); object of type "%s" received',
+                        '%s expects object arguments of type Zend\Mime\Message or implementing __toString();'
+                        . ' object of type "%s" received',
                         __METHOD__,
                         get_class($body)
                     ));
@@ -25833,7 +25931,7 @@ class Message
         $parts = $this->body->getParts();
         if (!empty($parts)) {
             $part = array_shift($parts);
-            $headers->addHeaders($part->getHeadersArray());
+            $headers->addHeaders($part->getHeadersArray("\r\n"));
         }
         return $this;
     }
@@ -25941,7 +26039,8 @@ class Message
         }
         if (!is_string($emailOrAddressOrList) && !$emailOrAddressOrList instanceof Address\AddressInterface) {
             throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects a string, AddressInterface, array, AddressList, or Traversable as its first argument; received "%s"',
+                '%s expects a string, AddressInterface, array, AddressList, or Traversable as its first argument;'
+                . ' received "%s"',
                 $callingMethod,
                 (is_object($emailOrAddressOrList) ? get_class($emailOrAddressOrList) : gettype($emailOrAddressOrList))
             ));
@@ -26051,9 +26150,28 @@ class Headers implements Countable, Iterator
     {
         $headers     = new static();
         $currentLine = '';
+        $emptyLine   = 0;
 
         // iterate the header lines, some might be continuations
-        foreach (explode($EOL, $string) as $line) {
+        $lines = explode($EOL, $string);
+        $total = count($lines);
+        for ($i = 0; $i < $total; $i += 1) {
+            $line = $lines[$i];
+
+            // Empty line indicates end of headers
+            // EXCEPT if there are more lines, in which case, there's a possible error condition
+            if (preg_match('/^\s*$/', $line)) {
+                $emptyLine += 1;
+                if ($emptyLine > 2) {
+                    throw new Exception\RuntimeException('Malformed header detected');
+                }
+                continue;
+            }
+
+            if ($emptyLine > 0) {
+                throw new Exception\RuntimeException('Malformed header detected');
+            }
+
             // check if a header name is present
             if (preg_match('/^[\x21-\x39\x3B-\x7E]+:.*$/', $line)) {
                 if ($currentLine) {
@@ -26061,20 +26179,21 @@ class Headers implements Countable, Iterator
                     $headers->addHeaderLine($currentLine);
                 }
                 $currentLine = trim($line);
-            } elseif (preg_match('/^\s+.*$/', $line)) {
-                // continuation: append to current line
-                // recover the whitespace that break the line (unfolding, rfc2822#section-2.2.3)
-                $currentLine .= ' ' . trim($line);
-            } elseif (preg_match('/^\s*$/', $line)) {
-                // empty line indicates end of headers
-                break;
-            } else {
-                // Line does not match header format!
-                throw new Exception\RuntimeException(sprintf(
-                    'Line "%s"does not match header format!',
-                    $line
-                ));
+                continue;
             }
+
+            // continuation: append to current line
+            // recover the whitespace that break the line (unfolding, rfc2822#section-2.2.3)
+            if (preg_match('/^\s+.*$/', $line)) {
+                $currentLine .= ' ' . trim($line);
+                continue;
+            }
+
+            // Line does not match header format!
+            throw new Exception\RuntimeException(sprintf(
+                'Line "%s"does not match header format!',
+                $line
+            ));
         }
         if ($currentLine) {
             $headers->addHeaderLine($currentLine);
@@ -26185,7 +26304,10 @@ class Headers implements Countable, Iterator
         if (!is_string($headerFieldNameOrLine)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects its first argument to be a string; received "%s"',
-                (is_object($headerFieldNameOrLine) ? get_class($headerFieldNameOrLine) : gettype($headerFieldNameOrLine))
+                __METHOD__,
+                (is_object($headerFieldNameOrLine)
+                ? get_class($headerFieldNameOrLine)
+                : gettype($headerFieldNameOrLine))
             ));
         }
 
@@ -26193,10 +26315,10 @@ class Headers implements Countable, Iterator
             $this->addHeader(Header\GenericHeader::fromString($headerFieldNameOrLine));
         } elseif (is_array($fieldValue)) {
             foreach ($fieldValue as $i) {
-                $this->addHeader(new Header\GenericMultiHeader($headerFieldNameOrLine, $i));
+                $this->addHeader(Header\GenericMultiHeader::fromString($headerFieldNameOrLine . ':' . $i));
             }
         } else {
-            $this->addHeader(new Header\GenericHeader($headerFieldNameOrLine, $fieldValue));
+            $this->addHeader(Header\GenericHeader::fromString($headerFieldNameOrLine . ':' . $fieldValue));
         }
 
         return $this;
@@ -26434,8 +26556,7 @@ class Headers implements Countable, Iterator
     {
         $current = $this->headers[$index];
 
-        $key = $this->headersKeys[$index];
-        /* @var $class Header\HeaderInterface */
+        $key   = $this->headersKeys[$index];
         $class = ($this->getPluginClassLoader()->load($key)) ?: 'Zend\Mail\Header\GenericHeader';
 
         $encoding = $current->getEncoding();
@@ -26573,6 +26694,8 @@ interface UnstructuredInterface extends HeaderInterface
 
 namespace Zend\Mail\Header;
 
+use Zend\Mime\Mime;
+
 class GenericHeader implements HeaderInterface, UnstructuredInterface
 {
     /**
@@ -26588,18 +26711,16 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
     /**
      * Header encoding
      *
-     * @var string
+     * @var null|string
      */
-    protected $encoding = 'ASCII';
+    protected $encoding;
 
     public static function fromString($headerLine)
     {
-        $decodedLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
-        list($name, $value) = GenericHeader::splitHeaderLine($decodedLine);
+        list($name, $value) = self::splitHeaderLine($headerLine);
+        $value  = HeaderWrap::mimeDecodeValue($value);
         $header = new static($name, $value);
-        if ($decodedLine != $headerLine) {
-            $header->setEncoding('UTF-8');
-        }
+
         return $header;
     }
 
@@ -26617,6 +26738,15 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
             throw new Exception\InvalidArgumentException('Header must match with the format "name:value"');
         }
 
+        if (! HeaderName::isValid($parts[0])) {
+            throw new Exception\InvalidArgumentException('Invalid header name detected');
+        }
+
+        if (! HeaderValue::isValid($parts[1])) {
+            throw new Exception\InvalidArgumentException('Invalid header value detected');
+        }
+
+        $parts[0] = $parts[0];
         $parts[1] = ltrim($parts[1]);
 
         return $parts;
@@ -26643,8 +26773,8 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
      * Set header name
      *
      * @param  string $fieldName
-     * @throws Exception\InvalidArgumentException
      * @return GenericHeader
+     * @throws Exception\InvalidArgumentException;
      */
     public function setFieldName($fieldName)
     {
@@ -26655,8 +26785,7 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
         // Pre-filter to normalize valid characters, change underscore to dash
         $fieldName = str_replace(' ', '-', ucwords(str_replace(array('_', '-'), ' ', $fieldName)));
 
-        // Validate what we have
-        if (!preg_match('/^[\x21-\x39\x3B-\x7E]*$/', $fieldName)) {
+        if (! HeaderName::isValid($fieldName)) {
             throw new Exception\InvalidArgumentException(
                 'Header name must be composed of printable US-ASCII characters, except colon.'
             );
@@ -26676,16 +26805,21 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
      *
      * @param  string $fieldValue
      * @return GenericHeader
+     * @throws Exception\InvalidArgumentException;
      */
     public function setFieldValue($fieldValue)
     {
         $fieldValue = (string) $fieldValue;
 
-        if (empty($fieldValue) || preg_match('/^\s+$/', $fieldValue)) {
-            $fieldValue = '';
+        if (! HeaderWrap::canBeEncoded($fieldValue)) {
+            throw new Exception\InvalidArgumentException(
+                'Header value must be composed of printable US-ASCII characters and valid folding sequences.'
+            );
         }
 
         $this->fieldValue = $fieldValue;
+        $this->encoding   = null;
+
         return $this;
     }
 
@@ -26706,12 +26840,19 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
 
     public function getEncoding()
     {
+        if (! $this->encoding) {
+            $this->encoding = Mime::isPrintable($this->fieldValue) ? 'ASCII' : 'UTF-8';
+        }
+
         return $this->encoding;
     }
 
     public function toString()
     {
-        $name  = $this->getFieldName();
+        $name = $this->getFieldName();
+        if (empty($name)) {
+            throw new Exception\RuntimeException('Header name is not set, use setFieldName()');
+        }
         $value = $this->getFieldValue(HeaderInterface::FORMAT_ENCODED);
 
         return $name . ': ' . $value;
@@ -26811,6 +26952,34 @@ abstract class HeaderWrap
     {
         return Mime::encodeQuotedPrintableHeader($value, $encoding, $lineLength, Headers::EOL);
     }
+
+    /**
+     * MIME-decode a value
+     *
+     * Performs quoted-printable decoding on a value.
+     *
+     * @param  string $value
+     * @return string Returns the mime encode value without the last line ending
+     */
+    public static function mimeDecodeValue($value)
+    {
+        $decodedValue = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+
+        return $decodedValue;
+    }
+
+    /**
+     * Test if is possible apply MIME-encoding
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function canBeEncoded($value)
+    {
+        $encoded = iconv_mime_encode('x-test', $value, array('scheme' => 'Q'));
+
+        return (false !== $encoded);
+    }
 }
 
 /**
@@ -26881,6 +27050,7 @@ class Date implements HeaderInterface
     public static function fromString($headerLine)
     {
         list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        $value = HeaderWrap::mimeDecodeValue($value);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'date') {
@@ -26894,6 +27064,9 @@ class Date implements HeaderInterface
 
     public function __construct($value)
     {
+        if (! HeaderValue::isValid($value)) {
+            throw new Exception\InvalidArgumentException('Invalid Date header value detected');
+        }
         $this->value = $value;
     }
 
@@ -26966,9 +27139,10 @@ abstract class AbstractAddressList implements HeaderInterface
 
     public static function fromString($headerLine)
     {
-        $decodedLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
-        // split into name/value
-        list($fieldName, $fieldValue) = GenericHeader::splitHeaderLine($decodedLine);
+        list($fieldName, $fieldValue) = GenericHeader::splitHeaderLine($headerLine);
+        $decodedValue = HeaderWrap::mimeDecodeValue($fieldValue);
+        $wasEncoded = ($decodedValue !== $fieldValue);
+        $fieldValue = $decodedValue;
 
         if (strtolower($fieldName) !== static::$type) {
             throw new Exception\InvalidArgumentException(sprintf(
@@ -26977,7 +27151,7 @@ abstract class AbstractAddressList implements HeaderInterface
             ));
         }
         $header = new static();
-        if ($decodedLine != $headerLine) {
+        if ($wasEncoded) {
             $header->setEncoding('UTF-8');
         }
         // split value on ","
@@ -27006,22 +27180,33 @@ abstract class AbstractAddressList implements HeaderInterface
     {
         $emails   = array();
         $encoding = $this->getEncoding();
+
         foreach ($this->getAddressList() as $address) {
             $email = $address->getEmail();
             $name  = $address->getName();
+
             if (empty($name)) {
                 $emails[] = $email;
-            } else {
-                if (false !== strstr($name, ',')) {
-                    $name = sprintf('"%s"', $name);
-                }
+                continue;
+            }
 
-                if ($format == HeaderInterface::FORMAT_ENCODED
-                    && 'ASCII' !== $encoding
-                ) {
-                    $name = HeaderWrap::mimeEncodeValue($name, $encoding);
-                }
-                $emails[] = sprintf('%s <%s>', $name, $email);
+            if (false !== strstr($name, ',')) {
+                $name = sprintf('"%s"', $name);
+            }
+
+            if ($format === HeaderInterface::FORMAT_ENCODED
+                && 'ASCII' !== $encoding
+            ) {
+                $name = HeaderWrap::mimeEncodeValue($name, $encoding);
+            }
+
+            $emails[] = sprintf('%s <%s>', $name, $email);
+        }
+
+        // Ensure the values are valid before sending them.
+        if ($format !== HeaderInterface::FORMAT_RAW) {
+            foreach ($emails as $email) {
+                HeaderValue::assertValid($email);
             }
         }
 
@@ -27145,7 +27330,14 @@ class Cc extends AbstractAddressList
 namespace Zend\Mail\Header;
 
 use Zend\Mail;
+use Zend\Mime\Mime;
 
+/**
+ * Sender header class methods.
+ *
+ * @see https://tools.ietf.org/html/rfc2822 RFC 2822
+ * @see https://tools.ietf.org/html/rfc2047 RFC 2047
+ */
 class Sender implements HeaderInterface
 {
     /**
@@ -27156,35 +27348,34 @@ class Sender implements HeaderInterface
     /**
      * Header encoding
      *
-     * @var string
+     * @var null|string
      */
-    protected $encoding = 'ASCII';
+    protected $encoding;
 
     public static function fromString($headerLine)
     {
-        $decodedLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
-        list($name, $value) = GenericHeader::splitHeaderLine($decodedLine);
+        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        $value = HeaderWrap::mimeDecodeValue($value);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'sender') {
             throw new Exception\InvalidArgumentException('Invalid header line for Sender string');
         }
 
-        $header = new static();
-        if ($decodedLine != $headerLine) {
-            $header->setEncoding('UTF-8');
-        }
+        $header      = new static();
+        $senderName  = '';
+        $senderEmail = '';
 
         // Check for address, and set if found
         if (preg_match('/^(?P<name>.*?)<(?P<email>[^>]+)>$/', $value, $matches)) {
-            $name = $matches['name'];
-            if (empty($name)) {
-                $name = null;
-            } else {
-                $name = iconv_mime_decode($name, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+            $senderName = trim($matches['name']);
+            if (empty($senderName)) {
+                $senderName = null;
             }
-            $header->setAddress($matches['email'], $name);
+            $senderEmail = $matches['email'];
         }
+
+        $header->setAddress($senderEmail, $senderName);
 
         return $header;
     }
@@ -27196,21 +27387,23 @@ class Sender implements HeaderInterface
 
     public function getFieldValue($format = HeaderInterface::FORMAT_RAW)
     {
-        if (!$this->address instanceof Mail\Address\AddressInterface) {
+        if (! $this->address instanceof Mail\Address\AddressInterface) {
             return '';
         }
 
         $email = sprintf('<%s>', $this->address->getEmail());
         $name  = $this->address->getName();
+
         if (!empty($name)) {
-            $encoding = $this->getEncoding();
-            if ($format == HeaderInterface::FORMAT_ENCODED
-                && 'ASCII' !== $encoding
-            ) {
-                $name  = HeaderWrap::mimeEncodeValue($name, $encoding);
+            if ($format == HeaderInterface::FORMAT_ENCODED) {
+                $encoding = $this->getEncoding();
+                if ('ASCII' !== $encoding) {
+                    $name  = HeaderWrap::mimeEncodeValue($name, $encoding);
+                }
             }
             $email = sprintf('%s %s', $name, $email);
         }
+
         return $email;
     }
 
@@ -27222,6 +27415,12 @@ class Sender implements HeaderInterface
 
     public function getEncoding()
     {
+        if (! $this->encoding) {
+            $this->encoding = Mime::isPrintable($this->getFieldValue(HeaderInterface::FORMAT_RAW))
+                ? 'ASCII'
+                : 'UTF-8';
+        }
+
         return $this->encoding;
     }
 
@@ -27274,6 +27473,14 @@ class Sender implements HeaderInterface
 
 namespace Zend\Mail\Header;
 
+use Zend\Mime\Mime;
+
+/**
+ * Subject header class methods.
+ *
+ * @see https://tools.ietf.org/html/rfc2822 RFC 2822
+ * @see https://tools.ietf.org/html/rfc2047 RFC 2047
+ */
 class Subject implements UnstructuredInterface
 {
     /**
@@ -27284,14 +27491,14 @@ class Subject implements UnstructuredInterface
     /**
      * Header encoding
      *
-     * @var string
+     * @var null|string
      */
-    protected $encoding = 'ASCII';
+    protected $encoding;
 
     public static function fromString($headerLine)
     {
-        $decodedLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
-        list($name, $value) = GenericHeader::splitHeaderLine($decodedLine);
+        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        $value = HeaderWrap::mimeDecodeValue($value);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'subject') {
@@ -27299,9 +27506,6 @@ class Subject implements UnstructuredInterface
         }
 
         $header = new static();
-        if ($decodedLine != $headerLine) {
-            $header->setEncoding('UTF-8');
-        }
         $header->setSubject($value);
 
         return $header;
@@ -27329,12 +27533,26 @@ class Subject implements UnstructuredInterface
 
     public function getEncoding()
     {
+        if (! $this->encoding) {
+            $this->encoding = Mime::isPrintable($this->subject) ? 'ASCII' : 'UTF-8';
+        }
+
         return $this->encoding;
     }
 
     public function setSubject($subject)
     {
-        $this->subject = (string) $subject;
+        $subject = (string) $subject;
+
+        if (! HeaderWrap::canBeEncoded($subject)) {
+            throw new Exception\InvalidArgumentException(
+                'Subject value must be composed of printable US-ASCII or UTF-8 characters.'
+            );
+        }
+
+        $this->subject  = $subject;
+        $this->encoding = null;
+
         return $this;
     }
 
@@ -27364,6 +27582,7 @@ class MimeVersion implements HeaderInterface
     public static function fromString($headerLine)
     {
         list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        $value = HeaderWrap::mimeDecodeValue($value);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'mime-version') {
@@ -27413,6 +27632,9 @@ class MimeVersion implements HeaderInterface
      */
     public function setVersion($version)
     {
+        if (! preg_match('/^[1-9]\d*\.\d+$/', $version)) {
+            throw new Exception\InvalidArgumentException('Invalid MIME-Version value detected');
+        }
         $this->version = $version;
         return $this;
     }
@@ -27454,32 +27676,28 @@ class ContentType implements HeaderInterface
 
     public static function fromString($headerLine)
     {
-        $headerLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
         list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        $value = HeaderWrap::mimeDecodeValue($value);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'content-type') {
             throw new Exception\InvalidArgumentException('Invalid header line for Content-Type string');
         }
 
-        $value  = str_replace(Headers::FOLDING, " ", $value);
+        $value  = str_replace(Headers::FOLDING, ' ', $value);
         $values = preg_split('#\s*;\s*#', $value);
+
         $type   = array_shift($values);
-
-        //Remove empty values
-        $values = array_filter($values);
-
         $header = new static();
         $header->setType($type);
 
+        // Remove empty values
         $values = array_filter($values);
 
-        if (count($values)) {
-            foreach ($values as $keyValuePair) {
-                list($key, $value) = explode('=', $keyValuePair, 2);
-                $value = trim($value, "'\" \t\n\r\0\x0B");
-                $header->addParameter($key, $value);
-            }
+        foreach ($values as $keyValuePair) {
+            list($key, $value) = explode('=', $keyValuePair, 2);
+            $value = trim($value, "'\" \t\n\r\0\x0B");
+            $header->addParameter($key, $value);
         }
 
         return $header;
@@ -27557,11 +27775,22 @@ class ContentType implements HeaderInterface
      * @param  string $name
      * @param  string $value
      * @return ContentType
+     * @throws Exception\InvalidArgumentException for parameter names that do not follow RFC 2822
+     * @throws Exception\InvalidArgumentException for parameter values that do not follow RFC 2822
      */
     public function addParameter($name, $value)
     {
-        $name = strtolower($name);
-        $this->parameters[$name] = (string) $value;
+        $name  = strtolower($name);
+        $value = (string) $value;
+
+        if (! HeaderValue::isValid($name)) {
+            throw new Exception\InvalidArgumentException('Invalid content-type parameter name detected');
+        }
+        if (! HeaderValue::isValid($value)) {
+            throw new Exception\InvalidArgumentException('Invalid content-type parameter value detected');
+        }
+
+        $this->parameters[$name] = $value;
         return $this;
     }
 
@@ -27648,8 +27877,8 @@ class ContentTransferEncoding implements HeaderInterface
 
     public static function fromString($headerLine)
     {
-        $headerLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
         list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        $value = HeaderWrap::mimeDecodeValue($value);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'content-transfer-encoding') {
@@ -27749,6 +27978,9 @@ interface AddressInterface
 
 namespace Zend\Mail;
 
+use Zend\Validator\EmailAddress as EmailAddressValidator;
+use Zend\Validator\Hostname;
+
 class Address implements Address\AddressInterface
 {
     protected $email;
@@ -27764,15 +27996,33 @@ class Address implements Address\AddressInterface
      */
     public function __construct($email, $name = null)
     {
-        if (!is_string($email)) {
-            throw new Exception\InvalidArgumentException('Email must be a string');
+        $emailAddressValidator = new EmailAddressValidator(Hostname::ALLOW_LOCAL);
+        if (! is_string($email) || empty($email)) {
+            throw new Exception\InvalidArgumentException('Email must be a valid email address');
         }
-        if (null !== $name && !is_string($name)) {
-            throw new Exception\InvalidArgumentException('Name must be a string');
+
+        if (preg_match("/[\r\n]/", $email)) {
+            throw new Exception\InvalidArgumentException('CRLF injection detected');
+        }
+
+        if (! $emailAddressValidator->isValid($email)) {
+            $invalidMessages = $emailAddressValidator->getMessages();
+            throw new Exception\InvalidArgumentException(array_shift($invalidMessages));
+        }
+
+        if (null !== $name) {
+            if (! is_string($name)) {
+                throw new Exception\InvalidArgumentException('Name must be a string');
+            }
+
+            if (preg_match("/[\r\n]/", $name)) {
+                throw new Exception\InvalidArgumentException('CRLF injection detected');
+            }
+
+            $this->name = $name;
         }
 
         $this->email = $email;
-        $this->name  = $name;
     }
 
     /**
@@ -27808,8 +28058,7 @@ class Address implements Address\AddressInterface
             return $string;
         }
 
-        $string = $name . ' ' . $string;
-        return $string;
+        return $name . ' ' . $string;
     }
 }
 
@@ -29157,7 +29406,7 @@ class Smtp extends AbstractProtocol
                 case 'ssl':
                     $this->transport = 'ssl';
                     $this->secure = 'ssl';
-                    if ($port == null) {
+                    if ($port === null) {
                         $port = 465;
                     }
                     break;
@@ -29168,7 +29417,7 @@ class Smtp extends AbstractProtocol
         }
 
         // If no port has been specified then check the master PHP ini file. Defaults to 25 if the ini setting is null.
-        if ($port == null) {
+        if ($port === null) {
             if (($port = ini_get('smtp_port')) == '') {
                 $port = 25;
             }
@@ -30241,28 +30490,29 @@ class Mime
         $str = str_replace(array('?', ' ', '_'), array('=3F', '=20', '=5F'), $str);
 
         // initialize first line, we need it anyways
-        $lines = array(0 => "");
+        $lines = array(0 => '');
 
         // Split encoded text into separate lines
-        $tmp = "";
+        $tmp = '';
         while (strlen($str) > 0) {
-            $currentLine = max(count($lines)-1, 0);
+            $currentLine = max(count($lines) - 1, 0);
             $token       = static::getNextQuotedPrintableToken($str);
-            $str         = substr($str, strlen($token)) ?: '';
+            $substr      = substr($str, strlen($token));
+            $str         = (false === $substr) ? '' : $substr;
 
             $tmp .= $token;
-            if ($token == '=20') {
+            if ($token === '=20') {
                 // only if we have a single char token or space, we can append the
                 // tempstring it to the current line or start a new line if necessary.
                 if (strlen($lines[$currentLine] . $tmp) > $lineLength) {
-                    $lines[$currentLine+1] = $tmp;
+                    $lines[$currentLine + 1] = $tmp;
                 } else {
                     $lines[$currentLine] .= $tmp;
                 }
-                $tmp = "";
+                $tmp = '';
             }
             // don't forget to append the rest to the last line
-            if (strlen($str) == 0) {
+            if (strlen($str) === 0) {
                 $lines[$currentLine] .= $tmp;
             }
         }
@@ -30283,7 +30533,7 @@ class Mime
      */
     private static function getNextQuotedPrintableToken($str)
     {
-        if (substr($str, 0, 1) == "=") {
+        if (substr($str, 0, 1) === "=") {
             $token = substr($str, 0, 3);
         } else {
             $token = substr($str, 0, 1);
@@ -32462,21 +32712,27 @@ class Hostname extends AbstractValidator
      * @var array
      */
     protected $validTlds = array(
+        'abb',
         'abbott',
         'abogado',
         'ac',
         'academy',
+        'accenture',
+        'accountant',
         'accountants',
         'active',
         'actor',
         'ad',
+        'ads',
         'adult',
         'ae',
         'aero',
         'af',
+        'afl',
         'ag',
         'agency',
         'ai',
+        'aig',
         'airforce',
         'al',
         'allfinanz',
@@ -32501,6 +32757,7 @@ class Hostname extends AbstractValidator
         'au',
         'auction',
         'audio',
+        'auto',
         'autos',
         'aw',
         'ax',
@@ -32513,8 +32770,10 @@ class Hostname extends AbstractValidator
         'barclaycard',
         'barclays',
         'bargains',
+        'bauhaus',
         'bayern',
         'bb',
+        'bbc',
         'bd',
         'be',
         'beer',
@@ -32540,9 +32799,13 @@ class Hostname extends AbstractValidator
         'bnpparibas',
         'bo',
         'boats',
+        'bond',
         'boo',
         'boutique',
         'br',
+        'bridgestone',
+        'broker',
+        'brother',
         'brussels',
         'bs',
         'bt',
@@ -32558,6 +32821,7 @@ class Hostname extends AbstractValidator
         'bzh',
         'ca',
         'cab',
+        'cafe',
         'cal',
         'camera',
         'camp',
@@ -32570,6 +32834,7 @@ class Hostname extends AbstractValidator
         'care',
         'career',
         'careers',
+        'cars',
         'cartier',
         'casa',
         'cash',
@@ -32583,6 +32848,7 @@ class Hostname extends AbstractValidator
         'ceo',
         'cern',
         'cf',
+        'cfa',
         'cfd',
         'cg',
         'ch',
@@ -32594,6 +32860,7 @@ class Hostname extends AbstractValidator
         'chrome',
         'church',
         'ci',
+        'cisco',
         'citic',
         'city',
         'ck',
@@ -32623,7 +32890,9 @@ class Hostname extends AbstractValidator
         'cooking',
         'cool',
         'coop',
+        'corsica',
         'country',
+        'coupons',
         'courses',
         'cr',
         'credit',
@@ -32638,10 +32907,12 @@ class Hostname extends AbstractValidator
         'cx',
         'cy',
         'cymru',
+        'cyou',
         'cz',
         'dabur',
         'dad',
         'dance',
+        'date',
         'dating',
         'datsun',
         'day',
@@ -32668,11 +32939,15 @@ class Hostname extends AbstractValidator
         'dnp',
         'do',
         'docs',
+        'dog',
+        'doha',
         'domains',
         'doosan',
+        'download',
         'durban',
         'dvag',
         'dz',
+        'earth',
         'eat',
         'ec',
         'edu',
@@ -32701,13 +32976,16 @@ class Hostname extends AbstractValidator
         'exchange',
         'expert',
         'exposed',
+        'express',
         'fail',
+        'faith',
         'fan',
         'fans',
         'farm',
         'fashion',
         'feedback',
         'fi',
+        'film',
         'finance',
         'financial',
         'firmdale',
@@ -32735,6 +33013,7 @@ class Hostname extends AbstractValidator
         'fund',
         'furniture',
         'futbol',
+        'fyi',
         'ga',
         'gal',
         'gallery',
@@ -32763,7 +33042,9 @@ class Hostname extends AbstractValidator
         'gmo',
         'gmx',
         'gn',
+        'gold',
         'goldpoint',
+        'golf',
         'goo',
         'goog',
         'google',
@@ -32779,6 +33060,7 @@ class Hostname extends AbstractValidator
         'gs',
         'gt',
         'gu',
+        'guge',
         'guide',
         'guitars',
         'guru',
@@ -32792,13 +33074,16 @@ class Hostname extends AbstractValidator
         'here',
         'hermes',
         'hiphop',
+        'hitachi',
         'hiv',
         'hk',
         'hm',
         'hn',
+        'hockey',
         'holdings',
         'holiday',
         'homes',
+        'honda',
         'horse',
         'host',
         'hosting',
@@ -32808,6 +33093,8 @@ class Hostname extends AbstractValidator
         'ht',
         'hu',
         'ibm',
+        'icbc',
+        'icu',
         'id',
         'ie',
         'ifm',
@@ -32837,6 +33124,8 @@ class Hostname extends AbstractValidator
         'jcb',
         'je',
         'jetzt',
+        'jewelry',
+        'jll',
         'jm',
         'jo',
         'jobs',
@@ -32855,6 +33144,7 @@ class Hostname extends AbstractValidator
         'km',
         'kn',
         'koeln',
+        'komatsu',
         'kp',
         'kr',
         'krd',
@@ -32877,6 +33167,7 @@ class Hostname extends AbstractValidator
         'legal',
         'lgbt',
         'li',
+        'liaison',
         'lidl',
         'life',
         'lighting',
@@ -32884,15 +33175,19 @@ class Hostname extends AbstractValidator
         'limo',
         'link',
         'lk',
+        'loan',
         'loans',
+        'lol',
         'london',
         'lotte',
         'lotto',
+        'love',
         'lr',
         'ls',
         'lt',
         'ltda',
         'lu',
+        'lupin',
         'luxe',
         'luxury',
         'lv',
@@ -32907,6 +33202,7 @@ class Hostname extends AbstractValidator
         'marketing',
         'markets',
         'marriott',
+        'mba',
         'mc',
         'md',
         'me',
@@ -32915,6 +33211,7 @@ class Hostname extends AbstractValidator
         'melbourne',
         'meme',
         'memorial',
+        'men',
         'menu',
         'mg',
         'mh',
@@ -32924,6 +33221,7 @@ class Hostname extends AbstractValidator
         'mk',
         'ml',
         'mm',
+        'mma',
         'mn',
         'mo',
         'mobi',
@@ -32936,11 +33234,13 @@ class Hostname extends AbstractValidator
         'moscow',
         'motorcycles',
         'mov',
+        'movie',
         'mp',
         'mq',
         'mr',
         'ms',
         'mt',
+        'mtn',
         'mtpc',
         'mu',
         'museum',
@@ -32950,15 +33250,18 @@ class Hostname extends AbstractValidator
         'my',
         'mz',
         'na',
+        'nadex',
         'nagoya',
         'name',
         'navy',
         'nc',
         'ne',
+        'nec',
         'net',
         'network',
         'neustar',
         'new',
+        'news',
         'nexus',
         'nf',
         'ng',
@@ -32993,6 +33296,7 @@ class Hostname extends AbstractValidator
         'ovh',
         'pa',
         'page',
+        'panerai',
         'paris',
         'partners',
         'parts',
@@ -33002,6 +33306,7 @@ class Hostname extends AbstractValidator
         'pg',
         'ph',
         'pharmacy',
+        'philips',
         'photo',
         'photography',
         'photos',
@@ -33016,6 +33321,7 @@ class Hostname extends AbstractValidator
         'pl',
         'place',
         'plumbing',
+        'plus',
         'pm',
         'pn',
         'pohl',
@@ -33039,21 +33345,25 @@ class Hostname extends AbstractValidator
         'qa',
         'qpon',
         'quebec',
+        'racing',
         're',
         'realtor',
         'recipes',
         'red',
+        'redstone',
         'rehab',
         'reise',
         'reisen',
         'reit',
         'ren',
+        'rent',
         'rentals',
         'repair',
         'report',
         'republican',
         'rest',
         'restaurant',
+        'review',
         'reviews',
         'rich',
         'rio',
@@ -33065,12 +33375,14 @@ class Hostname extends AbstractValidator
         'rsvp',
         'ru',
         'ruhr',
+        'run',
         'rw',
         'ryukyu',
         'sa',
         'saarland',
         'sale',
         'samsung',
+        'sap',
         'sarl',
         'saxo',
         'sb',
@@ -33078,6 +33390,7 @@ class Hostname extends AbstractValidator
         'sca',
         'scb',
         'schmidt',
+        'scholarships',
         'school',
         'schule',
         'schwarz',
@@ -33085,13 +33398,17 @@ class Hostname extends AbstractValidator
         'scot',
         'sd',
         'se',
+        'seat',
+        'sener',
         'services',
         'sew',
+        'sex',
         'sexy',
         'sg',
         'sh',
         'shiksha',
         'shoes',
+        'show',
         'shriram',
         'si',
         'singles',
@@ -33103,11 +33420,13 @@ class Hostname extends AbstractValidator
         'sm',
         'sn',
         'so',
+        'soccer',
         'social',
         'software',
         'sohu',
         'solar',
         'solutions',
+        'sony',
         'soy',
         'space',
         'spiegel',
@@ -33125,6 +33444,7 @@ class Hostname extends AbstractValidator
         'surgery',
         'suzuki',
         'sv',
+        'swiss',
         'sx',
         'sy',
         'sydney',
@@ -33134,8 +33454,11 @@ class Hostname extends AbstractValidator
         'tatar',
         'tattoo',
         'tax',
+        'taxi',
         'tc',
         'td',
+        'team',
+        'tech',
         'technology',
         'tel',
         'temasek',
@@ -33143,6 +33466,9 @@ class Hostname extends AbstractValidator
         'tf',
         'tg',
         'th',
+        'thd',
+        'theater',
+        'tickets',
         'tienda',
         'tips',
         'tires',
@@ -33157,7 +33483,9 @@ class Hostname extends AbstractValidator
         'tokyo',
         'tools',
         'top',
+        'toray',
         'toshiba',
+        'tours',
         'town',
         'toys',
         'tr',
@@ -33209,11 +33537,13 @@ class Hostname extends AbstractValidator
         'website',
         'wed',
         'wedding',
+        'weir',
         'wf',
         'whoswho',
         'wien',
         'wiki',
         'williamhill',
+        'win',
         'wme',
         'work',
         'works',
@@ -33221,8 +33551,10 @@ class Hostname extends AbstractValidator
         'ws',
         'wtc',
         'wtf',
+        'xerox',
         'xin',
         '佛山',
+        '慈善',
         '集团',
         '在线',
         '한국',
@@ -33239,6 +33571,7 @@ class Hostname extends AbstractValidator
         'сайт',
         'срб',
         'бел',
+        '时尚',
         '淡马锡',
         'орг',
         '삼성',
@@ -33248,10 +33581,12 @@ class Hostname extends AbstractValidator
         '商城',
         'дети',
         'мкд',
+        '工行',
         '中文网',
         '中信',
         '中国',
         '中國',
+        '娱乐',
         '谷歌',
         'భారత్',
         'ලංකා',
@@ -33262,6 +33597,7 @@ class Hostname extends AbstractValidator
         '网络',
         'укр',
         '香港',
+        '飞利浦',
         '台湾',
         '台灣',
         '手机',
@@ -33275,12 +33611,14 @@ class Hostname extends AbstractValidator
         'بھارت',
         'المغرب',
         'السعودية',
+        'سودان',
         'مليسيا',
         '政府',
         'شبكة',
         'გე',
         '机构',
         '组织机构',
+        '健康',
         'ไทย',
         'سورية',
         'рус',
@@ -33295,11 +33633,13 @@ class Hostname extends AbstractValidator
         'vermögensberater',
         'vermögensberatung',
         '企业',
+        '信息',
         'مصر',
         'قطر',
         '广东',
         'இலங்கை',
         'இந்தியா',
+        'հայ',
         '新加坡',
         'فلسطين',
         '政务',

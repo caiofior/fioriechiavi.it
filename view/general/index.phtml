@@ -39,8 +39,12 @@ endif;
 ?>
 <div>
     <?php  if ($GLOBALS['profile'] instanceof \login\user\Profile) : ?>
-    <a id="signalObservationButton" href="#">Segnala il ritrovamento di questa pianta</a>
-    <div id="signalObservation"></div>
+    <?php if (array_key_exists('insertObservation', $_GET) && $_GET['insertObservation']== 1) : ?>
+        <p>Grazie della segnalazione, sarà visibile non appena approvata dallo staff di <?php echo $GLOBALS['db']->config->siteName; ?></p>
+    <?php else: ?>
+        <a id="signalObservationButton" href="#">Segnala il ritrovamento di questa pianta</a>
+        <div id="signalObservation"></div>
+    <?php endif; ?>
     <?php else: ?>
     <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>user.php?return_url=<?php echo $GLOBALS['control']->getPage();?>?id=<?php echo $taxa->getData('id');?>">Iscriviti per segnalare l'avvistamento di questa pianta</a>
     <?php endif; ?>
@@ -153,7 +157,7 @@ if (
 <div class="image_list">
       <?php foreach($imageColl->getItems() as $key=>$image) : ?>
       <div>
-            <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>" alt="Immagine <?php echo $key; ?>"/>
+            <img class="plantImage" src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>" alt="Immagine <?php echo $key; ?>"/>
       </div>
       <?php endforeach; ?>
 </div>

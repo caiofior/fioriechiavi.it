@@ -45,7 +45,9 @@ class TaxaObservation extends \Content
     * Update the coordinates
     */
    private function updateCoordinates() {
-       $this->data['position']=new \Zend\Db\Sql\Expression('PointFromText("POINT('.floatval($this->rawData['latitude']).' '.floatval($this->rawData['longitude']).')")');
+       if (array_key_exists('latitude', $this->rawData) && array_key_exists('longitude', $this->rawData)) {
+        $this->data['position']=new \Zend\Db\Sql\Expression('PointFromText("POINT('.floatval($this->rawData['latitude']).' '.floatval($this->rawData['longitude']).')")');
+       }
    }
    /**
     * Gets coordinates from point data
@@ -68,5 +70,14 @@ class TaxaObservation extends \Content
             $taxaObservationImageColl->loadAll(array('taxa_observation_id' => $this->data['id']));
         }
         return $taxaObservationImageColl;
+    }
+     /**
+     * Deletes also the associated data
+     */
+    public function delete() {
+        foreach ($this->getTaxaObservationImageColl()->getItems() as $image) {
+            $image->delete();
+        }
+        parent::delete();
     }
 }

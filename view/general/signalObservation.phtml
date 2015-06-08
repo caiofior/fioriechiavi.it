@@ -3,7 +3,7 @@
 <script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/javascript-mobile-desktop-geolocation/js/geoPositionSimulator.js');?>"></script>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/signalObservation.js');?>"></script>
 <!--<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/signalObservation.min.js.gz');?>"></script>-->
-<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>?action=signalObservation" enctype="multipart/form-data">
+<form action="<?php echo $GLOBALS['db']->config->baseUrl;?><?php echo $GLOBALS['control']->getPage();?>?id=<?php echo $taxa->getData('id');?>&action=signalObservation" enctype="multipart/form-data" method="post">
     <div class="errorMessage">Non è stato possibile rilevare la posizione</div>
     <div>
         <input type="hidden" name="latitude" id="latitude"/>

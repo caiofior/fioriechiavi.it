@@ -92,13 +92,13 @@ class Taxa extends \Content {
     }
 
     /**
-     * Delets also the associated data
+     * Deletes also the associated data
      */
     public function delete() {
-        foreach ($this->getTaxaImageColl() as $image) {
+        foreach ($this->getTaxaImageColl()->getItems() as $image) {
             $image->delete();
         }
-        foreach ($this->getTaxaAttributeColl() as $attribute) {
+        foreach ($this->getTaxaAttributeColl()->getItems() as $attribute) {
             $attribute->delete();
         }
         $this->db->query('DELETE FROM `taxa_region` 
@@ -267,7 +267,7 @@ class Taxa extends \Content {
      * @return \flora\taxa\TaxaAttributeColl
      */
     public function getTaxaObservationColl() {
-        $taxaObservationColl = new \floraobsercation\TaxaObservationColl($this->db);
+        $taxaObservationColl = new \floraobservation\TaxaObservationColl($this->db);
         if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
             $taxaObservationColl->loadAll(array('taxa_id' => $this->data['id']));
         }

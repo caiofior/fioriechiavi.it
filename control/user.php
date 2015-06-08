@@ -116,6 +116,9 @@ switch ($_REQUEST['task']) {
    case 'facebook' :
        require __DIR__.DIRECTORY_SEPARATOR.'user'.DIRECTORY_SEPARATOR.'facebook.php';   
    break;
+   case 'observation':
+      require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'observation.php';
+      break;
    default :
       if ($GLOBALS['profile'] instanceof \login\user\Profile) {
          switch ($GLOBALS['profile']->getData('role_id')) {

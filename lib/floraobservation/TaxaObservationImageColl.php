@@ -37,7 +37,7 @@ class TaxaObservationImageColl extends \ContentColl {
    */
      public function addItem($key = null) {
         $item = parent::addItem($key);
-        $item->setData($this->taxa_id, 'taxa_observation_id');
+        $item->setData($this->taxa_observation_id, 'taxa_observation_id');
         return $item;
      }
 }

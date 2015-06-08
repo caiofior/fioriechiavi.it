@@ -6,6 +6,11 @@ namespace floraobservation;
  * @author caiofior
  */
 class TaxaObservationColl extends \ContentColl {
+       /**
+       * Taxa id
+       * @var int
+       */
+      private $taxa_id;
       /**
        * Relation with th content
        * @param type $db
@@ -44,9 +49,27 @@ class TaxaObservationColl extends \ContentColl {
      * @return \Zend\Db\Sql\Select
      */
     private function setFilter ($select,$criteria) {
+      $select->columns(array(
+          '*',
+          'taxa_name'=>new \Zend\Db\Sql\Expression('(SELECT CONCAT((SELECT `initials` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id`)," ",`name`) FROM `taxa` WHERE `taxa`.`id`=`taxa_observation`.`taxa_id`)'),
+          'profile_email'=>new \Zend\Db\Sql\Expression('(SELECT `email` FROM `profile` WHERE `profile`.`id`=`taxa_observation`.`profile_id`)')
+      ));
       if (array_key_exists('taxa_id', $criteria)) {
+          $this->taxa_id=intval($criteria['taxa_id']);
           $select->where('`taxa_observation`.`taxa_id` = '.intval($criteria['taxa_id']));
+      }
+      if (array_key_exists('profile_id', $criteria)) {
+          $select->where('`taxa_observation`.`profile_id` = '.intval($criteria['profile_id']));
       }
       return $select;
     }
+    /**
+   * Add new item to the collection
+   * @return \Content
+   */
+     public function addItem($key = null) {
+        $item = parent::addItem($key);
+        $item->setData($this->taxa_id, 'taxa_id');
+        return $item;
+     }
 }

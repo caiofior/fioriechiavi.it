@@ -14,10 +14,41 @@ function error_callback(p){
 }
 $(document).ready(function() {
     $(".moreImage").click(function(e) {
-        
         el = $(".imageContainer input:first").clone(false);
         el.val("");
         $(".imageContainer").append(el);
         e.preventDefault();
+    });
+    $("input:submit").unbind("click").click(function (e) {
+       $(".notValid").removeClass("notValid");
+       $(".errorMessage").remove();
+       valid = true;
+       form = $(this).parents("form").first();
+       if ($("#title").val() == "") {
+            $("#title").addClass("notValid").focus();
+            $(form).find("input:submit").after("<div class=\"errorMessage\"><span>Il titolo è obbligatorio</span></div>");    
+            valid = false;
+       }
+       if ($("#description").val() == "") {
+            $("#description").addClass("notValid").focus();
+            $(form).find("input:submit").after("<div class=\"errorMessage\"><span>La descrizione è obbligatoria</span></div>");    
+            valid = false;
+       }
+       if ($("#latitude").val() == "" || $("#longitude").val() == "") {
+            $(form).find("input:submit").after("<div class=\"errorMessage\"><span>La posizione è obbligatoria</span></div>");
+            valid = false;
+       }
+       nFiles = 0;
+       $("input:file").each(function (id,input) {
+           if ($(input).val() != "")
+               nFiles++;
+       });
+       if (nFiles <1) {
+            $(form).find("input:submit").after("<div class=\"errorMessage\"><span>Caricare almeno una foto</span></div>");
+            valid = false;
+       }
+       if (valid == false) {
+           e.preventDefault();
+       }
     });
 });
