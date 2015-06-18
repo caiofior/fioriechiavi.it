@@ -55,7 +55,7 @@ class TaxaObservation extends \Content
    private function getCoordinates() {
        $point = $this->db->query('SELECT AsText("'.$this->data['position'].'")' , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
        $point = $point->current()->getArrayCopy()['AsText("'];
-       preg_match_all('/[[:digit:]]*/', $point, $matches);
+       preg_match_all('/[[:digit:]\.]*/', $point, $matches);
        $matches = array_filter($matches[0]);      
        $this->rawData['latitude']=current($matches);
        $this->rawData['longitude']=next($matches);

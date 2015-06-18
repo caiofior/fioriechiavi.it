@@ -45,8 +45,8 @@ if (array_key_exists('id', $_REQUEST)) {
 </form>
 <script>
 //<![CDATA[
-var latitude = <?php echo $taxaObservation->getData('latitude')?>;
-var longitude = <?php echo $taxaObservation->getData('longitude')?>;
+var latitude = <?php echo $taxaObservation->getRawData('latitude')?>;
+var longitude = <?php echo $taxaObservation->getRawData('longitude')?>;
 //]]>
 </script>
 <div id="map-canvas"></div>

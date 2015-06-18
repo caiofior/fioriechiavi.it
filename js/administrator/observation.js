@@ -34,16 +34,17 @@ $(document).ready(function() {
     tinymce.init({
       selector: "textarea"
     });
-var map;
-function initialize() {
-  map = new google.maps.Map($('#map-canvas')[0],
-      mapOptions = {
-    zoom: 8,
-    center: new google.maps.LatLng(latitude, longitude)
+    latLong = new google.maps.LatLng(latitude, longitude);
+    map = new google.maps.Map($('#map-canvas')[0],{
+    zoom: 12,
+    center: latLong
   });
-}
+  new google.maps.Marker({
+      position: latLong,
+      map: map
+  });
 
-google.maps.event.addDomListener(window, 'load', initialize);
+
 
 
 
