@@ -39,8 +39,13 @@ class TaxaObservationColl extends \ContentColl {
       $results = $statement->execute();
       $resultSet = new \Zend\Db\ResultSet\ResultSet();
       $resultSet->initialize($results);
-      $data = $resultSet->current()->getArrayCopy();
-      return intval(array_pop($data));
+      if (is_object($resultSet->current())) {
+        $data = $resultSet->current()->getArrayCopy();
+        $data = intval(array_pop($data));
+      } else {
+        $data =0;
+      }
+      return $data;
     }
     /**
      * Sets the filter

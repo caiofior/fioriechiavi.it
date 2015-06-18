@@ -73,6 +73,10 @@ case 'edit':
    break; 
 case 'delete' :
    $taxaObservation = new \floraobservation\TaxaObservation($GLOBALS['db']);
+   if (array_key_exists('cid', $_REQUEST)) {
+            $vector_size = mcrypt_get_iv_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
+            $_REQUEST['id'] = mcrypt_decrypt($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->key,  urldecode($_REQUEST['cid']),$GLOBALS['db']->config->crypt->mode,substr($GLOBALS['db']->config->crypt->iv,0,$vector_size));
+   }
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
       $taxaObservation->loadFromId($_REQUEST['id']);
       $taxaObservation->delete();
