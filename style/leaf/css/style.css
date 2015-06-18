@@ -720,10 +720,10 @@ a.hvr-shutter-in-horizontal:hover:before,a.hvr-shutter-in-horizontal:focus:befor
 .selectedPage {
     font-weight: bold;
 }
-#signalObservationButton {
-    background-color: #FF2D55;
+#signalObservationButton,
+#signalObservationLink {
     font-size: 19.6px;
-    font-weight: 400;
+    font-weight: bold;
 }
 /*-- responsive-design starts-here --*/
 

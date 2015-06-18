@@ -40,7 +40,7 @@ class Taxa extends \Content {
                '))
                 )
                 ->where('`taxa`.`id` = ' . intval($id))
-                ->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id', array('taxa_kind_initials' => 'initials', 'taxa_kind_id_name' => 'name'), \Zend\Db\Sql\Select::JOIN_LEFT);
+                ->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id', array('taxa_kind_initials' => 'initials', 'taxa_kind_id_name' => 'name','taxa_kind_ord'=>'ord'), \Zend\Db\Sql\Select::JOIN_LEFT);
         $data = $this->table->selectWith($select)->current();
         if (is_object($data)) {
             $this->data = $data->getArrayCopy();
@@ -62,6 +62,7 @@ class Taxa extends \Content {
     public function insert() {
         unset($this->data['taxa_kind_initials']);
         unset($this->data['taxa_kind_id_name']);
+        unset($this->data['taxa_kind_ord']);
         unset($this->data['dico_id']);
         $this->data['creation_datetime'] = date('Y-m-d H:i:s');
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
@@ -80,6 +81,7 @@ class Taxa extends \Content {
     public function update() {
         unset($this->data['taxa_kind_initials']);
         unset($this->data['taxa_kind_id_name']);
+        unset($this->data['taxa_kind_ord']);
         unset($this->data['status']);
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
