@@ -42,15 +42,9 @@ switch ($_REQUEST['task']) {
                $this->getTemplate()->setBlock('middle','contact/sent.phtml');   
                
                try{
-                  $html = new \Zend\Mime\Part(<<<EOT
-<p>Messaggio dal sito {$GLOBALS['db']->config->siteName} da parte di {$_REQUEST['name']}<br/>
-Mail: <a href="mailto:{$_REQUEST['mail']}">{$_REQUEST['mail']}</a><br/>
-Telefono: {$_REQUEST['phone']}<br/>
-Fax: {$_REQUEST['fax']}<br/>
-</p>
-<p>{$_REQUEST['message']}</p>
-EOT
-                  );
+                  ob_start();
+                  require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_message.php';
+                  $html = new \Zend\Mime\Part(ob_get_clean());
                   $html->type = 'text/html';
 
                   $body = new \Zend\Mime\Message();
@@ -64,12 +58,9 @@ EOT
                      ->setBody($body);
                   $GLOBALS['transport']->send($message);
 
-                  $html = new \Zend\Mime\Part(<<<EOT
-<p>Hai inviato il seguente messaggio al sito {$GLOBALS['db']->config->siteName}</p>
-<p>{$_REQUEST['message']}</p>
-<p>A breve verrai contattato.</p>
-EOT
-                  );
+                  ob_start();
+                  require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_message.php';
+                  $html = new \Zend\Mime\Part(ob_get_clean());
                   $html->type = 'text/html';
 
                   $body = new \Zend\Mime\Message();

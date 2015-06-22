@@ -167,6 +167,8 @@ require __DIR__.'/../lib/zendframework/zend-mail/src/Header/UnstructuredInterfac
 require __DIR__.'/../lib/zendframework/zend-mail/src/Header/GenericHeader.php';
 require __DIR__.'/../lib/zendframework/zend-mail/src/Header/HeaderWrap.php';
 require __DIR__.'/../lib/zendframework/zend-mail/src/Header/HeaderLoader.php';
+require __DIR__.'/../lib/zendframework/zend-mail/src/Header/HeaderValue.php';
+require __DIR__.'/../lib/zendframework/zend-mail/src/Header/HeaderName.php';
 require __DIR__.'/../lib/zendframework/zend-mail/src/Header/Date.php';
 require __DIR__.'/../lib/zendframework/zend-mail/src/Header/AbstractAddressList.php';
 require __DIR__.'/../lib/zendframework/zend-mail/src/Header/To.php';
@@ -188,6 +190,8 @@ require __DIR__.'/../lib/zendframework/zend-mail/src/Protocol/SmtpPluginManager.
 require __DIR__.'/../lib/zendframework/zend-mail/src/Protocol/AbstractProtocol.php';
 require __DIR__.'/../lib/zendframework/zend-mail/src/Protocol/Smtp.php';
 require __DIR__.'/../lib/zendframework/zend-mail/src/Protocol/Smtp/Auth/Login.php';
+require __DIR__.'/../lib/zendframework/zend-mail/src/Exception/ExceptionInterface.php';
+require __DIR__.'/../lib/zendframework/zend-mail/src/Exception/InvalidArgumentException.php';
 require __DIR__.'/../lib/zendframework/zend-mime/src/Part.php';
 require __DIR__.'/../lib/zendframework/zend-mime/src/Mime.php';
 require __DIR__.'/../lib/zendframework/zend-mime/src/Message.php';
@@ -199,6 +203,7 @@ require __DIR__.'/../lib/zendframework/zend-validator/src/ValidatorInterface.php
 require __DIR__.'/../lib/zendframework/zend-validator/src/Translator/TranslatorAwareInterface.php';
 require __DIR__.'/../lib/zendframework/zend-validator/src/AbstractValidator.php';
 require __DIR__.'/../lib/zendframework/zend-validator/src/ValidatorChain.php';
+require __DIR__.'/../lib/zendframework/zend-validator/src/EmailAddress.php';
 require __DIR__.'/../lib/zendframework/zend-validator/src/Hostname.php';
 require __DIR__.'/../lib/zendframework/zend-validator/src/Ip.php';
 require __DIR__.'/../lib/zendframework/zend-validator/src/Hostname/Com.php';
