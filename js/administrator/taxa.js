@@ -32,10 +32,12 @@ $(document).ready(function() {
         }
     });
     tinymce.init({
-         plugins: ["table","code"],
-         tools: ["inserttable","code"],
-         selector: "textarea:not(.notEditable)",
-         setup: function(editor) {
+        //language : 'it', 
+        //language_url : '/languages/it.js',
+        plugins: ["table","code"],
+        tools: ["inserttable","code"],
+        selector: "textarea:not(.notEditable)",
+        setup: function(editor) {
             editor.on('change', function(e) {
                 $("#"+e.target.id).trigger("change");
             });
@@ -177,9 +179,10 @@ $(document).ready(function() {
         url : "administrator.php?task=taxa&action=imageupload&taxa_id="+$("#id").val(),
  
         // Maximum file size
-        max_file_size : '2mb',
+        max_file_size : '500kb',
  
-        chunk_size: '1mb',
+        chunk_size: '10kb',
+	max_retries: 10,
  
         // Specify what files to browse for
         filters : [

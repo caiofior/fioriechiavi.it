@@ -10,11 +10,11 @@ $regionColl = $taxa->getRegionColl();
 <!--
 <link rel="stylesheet" href="js/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css">
 -->
-<link rel="stylesheet" href="style/administrator/taxa.css">
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('style/administrator/taxa.css');?>">
 <div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica un taxa</h2>
 </div>
-<form method="post" action="#">
+<form method="post" action="#" enctype="multipart/form-data">
    <input type="hidden" id="id" name="id" value="<?php echo $taxa->getData('id')?>">
    <input type="hidden" id="dico_id" name="dico_id" value="<?php echo $taxa->getData('dico_id')?>">
    <input type="hidden" id="taxa_kind_id" name="taxa_kind_id" value="<?php echo $taxa->getData('taxa_kind_id')?>">
@@ -103,6 +103,10 @@ $regionColl = $taxa->getRegionColl();
       ?>
       </div>
    </div>
+   <div>
+       <label>Aggiungi file</label>
+       <input type="file" accept="image/*" name="traditional_image"/>
+   </div>    
    <div>
       <div id="uploader">
          <p>Il tuo browser non ha Flash, Silverlight e non supporta HTML5.</p>

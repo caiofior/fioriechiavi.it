@@ -137,8 +137,21 @@ case 'edit':
                    $taxaImage->moveInsert($GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$imageName);
                 }
             }
-         
-         
+            
+            if (
+                    isset($_FILES) &&
+                    is_array($_FILES) &&
+                    is_array($_FILES['traditional_image']) && 
+                    $_FILES['traditional_image']['error'] ==0 &&
+                    $_FILES['traditional_image']['name'] != '' &&
+                    is_file($_FILES['traditional_image']['tmp_name'])
+                    ) {
+                    $fileName = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$_FILES['traditional_image']['name'];
+                    if (move_uploaded_file($_FILES['traditional_image']['tmp_name'], $fileName)) {
+                        $taxaImage = $taxaImageColl->addItem();
+                        $taxaImage->moveInsert($fileName);
+                    }
+            }
          
          if (
                  array_key_exists('children_dico_item_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_item_id']) &&
