@@ -24,8 +24,7 @@ if (is_file(__DIR__.'/zendRequireCompiled.php')) {
 } else if (is_file(__DIR__.'/zendRequire.php')) {
    require __DIR__.'/zendRequire.php';
 } else {
-ini_set('include_path','.:'.__DIR__.'/../lib/zendframework/library');
-require 'Zend/Loader/StandardAutoloader.php';
+require 'vendor/autoload.php';
 $loader = new Zend\Loader\StandardAutoloader(array(
     'autoregister_zf' => true,
     'fallback_autoloader' => true
