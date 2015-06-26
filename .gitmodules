@@ -10,3 +10,6 @@
 [submodule "js/DataTables"]
 	path = js/DataTables
 	url = https://github.com/DataTables/DataTables.git
+[submodule "js/plupload"]
+	path = js/plupload
+	url = https://github.com/moxiecode/plupload.git
