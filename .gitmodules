@@ -13,3 +13,6 @@
 [submodule "js/jqueryui"]
 	path = js/jqueryui
 	url = https://github.com/components/jqueryui.git
+[submodule "js/jquery"]
+	path = js/jquery
+	url = https://github.com/components/jquery.git
