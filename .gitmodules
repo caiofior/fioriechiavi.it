@@ -7,12 +7,12 @@
 [submodule "js/plupload"]
 	path = js/plupload
 	url = https://github.com/moxiecode/plupload.git
-[submodule "js/tinymce"]
-	path = js/tinymce
-	url = https://github.com/tinymce/tinymce.git
 [submodule "js/jqueryui"]
 	path = js/jqueryui
 	url = https://github.com/components/jqueryui.git
 [submodule "js/jquery"]
 	path = js/jquery
 	url = https://github.com/components/jquery.git
+[submodule "js/tinymce-dist"]
+	path = js/tinymce-dist
+	url = https://github.com/tinymce/tinymce-dist.git
