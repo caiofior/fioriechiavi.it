@@ -1,12 +1,6 @@
 [submodule "js/javascript-mobile-desktop-geolocation"]
 	path = js/javascript-mobile-desktop-geolocation
 	url = https://github.com/estebanav/javascript-mobile-desktop-geolocation.git
-[submodule "js/jquery"]
-	path = js/jquery
-	url = https://github.com/jquery/jquery.git
-[submodule "js/jquery-ui"]
-	path = js/jquery-ui
-	url = https://github.com/jquery/jquery-ui.git
 [submodule "js/DataTables"]
 	path = js/DataTables
 	url = https://github.com/DataTables/DataTables.git
@@ -16,3 +10,6 @@
 [submodule "js/tinymce"]
 	path = js/tinymce
 	url = https://github.com/tinymce/tinymce.git
+[submodule "js/jqueryui"]
+	path = js/jqueryui
+	url = https://github.com/components/jqueryui.git
