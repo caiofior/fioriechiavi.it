@@ -13,3 +13,6 @@
 [submodule "js/plupload"]
 	path = js/plupload
 	url = https://github.com/moxiecode/plupload.git
+[submodule "js/tinymce"]
+	path = js/tinymce
+	url = https://github.com/tinymce/tinymce.git
