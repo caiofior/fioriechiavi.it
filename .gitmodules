@@ -19,3 +19,6 @@
 [submodule "js/jquery_jeditable"]
 	path = js/jquery_jeditable
 	url = https://github.com/tuupola/jquery_jeditable.git
+[submodule "lib/parsedown"]
+	path = lib/parsedown
+	url = https://github.com/erusev/parsedown.git
