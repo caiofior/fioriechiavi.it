@@ -16,3 +16,6 @@
 [submodule "js/tinymce-dist"]
 	path = js/tinymce-dist
 	url = https://github.com/tinymce/tinymce-dist.git
+[submodule "js/jquery_jeditable"]
+	path = js/jquery_jeditable
+	url = https://github.com/tuupola/jquery_jeditable.git

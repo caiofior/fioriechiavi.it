@@ -688,7 +688,7 @@ class Search {
         }
         if  (
                 array_key_exists('posture', $this->request) && 
-                sizeof(array_diff($this->request['posture'],$this->getPostureArray())) == 0 &&
+                sizeof(array_diff($this->request['posture'],$this->getPostureArray())) <> 0 &&
                 !in_array('posture',$avoid)
             ) {
             $this->request['posture']=array_map('addslashes',$this->request['posture']);
@@ -698,9 +698,9 @@ class Search {
         }
         if  (
                 array_key_exists('biologicForm', $this->request) && 
-                sizeof(array_diff($this->request['biologicForm'],$this->getBiologicFormArray())) == 0 &&
+                sizeof(array_diff($this->request['biologicForm'],$this->getBiologicFormArray())) <> 0 &&
                 !in_array('biologicForm',$avoid)
-            ) {
+            ) {die('HI');
             $this->request['biologicForm']=array_map('addslashes',$this->request['biologicForm']);
             $select->where('
                   `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_attribute_value` WHERE `taxa_attribute_id`='.$this->attributeId['Forma biologica'].' AND `value` IN ("'.implode('","',$this->request['biologicForm']).'"))
@@ -708,7 +708,7 @@ class Search {
         }
         if  (
                 array_key_exists('community', $this->request) && 
-                sizeof(array_diff($this->request['community'],$this->getCommunityArray())) == 0 &&
+                sizeof(array_diff($this->request['community'],$this->getCommunityArray())) <> 0 &&
                 !in_array('community',$avoid)
             ) {
             $this->request['community']=array_map('addslashes',$this->request['community']);
