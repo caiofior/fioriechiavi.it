@@ -22,3 +22,9 @@
 [submodule "lib/parsedown"]
 	path = lib/parsedown
 	url = https://github.com/erusev/parsedown.git
+[submodule "lib/firephp"]
+	path = lib/firephp
+	url = https://github.com/firephp/firephp.git
+[submodule "lib/facebook-php-sdk-v4"]
+	path = lib/facebook-php-sdk-v4
+	url = https://github.com/facebook/facebook-php-sdk-v4.git

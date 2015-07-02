@@ -19,7 +19,7 @@ class Autoload {
          \Autoload::getInstance();
       
       }
-      $firePhpDir = $GLOBALS['db']->baseDir.'/lib/firephp/firephp-core/lib/FirePHPCore';
+      $firePhpDir = $GLOBALS['db']->baseDir.'/lib/firephp/lib/FirePHPCore';
       if (!class_exists('FirePHP') && is_dir($firePhpDir)) {
          require $firePhpDir.'/FirePHP.class.php';
          require $firePhpDir.'/fb.php';
