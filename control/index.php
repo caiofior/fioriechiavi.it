@@ -117,6 +117,7 @@ switch ($_REQUEST['action']) {
       $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
       $_REQUEST['iDisplayStart']=0;
       $_REQUEST['iDisplayLength']=10;
+      $_REQUEST['status']=1;
       $taxaColl->loadAll($_REQUEST);
       $result = array();
       foreach ($taxaColl->getItems() as $taxa) {

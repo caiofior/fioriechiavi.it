@@ -174,6 +174,7 @@ class Search {
                 SELECT COUNT(`p`.`taxa_id`) FROM `taxa_search` AS `p`
                 WHERE p.`lft` >= `taxa_search`.`lft`
                 AND p.`rgt` <= `taxa_search`.`rgt`
+                AND p.`text` <> ""
                 ) ')
         ));
         $select->limit(10);
