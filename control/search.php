@@ -59,6 +59,7 @@ switch ($_REQUEST['action']) {
          );
       } 
       header('Content-Type: application/json');
+      header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
       echo json_encode($result);
       exit;
    case 'search' :
@@ -82,6 +83,7 @@ switch ($_REQUEST['action']) {
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'search'.DIRECTORY_SEPARATOR.'searchContent.phtml';
       $result['searchContent']=  ob_get_clean();
       header('Content-Type: application/json');
+      header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
       echo json_encode($result);
       exit;
    break;
