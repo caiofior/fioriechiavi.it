@@ -51,6 +51,7 @@ case 'edit':
    if (
             array_key_exists('xhrValidate', $_REQUEST) ||
             array_key_exists('submit', $_REQUEST) ||
+            array_key_exists('submit_back', $_REQUEST) ||
             array_key_exists('submit_create_key', $_REQUEST)
       ) {
       if (!array_key_exists('taxa_kind_id', $_REQUEST) ||$_REQUEST['taxa_kind_id']=='') {
@@ -62,6 +63,7 @@ case 'edit':
       if (
               (
               array_key_exists('submit', $_REQUEST) ||
+              array_key_exists('submit_back', $_REQUEST) ||
               array_key_exists('submit_create_key', $_REQUEST) 
               ) && $this->formIsValid()) {
          
@@ -172,6 +174,8 @@ case 'edit':
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
          } else if (array_key_exists('submit_create_key', $_REQUEST) && array_key_exists('dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['dico_id']);
+         } else if (array_key_exists('submit_back', $_REQUEST) ){
+            header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa');
          } else {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'));
          }
@@ -213,7 +217,7 @@ case 'taxaattributelist' :
    } 
    header('Content-Type: application/json');
    header('Pragma: cache');
-   header('Expires: '.gmdate('D, d M Y H:i:s', time() + 3600).' GMT');
+   header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
    header('Cache-Control: max-age=3600, must-revalidate, public ');
    echo json_encode($result);
    exit;
@@ -231,7 +235,7 @@ case 'taxaattributelistvalue' :
    }
    header('Content-Type: application/json');
    header('Pragma: cache');
-   header('Expires: '.gmdate('D, d M Y H:i:s', time() + 3600).' GMT');
+   header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
    header('Cache-Control: max-age=3600, must-revalidate, public ');
    echo json_encode($result);
    exit;
@@ -263,7 +267,8 @@ case 'taxakindlist':
           'label'=>$taxaKind->getData('name'),
           'value'=>$taxaKind->getData('id')
       );
-   } 
+   }
+   header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
    header('Content-Type: application/json');
    echo json_encode($result);
    exit;

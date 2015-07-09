@@ -36,6 +36,9 @@ $regionColl = $taxa->getRegionColl();
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
+      <?php if (!array_key_exists('children_dico_item_id', $_REQUEST)): ?>
+      <input type="submit" name="submit_back" value="Salva e torna">
+      <?php endif; ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
    </div>
    <div>
@@ -137,6 +140,9 @@ $regionColl = $taxa->getRegionColl();
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
+      <?php if (!array_key_exists('children_dico_item_id', $_REQUEST)): ?>
+      <input type="submit" name="submit_back" value="Salva e torna">
+      <?php endif; ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
    </div>
 </form>

@@ -109,6 +109,7 @@ switch ($_REQUEST['action']) {
            header('Location: '.$GLOBALS['db']->config->baseUrl.'index.php?id='.$taxa->getData('id').'&insertObservation=1');
            exit;
        } else {
+          header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
           require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'general'.DIRECTORY_SEPARATOR.'signalObservation.phtml';
           exit;
        }
