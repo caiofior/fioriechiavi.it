@@ -28,3 +28,6 @@
 [submodule "lib/facebook-php-sdk-v4"]
 	path = lib/facebook-php-sdk-v4
 	url = https://github.com/facebook/facebook-php-sdk-v4.git
+[submodule "install/dbv"]
+	path = install/dbv
+	url = https://github.com/victorstanciu/dbv.git
