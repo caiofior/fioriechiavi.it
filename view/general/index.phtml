@@ -23,8 +23,8 @@ $taxa = $this->object;
 $title = $GLOBALS['db']->config->siteName;
 if ($taxa->getData('id') != 1 && $taxa->getData('name') != '' ) :
     $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); 
-require (__DIR__.DIRECTORY_SEPARATOR.'social.php');
-endif; ?>
+endif;
+?>
 <h1><?php echo $title; ?></h1>
 <?php
 if ($taxa->getData('name') != '') : 

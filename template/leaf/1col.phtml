@@ -23,7 +23,7 @@
 		<div class="container">
 			<div class="col-md-4 header-left">
                             <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>">
-				<img src="style/leaf/images/logo.jpg" alt="" />
+				<img src="style/leaf/images/logo.jpg" alt="<?php echo $GLOBALS['db']->config->siteName; ?>" />
                             </a>
 			</div>
 			<div class="col-md-8 header-right">
@@ -34,6 +34,22 @@
 			</div>
 			<div class="clearfix"></div>
 		</div>
+                <?php if(sizeof($GLOBALS['db']->config->socialPages)>0) :?>
+                <div class="container">
+                        <div class="col-xs-offset-1 header-right">
+                            <?php if($GLOBALS['db']->config->socialPages->facebook != '') : ?>
+                            <a rel="nofollow" class="blank" href="<?php echo $GLOBALS['db']->config->socialPages->facebook; ?>">
+                                <img src="style/leaf/images/fb.png" alt="Facebook" />
+                            </a>
+                            <?php endif; 
+                            if($GLOBALS['db']->config->socialPages->googlePlus != '') : ?>
+                            <a rel="publisher" class="blank" href="<?php echo $GLOBALS['db']->config->socialPages->googlePlus; ?>">
+                                <img src="style/leaf/images/gp.png" alt="Google +" />
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                </div>
+                <?php endif; ?>
 	</div>
 	<div class="content">
 		<div class="features-section">

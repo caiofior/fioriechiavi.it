@@ -78,3 +78,18 @@ function statusChangeCallback(response) {
   $("#subscribe_form, #lost_password_form").hide();
   $("#lost_password_link").click(function(e) {$("#lost_password_form").toggle();e.preventDefault();});
   $("#subscribe_link").click(function(e) {$("#subscribe_form").toggle();e.preventDefault();});
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/it_IT/all.js#xfbml=1&appId="+appId;
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : appId,
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.2'
+    });
+  }
