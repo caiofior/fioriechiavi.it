@@ -720,6 +720,9 @@ a.hvr-shutter-in-horizontal:hover:before,a.hvr-shutter-in-horizontal:focus:befor
 .selectedPage {
     font-weight: bold;
 }
+a.notextdecoration {
+    text-decoration: none;
+}
 #signalObservationButton,
 #signalObservationLink {
     font-size: 19.6px;

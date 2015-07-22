@@ -717,7 +717,9 @@ a.hvr-shutter-in-horizontal:hover:before,a.hvr-shutter-in-horizontal:focus:befor
     border: 2px solid;
     border-radius: 25px;
 }
-
+a.notextdecoration {
+    text-decoration: none;
+}
 /*-- responsive-design starts-here --*/
 
 @media screen and (max-width: 1440px) {
