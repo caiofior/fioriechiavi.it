@@ -215,10 +215,11 @@ class Search {
     }
     /**
      * Gets a collection of filtered regions
+     * @param $removeEmpty bool Remove empty items
      * @return \flora\region\RegionColl
      * @throws \Exception
      */
-    public function getFilteredRegionColl(){
+    public function getFilteredRegionColl($removeEmpty=false){
         $select=$this->createSelect(array('region'));
         $select->columns(array(
             'taxa_id'
@@ -256,13 +257,21 @@ class Search {
                 ) {
                    $regionData['selected']=true;
                 }
-            foreach($this->regionColl->getItems() as $region) {
-                if ($region->getData('id')==$regionData['id']) {
+            foreach($this->regionColl->getItems() as $key=>$region) {
+                if ($region->getData('id')== $regionData['id']) {
                     $region->setData($regionData);
                 }
             }    
         }
-        return $this->regionColl;
+        $regionColl = clone $this->regionColl;
+        if ($removeEmpty == true) {
+            foreach($regionColl->getItems() as $key=>$region) {
+                if ($region->getRawData('count') < 1) {
+                    $regionColl->deleteByKey($key);
+                } 
+            }
+        }
+        return $regionColl;
     }
     /**
      * Gets altitude array
@@ -273,9 +282,10 @@ class Search {
     }
     /**
      * Gets filtered altitude array
+     * @param $removeEmpty bool Remove empty items
      * @return array
      */
-    public function getFilteredAltitudeArray() {
+    public function getFilteredAltitudeArray($removeEmpty=false) {
         $select=$this->createSelect(array('altitude'));
         $select->columns(array(
             'taxa_id'
@@ -300,13 +310,12 @@ class Search {
                    $this->altitude[$data['altitude']]=array('count'=>$data['count']);
                } 
         }
-           catch (\Exception $e) {
+        catch (\Exception $e) {
               $mysqli = $this->db->getDriver()->getConnection()->getResource();  
               if (array_key_exists('firephp', $GLOBALS) && !headers_sent())
                   $GLOBALS['firephp']->error('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error);
               throw new \Exception('Error in '. get_called_class().' on query '.$select->getSqlString($this->db->getPlatform()).' '.$e->getMessage().' '.$mysqli->errno.' '.$mysqli->error,1401301242);
-        }
-        
+        }    
         if(array_key_exists('altitude', $this->request) && is_array($this->request['altitude'])) {
              foreach ($this->request['altitude'] as $altitude) {
                  if (array_key_exists($altitude, $this->altitude)) {
@@ -317,7 +326,15 @@ class Search {
                  }
              }
         }
-        return $this->altitude;
+        $altitude = $this->altitude;
+        if ($removeEmpty == true) {
+            foreach($altitude as $key => $values) {
+                if (!array_key_exists('count', $values) || $values['count'] <1) {
+                    unset($altitude[$key]);
+                }
+            }
+        }   
+        return $altitude;
     }
     /**
      * Gets flowering array
@@ -328,9 +345,10 @@ class Search {
     }
     /**
      * Gets filtered flowering array
+     * @param $removeEmpty bool Remove empty items
      * @return array
      */
-    public function getFilteredFloweringArray() {
+    public function getFilteredFloweringArray($removeEmpty=false) {
         $select=$this->createSelect(array('flowering'));
         $select->columns(array(
             'taxa_id'
@@ -374,7 +392,15 @@ class Search {
                  }
              }
         }
-        return $this->flowering;
+        $flowering = $this->flowering;
+        if ($removeEmpty == true) {
+            foreach($flowering as $key => $values) {
+                if (!array_key_exists('count', $values) || $values['count'] <1) {
+                    unset($flowering[$key]);
+                }
+            }
+        }
+        return $flowering;
     }
     /**
      * Gets posture array
@@ -412,9 +438,10 @@ class Search {
     }
     /**
      * Gets filtered posture array
+     * @param $removeEmpty bool Remove empty items
      * @return array
      */
-    public function getFilteredPostureArray() {
+    public function getFilteredPostureArray($removeEmpty=false) {
         $posture = array();
         $select=$this->createSelect(array('posture'));
         $select->columns(array(
@@ -461,6 +488,13 @@ class Search {
                  }
              }
         }
+        if ($removeEmpty == true) {
+            foreach($posture as $key => $values) {
+                if (!array_key_exists('count', $values) || $values['count'] <1) {
+                    unset($posture[$key]);
+                }
+            }
+        } 
         return $posture;
     }
     /**
@@ -500,9 +534,10 @@ class Search {
     }
     /**
      * Gets filtered community array
+     * @param $removeEmpty bool Remove empty items
      * @return array
      */
-    public function getFilteredCommunityArray() {
+    public function getFilteredCommunityArray($removeEmpty=false) {
         $community = array();
         $select=$this->createSelect(array('community'));
         $select->columns(array(
@@ -549,6 +584,13 @@ class Search {
                  }
              }
         }
+        if ($removeEmpty == true) {
+            foreach($community as $key => $values) {
+                if (!array_key_exists('count', $values) || $values['count'] <1) {
+                    unset($community[$key]);
+                }
+            }
+        } 
         return $community;
     }
     /**
@@ -587,9 +629,10 @@ class Search {
     }
     /**
      * Gets filtered biologic form array
+     * @param $removeEmpty bool Remove empty items
      * @return array
      */
-    public function getFilteredBiologicFormArray() {
+    public function getFilteredBiologicFormArray($removeEmpty=false) {
         $biologicForm = array();
         $select=$this->createSelect(array('biologicForm'));
         $select->columns(array(
@@ -636,6 +679,13 @@ class Search {
                  }
              }
         }
+        if ($removeEmpty == true) {
+            foreach($biologicForm as $key => $values) {
+                if (!array_key_exists('count', $values) || $values['count'] <1) {
+                    unset($biologicForm[$key]);
+                }
+            }
+        } 
         return $biologicForm;
     }
     /**
@@ -688,7 +738,8 @@ class Search {
             ');
         }
         if  (
-                array_key_exists('posture', $this->request) && 
+                array_key_exists('posture', $this->request) &&
+                is_array($this->request['posture']) &&
                 sizeof(array_diff($this->request['posture'],$this->getPostureArray())) <> 0 &&
                 !in_array('posture',$avoid)
             ) {
@@ -699,16 +750,18 @@ class Search {
         }
         if  (
                 array_key_exists('biologicForm', $this->request) && 
-                sizeof(array_diff($this->request['biologicForm'],$this->getBiologicFormArray())) <> 0 &&
+                is_array($this->request['biologicForm']) &&
+                sizeof(array_diff($this->getBiologicFormArray(),$this->request['biologicForm'])) <> 0 &&
                 !in_array('biologicForm',$avoid)
-            ) {die('HI');
+            ) {
             $this->request['biologicForm']=array_map('addslashes',$this->request['biologicForm']);
             $select->where('
                   `taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_attribute_value` WHERE `taxa_attribute_id`='.$this->attributeId['Forma biologica'].' AND `value` IN ("'.implode('","',$this->request['biologicForm']).'"))
             ');
         }
         if  (
-                array_key_exists('community', $this->request) && 
+                array_key_exists('community', $this->request) &&
+                is_array($this->request['community']) &&
                 sizeof(array_diff($this->request['community'],$this->getCommunityArray())) <> 0 &&
                 !in_array('community',$avoid)
             ) {

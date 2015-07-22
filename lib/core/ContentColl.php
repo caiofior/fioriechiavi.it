@@ -165,7 +165,7 @@ abstract class ContentColl {
 * @return array
 */
     public function count() {
-        return sizeof($this->items);
+        return count($this->items);
     }
     /**
 * Returns all contents without any filter

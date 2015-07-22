@@ -2,7 +2,7 @@
 if (!isset($floraSearch)) {
     $floraSearch = $this->object;
 }
-$communityArray = $floraSearch-> getFilteredCommunityArray();
+$communityArray = $floraSearch->getFilteredCommunityArray(true);
 ?>
 <select id="community" name="community[]" multiple="multiple" size="<?php echo sizeof($communityArray);?>">
 <?php foreach ($communityArray as $communityData) :

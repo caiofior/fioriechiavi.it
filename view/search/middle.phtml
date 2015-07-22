@@ -9,42 +9,45 @@
 </div>
 <div>
     <label for="text">Testo</label>
-    <input id="text" name="text">
+    <input id="text" name="text" value="<?php echo (array_key_exists('text', $_REQUEST) ? $_REQUEST['text']: '') ?>">
 </div>
-<a href="#" class="showNext">Filtra per regione</a>
-<div id="regionFilterContainer" style="display: none;">
+<a href="#" class="showNext">Filtro avanzato</a>
+<div style="display: none;">
+<div id="regionFilterContainer">
+    <p><strong>Regione</strong></p>
     <a href="#" class="selectAll">Seleziona tutti</a><br/>
     <div id="regionFilter">
         <?php require __DIR__.'/regionFilter.phtml';?>
     </div>
 </div>
-<a href="#" class="showNext">Filtra per altitudine</a>
-<div id="altitudeFilterContainer" style="display: none;">
+<div id="altitudeFilterContainer">
+    <p><strong>Altitudine</strong></p>
     <a href="#" class="selectAll">Seleziona tutti</a><br/>
     <div id="altitudeFilter">
         <?php require __DIR__.'/altitudeFilter.phtml';?>
     </div>
 </div>
-<a href="#" class="showNext">Filtra per periodo di fioritura</a>
-<div id="floweringFilterContainer" style="display: none;">
+<div id="floweringFilterContainer">
+    <p><strong>Periodo di fioritura</strong></p>
     <a href="#" class="selectAll">Seleziona tutti</a><br/>
     <div id="floweringFilter">
         <?php require __DIR__.'/floweringFilter.phtml';?>
     </div>
 </div>
-<a href="#" class="showNext">Filtra per portamento</a>
-<div id="postureFilterContainer" style="display: none;">
+<div id="postureFilterContainer">
+    <p><strong>Portamento</strong></p>
     <a href="#" class="selectAll">Seleziona tutti</a><br/>
     <div id="postureFilter">
         <?php require __DIR__.'/postureFilter.phtml';?>
     </div>
 </div>
-<a href="#" class="showNext">Filtra per forma biologica</a>
-<div id="biologicFormFilterContainer" style="display: none;">
+<div id="biologicFormFilterContainer">
+    <p><strong>Forma biologico</strong></p>
     <a href="#" class="selectAll">Seleziona tutti</a><br/>
     <div id="biologicFormFilter">
         <?php require __DIR__.'/biologicFormFilter.phtml';?>
     </div>
+</div>
 </div>
 <div id="searchContent">
     <?php require __DIR__.'/searchContent.phtml';?>
