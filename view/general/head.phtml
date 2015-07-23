@@ -1,12 +1,24 @@
 <?php
 $title = $GLOBALS['db']->config->siteName;
+$description = $title;
 $taxa = $this->object;
 if (
         is_object($taxa) &&
         $taxa instanceof \flora\taxa\Taxa &&
         $taxa->getData('id') != 1 &&
         $taxa->getData('name') != '') :
-   $title .= ' :: '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>
+   $title .= ' :: '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name');
+   $description = $title;
+   if ($taxa->getData('description') != '') {
+        $description = $taxa->getData('description');
+   }
+   $description = strip_tags($description);
+   if (strlen($description)>300) {
+       $description = substr($description, 0,strpos($description,' ',300)).' …';
+   }
+   ?>
+   <meta name="description" content="<?php echo $description;?>"/>   
+   <meta property="og:description" content="<?php echo $description;?>"/>
    <meta property="og:site_name" content="<?php echo $GLOBALS['db']->config->siteName;?>"/>
    <meta property="og:title" content="<?php echo $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>" />
    <meta property="og:type" content="article" />
