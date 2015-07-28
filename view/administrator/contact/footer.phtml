@@ -1,5 +1,6 @@
+<?php if($GLOBALS['db']->config->useCDN === true) : ?>
 <script src="//cdn.datatables.net/1.10.3/js/jquery.dataTables.min.js"></script>
-<!--
+<?php else : ?>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/DataTables/media/js/jquery.dataTables.min.js"></script>
--->
+<?php endif; ?>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/administrator/contact.js');?>"></script>

@@ -1,5 +1,8 @@
-<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/index.js');?>"></script>
-<!--<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/index.min.js.gz');?>"></script>-->
+<?php if($GLOBALS['db']->config->useCDN === true) : ?>
+<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/index.min.js.gz');?>"></script>
+<?php else : ?>
+<script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/index.js"></script>
+<?php endif; ?>
 <script src="https://apis.google.com/js/platform.js" async defer>
 //<![CDATA[
   {lang: 'it'}

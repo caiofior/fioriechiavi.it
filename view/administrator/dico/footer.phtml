@@ -1,12 +1,13 @@
+<?php if($GLOBALS['db']->config->useCDN === true) : ?>
 <script src="//cdn.datatables.net/1.10.3/js/jquery.dataTables.min.js"></script>
 <script src="//cdn.jsdelivr.net/jquery.jeditable/1.7.3/jquery.jeditable.js"></script>
 <script src="//cdn.jsdelivr.net/plupload/2.1.1/plupload.full.min.js"></script>
 <script src="//cdn.jsdelivr.net/plupload/2.1.1/jquery.ui.plupload/jquery.ui.plupload.min.js"></script>
-<!--
+<?php else : ?>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/DataTables/media/js/jquery.dataTables.min.js"></script>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/jquery_jeditable/jquery.jeditable.js"></script>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/plupload/js/plupload.full.min.js"></script>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/plupload/js/jquery.ui.plupload/jquery.ui.plupload.min.js"></script>
--->
+<?php endif; ?>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/plupload/js/i18n/it.js');?>"></script>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/administrator/dico.js');?>"></script>
