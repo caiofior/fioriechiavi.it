@@ -32,7 +32,7 @@ endif;
 if ($taxa->getData('name') != '') : 
    $taxaParentColl = $taxa->getParentColl();
    foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) : ?>
-   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxaParent->getData('id');?>">
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxaParent->getData('id');?>">
       <h<?php echo 1+$taxaParentColl->count()-$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
    </a>
    <?php
@@ -222,7 +222,7 @@ if($newTaxaColl->count() > 0): ?>
             <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>" alt="<?php echo $newTaxa->getData('name');?>"/>
          <?php endif; ?>
          <br/>
-         <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $newTaxa->getData('id');?>"><?php echo $newTaxa->getRawData('taxa_kind_initials').' '.$newTaxa->getData('name') ?></a>
+         <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $newTaxa->getData('id');?>"><?php echo $newTaxa->getRawData('taxa_kind_initials').' '.$newTaxa->getData('name') ?></a>
 
       </div>
    <?php endforeach;?>
