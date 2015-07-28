@@ -3632,14 +3632,14 @@ abstract class StorageFactory
             throw new Exception\InvalidArgumentException('Missing "adapter"');
         }
         $adapterName    = $cfg['adapter'];
-        $adapterOptions = array();
+        $adapterOptions = [];
         if (is_array($cfg['adapter'])) {
             if (!isset($cfg['adapter']['name'])) {
                 throw new Exception\InvalidArgumentException('Missing "adapter.name"');
             }
 
             $adapterName    = $cfg['adapter']['name'];
-            $adapterOptions = isset($cfg['adapter']['options']) ? $cfg['adapter']['options'] : array();
+            $adapterOptions = isset($cfg['adapter']['options']) ? $cfg['adapter']['options'] : [];
         }
         if (isset($cfg['options'])) {
             $adapterOptions = array_merge($adapterOptions, $cfg['options']);
@@ -3683,7 +3683,7 @@ abstract class StorageFactory
                     if (isset($v['options'])) {
                         $pluginOptions = $v['options'];
                     } else {
-                        $pluginOptions = array();
+                        $pluginOptions = [];
                     }
 
                     if (isset($v['priority'])) {
@@ -3691,7 +3691,7 @@ abstract class StorageFactory
                     }
                 } else {
                     $pluginName    = $v;
-                    $pluginOptions = array();
+                    $pluginOptions = [];
                 }
 
                 $plugin = static::pluginFactory($pluginName, $pluginOptions);
@@ -3710,7 +3710,7 @@ abstract class StorageFactory
      * @return Storage\StorageInterface
      * @throws Exception\RuntimeException
      */
-    public static function adapterFactory($adapterName, $options = array())
+    public static function adapterFactory($adapterName, $options = [])
     {
         if ($adapterName instanceof Storage\StorageInterface) {
             // $adapterName is already an adapter object
@@ -3768,7 +3768,7 @@ abstract class StorageFactory
      * @return Storage\Plugin\PluginInterface
      * @throws Exception\RuntimeException
      */
-    public static function pluginFactory($pluginName, $options = array())
+    public static function pluginFactory($pluginName, $options = [])
     {
         if ($pluginName instanceof Storage\Plugin\PluginInterface) {
             // $pluginName is already a plugin object
@@ -3821,6 +3821,43 @@ abstract class StorageFactory
     {
         static::$plugins = null;
     }
+}
+
+/**
+ * @license http://www.opensource.org/licenses/mit-license.php MIT (see the LICENSE file)
+ */
+
+namespace Interop\Container;
+
+use Interop\Container\Exception\ContainerException;
+use Interop\Container\Exception\NotFoundException;
+
+/**
+ * Describes the interface of a container that exposes methods to read its entries.
+ */
+interface ContainerInterface
+{
+    /**
+     * Finds an entry of the container by its identifier and returns it.
+     *
+     * @param string $id Identifier of the entry to look for.
+     *
+     * @throws NotFoundException  No entry was found for this identifier.
+     * @throws ContainerException Error while retrieving the entry.
+     *
+     * @return mixed Entry.
+     */
+    public function get($id);
+
+    /**
+     * Returns true if the container can return an entry for the given identifier.
+     * Returns false otherwise.
+     *
+     * @param string $id Identifier of the entry to look for.
+     *
+     * @return boolean
+     */
+    public function has($id);
 }
 
 /**
@@ -3893,7 +3930,9 @@ interface ServiceLocatorAwareInterface
 
 namespace Zend\ServiceManager;
 
-class ServiceManager implements ServiceLocatorInterface
+use Interop\Container\ContainerInterface;
+
+class ServiceManager implements ServiceLocatorInterface, ContainerInterface
 {
     /**@#+
      * Constants
@@ -3907,7 +3946,7 @@ class ServiceManager implements ServiceLocatorInterface
      *
      * @var array
      */
-    protected $canonicalNames = array();
+    protected $canonicalNames = [];
 
     /**
      * @var bool
@@ -3917,27 +3956,27 @@ class ServiceManager implements ServiceLocatorInterface
     /**
      * @var array
      */
-    protected $invokableClasses = array();
+    protected $invokableClasses = [];
 
     /**
      * @var string|callable|\Closure|FactoryInterface[]
      */
-    protected $factories = array();
+    protected $factories = [];
 
     /**
      * @var AbstractFactoryInterface[]
      */
-    protected $abstractFactories = array();
+    protected $abstractFactories = [];
 
     /**
      * @var array[]
      */
-    protected $delegators = array();
+    protected $delegators = [];
 
     /**
      * @var array
      */
-    protected $pendingAbstractFactoryRequests = array();
+    protected $pendingAbstractFactoryRequests = [];
 
     /**
      * @var integer
@@ -3947,34 +3986,34 @@ class ServiceManager implements ServiceLocatorInterface
     /**
      * @var array
      */
-    protected $nestedContext = array();
+    protected $nestedContext = [];
 
     /**
      * @var array
      */
-    protected $shared = array();
+    protected $shared = [];
 
     /**
      * Registered services and cached values
      *
      * @var array
      */
-    protected $instances = array();
+    protected $instances = [];
 
     /**
      * @var array
      */
-    protected $aliases = array();
+    protected $aliases = [];
 
     /**
      * @var array
      */
-    protected $initializers = array();
+    protected $initializers = [];
 
     /**
      * @var ServiceManager[]
      */
-    protected $peeringServiceManagers = array();
+    protected $peeringServiceManagers = [];
 
     /**
      * Whether or not to share by default
@@ -3996,7 +4035,7 @@ class ServiceManager implements ServiceLocatorInterface
     /**
      * @var array map of characters to be replaced through strtr
      */
-    protected $canonicalNamesReplacements = array('-' => '', '_' => '', ' ' => '', '\\' => '', '/' => '');
+    protected $canonicalNamesReplacements = ['-' => '', '_' => '', ' ' => '', '\\' => '', '/' => ''];
 
     /**
      * @var ServiceLocatorInterface
@@ -4123,7 +4162,7 @@ class ServiceManager implements ServiceLocatorInterface
     {
         $cName = $this->canonicalizeName($name);
 
-        if ($this->has(array($cName, $name), false)) {
+        if ($this->has([$cName, $name], false)) {
             if ($this->allowOverride === false) {
                 throw new Exception\InvalidServiceNameException(sprintf(
                     'A service by the name or alias "%s" already exists and cannot be overridden; please use an alternate name',
@@ -4163,7 +4202,7 @@ class ServiceManager implements ServiceLocatorInterface
             );
         }
 
-        if ($this->has(array($cName, $name), false)) {
+        if ($this->has([$cName, $name], false)) {
             if ($this->allowOverride === false) {
                 throw new Exception\InvalidServiceNameException(sprintf(
                     'A service by the name or alias "%s" already exists and cannot be overridden, please use an alternate name',
@@ -4225,7 +4264,7 @@ class ServiceManager implements ServiceLocatorInterface
         $cName = $this->canonicalizeName($serviceName);
 
         if (!isset($this->delegators[$cName])) {
-            $this->delegators[$cName] = array();
+            $this->delegators[$cName] = [];
         }
 
         $this->delegators[$cName][] = $delegatorFactoryName;
@@ -4347,7 +4386,7 @@ class ServiceManager implements ServiceLocatorInterface
      */
     protected function resolveAlias($cName)
     {
-        $stack = array();
+        $stack = [];
 
         while ($this->hasAlias($cName)) {
             if (isset($stack[$cName])) {
@@ -4411,7 +4450,7 @@ class ServiceManager implements ServiceLocatorInterface
                 || isset($this->aliases[$cName])
                 || $this->canCreateFromAbstractFactory($cName, $name)
             ) {
-                $instance = $this->create(array($cName, $name));
+                $instance = $this->create([$cName, $name]);
             } elseif ($isAlias && $this->canCreateFromAbstractFactory($name, $cName)) {
                 /*
                  * case of an alias leading to an abstract factory :
@@ -4419,7 +4458,7 @@ class ServiceManager implements ServiceLocatorInterface
                  *     $name = 'my-alias'
                  *     $cName = 'my-abstract-defined-service'
                  */
-                $instance = $this->create(array($name, $cName));
+                $instance = $this->create([$name, $cName]);
             } elseif ($usePeeringServiceManagers && !$this->retrieveFromPeeringManagerFirst) {
                 $instance = $this->retrieveFromPeeringManager($name);
             }
@@ -4494,12 +4533,10 @@ class ServiceManager implements ServiceLocatorInterface
      */
     private function createDelegatorCallback($delegatorFactory, $rName, $cName, $creationCallback)
     {
-        $serviceManager  = $this;
-
-        return function () use ($serviceManager, $delegatorFactory, $rName, $cName, $creationCallback) {
+        return function () use ($delegatorFactory, $rName, $cName, $creationCallback) {
             return $delegatorFactory instanceof DelegatorFactoryInterface
-                ? $delegatorFactory->createDelegatorWithName($serviceManager, $cName, $rName, $creationCallback)
-                : $delegatorFactory($serviceManager, $cName, $rName, $creationCallback);
+                ? $delegatorFactory->createDelegatorWithName($this, $cName, $rName, $creationCallback)
+                : $delegatorFactory($this, $cName, $rName, $creationCallback);
         };
     }
 
@@ -4512,9 +4549,8 @@ class ServiceManager implements ServiceLocatorInterface
      * @return bool|mixed|null|object
      * @throws Exception\ServiceNotFoundException
      *
-     * @internal this method is internal because of PHP 5.3 compatibility - do not explicitly use it
      */
-    public function doCreate($rName, $cName)
+    protected function doCreate($rName, $cName)
     {
         $instance = null;
 
@@ -4678,7 +4714,7 @@ class ServiceManager implements ServiceLocatorInterface
     {
         $aliases = $this->aliases;
         $aliases[$alias] = $nameOrAlias;
-        $stack = array();
+        $stack = [];
 
         while (isset($aliases[$alias])) {
             if (isset($stack[$alias])) {
@@ -4718,7 +4754,7 @@ class ServiceManager implements ServiceLocatorInterface
             throw new Exception\InvalidServiceNameException('Invalid service name alias');
         }
 
-        if ($this->allowOverride === false && $this->has(array($cAlias, $alias), false)) {
+        if ($this->allowOverride === false && $this->has([$cAlias, $alias], false)) {
             throw new Exception\InvalidServiceNameException(sprintf(
                 'An alias by the name "%s" or "%s" already exists',
                 $cAlias,
@@ -4810,11 +4846,11 @@ class ServiceManager implements ServiceLocatorInterface
      */
     protected function createServiceViaCallback($callable, $cName, $rName)
     {
-        static $circularDependencyResolver = array();
+        static $circularDependencyResolver = [];
         $depKey = spl_object_hash($this) . '-' . $cName;
 
         if (isset($circularDependencyResolver[$depKey])) {
-            $circularDependencyResolver = array();
+            $circularDependencyResolver = [];
             throw new Exception\CircularDependencyFoundException('Circular dependency for LazyServiceLoader was found for instance ' . $rName);
         }
 
@@ -4847,12 +4883,12 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function getRegisteredServices()
     {
-        return array(
+        return [
             'invokableClasses' => array_keys($this->invokableClasses),
             'factories' => array_keys($this->factories),
             'aliases' => array_keys($this->aliases),
             'instances' => array_keys($this->instances),
-        );
+        ];
     }
 
     /**
@@ -4978,7 +5014,7 @@ class ServiceManager implements ServiceLocatorInterface
             $this->factories[$canonicalName] = $factory;
         }
         if ($factory instanceof FactoryInterface) {
-            $instance = $this->createServiceViaCallback(array($factory, 'createService'), $canonicalName, $requestedName);
+            $instance = $this->createServiceViaCallback([$factory, 'createService'], $canonicalName, $requestedName);
         } elseif (is_callable($factory)) {
             $instance = $this->createServiceViaCallback($factory, $canonicalName, $requestedName);
         } else {
@@ -5007,7 +5043,7 @@ class ServiceManager implements ServiceLocatorInterface
             try {
                 $this->pendingAbstractFactoryRequests[$pendingKey] = true;
                 $instance = $this->createServiceViaCallback(
-                    array($abstractFactory, 'createServiceWithName'),
+                    [$abstractFactory, 'createServiceWithName'],
                     $canonicalName,
                     $requestedName
                 );
@@ -5053,13 +5089,13 @@ class ServiceManager implements ServiceLocatorInterface
     {
         if ($force) {
             $this->nestedContextCounter = -1;
-            $this->nestedContext = array();
+            $this->nestedContext = [];
             return $this;
         }
 
         $this->nestedContextCounter--;
         if ($this->nestedContextCounter === -1) {
-            $this->nestedContext = array();
+            $this->nestedContext = [];
         }
         return $this;
     }
@@ -5072,10 +5108,9 @@ class ServiceManager implements ServiceLocatorInterface
      */
     protected function createDelegatorFromFactory($canonicalName, $requestedName)
     {
-        $serviceManager     = $this;
         $delegatorsCount    = count($this->delegators[$canonicalName]);
-        $creationCallback   = function () use ($serviceManager, $requestedName, $canonicalName) {
-            return $serviceManager->doCreate($requestedName, $canonicalName);
+        $creationCallback   = function () use ($requestedName, $canonicalName) {
+            return $this->doCreate($requestedName, $canonicalName);
         };
 
         for ($i = 0; $i < $delegatorsCount; $i += 1) {
@@ -5104,7 +5139,7 @@ class ServiceManager implements ServiceLocatorInterface
             );
         }
 
-        return $creationCallback($serviceManager, $canonicalName, $requestedName, $creationCallback);
+        return $creationCallback($this, $canonicalName, $requestedName, $creationCallback);
     }
 
     /**
@@ -5138,7 +5173,7 @@ class ServiceManager implements ServiceLocatorInterface
      */
     protected function unregisterService($canonical)
     {
-        $types = array('invokableClasses', 'factories', 'aliases');
+        $types = ['invokableClasses', 'factories', 'aliases'];
         foreach ($types as $type) {
             if (isset($this->{$type}[$canonical])) {
                 unset($this->{$type}[$canonical]);
@@ -5219,10 +5254,9 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
     public function __construct(ConfigInterface $configuration = null)
     {
         parent::__construct($configuration);
-        $self = $this;
-        $this->addInitializer(function ($instance) use ($self) {
+        $this->addInitializer(function ($instance) {
             if ($instance instanceof ServiceLocatorAwareInterface) {
-                $instance->setServiceLocator($self);
+                $instance->setServiceLocator($this);
             }
         });
     }
@@ -5256,7 +5290,7 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
      * @throws Exception\ServiceNotCreatedException
      * @throws Exception\RuntimeException
      */
-    public function get($name, $options = array(), $usePeeringServiceManagers = true)
+    public function get($name, $options = [], $usePeeringServiceManagers = true)
     {
         $isAutoInvokable = false;
 
@@ -5396,7 +5430,7 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
         }
 
         if ($factory instanceof FactoryInterface) {
-            $instance = $this->createServiceViaCallback(array($factory, 'createService'), $canonicalName, $requestedName);
+            $instance = $this->createServiceViaCallback([$factory, 'createService'], $canonicalName, $requestedName);
         } elseif (is_callable($factory)) {
             $instance = $this->createServiceViaCallback($factory, $canonicalName, $requestedName);
         } else {
@@ -5500,7 +5534,7 @@ class AdapterPluginManager extends AbstractPluginManager
      *
      * @var array
      */
-    protected $invokableClasses = array(
+    protected $invokableClasses = [
         'apc'            => 'Zend\Cache\Storage\Adapter\Apc',
         'blackhole'      => 'Zend\Cache\Storage\Adapter\BlackHole',
         'dba'            => 'Zend\Cache\Storage\Adapter\Dba',
@@ -5515,7 +5549,7 @@ class AdapterPluginManager extends AbstractPluginManager
         'wincache'       => 'Zend\Cache\Storage\Adapter\WinCache',
         'zendserverdisk' => 'Zend\Cache\Storage\Adapter\ZendServerDisk',
         'zendservershm'  => 'Zend\Cache\Storage\Adapter\ZendServerShm',
-    );
+    ];
 
     /**
      * Do not share by default
@@ -5857,7 +5891,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      * Event handles of this adapter
      * @var array
      */
-    protected $eventHandles = array();
+    protected $eventHandles = [];
 
     /**
      * The plugin registry
@@ -6008,7 +6042,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     public function getEventManager()
     {
         if ($this->events === null) {
-            $this->events = new EventManager(array(__CLASS__, get_class($this)));
+            $this->events = new EventManager([__CLASS__, get_class($this)]);
         }
         return $this->events;
     }
@@ -6161,9 +6195,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         $this->normalizeKey($key);
 
         $argn = func_num_args();
-        $args = array(
+        $args = [
             'key' => & $key,
-        );
+        ];
         if ($argn > 1) {
             $args['success'] = & $success;
         }
@@ -6218,13 +6252,13 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     public function getItems(array $keys)
     {
         if (!$this->getOptions()->getReadable()) {
-            return array();
+            return [];
         }
 
         $this->normalizeKeys($keys);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keys' => & $keys,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6235,7 +6269,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
-            $result = array();
+            $result = [];
             return $this->triggerException(__FUNCTION__, $args, $result, $e);
         }
     }
@@ -6250,7 +6284,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     protected function internalGetItems(array & $normalizedKeys)
     {
         $success = null;
-        $result  = array();
+        $result  = [];
         foreach ($normalizedKeys as $normalizedKey) {
             $value = $this->internalGetItem($normalizedKey, $success);
             if ($success) {
@@ -6279,9 +6313,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key' => & $key,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6325,13 +6359,13 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     public function hasItems(array $keys)
     {
         if (!$this->getOptions()->getReadable()) {
-            return array();
+            return [];
         }
 
         $this->normalizeKeys($keys);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keys' => & $keys,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6342,7 +6376,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
-            $result = array();
+            $result = [];
             return $this->triggerException(__FUNCTION__, $args, $result, $e);
         }
     }
@@ -6356,7 +6390,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalHasItems(array & $normalizedKeys)
     {
-        $result = array();
+        $result = [];
         foreach ($normalizedKeys as $normalizedKey) {
             if ($this->internalHasItem($normalizedKey)) {
                 $result[] = $normalizedKey;
@@ -6383,9 +6417,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key' => & $key,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6414,7 +6448,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
             return false;
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -6431,13 +6465,13 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     public function getMetadatas(array $keys)
     {
         if (!$this->getOptions()->getReadable()) {
-            return array();
+            return [];
         }
 
         $this->normalizeKeys($keys);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keys' => & $keys,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6448,7 +6482,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
-            $result = array();
+            $result = [];
             return $this->triggerException(__FUNCTION__, $args, $result, $e);
         }
     }
@@ -6462,7 +6496,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalGetMetadatas(array & $normalizedKeys)
     {
-        $result = array();
+        $result = [];
         foreach ($normalizedKeys as $normalizedKey) {
             $metadata = $this->internalGetMetadata($normalizedKey);
             if ($metadata !== false) {
@@ -6493,10 +6527,10 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key'   => & $key,
             'value' => & $value,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6540,9 +6574,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKeyValuePairs($keyValuePairs);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keyValuePairs' => & $keyValuePairs,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6567,7 +6601,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalSetItems(array & $normalizedKeyValuePairs)
     {
-        $failedKeys = array();
+        $failedKeys = [];
         foreach ($normalizedKeyValuePairs as $normalizedKey => $value) {
             if (!$this->internalSetItem($normalizedKey, $value)) {
                 $failedKeys[] = $normalizedKey;
@@ -6595,10 +6629,10 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key'   => & $key,
             'value' => & $value,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6648,9 +6682,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKeyValuePairs($keyValuePairs);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keyValuePairs' => & $keyValuePairs,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6675,7 +6709,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalAddItems(array & $normalizedKeyValuePairs)
     {
-        $result = array();
+        $result = [];
         foreach ($normalizedKeyValuePairs as $normalizedKey => $value) {
             if (!$this->internalAddItem($normalizedKey, $value)) {
                 $result[] = $normalizedKey;
@@ -6703,10 +6737,10 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key'   => & $key,
             'value' => & $value,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6757,9 +6791,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKeyValuePairs($keyValuePairs);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keyValuePairs' => & $keyValuePairs,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6784,7 +6818,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalReplaceItems(array & $normalizedKeyValuePairs)
     {
-        $result = array();
+        $result = [];
         foreach ($normalizedKeyValuePairs as $normalizedKey => $value) {
             if (!$this->internalReplaceItem($normalizedKey, $value)) {
                 $result[] = $normalizedKey;
@@ -6814,11 +6848,11 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'token' => & $token,
             'key'   => & $key,
             'value' => & $value,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6873,9 +6907,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key' => & $key,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6927,9 +6961,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKeys($keys);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keys' => & $keys,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -6953,7 +6987,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalTouchItems(array & $normalizedKeys)
     {
-        $result = array();
+        $result = [];
         foreach ($normalizedKeys as $normalizedKey) {
             if (!$this->internalTouchItem($normalizedKey)) {
                 $result[] = $normalizedKey;
@@ -6980,9 +7014,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key' => & $key,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -7025,9 +7059,9 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKeys($keys);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keys' => & $keys,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -7051,7 +7085,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalRemoveItems(array & $normalizedKeys)
     {
-        $result = array();
+        $result = [];
         foreach ($normalizedKeys as $normalizedKey) {
             if (!$this->internalRemoveItem($normalizedKey)) {
                 $result[] = $normalizedKey;
@@ -7079,10 +7113,10 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key'   => & $key,
             'value' => & $value,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -7136,13 +7170,13 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     public function incrementItems(array $keyValuePairs)
     {
         if (!$this->getOptions()->getWritable()) {
-            return array();
+            return [];
         }
 
         $this->normalizeKeyValuePairs($keyValuePairs);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keyValuePairs' => & $keyValuePairs,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -7153,7 +7187,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
-            $result = array();
+            $result = [];
             return $this->triggerException(__FUNCTION__, $args, $result, $e);
         }
     }
@@ -7167,7 +7201,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalIncrementItems(array & $normalizedKeyValuePairs)
     {
-        $result = array();
+        $result = [];
         foreach ($normalizedKeyValuePairs as $normalizedKey => $value) {
             $newValue = $this->internalIncrementItem($normalizedKey, $value);
             if ($newValue !== false) {
@@ -7196,10 +7230,10 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
         }
 
         $this->normalizeKey($key);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'key'   => & $key,
             'value' => & $value,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -7253,13 +7287,13 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     public function decrementItems(array $keyValuePairs)
     {
         if (!$this->getOptions()->getWritable()) {
-            return array();
+            return [];
         }
 
         $this->normalizeKeyValuePairs($keyValuePairs);
-        $args = new ArrayObject(array(
+        $args = new ArrayObject([
             'keyValuePairs' => & $keyValuePairs,
-        ));
+        ]);
 
         try {
             $eventRs = $this->triggerPre(__FUNCTION__, $args);
@@ -7270,7 +7304,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
 
             return $this->triggerPost(__FUNCTION__, $args, $result);
         } catch (\Exception $e) {
-            $result = array();
+            $result = [];
             return $this->triggerException(__FUNCTION__, $args, $result, $e);
         }
     }
@@ -7284,7 +7318,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function internalDecrementItems(array & $normalizedKeyValuePairs)
     {
-        $result = array();
+        $result = [];
         foreach ($normalizedKeyValuePairs as $normalizedKey => $value) {
             $newValue = $this->decrementItem($normalizedKey, $value);
             if ($newValue !== false) {
@@ -7375,7 +7409,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
             );
         }
 
-        array_walk($keys, array($this, 'normalizeKey'));
+        array_walk($keys, [$this, 'normalizeKey']);
         $keys = array_values(array_unique($keys));
     }
 
@@ -7388,7 +7422,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
      */
     protected function normalizeKeyValuePairs(array & $keyValuePairs)
     {
-        $normalizedKeyValuePairs = array();
+        $normalizedKeyValuePairs = [];
         foreach ($keyValuePairs as $key => $value) {
             $this->normalizeKey($key);
             $normalizedKeyValuePairs[$key] = $value;
@@ -7895,7 +7929,7 @@ class Filesystem extends AbstractAdapter implements
         }
 
         $filespec = $this->getFileSpec($key);
-        $tags     = array();
+        $tags     = [];
         if (file_exists($filespec . '.tag')) {
             $tags = explode("\n", $this->getFileContent($filespec . '.tag'));
         }
@@ -8148,7 +8182,7 @@ class Filesystem extends AbstractAdapter implements
     protected function internalGetItems(array & $normalizedKeys)
     {
         $keys    = $normalizedKeys; // Don't change argument passed by reference
-        $result  = array();
+        $result  = [];
         while ($keys) {
             // LOCK_NB if more than one items have to read
             $nonBlocking = count($keys) > 1;
@@ -8275,7 +8309,7 @@ class Filesystem extends AbstractAdapter implements
      * @param array $options
      * @return array Associative array of keys and metadata
      */
-    public function getMetadatas(array $keys, array $options = array())
+    public function getMetadatas(array $keys, array $options = [])
     {
         $options = $this->getOptions();
         if ($options->getReadable() && $options->getClearStatCache()) {
@@ -8301,10 +8335,10 @@ class Filesystem extends AbstractAdapter implements
         $filespec = $this->getFileSpec($normalizedKey);
         $file     = $filespec . '.dat';
 
-        $metadata = array(
+        $metadata = [
             'filespec' => $filespec,
             'mtime'    => filemtime($file)
-        );
+        ];
 
         if (!$options->getNoCtime()) {
             $metadata['ctime'] = filectime($file);
@@ -8327,16 +8361,16 @@ class Filesystem extends AbstractAdapter implements
     protected function internalGetMetadatas(array & $normalizedKeys)
     {
         $options = $this->getOptions();
-        $result  = array();
+        $result  = [];
 
         foreach ($normalizedKeys as $normalizedKey) {
             $filespec = $this->getFileSpec($normalizedKey);
             $file     = $filespec . '.dat';
 
-            $metadata = array(
+            $metadata = [
                 'filespec' => $filespec,
                 'mtime'    => filemtime($file),
-            );
+            ];
 
             if (!$options->getNoCtime()) {
                 $metadata['ctime'] = filectime($file);
@@ -8520,7 +8554,7 @@ class Filesystem extends AbstractAdapter implements
     protected function internalSetItems(array & $normalizedKeyValuePairs)
     {
         // create an associated array of files and contents to write
-        $contents = array();
+        $contents = [];
         foreach ($normalizedKeyValuePairs as $key => & $value) {
             $filespec = $this->getFileSpec($key);
             $this->prepareDirectoryStructure($filespec);
@@ -8546,7 +8580,7 @@ class Filesystem extends AbstractAdapter implements
         }
 
         // return OK
-        return array();
+        return [];
     }
 
     /**
@@ -8742,7 +8776,7 @@ class Filesystem extends AbstractAdapter implements
             $options = $this->getOptions();
 
             // detect metadata
-            $metadata = array('mtime', 'filespec');
+            $metadata = ['mtime', 'filespec'];
             if (!$options->getNoAtime()) {
                 $metadata[] = 'atime';
             }
@@ -8753,8 +8787,8 @@ class Filesystem extends AbstractAdapter implements
             $capabilities = new Capabilities(
                 $this,
                 $marker,
-                array(
-                    'supportedDatatypes' => array(
+                [
+                    'supportedDatatypes' => [
                         'NULL'     => 'string',
                         'boolean'  => 'string',
                         'integer'  => 'string',
@@ -8763,7 +8797,7 @@ class Filesystem extends AbstractAdapter implements
                         'array'    => false,
                         'object'   => false,
                         'resource' => false,
-                    ),
+                    ],
                     'supportedMetadata'  => $metadata,
                     'minTtl'             => 1,
                     'maxTtl'             => 0,
@@ -8773,7 +8807,7 @@ class Filesystem extends AbstractAdapter implements
                     'maxKeyLength'       => 251, // 255 - strlen(.dat | .tag)
                     'namespaceIsPrefix'  => true,
                     'namespaceSeparator' => $options->getNamespaceSeparator(),
-                )
+                ]
             );
 
             // update capabilities on change options
@@ -9039,7 +9073,7 @@ class Filesystem extends AbstractAdapter implements
             // -> create directories one by one and set permissions
 
             // find existing path and missing path parts
-            $parts = array();
+            $parts = [];
             $path  = $pathname;
             while (!file_exists($path)) {
                 array_unshift($parts, basename($path));
@@ -9333,7 +9367,7 @@ abstract class AbstractOptions implements ParameterObjectInterface
      */
     public function toArray()
     {
-        $array = array();
+        $array = [];
         $transform = function ($letters) {
             $letter = array_shift($letters);
             return '_' . strtolower($letter);
@@ -9361,7 +9395,7 @@ abstract class AbstractOptions implements ParameterObjectInterface
     {
         $setter = 'set' . str_replace('_', '', $key);
 
-        if (is_callable(array($this, $setter))) {
+        if (is_callable([$this, $setter])) {
             $this->{$setter}($value);
 
             return;
@@ -9389,7 +9423,7 @@ abstract class AbstractOptions implements ParameterObjectInterface
     {
         $getter = 'get' . str_replace('_', '', $key);
 
-        if (is_callable(array($this, $getter))) {
+        if (is_callable([$this, $getter])) {
             return $this->{$getter}();
         }
 
@@ -9671,7 +9705,7 @@ class AdapterOptions extends AbstractOptions
     protected function triggerOptionEvent($optionName, $optionValue)
     {
         if ($this->adapter instanceof EventsCapableInterface) {
-            $event = new Event('option', $this->adapter, new ArrayObject(array($optionName => $optionValue)));
+            $event = new Event('option', $this->adapter, new ArrayObject([$optionName => $optionValue]));
             $this->adapter->getEventManager()->trigger($event);
         }
     }
@@ -10229,7 +10263,7 @@ interface EventManagerInterface extends SharedEventManagerAwareInterface
      * @param  null|callable $callback
      * @return ResponseCollection
      */
-    public function trigger($event, $target = null, $argv = array(), $callback = null);
+    public function trigger($event, $target = null, $argv = [], $callback = null);
 
     /**
      * Trigger an event until the given callback returns a boolean true
@@ -10468,7 +10502,7 @@ class Event implements EventInterface
     /**
      * @var array|ArrayAccess|object The event parameters
      */
-    protected $params = array();
+    protected $params = [];
 
     /**
      * @var bool Whether or not to stop propagation
@@ -10737,7 +10771,7 @@ class EventManager implements EventManagerInterface
      * Subscribed events and their listeners
      * @var array Array of PriorityQueue objects
      */
-    protected $events = array();
+    protected $events = [];
 
     /**
      * @var string Class representing the event being emitted
@@ -10748,7 +10782,7 @@ class EventManager implements EventManagerInterface
      * Identifiers, used to pull shared signals from SharedEventManagerInterface instance
      * @var array
      */
-    protected $identifiers = array();
+    protected $identifiers = [];
 
     /**
      * Shared event manager
@@ -10853,7 +10887,7 @@ class EventManager implements EventManagerInterface
         if (is_array($identifiers) || $identifiers instanceof Traversable) {
             $this->identifiers = array_unique((array) $identifiers);
         } elseif ($identifiers !== null) {
-            $this->identifiers = array($identifiers);
+            $this->identifiers = [$identifiers];
         }
         return $this;
     }
@@ -10869,7 +10903,7 @@ class EventManager implements EventManagerInterface
         if (is_array($identifiers) || $identifiers instanceof Traversable) {
             $this->identifiers = array_unique(array_merge($this->identifiers, (array) $identifiers));
         } elseif ($identifiers !== null) {
-            $this->identifiers = array_unique(array_merge($this->identifiers, array($identifiers)));
+            $this->identifiers = array_unique(array_merge($this->identifiers, [$identifiers]));
         }
         return $this;
     }
@@ -10884,7 +10918,7 @@ class EventManager implements EventManagerInterface
      * @return ResponseCollection All listener return values
      * @throws Exception\InvalidCallbackException
      */
-    public function trigger($event, $target = null, $argv = array(), $callback = null)
+    public function trigger($event, $target = null, $argv = [], $callback = null)
     {
         if ($event instanceof EventInterface) {
             $e        = $event;
@@ -10976,7 +11010,7 @@ class EventManager implements EventManagerInterface
 
         // Array of events should be registered individually, and return an array of all listeners
         if (is_array($event)) {
-            $listeners = array();
+            $listeners = [];
             foreach ($event as $name) {
                 $listeners[] = $this->attach($name, $callback, $priority);
             }
@@ -10989,7 +11023,7 @@ class EventManager implements EventManagerInterface
         }
 
         // Create a callback handler, setting the event and priority in its metadata
-        $listener = new CallbackHandler($callback, array('event' => $event, 'priority' => $priority));
+        $listener = new CallbackHandler($callback, ['event' => $event, 'priority' => $priority]);
 
         // Inject the callback handler into the queue
         $this->events[$event]->insert($listener, $priority);
@@ -11180,7 +11214,7 @@ class EventManager implements EventManagerInterface
     protected function getSharedListeners($event)
     {
         if (!$sharedManager = $this->getSharedManager()) {
-            return array();
+            return [];
         }
 
         $identifiers     = $this->getIdentifiers();
@@ -11188,7 +11222,7 @@ class EventManager implements EventManagerInterface
         if (!in_array('*', $identifiers)) {
             $identifiers[] = '*';
         }
-        $sharedListeners = array();
+        $sharedListeners = [];
 
         foreach ($identifiers as $id) {
             if (!$listeners = $sharedManager->getListeners($id, $event)) {
@@ -11362,7 +11396,7 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
      * with keys "data" and "priority".
      * @var array
      */
-    protected $items      = array();
+    protected $items      = [];
 
     /**
      * Inner queue object
@@ -11382,10 +11416,10 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
     public function insert($data, $priority = 1)
     {
         $priority = (int) $priority;
-        $this->items[] = array(
+        $this->items[] = [
             'data'     => $data,
             'priority' => $priority,
-        );
+        ];
         $this->getQueue()->insert($data, $priority);
         return $this;
     }
@@ -11746,7 +11780,7 @@ class SharedEventManager implements
      * Identifiers with event connections
      * @var array
      */
-    protected $identifiers = array();
+    protected $identifiers = [];
 
     /**
      * Attach a listener to an event
@@ -11781,7 +11815,7 @@ class SharedEventManager implements
     public function attach($id, $event, $callback, $priority = 1)
     {
         $ids = (array) $id;
-        $listeners = array();
+        $listeners = [];
         foreach ($ids as $id) {
             if (!array_key_exists($id, $this->identifiers)) {
                 $this->identifiers[$id] = new EventManager($id);
@@ -12013,7 +12047,7 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
     public function insert($datum, $priority)
     {
         if (!is_array($priority)) {
-            $priority = array($priority, $this->serial--);
+            $priority = [$priority, $this->serial--];
         }
         parent::insert($datum, $priority);
     }
@@ -12027,7 +12061,7 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
      */
     public function toArray()
     {
-        $array = array();
+        $array = [];
         foreach (clone $this as $item) {
             $array[] = $item;
         }
@@ -12044,7 +12078,7 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
         $clone = clone $this;
         $clone->setExtractFlags(self::EXTR_BOTH);
 
-        $data = array();
+        $data = [];
         foreach ($clone as $item) {
             $data[] = $item;
         }
@@ -12093,13 +12127,13 @@ class PluginManager extends AbstractPluginManager
      *
      * @var array
      */
-    protected $invokableClasses = array(
+    protected $invokableClasses = [
         'clearexpiredbyfactor' => 'Zend\Cache\Storage\Plugin\ClearExpiredByFactor',
         'exceptionhandler'     => 'Zend\Cache\Storage\Plugin\ExceptionHandler',
         'ignoreuserabort'      => 'Zend\Cache\Storage\Plugin\IgnoreUserAbort',
         'optimizebyfactor'     => 'Zend\Cache\Storage\Plugin\OptimizeByFactor',
         'serializer'           => 'Zend\Cache\Storage\Plugin\Serializer',
-    );
+    ];
 
     /**
      * Do not share by default
@@ -12192,7 +12226,7 @@ abstract class AbstractListenerAggregate implements ListenerAggregateInterface
     /**
      * @var \Zend\Stdlib\CallbackHandler[]
      */
-    protected $listeners = array();
+    protected $listeners = [];
 
     /**
      * {@inheritDoc}
@@ -12303,7 +12337,7 @@ class Serializer extends AbstractPlugin
     /**
      * @var array
      */
-    protected $capabilities = array();
+    protected $capabilities = [];
 
     /**
      * {@inheritDoc}
@@ -12316,30 +12350,30 @@ class Serializer extends AbstractPlugin
         $postPriority = -$priority;
 
         // read
-        $this->listeners[] = $events->attach('getItem.post', array($this, 'onReadItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('getItems.post', array($this, 'onReadItemsPost'), $postPriority);
+        $this->listeners[] = $events->attach('getItem.post', [$this, 'onReadItemPost'], $postPriority);
+        $this->listeners[] = $events->attach('getItems.post', [$this, 'onReadItemsPost'], $postPriority);
 
         // write
-        $this->listeners[] = $events->attach('setItem.pre', array($this, 'onWriteItemPre'), $prePriority);
-        $this->listeners[] = $events->attach('setItems.pre', array($this, 'onWriteItemsPre'), $prePriority);
+        $this->listeners[] = $events->attach('setItem.pre', [$this, 'onWriteItemPre'], $prePriority);
+        $this->listeners[] = $events->attach('setItems.pre', [$this, 'onWriteItemsPre'], $prePriority);
 
-        $this->listeners[] = $events->attach('addItem.pre', array($this, 'onWriteItemPre'), $prePriority);
-        $this->listeners[] = $events->attach('addItems.pre', array($this, 'onWriteItemsPre'), $prePriority);
+        $this->listeners[] = $events->attach('addItem.pre', [$this, 'onWriteItemPre'], $prePriority);
+        $this->listeners[] = $events->attach('addItems.pre', [$this, 'onWriteItemsPre'], $prePriority);
 
-        $this->listeners[] = $events->attach('replaceItem.pre', array($this, 'onWriteItemPre'), $prePriority);
-        $this->listeners[] = $events->attach('replaceItems.pre', array($this, 'onWriteItemsPre'), $prePriority);
+        $this->listeners[] = $events->attach('replaceItem.pre', [$this, 'onWriteItemPre'], $prePriority);
+        $this->listeners[] = $events->attach('replaceItems.pre', [$this, 'onWriteItemsPre'], $prePriority);
 
-        $this->listeners[] = $events->attach('checkAndSetItem.pre', array($this, 'onWriteItemPre'), $prePriority);
+        $this->listeners[] = $events->attach('checkAndSetItem.pre', [$this, 'onWriteItemPre'], $prePriority);
 
         // increment / decrement item(s)
-        $this->listeners[] = $events->attach('incrementItem.pre', array($this, 'onIncrementItemPre'), $prePriority);
-        $this->listeners[] = $events->attach('incrementItems.pre', array($this, 'onIncrementItemsPre'), $prePriority);
+        $this->listeners[] = $events->attach('incrementItem.pre', [$this, 'onIncrementItemPre'], $prePriority);
+        $this->listeners[] = $events->attach('incrementItems.pre', [$this, 'onIncrementItemsPre'], $prePriority);
 
-        $this->listeners[] = $events->attach('decrementItem.pre', array($this, 'onDecrementItemPre'), $prePriority);
-        $this->listeners[] = $events->attach('decrementItems.pre', array($this, 'onDecrementItemsPre'), $prePriority);
+        $this->listeners[] = $events->attach('decrementItem.pre', [$this, 'onDecrementItemPre'], $prePriority);
+        $this->listeners[] = $events->attach('decrementItems.pre', [$this, 'onDecrementItemsPre'], $prePriority);
 
         // overwrite capabilities
-        $this->listeners[] = $events->attach('getCapabilities.post', array($this, 'onGetCapabilitiesPost'), $postPriority);
+        $this->listeners[] = $events->attach('getCapabilities.post', [$this, 'onGetCapabilitiesPost'], $postPriority);
     }
 
     /**
@@ -12523,7 +12557,7 @@ class Serializer extends AbstractPlugin
             $this->capabilities[$index] = new Capabilities(
                 $baseCapabilities->getAdapter(),
                 new stdClass(), // marker
-                array('supportedDatatypes' => array(
+                ['supportedDatatypes' => [
                     'NULL'     => true,
                     'boolean'  => true,
                     'integer'  => true,
@@ -12532,7 +12566,7 @@ class Serializer extends AbstractPlugin
                     'array'    => true,
                     'object'   => 'object',
                     'resource' => false,
-                )),
+                ]],
                 $baseCapabilities
             );
         }
@@ -12598,7 +12632,7 @@ class PluginOptions extends AbstractOptions
      * - Serializer
      * @var array
      */
-    protected $serializerOptions = array();
+    protected $serializerOptions = [];
 
     /**
      * Used by:
@@ -12874,18 +12908,12 @@ class CallbackHandler
     protected $metadata;
 
     /**
-     * PHP version is greater as 5.4rc1?
-     * @var bool
-     */
-    protected static $isPhp54;
-
-    /**
      * Constructor
      *
      * @param  string|array|object|callable $callback PHP callback
      * @param  array                        $metadata  Callback metadata
      */
-    public function __construct($callback, array $metadata = array())
+    public function __construct($callback, array $metadata = [])
     {
         $this->metadata  = $metadata;
         $this->registerCallback($callback);
@@ -12923,18 +12951,12 @@ class CallbackHandler
      * @param  array $args Arguments to pass to callback
      * @return mixed
      */
-    public function call(array $args = array())
+    public function call(array $args = [])
     {
         $callback = $this->getCallback();
-
-        // Minor performance tweak, if the callback gets called more than once
-        if (!isset(static::$isPhp54)) {
-            static::$isPhp54 = version_compare(PHP_VERSION, '5.4.0rc1', '>=');
-        }
-
         $argCount = count($args);
 
-        if (static::$isPhp54 && is_string($callback)) {
+        if (is_string($callback)) {
             $result = $this->validateStringCallbackFor54($callback);
 
             if ($result !== true && $argCount <= 3) {
@@ -12949,30 +12971,18 @@ class CallbackHandler
         // reached
         switch ($argCount) {
             case 0:
-                if (static::$isPhp54) {
-                    return $callback();
-                }
-                return call_user_func($callback);
+                return $callback();
             case 1:
-                if (static::$isPhp54) {
-                    return $callback(array_shift($args));
-                }
-                return call_user_func($callback, array_shift($args));
+                return $callback(array_shift($args));
             case 2:
                 $arg1 = array_shift($args);
                 $arg2 = array_shift($args);
-                if (static::$isPhp54) {
-                    return $callback($arg1, $arg2);
-                }
-                return call_user_func($callback, $arg1, $arg2);
+                return $callback($arg1, $arg2);
             case 3:
                 $arg1 = array_shift($args);
                 $arg2 = array_shift($args);
                 $arg3 = array_shift($args);
-                if (static::$isPhp54) {
-                    return $callback($arg1, $arg2, $arg3);
-                }
-                return call_user_func($callback, $arg1, $arg2, $arg3);
+                return $callback($arg1, $arg2, $arg3);
             default:
                 return call_user_func_array($callback, $args);
         }
@@ -13015,7 +13025,6 @@ class CallbackHandler
     /**
      * Validate a static method call
      *
-     * Validates that a static method call in PHP 5.4 will actually work
      *
      * @param  string $callback
      * @return true|array
@@ -13054,7 +13063,7 @@ class CallbackHandler
         // returning a non boolean value may not be nice for a validate method,
         // but that allows the usage of a static string callback without using
         // the call_user_func function.
-        return array($class, $method);
+        return [$class, $method];
     }
 }
 
@@ -15536,7 +15545,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      * @param int    $flags
      * @param string $iteratorClass
      */
-    public function __construct($input = array(), $flags = self::STD_PROP_LIST, $iteratorClass = 'ArrayIterator')
+    public function __construct($input = [], $flags = self::STD_PROP_LIST, $iteratorClass = 'ArrayIterator')
     {
         $this->setFlags($flags);
         $this->storage = $input;
@@ -16140,7 +16149,7 @@ abstract class ArrayUtils
             return $iterator->toArray();
         }
 
-        $array = array();
+        $array = [];
         foreach ($iterator as $key => $value) {
             if (is_scalar($value)) {
                 $array[$key] = $value;
@@ -16221,16 +16230,16 @@ abstract class ArrayUtils
             return array_filter($data, $callback, $flag);
         }
 
-        $output = array();
+        $output = [];
         foreach ($data as $key => $value) {
-            $params = array($value);
+            $params = [$value];
 
             if ($flag === static::ARRAY_FILTER_USE_BOTH) {
                 $params[] = $key;
             }
 
             if ($flag === static::ARRAY_FILTER_USE_KEY) {
-                $params = array($key);
+                $params = [$key];
             }
 
             $response = call_user_func_array($callback, $params);
@@ -16266,7 +16275,7 @@ class PriorityList implements Iterator, Countable
      *
      * @var array[]
      */
-    protected $items = array();
+    protected $items = [];
 
     /**
      * Serial assigned to items to preserve LIFO.
@@ -16306,14 +16315,17 @@ class PriorityList implements Iterator, Countable
      */
     public function insert($name, $value, $priority = 0)
     {
-        $this->sorted = false;
-        $this->count++;
+        if (!isset($this->items[$name])) {
+            $this->count++;
+        }
 
-        $this->items[$name] = array(
+        $this->sorted = false;
+
+        $this->items[$name] = [
             'data'     => $value,
             'priority' => (int) $priority,
             'serial'   => $this->serial++,
-        );
+        ];
     }
 
     /**
@@ -16358,7 +16370,7 @@ class PriorityList implements Iterator, Countable
      */
     public function clear()
     {
-        $this->items  = array();
+        $this->items  = [];
         $this->serial = 0;
         $this->count  = 0;
         $this->sorted = false;
@@ -16387,7 +16399,7 @@ class PriorityList implements Iterator, Countable
     protected function sort()
     {
         if (!$this->sorted) {
-            uasort($this->items, array($this, 'compare'));
+            uasort($this->items, [$this, 'compare']);
             $this->sorted = true;
         }
     }
@@ -25220,7 +25232,7 @@ abstract class ErrorHandler
      *
      * @var array
      */
-    protected static $stack = array();
+    protected static $stack = [];
 
     /**
      * Check if this error handler is active
@@ -25250,7 +25262,7 @@ abstract class ErrorHandler
     public static function start($errorLevel = \E_WARNING)
     {
         if (!static::$stack) {
-            set_error_handler(array(get_called_class(), 'addError'), $errorLevel);
+            set_error_handler([get_called_class(), 'addError'], $errorLevel);
         }
 
         static::$stack[] = null;
@@ -25293,7 +25305,7 @@ abstract class ErrorHandler
             restore_error_handler();
         }
 
-        static::$stack = array();
+        static::$stack = [];
     }
 
     /**
@@ -31702,14 +31714,14 @@ abstract class StringUtils
      *
      * @var string[]
      */
-    protected static $singleByteEncodings = array(
+    protected static $singleByteEncodings = [
         'ASCII', '7BIT', '8BIT',
         'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4', 'ISO-8859-5',
         'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8', 'ISO-8859-9', 'ISO-8859-10',
         'ISO-8859-11', 'ISO-8859-13', 'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16',
         'CP-1251', 'CP-1252',
         // TODO
-    );
+    ];
 
     /**
      * Is PCRE compiled with Unicode support?
@@ -31726,7 +31738,7 @@ abstract class StringUtils
     public static function getRegisteredWrappers()
     {
         if (static::$wrapperRegistry === null) {
-            static::$wrapperRegistry = array();
+            static::$wrapperRegistry = [];
 
             if (extension_loaded('intl')) {
                 static::$wrapperRegistry[] = 'Zend\Stdlib\StringWrapper\Intl';
@@ -32007,16 +32019,16 @@ abstract class AbstractValidator implements
      */
     protected static $messageLength = -1;
 
-    protected $abstractOptions = array(
-        'messages'             => array(), // Array of validation failure messages
-        'messageTemplates'     => array(), // Array of validation failure message templates
-        'messageVariables'     => array(), // Array of additional variables available for validation failure messages
+    protected $abstractOptions = [
+        'messages'             => [], // Array of validation failure messages
+        'messageTemplates'     => [], // Array of validation failure message templates
+        'messageVariables'     => [], // Array of additional variables available for validation failure messages
         'translator'           => null,    // Translation object to used -> Translator\TranslatorInterface
         'translatorTextDomain' => null,    // Translation text domain
         'translatorEnabled'    => true,    // Is translation enabled?
         'valueObscured'        => false,   // Flag indicating whether or not value should be obfuscated
                                            // in error messages
-    );
+    ];
 
     /**
      * Abstract constructor for all validators
@@ -32089,7 +32101,7 @@ abstract class AbstractValidator implements
      * @throws Exception\InvalidArgumentException If $options is not an array or Traversable
      * @return AbstractValidator Provides fluid interface
      */
-    public function setOptions($options = array())
+    public function setOptions($options = [])
     {
         if (!is_array($options) && !$options instanceof Traversable) {
             throw new Exception\InvalidArgumentException(__METHOD__ . ' expects an array or Traversable');
@@ -32324,7 +32336,7 @@ abstract class AbstractValidator implements
     protected function setValue($value)
     {
         $this->value               = $value;
-        $this->abstractOptions['messages'] = array();
+        $this->abstractOptions['messages'] = [];
     }
 
     /**
@@ -32577,7 +32589,7 @@ class ValidatorChain implements
      *
      * @var array
      */
-    protected $messages = array();
+    protected $messages = [];
 
     /**
      * Initialize validator chain
@@ -32656,10 +32668,10 @@ class ValidatorChain implements
         $priority = self::DEFAULT_PRIORITY
     ) {
         $this->validators->insert(
-            array(
+            [
                 'instance'            => $validator,
                 'breakChainOnFailure' => (bool) $breakChainOnFailure,
-            ),
+            ],
             $priority
         );
 
@@ -32695,17 +32707,16 @@ class ValidatorChain implements
         $priority = self::DEFAULT_PRIORITY;
 
         if (!$this->validators->isEmpty()) {
-            $queue = $this->validators->getIterator();
-            $queue->setExtractFlags(PriorityQueue::EXTR_PRIORITY);
-            $extractedNode = $queue->extract();
-            $priority = $extractedNode[0] + 1;
+            $extractedNodes = $this->validators->toArray(PriorityQueue::EXTR_PRIORITY);
+            rsort($extractedNodes, SORT_NUMERIC);
+            $priority = $extractedNodes[0] + 1;
         }
 
         $this->validators->insert(
-            array(
+            [
                 'instance'            => $validator,
                 'breakChainOnFailure' => (bool) $breakChainOnFailure,
-            ),
+            ],
             $priority
         );
         return $this;
@@ -32720,7 +32731,7 @@ class ValidatorChain implements
      * @param  int $priority
      * @return ValidatorChain
      */
-    public function attachByName($name, $options = array(), $breakChainOnFailure = false, $priority = self::DEFAULT_PRIORITY)
+    public function attachByName($name, $options = [], $breakChainOnFailure = false, $priority = self::DEFAULT_PRIORITY)
     {
         if (isset($options['break_chain_on_failure'])) {
             $breakChainOnFailure = (bool) $options['break_chain_on_failure'];
@@ -32744,7 +32755,7 @@ class ValidatorChain implements
      * @param  bool   $breakChainOnFailure
      * @return ValidatorChain
      */
-    public function addByName($name, $options = array(), $breakChainOnFailure = false)
+    public function addByName($name, $options = [], $breakChainOnFailure = false)
     {
         return $this->attachByName($name, $options, $breakChainOnFailure);
     }
@@ -32757,7 +32768,7 @@ class ValidatorChain implements
      * @param  bool   $breakChainOnFailure
      * @return ValidatorChain
      */
-    public function prependByName($name, $options = array(), $breakChainOnFailure = false)
+    public function prependByName($name, $options = [], $breakChainOnFailure = false)
     {
         $validator = $this->plugin($name, $options);
         $this->prependValidator($validator, $breakChainOnFailure);
@@ -32775,7 +32786,7 @@ class ValidatorChain implements
      */
     public function isValid($value, $context = null)
     {
-        $this->messages = array();
+        $this->messages = [];
         $result         = true;
         foreach ($this->validators as $element) {
             $validator = $element['instance'];
@@ -32858,7 +32869,7 @@ class ValidatorChain implements
      */
     public function __sleep()
     {
-        return array('validators', 'messages');
+        return ['validators', 'messages'];
     }
 }
 
@@ -32887,7 +32898,7 @@ class EmailAddress extends AbstractValidator
     /**
      * @var array
      */
-    protected $messageTemplates = array(
+    protected $messageTemplates = [
         self::INVALID            => "Invalid type given. String expected",
         self::INVALID_FORMAT     => "The input is not a valid email address. Use the basic format local-part@hostname",
         self::INVALID_HOSTNAME   => "'%hostname%' is not a valid hostname for the email address",
@@ -32897,15 +32908,15 @@ class EmailAddress extends AbstractValidator
         self::QUOTED_STRING      => "'%localPart%' can not be matched against quoted-string format",
         self::INVALID_LOCAL_PART => "'%localPart%' is not a valid local part for the email address",
         self::LENGTH_EXCEEDED    => "The input exceeds the allowed length",
-    );
+    ];
 
     /**
      * @var array
      */
-    protected $messageVariables = array(
+    protected $messageVariables = [
         'hostname'  => 'hostname',
         'localPart' => 'localPart'
-    );
+    ];
 
     /**
      * @var string
@@ -32927,13 +32938,14 @@ class EmailAddress extends AbstractValidator
     /**
      * Internal options array
      */
-    protected $options = array(
+    protected $options = [
         'useMxCheck'        => false,
         'useDeepMxCheck'    => false,
         'useDomainCheck'    => true,
         'allow'             => Hostname::ALLOW_DNS,
+        'strict'            => true,
         'hostnameValidator' => null,
-    );
+    ];
 
     /**
      * Instantiates hostname validator for local use
@@ -32941,12 +32953,13 @@ class EmailAddress extends AbstractValidator
      * The following additional option keys are supported:
      * 'hostnameValidator' => A hostname validator, see Zend\Validator\Hostname
      * 'allow'             => Options for the hostname validator, see Zend\Validator\Hostname::ALLOW_*
+     * 'strict'            => Whether to adhere to strictest requirements in the spec
      * 'useMxCheck'        => If MX check should be enabled, boolean
      * 'useDeepMxCheck'    => If a deep MX check should be done, boolean
      *
      * @param array|\Traversable $options OPTIONAL
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         if (!is_array($options)) {
             $options = func_get_args();
@@ -33153,7 +33166,7 @@ class EmailAddress extends AbstractValidator
         if (!preg_match('/^([0-9]{1,3}\.){3}[0-9]{1,3}$/', $host)) {
             $host = gethostbynamel($host);
         } else {
-            $host = array($host);
+            $host = [$host];
         }
 
         if (empty($host)) {
@@ -33234,8 +33247,8 @@ class EmailAddress extends AbstractValidator
      */
     protected function validateMXRecords()
     {
-        $mxHosts = array();
-        $weight  = array();
+        $mxHosts = [];
+        $weight  = [];
         $result = getmxrr($this->idnToAscii($this->hostname), $mxHosts, $weight);
         if (!empty($mxHosts) && !empty($weight)) {
             $this->mxRecord = array_combine($mxHosts, $weight);
@@ -33362,7 +33375,7 @@ class EmailAddress extends AbstractValidator
             return false;
         }
 
-        if ((strlen($this->localPart) > 64) || (strlen($this->hostname) > 255)) {
+        if ($this->getOption('strict') && (strlen($this->localPart) > 64) || (strlen($this->hostname) > 255)) {
             $length = false;
             $this->error(self::LENGTH_EXCEEDED);
         }
@@ -33405,7 +33418,13 @@ class EmailAddress extends AbstractValidator
     protected function idnToUtf8($email)
     {
         if (extension_loaded('intl')) {
-            return idn_to_utf8($email);
+            // The documentation does not clarify what kind of failure
+            // can happen in idn_to_utf8. One can assume if the source
+            // is not IDN encoded, it would fail, but it usually returns
+            // the source string in those cases.
+            // But not when the source string is long enough.
+            // Thus we default to source string ourselves.
+            return idn_to_utf8($email) ?: $email;
         }
         return $email;
     }
@@ -33450,7 +33469,7 @@ class Hostname extends AbstractValidator
     /**
      * @var array
      */
-    protected $messageTemplates = array(
+    protected $messageTemplates = [
         self::CANNOT_DECODE_PUNYCODE  => "The input appears to be a DNS hostname but the given punycode notation cannot be decoded",
         self::INVALID                 => "Invalid type given. String expected",
         self::INVALID_DASH            => "The input appears to be a DNS hostname but contains a dash in an invalid position",
@@ -33462,14 +33481,14 @@ class Hostname extends AbstractValidator
         self::LOCAL_NAME_NOT_ALLOWED  => "The input appears to be a local network name but local network names are not allowed",
         self::UNDECIPHERABLE_TLD      => "The input appears to be a DNS hostname but cannot extract TLD part",
         self::UNKNOWN_TLD             => "The input appears to be a DNS hostname but cannot match TLD against known list",
-    );
+    ];
 
     /**
      * @var array
      */
-    protected $messageVariables = array(
+    protected $messageVariables = [
         'tld' => 'tld',
-    );
+    ];
 
     const ALLOW_DNS   = 1;  // Allows Internet domain names (e.g., example.com)
     const ALLOW_IP    = 2;  // Allows IP addresses
@@ -33484,7 +33503,7 @@ class Hostname extends AbstractValidator
      * @see http://www.iana.org/domains/root/db/ Official list of supported TLDs
      * @var array
      */
-    protected $validTlds = array(
+    protected $validTlds = [
         'abb',
         'abbott',
         'abogado',
@@ -34432,7 +34451,7 @@ class Hostname extends AbstractValidator
         'zone',
         'zuerich',
         'zw',
-    );
+    ];
 
     /**
      * Array for valid Idns
@@ -34487,64 +34506,64 @@ class Hostname extends AbstractValidator
      *
      * @var array
      */
-    protected $validIdns = array(
-        'AC'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēėęěĝġģĥħīįĵķĺļľŀłńņňŋőœŕŗřśŝşšţťŧūŭůűųŵŷźżž]{1,63}$/iu'),
-        'AR'  => array(1 => '/^[\x{002d}0-9a-zà-ãç-êìíñ-õü]{1,63}$/iu'),
-        'AS'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĸĺļľłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷźż]{1,63}$/iu'),
-        'AT'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿœšž]{1,63}$/iu'),
+    protected $validIdns = [
+        'AC'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēėęěĝġģĥħīįĵķĺļľŀłńņňŋőœŕŗřśŝşšţťŧūŭůűųŵŷźżž]{1,63}$/iu'],
+        'AR'  => [1 => '/^[\x{002d}0-9a-zà-ãç-êìíñ-õü]{1,63}$/iu'],
+        'AS'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĸĺļľłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷźż]{1,63}$/iu'],
+        'AT'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿœšž]{1,63}$/iu'],
         'BIZ' => 'Hostname/Biz.php',
-        'BR'  => array(1 => '/^[\x{002d}0-9a-zà-ãçéíó-õúü]{1,63}$/iu'),
-        'BV'  => array(1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),
-        'CAT' => array(1 => '/^[\x{002d}0-9a-z·àç-éíïòóúü]{1,63}$/iu'),
-        'CH'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿœ]{1,63}$/iu'),
-        'CL'  => array(1 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu'),
+        'BR'  => [1 => '/^[\x{002d}0-9a-zà-ãçéíó-õúü]{1,63}$/iu'],
+        'BV'  => [1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'],
+        'CAT' => [1 => '/^[\x{002d}0-9a-z·àç-éíïòóúü]{1,63}$/iu'],
+        'CH'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿœ]{1,63}$/iu'],
+        'CL'  => [1 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu'],
         'CN'  => 'Hostname/Cn.php',
         'COM' => 'Hostname/Com.php',
-        'DE'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),
-        'DK'  => array(1 => '/^[\x{002d}0-9a-zäéöü]{1,63}$/iu'),
-        'EE'  => array(1 => '/^[\x{002d}0-9a-zäõöüšž]{1,63}$/iu'),
-        'ES'  => array(1 => '/^[\x{002d}0-9a-zàáçèéíïñòóúü·]{1,63}$/iu'),
-        'EU'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿ]{1,63}$/iu',
+        'DE'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'],
+        'DK'  => [1 => '/^[\x{002d}0-9a-zäéöü]{1,63}$/iu'],
+        'EE'  => [1 => '/^[\x{002d}0-9a-zäõöüšž]{1,63}$/iu'],
+        'ES'  => [1 => '/^[\x{002d}0-9a-zàáçèéíïñòóúü·]{1,63}$/iu'],
+        'EU'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿ]{1,63}$/iu',
             2 => '/^[\x{002d}0-9a-zāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĺļľŀłńņňŉŋōŏőœŕŗřśŝšťŧũūŭůűųŵŷźżž]{1,63}$/iu',
             3 => '/^[\x{002d}0-9a-zșț]{1,63}$/iu',
             4 => '/^[\x{002d}0-9a-zΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώ]{1,63}$/iu',
             5 => '/^[\x{002d}0-9a-zабвгдежзийклмнопрстуфхцчшщъыьэюя]{1,63}$/iu',
-            6 => '/^[\x{002d}0-9a-zἀ-ἇἐ-ἕἠ-ἧἰ-ἷὀ-ὅὐ-ὗὠ-ὧὰ-ὼώᾀ-ᾇᾐ-ᾗᾠ-ᾧᾰ-ᾴᾶᾷῂῃῄῆῇῐ-ῒΐῖῗῠ-ῧῲῳῴῶῷ]{1,63}$/iu'),
-        'FI'  => array(1 => '/^[\x{002d}0-9a-zäåö]{1,63}$/iu'),
-        'GR'  => array(1 => '/^[\x{002d}0-9a-zΆΈΉΊΌΎ-ΡΣ-ώἀ-ἕἘ-Ἕἠ-ὅὈ-Ὅὐ-ὗὙὛὝὟ-ώᾀ-ᾴᾶ-ᾼῂῃῄῆ-ῌῐ-ΐῖ-Ίῠ-Ῥῲῳῴῶ-ῼ]{1,63}$/iu'),
+            6 => '/^[\x{002d}0-9a-zἀ-ἇἐ-ἕἠ-ἧἰ-ἷὀ-ὅὐ-ὗὠ-ὧὰ-ὼώᾀ-ᾇᾐ-ᾗᾠ-ᾧᾰ-ᾴᾶᾷῂῃῄῆῇῐ-ῒΐῖῗῠ-ῧῲῳῴῶῷ]{1,63}$/iu'],
+        'FI'  => [1 => '/^[\x{002d}0-9a-zäåö]{1,63}$/iu'],
+        'GR'  => [1 => '/^[\x{002d}0-9a-zΆΈΉΊΌΎ-ΡΣ-ώἀ-ἕἘ-Ἕἠ-ὅὈ-Ὅὐ-ὗὙὛὝὟ-ώᾀ-ᾴᾶ-ᾼῂῃῄῆ-ῌῐ-ΐῖ-Ίῠ-Ῥῲῳῴῶ-ῼ]{1,63}$/iu'],
         'HK'  => 'Hostname/Cn.php',
-        'HU'  => array(1 => '/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu'),
-        'IL'  => array(1 => '/^[\x{002d}0-9\x{05D0}-\x{05EA}]{1,63}$/iu',
-            2 => '/^[\x{002d}0-9a-z]{1,63}$/i'),
-        'INFO'=> array(1 => '/^[\x{002d}0-9a-zäåæéöøü]{1,63}$/iu',
+        'HU'  => [1 => '/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu'],
+        'IL'  => [1 => '/^[\x{002d}0-9\x{05D0}-\x{05EA}]{1,63}$/iu',
+            2 => '/^[\x{002d}0-9a-z]{1,63}$/i'],
+        'INFO'=> [1 => '/^[\x{002d}0-9a-zäåæéöøü]{1,63}$/iu',
             2 => '/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu',
             3 => '/^[\x{002d}0-9a-záæéíðóöúýþ]{1,63}$/iu',
             4 => '/^[\x{AC00}-\x{D7A3}]{1,17}$/iu',
             5 => '/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu',
             6 => '/^[\x{002d}0-9a-ząčėęįšūųž]{1,63}$/iu',
             7 => '/^[\x{002d}0-9a-zóąćęłńśźż]{1,63}$/iu',
-            8 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu'),
-        'IO'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),
-        'IS'  => array(1 => '/^[\x{002d}0-9a-záéýúíóþæöð]{1,63}$/iu'),
-        'IT'  => array(1 => '/^[\x{002d}0-9a-zàâäèéêëìîïòôöùûüæœçÿß-]{1,63}$/iu'),
+            8 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu'],
+        'IO'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'],
+        'IS'  => [1 => '/^[\x{002d}0-9a-záéýúíóþæöð]{1,63}$/iu'],
+        'IT'  => [1 => '/^[\x{002d}0-9a-zàâäèéêëìîïòôöùûüæœçÿß-]{1,63}$/iu'],
         'JP'  => 'Hostname/Jp.php',
-        'KR'  => array(1 => '/^[\x{AC00}-\x{D7A3}]{1,17}$/iu'),
-        'LI'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿœ]{1,63}$/iu'),
-        'LT'  => array(1 => '/^[\x{002d}0-9ąčęėįšųūž]{1,63}$/iu'),
-        'MD'  => array(1 => '/^[\x{002d}0-9ăâîşţ]{1,63}$/iu'),
-        'MUSEUM' => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćċčďđēėęěğġģħīįıķĺļľłńņňŋōőœŕŗřśşšţťŧūůűųŵŷźżžǎǐǒǔ\x{01E5}\x{01E7}\x{01E9}\x{01EF}ə\x{0292}ẁẃẅỳ]{1,63}$/iu'),
+        'KR'  => [1 => '/^[\x{AC00}-\x{D7A3}]{1,17}$/iu'],
+        'LI'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿœ]{1,63}$/iu'],
+        'LT'  => [1 => '/^[\x{002d}0-9ąčęėįšųūž]{1,63}$/iu'],
+        'MD'  => [1 => '/^[\x{002d}0-9ăâîşţ]{1,63}$/iu'],
+        'MUSEUM' => [1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćċčďđēėęěğġģħīįıķĺļľłńņňŋōőœŕŗřśşšţťŧūůűųŵŷźżžǎǐǒǔ\x{01E5}\x{01E7}\x{01E9}\x{01EF}ə\x{0292}ẁẃẅỳ]{1,63}$/iu'],
         'NET' => 'Hostname/Com.php',
-        'NO'  => array(1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),
+        'NO'  => [1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'],
         'NU'  => 'Hostname/Com.php',
-        'ORG' => array(1 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu',
+        'ORG' => [1 => '/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu',
             2 => '/^[\x{002d}0-9a-zóąćęłńśźż]{1,63}$/iu',
             3 => '/^[\x{002d}0-9a-záäåæéëíðóöøúüýþ]{1,63}$/iu',
             4 => '/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu',
             5 => '/^[\x{002d}0-9a-ząčėęįšūųž]{1,63}$/iu',
             6 => '/^[\x{AC00}-\x{D7A3}]{1,17}$/iu',
-            7 => '/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu'),
-        'PE'  => array(1 => '/^[\x{002d}0-9a-zñáéíóúü]{1,63}$/iu'),
-        'PL'  => array(1 => '/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu',
+            7 => '/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu'],
+        'PE'  => [1 => '/^[\x{002d}0-9a-zñáéíóúü]{1,63}$/iu'],
+        'PL'  => [1 => '/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu',
             2 => '/^[\x{002d}а-ик-ш\x{0450}ѓѕјљњќџ]{1,63}$/iu',
             3 => '/^[\x{002d}0-9a-zâîăşţ]{1,63}$/iu',
             4 => '/^[\x{002d}0-9а-яё\x{04C2}]{1,63}$/iu',
@@ -34576,70 +34595,70 @@ class Hostname extends AbstractValidator
             30=> '/^[\x{002d}0-9a-záäåæéëíðóöøúüýþ]{1,63}$/iu',
             31=> '/^[\x{002d}0-9a-zàâæçèéêëîïñôùûüÿœ]{1,63}$/iu',
             32=> '/^[\x{002d}0-9а-щъыьэюяёєіїґ]{1,63}$/iu',
-            33=> '/^[\x{002d}0-9א-ת]{1,63}$/iu'),
-        'PR'  => array(1 => '/^[\x{002d}0-9a-záéíóúñäëïüöâêîôûàèùæçœãõ]{1,63}$/iu'),
-        'PT'  => array(1 => '/^[\x{002d}0-9a-záàâãçéêíóôõú]{1,63}$/iu'),
-        'RU'  => array(1 => '/^[\x{002d}0-9а-яё]{1,63}$/iu'),
-        'SA'  => array(1 => '/^[\x{002d}.0-9\x{0621}-\x{063A}\x{0641}-\x{064A}\x{0660}-\x{0669}]{1,63}$/iu'),
-        'SE'  => array(1 => '/^[\x{002d}0-9a-zäåéöü]{1,63}$/iu'),
-        'SH'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),
-        'SI'  => array(
+            33=> '/^[\x{002d}0-9א-ת]{1,63}$/iu'],
+        'PR'  => [1 => '/^[\x{002d}0-9a-záéíóúñäëïüöâêîôûàèùæçœãõ]{1,63}$/iu'],
+        'PT'  => [1 => '/^[\x{002d}0-9a-záàâãçéêíóôõú]{1,63}$/iu'],
+        'RU'  => [1 => '/^[\x{002d}0-9а-яё]{1,63}$/iu'],
+        'SA'  => [1 => '/^[\x{002d}.0-9\x{0621}-\x{063A}\x{0641}-\x{064A}\x{0660}-\x{0669}]{1,63}$/iu'],
+        'SE'  => [1 => '/^[\x{002d}0-9a-zäåéöü]{1,63}$/iu'],
+        'SH'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'],
+        'SI'  => [
             1 => '/^[\x{002d}0-9a-zà-öø-ÿ]{1,63}$/iu',
             2 => '/^[\x{002d}0-9a-zāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĺļľŀłńņňŉŋōŏőœŕŗřśŝšťŧũūŭůűųŵŷźżž]{1,63}$/iu',
-            3 => '/^[\x{002d}0-9a-zșț]{1,63}$/iu'),
-        'SJ'  => array(1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),
-        'TH'  => array(1 => '/^[\x{002d}0-9a-z\x{0E01}-\x{0E3A}\x{0E40}-\x{0E4D}\x{0E50}-\x{0E59}]{1,63}$/iu'),
-        'TM'  => array(1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēėęěĝġģĥħīįĵķĺļľŀłńņňŋőœŕŗřśŝşšţťŧūŭůűųŵŷźżž]{1,63}$/iu'),
+            3 => '/^[\x{002d}0-9a-zșț]{1,63}$/iu'],
+        'SJ'  => [1 => '/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'],
+        'TH'  => [1 => '/^[\x{002d}0-9a-z\x{0E01}-\x{0E3A}\x{0E40}-\x{0E4D}\x{0E50}-\x{0E59}]{1,63}$/iu'],
+        'TM'  => [1 => '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēėęěĝġģĥħīįĵķĺļľŀłńņňŋőœŕŗřśŝşšţťŧūŭůűųŵŷźżž]{1,63}$/iu'],
         'TW'  => 'Hostname/Cn.php',
-        'TR'  => array(1 => '/^[\x{002d}0-9a-zğıüşöç]{1,63}$/iu'),
-        'UA'  => array(1 => '/^[\x{002d}0-9a-zабвгдежзийклмнопрстуфхцчшщъыьэюяѐёђѓєѕіїјљњћќѝўџґӂʼ]{1,63}$/iu'),
-        'VE'  => array(1 => '/^[\x{002d}0-9a-záéíóúüñ]{1,63}$/iu'),
-        'VN'  => array(1 => '/^[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯư\x{1EA0}-\x{1EF9}]{1,63}$/iu'),
-        'мон' => array(1 => '/^[\x{002d}0-9\x{0430}-\x{044F}]{1,63}$/iu'),
-        'срб' => array(1 => '/^[\x{002d}0-9а-ик-шђјљњћџ]{1,63}$/iu'),
-        'сайт' => array(1 => '/^[\x{002d}0-9а-яёіїѝйўґг]{1,63}$/iu'),
-        'онлайн' => array(1 => '/^[\x{002d}0-9а-яёіїѝйўґг]{1,63}$/iu'),
+        'TR'  => [1 => '/^[\x{002d}0-9a-zğıüşöç]{1,63}$/iu'],
+        'UA'  => [1 => '/^[\x{002d}0-9a-zабвгдежзийклмнопрстуфхцчшщъыьэюяѐёђѓєѕіїјљњћќѝўџґӂʼ]{1,63}$/iu'],
+        'VE'  => [1 => '/^[\x{002d}0-9a-záéíóúüñ]{1,63}$/iu'],
+        'VN'  => [1 => '/^[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯư\x{1EA0}-\x{1EF9}]{1,63}$/iu'],
+        'мон' => [1 => '/^[\x{002d}0-9\x{0430}-\x{044F}]{1,63}$/iu'],
+        'срб' => [1 => '/^[\x{002d}0-9а-ик-шђјљњћџ]{1,63}$/iu'],
+        'сайт' => [1 => '/^[\x{002d}0-9а-яёіїѝйўґг]{1,63}$/iu'],
+        'онлайн' => [1 => '/^[\x{002d}0-9а-яёіїѝйўґг]{1,63}$/iu'],
         '中国' => 'Hostname/Cn.php',
         '中國' => 'Hostname/Cn.php',
-        'ලංකා' => array(1 => '/^[\x{0d80}-\x{0dff}]{1,63}$/iu'),
+        'ලංකා' => [1 => '/^[\x{0d80}-\x{0dff}]{1,63}$/iu'],
         '香港' => 'Hostname/Cn.php',
         '台湾' => 'Hostname/Cn.php',
         '台灣' => 'Hostname/Cn.php',
-        'امارات'   => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
-        'الاردن'    => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
-        'السعودية' => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
-        'ไทย' => array(1 => '/^[\x{002d}0-9a-z\x{0E01}-\x{0E3A}\x{0E40}-\x{0E4D}\x{0E50}-\x{0E59}]{1,63}$/iu'),
-        'рф' => array(1 => '/^[\x{002d}0-9а-яё]{1,63}$/iu'),
-        'تونس' => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
-        'مصر' => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
-        'இலங்கை' => array(1 => '/^[\x{0b80}-\x{0bff}]{1,63}$/iu'),
-        'فلسطين' => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
-        'شبكة'  => array(1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),
-    );
+        'امارات'   => [1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'],
+        'الاردن'    => [1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'],
+        'السعودية' => [1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'],
+        'ไทย' => [1 => '/^[\x{002d}0-9a-z\x{0E01}-\x{0E3A}\x{0E40}-\x{0E4D}\x{0E50}-\x{0E59}]{1,63}$/iu'],
+        'рф' => [1 => '/^[\x{002d}0-9а-яё]{1,63}$/iu'],
+        'تونس' => [1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'],
+        'مصر' => [1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'],
+        'இலங்கை' => [1 => '/^[\x{0b80}-\x{0bff}]{1,63}$/iu'],
+        'فلسطين' => [1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'],
+        'شبكة'  => [1 => '/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'],
+    ];
 
-    protected $idnLength = array(
-        'BIZ' => array(5 => 17, 11 => 15, 12 => 20),
-        'CN'  => array(1 => 20),
-        'COM' => array(3 => 17, 5 => 20),
-        'HK'  => array(1 => 15),
-        'INFO'=> array(4 => 17),
-        'KR'  => array(1 => 17),
-        'NET' => array(3 => 17, 5 => 20),
-        'ORG' => array(6 => 17),
-        'TW'  => array(1 => 20),
-        'امارات' => array(1 => 30),
-        'الاردن' => array(1 => 30),
-        'السعودية' => array(1 => 30),
-        'تونس' => array(1 => 30),
-        'مصر' => array(1 => 30),
-        'فلسطين' => array(1 => 30),
-        'شبكة' => array(1 => 30),
-        '中国' => array(1 => 20),
-        '中國' => array(1 => 20),
-        '香港' => array(1 => 20),
-        '台湾' => array(1 => 20),
-        '台灣' => array(1 => 20),
-    );
+    protected $idnLength = [
+        'BIZ' => [5 => 17, 11 => 15, 12 => 20],
+        'CN'  => [1 => 20],
+        'COM' => [3 => 17, 5 => 20],
+        'HK'  => [1 => 15],
+        'INFO'=> [4 => 17],
+        'KR'  => [1 => 17],
+        'NET' => [3 => 17, 5 => 20],
+        'ORG' => [6 => 17],
+        'TW'  => [1 => 20],
+        'امارات' => [1 => 30],
+        'الاردن' => [1 => 30],
+        'السعودية' => [1 => 30],
+        'تونس' => [1 => 30],
+        'مصر' => [1 => 30],
+        'فلسطين' => [1 => 30],
+        'شبكة' => [1 => 30],
+        '中国' => [1 => 20],
+        '中國' => [1 => 20],
+        '香港' => [1 => 20],
+        '台湾' => [1 => 20],
+        '台灣' => [1 => 20],
+    ];
 
     protected $tld;
 
@@ -34648,12 +34667,12 @@ class Hostname extends AbstractValidator
      *
      * @var array
      */
-    protected $options = array(
+    protected $options = [
         'allow'       => self::ALLOW_DNS, // Allow these hostnames
         'useIdnCheck' => true,  // Check IDN domains
         'useTldCheck' => true,  // Check TLD elements
         'ipValidator' => null,  // IP validator to use
-    );
+    ];
 
     /**
      * Sets validator options.
@@ -34664,7 +34683,7 @@ class Hostname extends AbstractValidator
      * @param Ip   $ipValidator OPTIONAL
      * @see http://www.iana.org/cctld/specifications-policies-cctlds-01apr02.htm  Technical Specifications for ccTLDs
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         if (!is_array($options)) {
             $options = func_get_args();
@@ -34846,7 +34865,7 @@ class Hostname extends AbstractValidator
 
             do {
                 // First check TLD
-                $matches = array();
+                $matches = [];
                 if (preg_match('/([^.]{2,63})$/iu', end($domainParts), $matches)
                     || (array_key_exists(end($domainParts), $this->validIdns))
                 ) {
@@ -34877,7 +34896,7 @@ class Hostname extends AbstractValidator
                      *
                      * @see Hostname\Interface
                      */
-                    $regexChars = array(0 => '/^[a-z0-9\x2d]{1,63}$/i');
+                    $regexChars = [0 => '/^[a-z0-9\x2d]{1,63}$/i'];
                     if ($this->getIdnCheck() && isset($this->validIdns[$this->tld])) {
                         if (is_string($this->validIdns[$this->tld])) {
                             true;
@@ -35006,7 +35025,7 @@ class Hostname extends AbstractValidator
             return false;
         }
 
-        $decoded = array();
+        $decoded = [];
         $separator = strrpos($encoded, '-');
         if ($separator > 0) {
             for ($x = 0; $x < $separator; ++$x) {
@@ -35106,22 +35125,22 @@ class Ip extends AbstractValidator
     /**
      * @var array
      */
-    protected $messageTemplates = array(
+    protected $messageTemplates = [
         self::INVALID        => 'Invalid type given. String expected',
         self::NOT_IP_ADDRESS => "The input does not appear to be a valid IP address",
-    );
+    ];
 
     /**
      * Internal options
      *
      * @var array
      */
-    protected $options = array(
+    protected $options = [
         'allowipv4'      => true, // Enable IPv4 Validation
         'allowipv6'      => true, // Enable IPv6 Validation
         'allowipvfuture' => false, // Enable IPvFuture Validation
         'allowliteral'   => true, // Enable IPs in literal format (only IPv6 and IPvFuture)
-    );
+    ];
 
     /**
      * Sets the options for this validator
@@ -35130,7 +35149,7 @@ class Ip extends AbstractValidator
      * @throws Exception\InvalidArgumentException If there is any kind of IP allowed or $options is not an array or Traversable.
      * @return AbstractValidator
      */
-    public function setOptions($options = array())
+    public function setOptions($options = [])
     {
         parent::setOptions($options);
 
@@ -35288,7 +35307,7 @@ namespace Zend\Validator\Hostname;
 /**
  * Resource file for com and net idn validation
  */
-return array(
+return [
     1  => '/^[\x{002d}0-9\x{0400}-\x{052f}]{1,63}$/iu',
     2  => '/^[\x{002d}0-9\x{0370}-\x{03ff}]{1,63}$/iu',
     3  => '/^[\x{002d}0-9a-z\x{ac00}-\x{d7a3}]{1,17}$/iu',
@@ -35453,4 +35472,4 @@ return array(
     78 => '/^[\x{FF00}-\x{FFEF}]{1,63}$/iu',
     79 => '/^[\x{20000}-\x{2A6DF}]{1,63}$/iu',
     80 => '/^[\x{2F800}-\x{2FA1F}]{1,63}$/iu',
-);
+];
