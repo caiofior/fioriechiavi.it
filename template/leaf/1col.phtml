@@ -31,7 +31,7 @@
         <?php endif; ?>
 	<!-- header-section-starts -->	
         <div id="fb-root"></div>
-	<div class="header">
+	<header class="header">
 		<div class="container">
 			<div class="col-md-4 header-left">
                             <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>">
@@ -39,9 +39,9 @@
                             </a>
 			</div>
 			<div class="col-md-8 header-right">
-				<div class="top-menu">
+				<nav class="top-menu">
                                     <?php $GLOBALS['template']->renderBlock('header'); ?>
-				</div>
+				</nav>
 			<div class="clearfix"></div>
 			</div>
 			<div class="clearfix"></div>
@@ -62,7 +62,7 @@
                         </div>
                 </div>
                 <?php endif; ?>
-	</div>
+	</header>
 	<div class="content">
 		<div class="features-section">
 			<div class="container">
@@ -70,7 +70,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="footer">
+	<footer class="footer">
             <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
             <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
             <!--
@@ -82,6 +82,6 @@
             <!--<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/common/common.min.js.gz');?>"></script>-->
             <script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/common/common.js');?>"></script>
             <?php $GLOBALS['template']->renderBlock('footer'); ?>
-	</div>
+	</footer>
 </body>
 </html>

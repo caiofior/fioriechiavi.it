@@ -24,8 +24,10 @@ if ($taxa->getData('id') != 1 && $taxa->getData('name') != '' ) :
     $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); 
 endif;
 ?>
-<div itemscope itemtype="http://schema.org/Thing">
+<article itemscope itemtype="http://schema.org/Thing">
+<header>
 <h1 itemprop="name"><?php echo $title; ?></h1>
+</header>
 <?php
 if ($taxa->getData('name') != '') : 
    $taxaParentColl = $taxa->getParentColl();
@@ -171,6 +173,7 @@ if (
       <?php endforeach; ?>
 </div>
 <?php endif; ?>
+<footer>
 <div>
 <a class="blank" rel="nofollow" href="http://it.wikipedia.org/wiki/<?php echo urlencode(str_replace(' ', '_', $taxa->getData('name')));?>">Cerca su Wikipedia</a>
 <a class="blank" rel="nofollow" href="https://www.google.it/#q=site:www.actaplantarum.org+<?php echo urlencode($taxa->getData('name'));?>">Cerca scheda su Acta plantorum</a>
@@ -254,4 +257,5 @@ if($newTaxaColl->count() > 0): ?>
    </div>
    </div>
 <?php endif;?>
-</div>
+</footer>
+</article>
