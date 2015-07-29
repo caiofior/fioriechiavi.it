@@ -34,6 +34,10 @@ $(document).ready(function() {
     tinymce.init({
         //language : 'it', 
         //language_url : '/languages/it.js',
+        force_br_newlines : false,
+        force_p_newlines : false,
+        forced_root_block : "",
+        entity_encoding : "raw",
         plugins: ["table","code"],
         tools: ["inserttable","code"],
         selector: "textarea:not(.notEditable)",
