@@ -11,3 +11,7 @@ a.selectAllRegions {
    display: inline-block;
    width: 200px;
 }
+#cod_id_list {
+    padding-left:40px;
+    font-size:10px;
+}

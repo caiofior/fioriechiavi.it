@@ -407,6 +407,23 @@ case 'imageupload':
    echo json_encode($m);
    exit;
    break;
+case 'get_col_id_list':
+   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+   if (array_key_exists('taxa_id', $_REQUEST) && is_numeric($_REQUEST['taxa_id'])) {
+       $taxa->loadFromId($_REQUEST['taxa_id']);
+   }
+   if ($taxa->getData('name') != '') {
+    $ch = curl_init($GLOBALS['db']->config->catalogOfLife->wsEndpoint.urlencode($taxa->getData('name')));
+    curl_setopt_array($ch,array(
+         CURLOPT_RETURNTRANSFER => true
+    ));
+    $response = unserialize(curl_exec($ch));
+    if (is_array($response)) {
+        require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'colList.phtml';
+    }
+   }
+   exit;
+   break;
 default:
    $this->getTemplate()->setBlock('middle','administrator/taxa/list.phtml');
    $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml');  

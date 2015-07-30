@@ -1,0 +1,16 @@
+<p><strong>Elenco dei taxa trovati su <a class="blank" href="<?php echo $GLOBALS['db']->config->catalogOfLife->mainPage; ?>">Catalog of life</a></strong></p>
+<?php
+$results = array_slice($response['results'], 0,5);
+foreach ($results as $resultItem) : ?>
+<div class="col_item">
+    <p><strong><?php echo $resultItem['rank']; ?> <?php echo $resultItem['name_html']; ?></strong></p>
+    <dl>
+        <dt>Nome</dt>
+        <dd class="con_name"><?php echo $resultItem['rank']; ?> <?php echo $resultItem['name']; ?></dd>
+        <dt>ID</dt>
+        <dd class="con_id"><a class="selected_col_id" href="#"><?php echo $resultItem['id']; ?></a></dd>
+        <dt>URL</dt>
+        <dd class="con_url"><a href="<?php echo $resultItem['url']; ?>" class="blank"><?php echo $resultItem['url']; ?></a></dd>
+    </dl>
+</div>
+<?php endforeach;

@@ -50,6 +50,11 @@ $regionColl = $taxa->getRegionColl();
    <input id="name" name="name" value="<?php echo $taxa->getData('name')?>">
    </div>
    <div>
+    <label for="col_id">Catalog of life ID</label>
+    <input id="col_id" name="col_id" value="<?php echo $taxa->getData('col_id')?>"><a class="update_col_id" href="#">Aggiorna</a>
+    <div id="col_id_list" style="display:none;"></div>
+   </div>
+   <div>
       <label for="description">Descrizione</label> <a class="loadMarkup" href="#">Carica Markup</a>
       <div style="display: none;" id="description_markup_container">
          <label for="description">Incolla il codice di markup</label><br/>

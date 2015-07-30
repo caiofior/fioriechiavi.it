@@ -177,6 +177,17 @@ $(document).ready(function() {
       $(".saved").hide();
       $(".tosave").show();
    });
+   $(".update_col_id").click(function(e){
+      $("#col_id_list").load("?task=taxa&action=get_col_id_list&taxa_id="+$("#id").val(),function(e){
+          $("#col_id_list").show();
+          $(".selected_col_id").click(function(e){
+              $("#col_id_list").hide();
+              $("#col_id").val($(this).text());
+              e.preventDefault();
+          });
+      }); 
+      e.preventDefault();
+   });
    up = $("#uploader").plupload({
         // General settings
         runtimes : 'html5,flash,silverlight,html4',
