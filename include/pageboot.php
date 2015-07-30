@@ -14,11 +14,12 @@ if (rand(0,10) == 0) {
         closedir($handle); 
     }
 }
+
+ini_set('display_errors',1);
+ini_set('error_reporting',E_ALL);
 session_save_path($sessionDir);
 require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
-ini_set('display_errors',1);
-ini_set('error_reporting',E_ALL);
 if (is_file(__DIR__.'/zendRequireCompiled.php')) {
    require __DIR__.'/zendRequireCompiled.php';
 } else if (is_file(__DIR__.'/zendRequire.php')) {

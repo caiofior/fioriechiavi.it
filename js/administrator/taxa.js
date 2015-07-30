@@ -179,6 +179,7 @@ $(document).ready(function() {
    });
    $(".update_col_id").click(function(e){
       $("#col_id_list").load("?task=taxa&action=get_col_id_list&taxa_id="+$("#id").val(),function(e){
+          $("a.blank").attr('target','_blank');
           $("#col_id_list").show();
           $(".selected_col_id").click(function(e){
               $("#col_id_list").hide();
