@@ -1,0 +1,17 @@
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('style/administrator/taxa.css');?>">
+<p><strong>Elenco dei taxa trovati su <a class="blank" href="<?php echo $GLOBALS['db']->config->encyclopediaOfLife->mainPage; ?>">Encyclopedia of life</a></strong></p>
+<?php
+$results = array_slice($response->results, 0,5);
+foreach ($results as $resultItem) : ?>
+<div class="eol_item">
+    <p><strong><?php echo $resultItem->title; ?></strong></p>
+    <dl>
+        <dt>Nome</dt>
+        <dd class="eol_title"><?php echo $resultItem->title; ?></dd>
+        <dt>ID</dt>
+        <dd class="eol_id"><a class="selected_eol_id" href="#"><?php echo $resultItem->id; ?></a></dd>
+        <dt>URL</dt>
+        <dd class="eol_link"><a href="<?php echo $resultItem->link; ?>" class="blank"><?php echo $resultItem->link; ?></a></dd>
+    </dl>
+</div>
+<?php endforeach;

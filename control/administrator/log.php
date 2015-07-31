@@ -15,7 +15,7 @@ if (array_key_exists('sEcho', $_REQUEST)) {
          foreach($columns as $column) {
             $data = $log->getRawData($column);
 	    if ($column == 'url' && $log->getRawData('label') != '') {
-     	    	$row[] = '<a class="blank" href="'.$data.'">'.$log->getRawData('label').'</a>';
+     	    	$row[] = '<a href="'.$data.'">'.$log->getRawData('label').'</a>';
 	    } else {
 		$row[] = $data;
 	    }

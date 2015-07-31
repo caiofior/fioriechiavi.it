@@ -189,6 +189,18 @@ $(document).ready(function() {
       }); 
       e.preventDefault();
    });
+   $(".update_eol_id").click(function(e){
+      $("#eol_id_list").load("?task=taxa&action=get_eol_id_list&taxa_id="+$("#id").val(),function(e){
+          $("a.blank").attr('target','_blank');
+          $("#eol_id_list").show();
+          $(".selected_eol_id").click(function(e){
+              $("#eol_id_list").hide();
+              $("#eol_id").val($(this).text());
+              e.preventDefault();
+          });
+      }); 
+      e.preventDefault();
+   });
    up = $("#uploader").plupload({
         // General settings
         runtimes : 'html5,flash,silverlight,html4',

@@ -180,6 +180,9 @@ if (
 <?php if ($taxa->getData('col_id') != '') :?>
 <a class="blank" rel="nofollow" href="<?php echo $GLOBALS['db']->config->catalogOfLife->landingPage.urlencode($taxa->getData('col_id'));?>">Catalog of life</a>
 <?php endif; ?>
+<?php if ($taxa->getData('eol_id') != '') :?>
+<a class="blank" rel="nofollow" href="<?php echo $GLOBALS['db']->config->encyclopediaOfLife->landingPage.urlencode($taxa->getData('eol_id'));?>">Encyclopedia of life</a>
+<?php endif; ?>
 </div>
 <?php endif;
 $searchTerm = '';

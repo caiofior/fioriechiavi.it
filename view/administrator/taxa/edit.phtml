@@ -55,6 +55,11 @@ $regionColl = $taxa->getRegionColl();
     <div id="col_id_list" style="display:none;"></div>
    </div>
    <div>
+    <label for="eol_id">Encyclopedia of life ID</label>
+    <input id="eol_id" name="eol_id" value="<?php echo $taxa->getData('eol_id')?>"><a class="update_eol_id" href="#">Aggiorna</a>
+    <div id="eol_id_list" style="display:none;"></div>
+   </div>
+   <div>
       <label for="description">Descrizione</label> <a class="loadMarkup" href="#">Carica Markup</a>
       <div style="display: none;" id="description_markup_container">
          <label for="description">Incolla il codice di markup</label><br/>

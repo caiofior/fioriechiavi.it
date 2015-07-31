@@ -11,7 +11,7 @@ a.selectAllRegions {
    display: inline-block;
    width: 200px;
 }
-#cod_id_list {
+.col_item, eol_item {
     padding-left:40px;
     font-size:10px;
 }
