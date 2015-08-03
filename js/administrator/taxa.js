@@ -178,7 +178,8 @@ $(document).ready(function() {
       $(".tosave").show();
    });
    $(".update_col_id").click(function(e){
-      $("#col_id_list").load("?task=taxa&action=get_col_id_list&taxa_id="+$("#id").val(),function(e){
+      $(this).siblings(".ajaxLoader").show();
+      $("#col_id_list").load("?task=taxa&action=get_col_id_list&taxa_name="+$("#name").val(),function(e){
           $("a.blank").attr('target','_blank');
           $("#col_id_list").show();
           $(".selected_col_id").click(function(e){
@@ -186,11 +187,13 @@ $(document).ready(function() {
               $("#col_id").val($(this).text());
               e.preventDefault();
           });
+          $(this).siblings(".ajaxLoader").hide();
       }); 
       e.preventDefault();
    });
    $(".update_eol_id").click(function(e){
-      $("#eol_id_list").load("?task=taxa&action=get_eol_id_list&taxa_id="+$("#id").val(),function(e){
+      $(this).siblings(".ajaxLoader").show();
+      $("#eol_id_list").load("?task=taxa&action=get_eol_id_list&taxa_name="+$("#name").val(),function(e){
           $("a.blank").attr('target','_blank');
           $("#eol_id_list").show();
           $(".selected_eol_id").click(function(e){
@@ -198,6 +201,7 @@ $(document).ready(function() {
               $("#eol_id").val($(this).text());
               e.preventDefault();
           });
+          $(this).siblings(".ajaxLoader").hide();
       }); 
       e.preventDefault();
    });

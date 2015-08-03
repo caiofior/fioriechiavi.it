@@ -51,12 +51,14 @@ $regionColl = $taxa->getRegionColl();
    </div>
    <div>
     <label for="col_id">Catalog of life ID</label>
-    <input id="col_id" name="col_id" value="<?php echo $taxa->getData('col_id')?>"><a class="update_col_id" href="#">Aggiorna</a>
+    <input id="col_id" name="col_id" value="<?php echo $taxa->getData('col_id')?>"><a class="update_col_id actions update" title="Aggiorna" href="#">Aggiorna</a>
+    <img class="ajaxLoader" src="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/images/ajax-loader.gif" style="display: none;">
     <div id="col_id_list" style="display:none;"></div>
    </div>
    <div>
     <label for="eol_id">Encyclopedia of life ID</label>
-    <input id="eol_id" name="eol_id" value="<?php echo $taxa->getData('eol_id')?>"><a class="update_eol_id" href="#">Aggiorna</a>
+    <input id="eol_id" name="eol_id" value="<?php echo $taxa->getData('eol_id')?>"><a class="update_eol_id actions update" title="Aggiorna" href="#">Aggiorna</a>
+    <img class="ajaxLoader" src="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/images/ajax-loader.gif" style="display: none;">
     <div id="eol_id_list" style="display:none;"></div>
    </div>
    <div>

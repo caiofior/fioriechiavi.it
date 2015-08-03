@@ -408,12 +408,8 @@ case 'imageupload':
    exit;
    break;
 case 'get_col_id_list':
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-   if (array_key_exists('taxa_id', $_REQUEST) && is_numeric($_REQUEST['taxa_id'])) {
-       $taxa->loadFromId($_REQUEST['taxa_id']);
-   }
-   if ($taxa->getData('name') != '') {
-    $ch = curl_init($GLOBALS['db']->config->catalogOfLife->wsEndpoint.urlencode($taxa->getData('name')));
+   if (array_key_exists('taxa_name', $_REQUEST) && $_REQUEST['taxa_name'] != '') {
+    $ch = curl_init($GLOBALS['db']->config->catalogOfLife->wsEndpoint.urlencode($_REQUEST['taxa_name']));
     curl_setopt_array($ch,array(
          CURLOPT_RETURNTRANSFER => true
     ));
@@ -425,12 +421,8 @@ case 'get_col_id_list':
    exit;
    break;
 case 'get_eol_id_list':
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-   if (array_key_exists('taxa_id', $_REQUEST) && is_numeric($_REQUEST['taxa_id'])) {
-       $taxa->loadFromId($_REQUEST['taxa_id']);
-   }
-   if ($taxa->getData('name') != '') {
-    $ch = curl_init($GLOBALS['db']->config->encyclopediaOfLife->wsEndpoint.urlencode($taxa->getData('name')));
+   if (array_key_exists('taxa_name', $_REQUEST) && $_REQUEST['taxa_name'] != '') {
+    $ch = curl_init($GLOBALS['db']->config->encyclopediaOfLife->wsEndpoint.urlencode($_REQUEST['taxa_name']));
     curl_setopt_array($ch,array(
          CURLOPT_RETURNTRANSFER => true
     ));
