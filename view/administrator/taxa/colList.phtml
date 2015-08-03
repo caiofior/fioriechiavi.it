@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('style/administrator/taxa.css');?>">
 <p><strong>Elenco dei taxa trovati su <a class="blank" href="<?php echo $GLOBALS['db']->config->catalogOfLife->mainPage; ?>">Catalog of life</a></strong></p>
 <?php
+if (array_key_exists('results', $response)) :
 $results = array_slice($response['results'], 0,5);
 foreach ($results as $resultItem) : ?>
 <div class="col_item">
@@ -15,3 +16,4 @@ foreach ($results as $resultItem) : ?>
     </dl>
 </div>
 <?php endforeach;
+endif;
