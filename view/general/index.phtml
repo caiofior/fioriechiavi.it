@@ -27,6 +27,9 @@ endif;
 <article itemscope itemtype="http://schema.org/Article">
 <header>
 <h1 itemprop="name"><?php echo $title; ?></h1>
+<?php  if ($GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>
+<a class="actions modify blank" title="Modifica" href="?task=dico&amp;action=edit&amp;id=<?php echo $taxa->getData('id');?>">Modifica</a>
+<?php endif; ?>
 </header>
 <?php
 if ($taxa->getData('name') != '') : 

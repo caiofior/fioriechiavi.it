@@ -21,6 +21,9 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
       <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $dicoItem->getData('taxa_id'); ?>"><?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?></a>
       <?php endif; ?>
       </em>
+      <?php  if (is_numeric($dicoItem->getData('taxa_id')) && $GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>
+      <a class="actions modify blank" title="Modifica" href="?task=dico&amp;action=edit&amp;id=<?php echo $dicoItem->getData('taxa_id');?>">Modifica</a>
+      <?php endif; ?>
    </span>
 </div>
 <?php endforeach; 
