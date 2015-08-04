@@ -25,6 +25,7 @@ Caratteristiche
 ---------------
 
 * Sono economica, per funzionare basta una giornata di lavoro per il primo avvio e l'acquisto di un servizio di hosting da 10€/anno;
+* Sono loquace, mi integro con progetti come _Encyclopedya of life_ http://www.eol.org , _Catalog of life_ http://www.catalogueoflife.org/ e _Wikipedia_  http://it.wikipedia.org;
 * Sono personalizzabile, il codice è liberamente disponibile e personalizzabile a patto di continuare ad utilizzare http://github.com per tenere traccia delle tue modifiche (*fork on github*). Se non hai le competenze per farlo puoi contattarmi per proporre sviluppi ed implementazioni, mi piace parlare con biologi e botanici;
 * Sono brutta ma mi puoi truccare a piacere; la grafica del sito si trova è racchiusa in tre cartelle, un grafico dovrebbe riuscire a modificare e personalizzare a tuo piacere la grafica basta avere dimestichezza con PHP, HTML5, JQuery, JQuery UI e JQuery datatables.
 
@@ -41,7 +42,8 @@ I'm not a dicotomic key but a web app to create in a cooperative way a dicotomic
 Characteristics
 ---------------
 
-* I'am  cheap, you need only an entry level web hosting service of 10€/year.
+* I'am  cheap, you need only an entry level web hosting service of 10€/year;
+* I'am talkative and integrated with  _Encyclopedya of life_ http://www.eol.org , _Catalog of life_ http://www.catalogueoflife.org/ and _Wikipedia_  http://it.wikipedia.org;
 * Fork me on github,I'm open source;
 * I'm ugly but I like make-up; the site layout is autonomous and is present in three folders, a web designer that knows PHP, HTML5, JQuery, JQuery UI e JQuery datatables could make me beatiful.
 
