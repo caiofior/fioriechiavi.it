@@ -64,6 +64,9 @@ class Taxa extends \Content {
         unset($this->data['taxa_kind_id_name']);
         unset($this->data['taxa_kind_ord']);
         unset($this->data['dico_id']);
+        if (array_key_exists('eol_id', $this->data) && ($this->data['eol_id']=='' || $this->data['eol_id']==0)) {
+            $this->data['eol_id']=null;
+        }
         $this->data['creation_datetime'] = date('Y-m-d H:i:s');
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
@@ -83,6 +86,9 @@ class Taxa extends \Content {
         unset($this->data['taxa_kind_id_name']);
         unset($this->data['taxa_kind_ord']);
         unset($this->data['status']);
+        if (array_key_exists('eol_id', $this->data) && ($this->data['eol_id']=='' || $this->data['eol_id']==0)) {
+            $this->data['eol_id']=null;
+        }
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
         pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
         parent::update();
