@@ -1349,6 +1349,9 @@ a.notextdecoration {
 	}
 }
 @media screen and (max-width: 480px) {
+        .github {
+            display: none;
+        }
 	.header-left {
 		padding: 0;
 	}
@@ -1503,6 +1506,9 @@ a.notextdecoration {
 	}
 }
 @media screen and (max-width: 320px) {
+        .github {
+            display: none;
+        }
 	.copyright {
 		text-align: center;
 	}
