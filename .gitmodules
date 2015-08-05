@@ -31,3 +31,6 @@
 [submodule "install/dbv"]
 	path = install/dbv
 	url = https://github.com/victorstanciu/dbv.git
+[submodule "lib/geoPHP"]
+	path = lib/geoPHP
+	url = https://github.com/phayes/geoPHP.git

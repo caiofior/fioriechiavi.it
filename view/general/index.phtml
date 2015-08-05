@@ -200,6 +200,9 @@ var cx = "<?php echo $GLOBALS['db']->config->search->cx; ?>";
 var key = "<?php echo $GLOBALS['db']->config->search->key; ?>";
 //]]>
 </script>
+<?php
+require (__DIR__.DIRECTORY_SEPARATOR.'observations.php'); 
+?>
 <h2>Immagini dal web</h2>
 <div id="imageSnipets"></div>
 <div class="clear"></div>

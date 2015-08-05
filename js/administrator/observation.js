@@ -36,16 +36,11 @@ $(document).ready(function() {
     });
     latLong = new google.maps.LatLng(latitude, longitude);
     map = new google.maps.Map($('#map-canvas')[0],{
-    zoom: 12,
-    center: latLong
-  });
-  new google.maps.Marker({
-      position: latLong,
-      map: map
-  });
-
-
-
-
-
+        zoom: 12,
+        center: latLong
+    });
+    new google.maps.Marker({
+          position: latLong,
+          map: map
+    });
 });

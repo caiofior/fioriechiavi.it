@@ -35,4 +35,16 @@ $(document).ready(function() {
        });
        e.preventDefault();
    });
+   if ($('#map-canvas').length > 0) {
+       map = new google.maps.Map($('#map-canvas')[0],{
+            zoom: 12,
+            center: new google.maps.LatLng(centroid.latitude,centroid.longitude)
+       });
+       $.each(points, function(index, point) {
+          new google.maps.Marker({
+                position: new google.maps.LatLng(point.latitude, point.longitude),
+                map: map
+          });
+       });
+   }
 });

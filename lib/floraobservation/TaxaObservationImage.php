@@ -58,9 +58,31 @@ class TaxaObservationImage extends \Content
     * Return the image url
     * @return string
     */
-   public function getUrl() {
+   public function getUrl(array $size=array()) {
       if (array_key_exists('filename', $this->data)) {
-         return self::imageBaseDir.$this->data['filename'];
+         if (array_key_exists('x', $size) && array_key_exists('y', $size)) {
+             $url = self::imageBaseDir.$size['x'].'x'.$size['y'];
+             $path = $this->db->baseDir.DIRECTORY_SEPARATOR.$url;
+             if (!is_dir($path)) {
+                 mkdir($path);
+             }
+             $url .= '/'.$this->data['filename'];
+             if (!is_file($path.DIRECTORY_SEPARATOR.$this->data['filename'])) {
+                $dirs = array_filter(explode(DIRECTORY_SEPARATOR, $this->data['filename']));
+                $fileName = array_pop($dirs);
+                foreach ($dirs as $dir) {
+                    $path .= DIRECTORY_SEPARATOR.$dir;
+                    if (!is_dir($path)) {
+                        mkdir($path);
+                    }
+                }
+                $path .= DIRECTORY_SEPARATOR.$fileName;
+                $this->generateImageThumbnail($this->getPath(), $path,$size);
+             }
+             return $url;
+         } else {
+            return self::imageBaseDir.$this->data['filename'];
+         }
       }
    }
    /**
@@ -75,7 +97,7 @@ class TaxaObservationImage extends \Content
     * @return string
     */
    private function getBaseFileName () {
-      return $this->db->baseDir.'/'.self::imageBaseDir;
+      return $this->db->baseDir.DIRECTORY_SEPARATOR.self::imageBaseDir;
    }
    /**
     * @param string $inputFile input file path
@@ -124,4 +146,61 @@ class TaxaObservationImage extends \Content
       }
       parent::delete();
    }
+   /**
+    * Creates a thumbnail
+    * @param string $source_image_path
+    * @param string $thumbnail_image_path
+    * @param array $size
+    * @throws Exception
+    */
+   private function generateImageThumbnail($source_image_path, $thumbnail_image_path,$size) {
+        list($source_image_width, $source_image_height, $source_image_type) = getimagesize($source_image_path);
+        switch ($source_image_type) {
+            case IMAGETYPE_GIF:
+                $source_gd_image = imagecreatefromgif($source_image_path);
+                break;
+            case IMAGETYPE_JPEG:
+                $source_gd_image = imagecreatefromjpeg($source_image_path);
+                break;
+            case IMAGETYPE_PNG:
+                $source_gd_image = imagecreatefrompng($source_image_path);
+                break;
+            default:
+                throw new Exception('Image type not supported '.$source_image_type,1508051433);
+                break;
+        }
+        if ($source_gd_image === false) {
+            throw new Exception('Unable to find image type',1508051433);
+        }
+        $source_aspect_ratio = $source_image_width / $source_image_height;
+        $thumbnail_aspect_ratio = $size['x'] / $size['y'];
+        if ($source_image_width <= $size['x'] && $source_image_height <= $size['y']) {
+            $thumbnail_image_width = $source_image_width;
+            $thumbnail_image_height = $source_image_height;
+        } elseif ($thumbnail_aspect_ratio > $source_aspect_ratio) {
+            $thumbnail_image_width = (int) ($size['y'] * $source_aspect_ratio);
+            $thumbnail_image_height = $size['y'];
+        } else {
+            $thumbnail_image_width = $size['x'];
+            $thumbnail_image_height = (int) ($size['x'] / $source_aspect_ratio);
+        }
+        $thumbnail_gd_image = imagecreatetruecolor($thumbnail_image_width, $thumbnail_image_height);
+        imagecopyresampled($thumbnail_gd_image, $source_gd_image, 0, 0, 0, 0, $thumbnail_image_width, $thumbnail_image_height, $source_image_width, $source_image_height);
+        switch ($source_image_type) {
+            case IMAGETYPE_GIF:
+                imagegif($thumbnail_gd_image, $thumbnail_image_path);
+                break;
+            case IMAGETYPE_JPEG:
+                imagejpeg($thumbnail_gd_image, $thumbnail_image_path, 90);
+                break;
+            case IMAGETYPE_PNG:
+                imagepng($thumbnail_gd_image, $thumbnail_image_path, 90);
+                break;
+            default:
+                throw new Exception('Image type not supported '.$source_image_type,1508051433);
+                break;
+        }
+        imagedestroy($source_gd_image);
+        imagedestroy($thumbnail_gd_image);
+    }
 }

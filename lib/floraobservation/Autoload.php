@@ -34,7 +34,7 @@ class Autoload {
          self::$instance = new $class();
       }
 
-      
+      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'geoPHP'.DIRECTORY_SEPARATOR.'geoPHP.inc';
       require __DIR__.DIRECTORY_SEPARATOR.'TaxaObservation.php';
       require __DIR__.DIRECTORY_SEPARATOR.'TaxaObservationColl.php';
       

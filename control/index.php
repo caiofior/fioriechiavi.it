@@ -124,7 +124,7 @@ switch ($_REQUEST['action']) {
       foreach ($taxaColl->getItems() as $taxa) {
          $result[] = array(
              'label'=>$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'),
-             'value'=>$GLOBALS['config']->baseUrl.'/index.php?id='.$taxa->getData('id')
+             'value'=>$GLOBALS['config']->baseUrl.'index.php?id='.$taxa->getData('id')
          );
       } 
       header('Content-Type: application/json');

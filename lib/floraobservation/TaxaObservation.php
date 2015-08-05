@@ -12,6 +12,11 @@ if (!class_exists('\Autoload')) {
 class TaxaObservation extends \Content
 {
     /**
+     * GeoPHP Point reference
+     * @var /Point
+     */
+    private $point;
+    /**
     * Associates the database table
     * @param \Zend\Db\Adapter\Adapter $db
     */
@@ -53,12 +58,17 @@ class TaxaObservation extends \Content
     * Gets coordinates from point data
     */
    private function getCoordinates() {
-       $point = $this->db->query('SELECT AsText("'.$this->data['position'].'")' , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-       $point = $point->current()->getArrayCopy()['AsText("'];
-       preg_match_all('/[[:digit:]\.]*/', $point, $matches);
-       $matches = array_filter($matches[0]);      
-       $this->rawData['latitude']=current($matches);
-       $this->rawData['longitude']=next($matches);
+       $this->rawData['latitude']=null;
+       $this->rawData['longitude']=null;
+       if (array_key_exists('position', $this->data) && $this->data['position'] != '') {
+        $point = $this->db->query('SELECT AsText("'.$this->data['position'].'")' , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $point = $point->current()->getArrayCopy()['AsText("'];
+        preg_match_all('/[[:digit:]\.]*/', $point, $matches);
+        $matches = array_filter($matches[0]);      
+        $this->rawData['latitude']=current($matches);
+        $this->rawData['longitude']=next($matches);
+        $this->point = new \Point($this->rawData['latitude'], $this->rawData['longitude']);
+       }
    }
     /**
      * Geths the associated taxa onservation image collection
@@ -79,5 +89,21 @@ class TaxaObservation extends \Content
             $image->delete();
         }
         parent::delete();
+    }
+    /**
+    * Sets the data
+    * @param variant $data
+    * @param string|null $field
+    */
+    public function setData($data,$field=null){
+        parent::setData($data, $field);
+        $this->getCoordinates();
+    }
+    /**
+     * Returns the GEOphp point object
+     * @return /Point
+     */
+    public function getPoint () {
+        return $this->point;
     }
 }
