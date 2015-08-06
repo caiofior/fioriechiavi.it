@@ -34,3 +34,6 @@
 [submodule "lib/geoPHP"]
 	path = lib/geoPHP
 	url = https://github.com/phayes/geoPHP.git
+[submodule "js/fancyBox"]
+	path = js/fancyBox
+	url = https://github.com/fancyapps/fancyBox.git

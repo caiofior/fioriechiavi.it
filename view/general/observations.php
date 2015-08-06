@@ -20,7 +20,9 @@ $pointsString='[';?>
     $taxaObservationImage = $taxaObservation->getTaxaObservationImageColl(array('iDisplayStart'=>0,'iDisplayLength'=>1))->getFirst(); ?>
 <div class="item">
     <p><strong><?php echo $taxaObservation->getData('title');?></strong></p>
-    <img src="<?php echo $taxaObservationImage->getUrl(array('x'=>300,'y'=>200)); ?>"> 
+    <a class="fancybox" href="<?php echo $taxaObservationImage->getUrl(); ?>">
+    <img src="<?php echo $taxaObservationImage->getUrl(array('x'=>300,'y'=>200)); ?>">
+    </a>
 </div>
 <?php endforeach; ?>
 </div>
