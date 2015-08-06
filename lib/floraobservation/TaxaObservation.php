@@ -50,8 +50,8 @@ class TaxaObservation extends \Content
     * Update the coordinates
     */
    private function updateCoordinates() {
-       if (array_key_exists('latitude', $this->rawData) && array_key_exists('longitude', $this->rawData)) {
-        $this->data['position']=new \Zend\Db\Sql\Expression('PointFromText("POINT('.floatval($this->rawData['latitude']).' '.floatval($this->rawData['longitude']).')")');
+       if (is_object($this->point) && $this->point instanceof \Point) {
+        $this->data['position']=new \Zend\Db\Sql\Expression('PointFromText("POINT('.$this->point->x().' '.$this->point->y().')")');
        }
    }
    /**
@@ -63,11 +63,7 @@ class TaxaObservation extends \Content
        if (array_key_exists('position', $this->data) && $this->data['position'] != '') {
         $point = $this->db->query('SELECT AsText("'.$this->data['position'].'")' , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $point = $point->current()->getArrayCopy()['AsText("'];
-        preg_match_all('/[[:digit:]\.]*/', $point, $matches);
-        $matches = array_filter($matches[0]);      
-        $this->rawData['latitude']=current($matches);
-        $this->rawData['longitude']=next($matches);
-        $this->point = new \Point($this->rawData['latitude'], $this->rawData['longitude']);
+        $this->point = \geoPHP::load($point,'wkt');
        }
    }
     /**
@@ -105,5 +101,12 @@ class TaxaObservation extends \Content
      */
     public function getPoint () {
         return $this->point;
+    }
+    /**
+     * Sets the GEOphp point object
+     * @return /Point
+     */
+    public function setPoint (\Point $point) {
+        $this->point = $point;
     }
 }
