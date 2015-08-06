@@ -38,6 +38,7 @@ $(document).ready(function() {
    if ($('#map-canvas').length > 0) {
        map = new google.maps.Map($('#map-canvas')[0],{
             zoom: 12,
+            scrollwheel: false,
             center: new google.maps.LatLng(centroid.latitude,centroid.longitude)
        });
        $.each(points, function(index, point) {
