@@ -87,7 +87,9 @@ class TaxaObservationColl extends \ContentColl {
      public function getMultiPoint () {
          $pointArray = array();
          foreach($this->items as $observation) {
-             $pointArray[] = $observation->getPoint();
+	     if (is_object($observation->getPoint())) {
+             	$pointArray[] = $observation->getPoint();
+	     }
          }
          return new \MultiPoint($pointArray);
      }

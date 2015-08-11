@@ -43,9 +43,25 @@ if (array_key_exists('id', $_REQUEST)) {
    <div>
    <?php
    $taxaObservationImageColl = $taxaObservation->getTaxaObservationImageColl();
-   foreach($taxaObservationImageColl->getItems() as $taxaObservationImage): ?>
+   foreach($taxaObservationImageColl->getItems() as $taxaObservationImage):
+   ?>
    <img src="<?php echo $GLOBALS['db']->config->staticUrl.$taxaObservationImage->getUrl();?>" />
-   <?php endforeach; ?>
+   <?php 
+   
+   if (function_exists('exif_read_data')) :
+    $exif = exif_read_data($taxaObservationImage->getPath());
+    foreach ($exif as $key => $section) :
+        if (is_array($section)) :
+        foreach ($section as $name => $val) :
+             echo "$key.$name: $val<br />\n";
+        endforeach;
+        else:
+            echo "$key: $section<br />\n";
+        endif;
+     endforeach;
+   endif;
+   
+   endforeach; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
    </div>

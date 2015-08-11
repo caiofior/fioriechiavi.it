@@ -34,7 +34,7 @@ switch ($_REQUEST['action']) {
             $taxaObservation->setData(strip_tags($_REQUEST['title']),'title');
 
             require $GLOBALS['db']->baseDir.'lib/parsedown/Parsedown.php';
-            $taxaObservation->setData(Parsedown::instance()->parse(strip_tags($_REQUEST['description'])),'description'); 
+            $taxaObservation->setData(Parsedown::instance()->line(strip_tags($_REQUEST['description'])),'description'); 
             $taxaObservation->setData($GLOBALS['profile']->getData('id'),'profile_id');
             $taxaObservation->setData(0,'valid');
             $taxaObservation->setPoint(new \Point(floatval($_REQUEST['latitude']), $_REQUEST['longitude']));

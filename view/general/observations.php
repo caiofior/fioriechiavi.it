@@ -14,7 +14,7 @@ $pointsString='[';?>
 <div id="map-canvas" style="width: 100%; height: 400px;"></div>
 <div class="observationColl">
 <?php foreach($taxaObservationColl->getItems() as $taxaObservation) :
-    if ($taxaObservation->getPoint()->x() != '' && $taxaObservation->getPoint()->y() != '') {
+    if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->x() != '' && $taxaObservation->getPoint()->y() != '') {
         $pointsString .= '{latitude:'.$taxaObservation->getPoint()->x().',longitude:'.$taxaObservation->getPoint()->y().'},';
     }
     $taxaObservationImage = $taxaObservation->getTaxaObservationImageColl(array('iDisplayStart'=>0,'iDisplayLength'=>1))->getFirst(); ?>

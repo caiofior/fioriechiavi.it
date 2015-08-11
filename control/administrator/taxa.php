@@ -275,7 +275,7 @@ case 'taxakindlist':
    break;
 case 'parse_markup':
    require $GLOBALS['db']->baseDir.'lib/parsedown/Parsedown.php';
-   echo Parsedown::instance()->parse($_REQUEST['description_markup']);
+   echo Parsedown::instance()->line($_REQUEST['description_markup']);
    exit;
    break;
 case 'imageupload':
