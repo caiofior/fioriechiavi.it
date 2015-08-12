@@ -31,7 +31,7 @@ $pointsString='[';?>
     } catch (Exception $e) {}
     if (!is_null($thumbnailImageUrl)) : ?>
 <div class="item">
-    <p><strong><?php echo chr(65+$index).' '.$taxaObservation->getData('title');?></strong></p>
+    <a id="observation_<?php echo $index;?>"><strong><?php echo chr(65+$index).') '.$taxaObservation->getData('title');?></strong></a>
     <a class="fancybox" href="<?php echo $taxaObservationImage->getUrl(); ?>">
     <img src="<?php echo $thumbnailImageUrl; ?>">
     </a>
@@ -39,7 +39,7 @@ $pointsString='[';?>
 <?php endif;
 endforeach;
 if ($taxaObservationColl->count() > 1) {
-    $radius += sqrt($taxaObservationColl->getMultiPoint()->envelope()->area())*sqrt(2);
+    $radius -= sqrt($taxaObservationColl->getMultiPoint()->envelope()->area())^3;
 }
 ?>
 </div>

@@ -193,7 +193,6 @@ if ($taxa->getData('id') != '' && $taxa->getData('id') != '1') {
    $searchTerm = $taxa->getData('name');
 }
 if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search->key != '') : ?>
-?>
 <script>
 //<![CDATA[
 var searchTerm = "<?php echo $searchTerm; ?>";

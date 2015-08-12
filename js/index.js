@@ -20,7 +20,6 @@ $(document).ready(function() {
        });
        e.preventDefault();
    });
-   
    if($(".github").css("display") != "none") {
     if (typeof google != 'undefined' && typeof searchTerm != 'undefined' && searchTerm != "") {
       $.getJSON( "https://www.googleapis.com/customsearch/v1?q="+searchTerm+"&cx="+cx+"&key="+key+"&num=7", function( data ) {
@@ -43,11 +42,12 @@ $(document).ready(function() {
             scrollwheel: false,
             center: new google.maps.LatLng(centroid.latitude,centroid.longitude)
        });
+       count = 0;
        $.each(points, function(index, point) {
           new google.maps.Marker({
                 position: new google.maps.LatLng(point.latitude, point.longitude),
                 map: map,
-                title: charCodeAt(65+index)
+                label: String.fromCharCode(65+count++)
           });
        });
     }
