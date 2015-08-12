@@ -28,7 +28,17 @@ class TaxaObservation extends \Content
     * @param int $id
     */
    public function loadFromId($id) {
-       parent::loadFromId($id);
+       $select = $this->table->getSql()->select();
+       $select->columns(array('*',
+           'point'=>new \Zend\Db\Sql\Expression('asText(position)')
+           ));
+       $select->where(array($this->primary=>$id));
+       $statement = $this->table->getSql()->prepareStatementForSqlObject($select);
+       $results = $statement->execute();
+       $resultSet = new \Zend\Db\ResultSet\ResultSet();
+       $resultSet->initialize($results);
+       $this->data = $resultSet->current();
+       $this->rawData = $this->data;
        $this->getCoordinates();
    }
    /**
@@ -58,12 +68,8 @@ class TaxaObservation extends \Content
     * Gets coordinates from point data
     */
    private function getCoordinates() {
-       $this->rawData['latitude']=null;
-       $this->rawData['longitude']=null;
-       if (array_key_exists('position', $this->data) && $this->data['position'] != '') {
-        $point = $this->db->query('SELECT AsText("'.$this->data['position'].'")' , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-        $point = $point->current()->getArrayCopy()['AsText("'];
-        $this->point = \geoPHP::load($point,'wkt');
+       if (array_key_exists('point', $this->rawData) && $this->rawData['point'] != '') {
+         $this->point = \geoPHP::load($this->rawData['point'],'wkt');
        }
    }
     /**

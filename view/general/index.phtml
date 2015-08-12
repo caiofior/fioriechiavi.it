@@ -192,6 +192,7 @@ $searchTerm = '';
 if ($taxa->getData('id') != '' && $taxa->getData('id') != '1') {
    $searchTerm = $taxa->getData('name');
 }
+if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search->key != '') : ?>
 ?>
 <script>
 //<![CDATA[
@@ -201,6 +202,7 @@ var key = "<?php echo $GLOBALS['db']->config->search->key; ?>";
 //]]>
 </script>
 <?php
+endif;
 require (__DIR__.DIRECTORY_SEPARATOR.'observations.php'); 
 ?>
 <h2>Immagini dal web</h2>

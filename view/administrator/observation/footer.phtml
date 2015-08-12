@@ -7,4 +7,6 @@
 <script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/tinymce-dist/tinymce.jquery.min.js"></script>
 <?php endif; ?>
 <script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/administrator/observation.js');?>"></script>
+<?php if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search->key != '') : ?>
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $GLOBALS['db']->config->search->key; ?>"></script>
+<?php endif; ?>

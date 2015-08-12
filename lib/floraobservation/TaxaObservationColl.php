@@ -57,7 +57,8 @@ class TaxaObservationColl extends \ContentColl {
       $select->columns(array(
           '*',
           'taxa_name'=>new \Zend\Db\Sql\Expression('(SELECT CONCAT((SELECT `initials` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id`)," ",`name`) FROM `taxa` WHERE `taxa`.`id`=`taxa_observation`.`taxa_id`)'),
-          'profile_email'=>new \Zend\Db\Sql\Expression('(SELECT `email` FROM `profile` WHERE `profile`.`id`=`taxa_observation`.`profile_id`)')
+          'profile_email'=>new \Zend\Db\Sql\Expression('(SELECT `email` FROM `profile` WHERE `profile`.`id`=`taxa_observation`.`profile_id`)'),
+          'point'=>new \Zend\Db\Sql\Expression('asText(position)')
       ));
       if (array_key_exists('valid', $criteria) && $criteria['valid'] != '') {
           $select->where('`taxa_observation`.`valid` = '.intval($criteria['valid']));
@@ -89,7 +90,9 @@ class TaxaObservationColl extends \ContentColl {
          foreach($this->items as $observation) {
 	     if (is_object($observation->getPoint())) {
              	$pointArray[] = $observation->getPoint();
-	     }
+             } else {
+                 throw new \Exception('Invalid observation coordinates', 1508121236);
+             }
          }
          return new \MultiPoint($pointArray);
      }

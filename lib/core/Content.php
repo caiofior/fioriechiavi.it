@@ -21,7 +21,7 @@ abstract class Content {
     protected $db;   
 /**
 * Zend Data table
-* @var Zend_Db_Table
+* @var \Zend\Db\TableGateway\TableGateway
 */
     protected $table;
     /**
@@ -120,10 +120,10 @@ abstract class Content {
       */
     public function loadFromId($id) {
         if (
-               !is_object($this->table) ||
-               !$this->table instanceof \Zend\Db\TableGateway\TableGateway
-               ) {
-                  throw new \Exception('No database table associated with this content',1409011101);
+            !is_object($this->table) ||
+            !$this->table instanceof \Zend\Db\TableGateway\TableGateway
+            ) {
+            throw new \Exception('No database table associated with this content',1409011101);
         }
         $data = $this->table->select(array($this->primary=>$id))->current();
         if (is_object($data))

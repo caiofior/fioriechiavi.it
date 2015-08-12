@@ -14,7 +14,15 @@ $(document).ready(function() {
        $(this).parent().siblings("div").show();
        e.preventDefault();
     });
-    if (typeof searchTerm != 'undefined' && searchTerm != "") {
+    $("#signalObservationButton").click(function (e){
+       $("#signalObservation").load(window.location.href.replace("#","")+"&action=signalObservation",function(e ){
+           $("#signalObservationButton").hide();
+       });
+       e.preventDefault();
+   });
+   
+   if($(".github").css("display") != "none") {
+    if (typeof google != 'undefined' && typeof searchTerm != 'undefined' && searchTerm != "") {
       $.getJSON( "https://www.googleapis.com/customsearch/v1?q="+searchTerm+"&cx="+cx+"&key="+key+"&num=7", function( data ) {
         $.each(data["items"],function (key,value) {
            if (   
@@ -29,26 +37,20 @@ $(document).ready(function() {
         });
      });
    }
-   $("#signalObservationButton").click(function (e){
-       $("#signalObservation").load(window.location.href.replace("#","")+"&action=signalObservation",function(e ){
-           $("#signalObservationButton").hide();
-       });
-       e.preventDefault();
-   });
-   if ($('#map-canvas').length > 0) {
+    if (typeof google != 'undefined' && $('#map-canvas').length > 0) {
        map = new google.maps.Map($('#map-canvas')[0],{
-            zoom: 12,
+            zoom: radius,
             scrollwheel: false,
             center: new google.maps.LatLng(centroid.latitude,centroid.longitude)
        });
        $.each(points, function(index, point) {
           new google.maps.Marker({
                 position: new google.maps.LatLng(point.latitude, point.longitude),
-                map: map
+                map: map,
+                title: charCodeAt(65+index)
           });
        });
-   }
-   if($(".github").css("display") != "none") {
+    }
     $(".fancybox").fancybox();
    }
 });

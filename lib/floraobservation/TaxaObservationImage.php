@@ -154,6 +154,9 @@ class TaxaObservationImage extends \Content
     * @throws Exception
     */
    private function generateImageThumbnail($source_image_path, $thumbnail_image_path,$size) {
+        if (!is_file($source_image_path)) {
+            throw new \Exception('Image not found '.$source_image_path,1508051434);
+        }
         list($source_image_width, $source_image_height, $source_image_type) = getimagesize($source_image_path);
         switch ($source_image_type) {
             case IMAGETYPE_GIF:
@@ -166,7 +169,7 @@ class TaxaObservationImage extends \Content
                 $source_gd_image = imagecreatefrompng($source_image_path);
                 break;
             default:
-                throw new Exception('Image type not supported '.$source_image_type,1508051433);
+                throw new \Exception('Image type not supported '.$source_image_type,1508051433);
                 break;
         }
         if ($source_gd_image === false) {
@@ -197,7 +200,7 @@ class TaxaObservationImage extends \Content
                 imagepng($thumbnail_gd_image, $thumbnail_image_path, 90);
                 break;
             default:
-                throw new Exception('Image type not supported '.$source_image_type,1508051433);
+                throw new \Exception('Image type not supported '.$source_image_type,1508051433);
                 break;
         }
         imagedestroy($source_gd_image);
