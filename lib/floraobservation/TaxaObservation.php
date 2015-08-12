@@ -36,8 +36,8 @@ class TaxaObservation extends \Content
        $statement = $this->table->getSql()->prepareStatementForSqlObject($select);
        $results = $statement->execute();
        $resultSet = new \Zend\Db\ResultSet\ResultSet();
-       $resultSet->initialize($results);
-       $this->data = $resultSet->current();
+       $resultSet->initialize($results);    
+       $this->data = $resultSet->current()->getArrayCopy();
        $this->rawData = $this->data;
        $this->getCoordinates();
    }
@@ -53,6 +53,9 @@ class TaxaObservation extends \Content
     * Updates data and add the coordinates
     */
    public function update() {
+       if (array_key_exists('point',$this->data)) {
+           unset($this->data['point']);
+       }
        $this->updateCoordinates();
        parent::update();
    }

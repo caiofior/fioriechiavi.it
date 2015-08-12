@@ -18,11 +18,7 @@ if (array_key_exists('id', $_REQUEST)) {
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=observation">Elenco delle osservazioni</a></p> &gt; <h2>Osservazione</h2>
 </div>
 <form method="post" action="#">
-   <?php if (array_key_exists('cid', $_REQUEST)) : ?>
-    <input type="hidden" id="cid" name="cid" value="<?php echo urlencode($_REQUEST['cid']);?>">
-   <?php else : ?>
-   <input type="hidden" id="id" name="id" value="<?php echo $taxaObservation->getData('id')?>">
-   <?php endif; ?>
+
    <div>
    <label for="datetime">Data e ora</label>
    <input id="datetime" name="datetime" readonly="readonly" value="<?php echo $taxaObservation->getData('datetime')?>">

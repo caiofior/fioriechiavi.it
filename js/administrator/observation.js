@@ -38,6 +38,7 @@ $(document).ready(function() {
         latLong = new google.maps.LatLng(latitude, longitude);
         map = new google.maps.Map($('#map-canvas')[0],{
             zoom: 12,
+            scrollwheel: false,
             center: latLong
         });
         new google.maps.Marker({

@@ -61,7 +61,7 @@ case 'edit':
 	    $_REQUEST['id'] = mcrypt_decrypt(
 	            $GLOBALS['db']->config->crypt->cipher,
 	            $GLOBALS['db']->config->crypt->key,
-	            urldecode($_REQUEST['cid']),
+	            $_REQUEST['cid'],
 	            $GLOBALS['db']->config->crypt->mode,
 	            substr($GLOBALS['db']->config->crypt->iv,0,$vector_size)
 	            );
