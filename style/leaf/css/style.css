@@ -44,6 +44,7 @@ label{
 }
 .top-menu {
 	float:right;
+        padding-right:2%; 
 }
 .top-menu ul li{
 	display:inline-block;

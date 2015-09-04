@@ -2,6 +2,10 @@
        ForceType text/javascript
        AddEncoding gzip .gz
   </FilesMatch>
+  <FilesMatch .*\.css.gz>
+       ForceType text/css
+       AddEncoding gzip .gz
+  </FilesMatch>
   FileETag None
   Header unset ETag   
   ExpiresActive On 
