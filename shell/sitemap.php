@@ -1,4 +1,5 @@
 <?php
+echo 'Start at '.date('d/m/Y H:i:s').PHP_EOL;
 $handler = fopen(__DIR__.'/../sitemap.xml', 'w');
 fwrite($handler,<<<EOT
 <?xml version="1.0" encoding="UTF-8"?>
@@ -6,7 +7,9 @@ fwrite($handler,<<<EOT
 
 EOT
 );
-require __DIR__.'/../include/pageboot.php';
+if(!array_key_exists('db', $GLOBALS)) {
+    require __DIR__.'/../include/pageboot.php';
+}
 $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
 $newTaxaColl->loadAll(array(
     'iDisplayStart'=>0,
@@ -45,3 +48,5 @@ fwrite($handler,<<<EOT
 EOT
 );
 fclose($handler);
+echo 'Memory '.  number_format(memory_get_peak_usage()/1024/1024,2).' M'.PHP_EOL;
+echo 'End at '.date('d/m/Y H:i:s').PHP_EOL;

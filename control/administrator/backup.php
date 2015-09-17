@@ -226,10 +226,15 @@ case 'reindex':
    if (!is_dir($logDir)) {
        mkdir($logDir);
    }
-   pclose(popen('php ' . $GLOBALS['db']->baseDir . 'shell/indexing_taxa_search.php > '.$logDir.'/reindex.txt &', 'r'));
+   pclose(popen('php ' . $GLOBALS['db']->baseDir . 'shell/indexing_taxa_search.php > '.$logDir.'/reindex.txt 2>&1 &', 'r'));
    header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=backup');  
    exit();
    break;
+case 'reindex_ajax':
+    require __DIR__ .'/../../shell/sitemap.php';
+    require __DIR__ .'/../../shell/indexing_taxa_search.php';
+    exit();
+    break;
 default:
    if ($enabled === true) {
         $this->getTemplate()->setBlock('middle','administrator/backup/main.phtml');

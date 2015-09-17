@@ -1,4 +1,3 @@
-
     $(".resetTaxa").click(function (e){
         e.preventDefault();
         $(this).dialog({
@@ -20,6 +19,15 @@
            }
         });
         
+    });
+    $(".reindexAJAX").click(function (e){
+        $.get(
+                $(this).attr("href"),
+                function(data){
+                    $("#reindexLog").html(data);
+                }
+              );
+        e.preventDefault();
     });
 up = new plupload.Uploader({
         browse_button: 'pickfiles',
