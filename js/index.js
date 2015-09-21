@@ -21,7 +21,7 @@ $(document).ready(function() {
        e.preventDefault();
    });
    if($(".github").css("display") != "none") {
-    if (typeof google != 'undefined' && typeof searchTerm != 'undefined' && searchTerm != "") {
+    if (typeof searchTerm != 'undefined' && searchTerm != "") {
       $.getJSON( "https://www.googleapis.com/customsearch/v1?q="+searchTerm+"&cx="+cx+"&key="+key+"&num=7", function( data ) {
         $.each(data["items"],function (key,value) {
            if (   
