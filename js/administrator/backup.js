@@ -50,7 +50,11 @@ up = new plupload.Uploader({
         
         init : {
             FilesAdded: function(up, files) {
+                $(".restoreAjaxLoader").show();
                 up.start();
+            },
+            UploadComplete: function(up, files) {
+                $(".restoreAjaxLoader").hide();
             }
           },
  

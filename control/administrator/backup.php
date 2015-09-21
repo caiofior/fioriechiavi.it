@@ -174,7 +174,12 @@ case 'restore' :
    if ($GLOBALS['config']->database->password != '') {
        $command .= ' -p'.$GLOBALS['config']->database->password;
    }
-   $command .= ' '.$GLOBALS['config']->database->database.' ';
+   $command .= ' '.$GLOBALS['config']->database->database;
+   $charset = 'latin1';
+   if ($GLOBALS['config']->database->charset != '' ) {
+       $charset = $GLOBALS['config']->database->charset;
+   }
+   $command .= ' --default-character-set='.$charset;
    $command .= ' < '.$filePath;
    exec($command);
    $m = new stdClass();
