@@ -51,9 +51,13 @@ foreach ($taxaItemColl->getItems() as $taxaItem):
    $label = $taxaItem->getData('text');
    $lastCharacter = substr($taxaItem->getData('id'),-1);
    if ($lastCharacter == 0) {
-      $lastPosition++;
-      $positions[substr($taxaItem->getData('id'),0,-1).'0']= $lastPosition;
-      $positions[substr($taxaItem->getData('id'),0,-1).'1']= $lastPosition;
+      $positions[substr($taxaItem->getData('id'),0,-1).'0']='';
+      $positions[substr($taxaItem->getData('id'),0,-1).'1']='';
+      if ($taxaItem->getRawData('incomplete') != 1) {
+        $lastPosition++;
+        $positions[substr($taxaItem->getData('id'),0,-1).'0']= $lastPosition;
+        $positions[substr($taxaItem->getData('id'),0,-1).'1']= $lastPosition;
+      }
    }
    $missing='';
    if ($taxaItem->getRawData('incomplete') == 1)

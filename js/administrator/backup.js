@@ -21,10 +21,12 @@
         
     });
     $(".reindexAJAX").click(function (e){
+        $(".reindexAjaxLoader").show();
         $.get(
                 $(this).attr("href"),
                 function(data){
                     $("#reindexLog").html(data);
+                    $(".reindexAjaxLoader").hide();
                 }
               );
         e.preventDefault();

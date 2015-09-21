@@ -29,6 +29,7 @@ $(document).ready(function() {
                   }
                });
             });
+            $("a.blank").attr('target','_blank');
         }
     });
     tinymce.init({
@@ -275,4 +276,14 @@ $(document).ready(function() {
       });
    }
    deleteImage ();
+   $(".reindexAJAX").click(function (e){
+        $(".reindexAjaxLoader").show();
+        $.get(
+                $(this).attr("href"),
+                function(data){
+                    $(".reindexAjaxLoader").hide();
+                }
+              );
+        e.preventDefault();
+    });
 });

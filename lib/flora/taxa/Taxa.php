@@ -69,13 +69,16 @@ class Taxa extends \Content {
         }
         $this->data['creation_datetime'] = date('Y-m-d H:i:s');
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
-        pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
+        if ($this->db->config->background->useAJAX != true ) {
+            pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
+        }
         parent::insert();
         $this->updateSearch();
         $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('ALTER TABLE `taxa_search` ORDER BY `taxa_id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+
     }
 
     /**
@@ -90,7 +93,9 @@ class Taxa extends \Content {
             $this->data['eol_id']=null;
         }
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
-        pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
+        if ($this->db->config->background->useAJAX != true ) {
+            pclose(popen('php ' . $this->db->baseDir . '/shell/sitemap.php  > /dev/null &', 'r'));
+        }
         parent::update();
         $this->updateSearch();
         $this->db->query('ALTER TABLE `taxa` ORDER BY `id` DESC'

@@ -23,7 +23,11 @@ $( "#taxasearch" ).autocomplete({
       }
 });
 $("#searchForm").on("click","a.showNext",function (e) {
-    $(this).next().toggle();
+    el = $(this).next();
+    el.toggle();
+    if(!el.is(":visible")) {
+        el.find("option").removeAttr("selected");
+    }
     e.preventDefault();
 });
 $("#searchForm").on("click","a.selectAll",function (e) {

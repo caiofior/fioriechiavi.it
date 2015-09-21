@@ -37,7 +37,15 @@ class TaxaColl extends \ContentColl {
       * @return Zend_Db_Select Select is expected
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
-       $select->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array('taxa_kind_initials'=>'initials','taxa_kind_id_name'=>'name'), \Zend\Db\Sql\Select::JOIN_LEFT);
+       $select ->columns(array('*',
+                    'status' => new \Zend\Db\Sql\Predicate\Expression('
+                (               
+                    IFNULL(LENGTH(taxa.description),0)+
+                    IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)
+                ) > 0
+               ')))->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array('taxa_kind_initials'=>'initials','taxa_kind_id_name'=>'name'), \Zend\Db\Sql\Select::JOIN_LEFT);
        $select = $this->setFilter($select,$criteria);
        return $select;
     }

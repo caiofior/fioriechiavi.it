@@ -26,10 +26,20 @@ if (array_key_exists('sEcho', $_REQUEST)) {
                    <a class="actions modify" title="Modifica" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a>
                    <a class="actions delete" title="Cancella" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>
                    ';
+                   if ($taxa->getRawData('status') == true) {
+                   $data .= '
+                                          <a class="actions view blank" title="Modifica" href="'.$GLOBALS['db']->config->baseUrl.'?id='.$taxa->getData('id').'">Visualizza</a>
+                       ';     
+                   }
                } else {
                    $data = '
                    <a class="actions modify" title="Modifica" href="?task=dico&amp;action=edit&amp;id='.$taxa->getData('id').'">Chiave dicotomica</a>
                    ';
+                   if ($taxa->getRawData('status') == true) {
+                   $data .= '
+                                          <a class="actions view blank" title="Modifica" href="'.$GLOBALS['db']->config->baseUrl.'?id='.$taxa->getData('id').'">Visualizza</a>
+                       ';     
+                   }
                }
                
             } 
