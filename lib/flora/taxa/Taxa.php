@@ -296,9 +296,8 @@ class Taxa extends \Content {
 
         $taxa_id = $this->data['id'];
         while (true) {
-            $taxa_id = $this->db->query('SELECT `parent_taxa_id` FROM `dico_item` 
-           WHERE `taxa_id` = ' . intval($taxa_id)
-                            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+            $taxa_id = $this->db->query('SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id` = ' . intval($taxa_id)
+            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
             if (is_null($taxa_id)) {
                 break;
             }

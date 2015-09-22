@@ -38,6 +38,7 @@ $baktrace = debug_backtrace();
 if (sizeof($baktrace) < 1)
    throw new Exception ('No backtrace available to create base path', 0710141057);
 $db->baseDir = dirname($baktrace[0]['file']).DIRECTORY_SEPARATOR;
+$db->baseDir = str_replace('/shell/', '/', $db->baseDir);
 try{  
 $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
 } catch (\Exception  $e) {

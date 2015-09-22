@@ -1,6 +1,8 @@
 <?php
-require __DIR__.'/../include/pageboot.php';
-require __DIR__.'/../lib/facebook-php-sdk-v4/autoload.php';
+if(!array_key_exists('db', $GLOBALS)) {
+    require __DIR__.'/../include/pageboot.php';
+}
+require_once __DIR__.'/../lib/facebook-php-sdk-v4/autoload.php';
 $fb = new login\user\Facebook($db);
 $fb->loadFromId($argv[1]);
 $session = new Facebook\Facebook(array(

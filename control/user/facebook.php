@@ -25,7 +25,11 @@ switch ($_REQUEST['action']) {
                 }
                 $facebookSession = new \Zend\Session\Container('facebook_id');
                 $facebookSession->facebook_id=$fb->getData('userID');
-                pclose(popen('php ' . $GLOBALS['db']->baseDir . 'shell/facebook.php  '.$fb->getData('userID').' > /dev/null &', 'r'));
+                if ($GLOBALS['db']->config->background->useAJAX == true) {
+                    require __DIR__ .'/../../shell/facebook.php';
+                } else {
+                    pclose(popen('php ' . $GLOBALS['db']->baseDir . 'shell/facebook.php  '.$fb->getData('userID').' > /dev/null &', 'r'));
+                }
             break;
             case 'not_authorized':
                 $m->status = false;
