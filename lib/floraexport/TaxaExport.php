@@ -19,6 +19,10 @@ class TaxaExport {
      */
     const HTML='html';
     /**
+     * HTML5 constant
+     */
+    const HTML5='html5';
+    /**
      * PDF constant
      */
     const PDF='pdf';
@@ -26,6 +30,10 @@ class TaxaExport {
      * DOC constant
      */
     const DOC='doc';
+    /**
+     * DOCX constant
+     */
+    const DOCX='docx';
      /**
      * ODT constant
      */
@@ -61,8 +69,13 @@ class TaxaExport {
     public function export($streamOutput,$format) {
         $image = new \flora\taxa\TaxaImage($this->db);
         $basePath = $this->db->baseDir;
+        $oClass = new \ReflectionClass(__CLASS__);
+        if (!in_array($format, $oClass->getConstants())) {
+            throw new \Exception('Export format '.$format.' not available',1509231547);
+        }
+        unset($oClass);
         if ($format != self::MD) {
-            if ($format == self::HTML && $this->db->config->externalUrl != '') {
+            if ( ($format == self::HTML || $format == self::HTML5) && $this->db->config->externalUrl != '') {
                 $basePath = $this->db->config->externalUrl;    
             }
             $pandocExists = shell_exec('which pandoc');
@@ -84,6 +97,7 @@ class TaxaExport {
             $taxa->loadFromId($this->rootId);
             fwrite($stream, '#1 Flora d\'Italia - Chiave '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name').PHP_EOL.PHP_EOL);
         }
+        $count = 0;
         while (sizeof($taxaToDo)>0) {
             $taxaId = array_shift($taxaToDo);
             if(array_key_exists($taxaId, $taxaDone)) {
@@ -91,6 +105,9 @@ class TaxaExport {
             }
             $taxa->loadFromId($taxaId);
             $taxaDone[$taxaId]=$taxa->getData('name');
+            if ($count++%10 == 0) {
+                file_put_contents('php://stderr', $count."\t".$taxa->getData('name').str_repeat(' ', 20)."\r");
+            }
             $taxaParentColl =  $taxa->getParentColl()->getItems();
             if ($taxa->getData('id') != 1) { 
                 fwrite($stream, str_repeat('#', count($taxaParentColl)+1).' ');
@@ -162,9 +179,23 @@ class TaxaExport {
                         break;
                     }
                 }
-                fwrite($stream,PHP_EOL);
+                $from = $attributeColl->filterByAttributeValue('Limite altitudinale inferiore','name')->getFirst()->getRawData('value');
+                $to = $attributeColl->filterByAttributeValue('Limite altitudinale superiore','name')->getFirst()->getRawData('value');
+                if (
+                     $from != '' &&
+                     $to != ''
+                ) {
+                    $altitudeImageUrl = $this->getAltitudeImage(
+                            $from,
+                            $to
+                    );
+                    fwrite($stream,'**Altitudine**'.PHP_EOL);
+                    fwrite($stream,':   da '.$from.' a '.$to.' m'.PHP_EOL.PHP_EOL);
+                    fwrite($stream,'![]('.$basePath.$altitudeImageUrl.')'.PHP_EOL);
+                    
+                }
             }
-            
+            fwrite($stream,PHP_EOL);
             $imageColl = $taxa->getTaxaImageColl();
             if ($imageColl->count() > 0) {
                 foreach($imageColl->getItems() as $key=>$image) {
@@ -203,6 +234,7 @@ class TaxaExport {
                 $taxaToDo = array_merge($childrensIds,$taxaToDo);
             }
         }
+        file_put_contents('php://stderr', 'Create Index'.str_repeat(' ', 20)."\r");
         if(count($taxaDone)>0) {
             asort($taxaDone);
             foreach($taxaDone as $taxaId => $taxaName) {
@@ -214,9 +246,15 @@ class TaxaExport {
                 case 'epub':
                 case 'odt':
                 case 'doc':
+                case 'docx':
                 case 'pdf':
-                case 'html':
                     $cmd = 'pandoc -f markdown+definition_lists+line_blocks --latex-engine=xelatex -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
+                case 'html':
+                case 'html5':   
+                    file_put_contents('php://stderr', 'Exporting'.str_repeat(' ', 20)."\r");
+                    if (!isset($cmd)) {
+                        $cmd = 'pandoc -t '.$format.' -f markdown+definition_lists+line_blocks --latex-engine=xelatex -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
+                    }
                     $error = shell_exec($cmd);
                     unlink($tempFileName);
                     if (!is_file($tempFileName.'.'.$format)) {
@@ -226,6 +264,81 @@ class TaxaExport {
                     fwrite($streamOutput,fread($tmpStream,  filesize($tempFileName.'.'.$format)));
                     fclose($tmpStream);
                     unlink($tempFileName.'.'.$format);
+                break;
+        }
+        file_put_contents('php://stderr', 'Done'.str_repeat(' ', 20)."\r");
+    }
+    /**
+     * Gets the image url, if image is not present creates it
+     * @param integer $from
+     * @param integer $to
+     * @return string image Url
+     */
+    private function getAltitudeImage($from,$to) {
+        $from = preg_replace('/[^0-9]/','',$from);
+        $to = preg_replace('/[^0-9]/','',$to);
+        $nameFile = md5($from.'-'.$to);
+        $basePath = $this->db->baseDir;
+        $imageUrl = DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'merged_altitude';
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.substr($nameFile, 0,1);
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.substr($nameFile, 1,1);
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.$nameFile.'.png';
+        if (!is_file($basePath.$imageUrl)) {
+            $images =array($this->db->baseDir.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'altitude'.DIRECTORY_SEPARATOR.'altitudine.png');
+            for($c = intval(1+($from/$this->db->config->attributes->altitudeStep)); $c <= intval(1+($to/$this->db->config->attributes->altitudeStep));$c++) {
+                array_push(
+                    $images,
+                    $this->db->baseDir.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'altitude'.DIRECTORY_SEPARATOR.$c*$this->db->config->attributes->altitudeStep.'.png'
+                );
+            }
+            $this->mergeImages($images,$basePath.$imageUrl);
+        }        
+        return $imageUrl;
+    }
+    /**
+     * Merges images array of path in one
+     * @param array $images array of file names
+     * @param string $destPath destination file
+     */
+    private function mergeImages($images,$destPath) {
+        foreach ($images as $level=>$imagePath) {
+            switch(strtolower(pathinfo($imagePath,PATHINFO_EXTENSION))) {
+                case 'png' :
+                    if ($level == 0) {
+                        if(!$destImageResource = imagecreatefrompng($imagePath)) {
+                            throw new \Exception('Unable to open the image '.$imagePath,1509231631);
+                        }
+                    } else {
+                        if(!$imageResource = imagecreatefrompng($imagePath)) {
+                            throw new \Exception('Unable to open the image '.$imagePath,1509231631);
+                        }
+                        if (!imagecopy($destImageResource,$imageResource,0,0,0,0,imagesx($imageResource),imagesy($imageResource))) {
+                            throw new \Exception('Unable to copy the image '.$imagePath,1509231631);
+                        }
+                    }
+                break;
+                default :
+                    throw new \Exception('File type '.strtolower(pathinfo($imagePath,PATHINFO_EXTENSION)).' not supported',1509231628);
+                break;
+            }
+        }
+        switch(strtolower(pathinfo($destPath,PATHINFO_EXTENSION))) {
+                case 'png' :
+                    if (!imagepng($destImageResource,$destPath)) {
+                        throw new \Exception('Unable to write the file '.$destPath,1509231630);
+                    }
+                break;
+                default :
+                    throw new \Exception('File type '.strtolower(pathinfo($imagePath,PATHINFO_EXTENSION)).' not supported',1509231628);
                 break;
         }
     }
