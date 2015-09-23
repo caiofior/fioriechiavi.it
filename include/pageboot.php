@@ -14,9 +14,6 @@ if (rand(0,10) == 0) {
         closedir($handle); 
     }
 }
-
-ini_set('display_errors',1);
-ini_set('error_reporting',E_ALL);
 session_save_path($sessionDir);
 require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
@@ -43,7 +40,7 @@ try{
 $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
 } catch (\Exception  $e) {
    if(preg_match('/Cache directory \'(.*)\' not found or not a directory/',$e->getMessage(),$catches)){
-      mkdir($catches[1],0777);
+      mkdir($catches[1]);
       $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
    } else {
       throw $e;

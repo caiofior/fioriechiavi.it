@@ -66,7 +66,6 @@ class TaxaAttribute extends \Content
                   $sql .= ' AND `value` LIKE "'.  addslashes($criteria['sSearch']).'%"';
             }
       $sql .= ' AND `taxa_attribute_id`='.intval($this->data['id']);
-      $sql .= ' GROUP BY `value`';
       return $sql;
    }
    /**

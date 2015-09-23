@@ -59,7 +59,12 @@ class TaxaExport {
      * @param string $format
      */
     public function export($streamOutput,$format) {
+        $image = new \flora\taxa\TaxaImage($this->db);
+        $basePath = $this->db->baseDir;
         if ($format != self::MD) {
+            if ($format == self::HTML && $this->db->config->externalUrl != '') {
+                $basePath = $this->db->config->externalUrl;    
+            }
             $pandocExists = shell_exec('which pandoc');
             $pandocExists = ($pandocExists!='');
             if (!$pandocExists) {
@@ -84,8 +89,8 @@ class TaxaExport {
             if(array_key_exists($taxaId, $taxaDone)) {
                 continue;
             }
-            $taxaDone[$taxaId]=$taxa->getData('name');
             $taxa->loadFromId($taxaId);
+            $taxaDone[$taxaId]=$taxa->getData('name');
             $taxaParentColl =  $taxa->getParentColl()->getItems();
             if ($taxa->getData('id') != 1) { 
                 fwrite($stream, str_repeat('#', count($taxaParentColl)+1).' ');
@@ -103,8 +108,59 @@ class TaxaExport {
             $attributeColl = $taxa->getTaxaAttributeColl();
             if ($attributeColl->count()>0) {
                 foreach($attributeColl->getItems() as $attribute) {
-                    fwrite($stream,'**'.$attribute->getData('name').'**'.PHP_EOL);
-                    fwrite($stream,':   '.$attribute->getRawData('value').PHP_EOL);
+                    switch ($attribute->getData('name')) {
+                        case 'Inizio fioritura' :
+                        break;
+                        case 'Fine fioritura' :
+                        break;
+                        case 'Limite altitudinale inferiore' :
+                        break;
+                        case 'Limite altitudinale superiore' :
+                        break;
+                        case 'Diffusione':
+                            fwrite($stream,'**'.$attribute->getData('name').'**'.PHP_EOL);
+                             switch($attribute->getRawData('value')) {
+                                 case 'Specie endemica':
+                                     fwrite($stream,':   ●'.PHP_EOL);
+                                 break;
+                             }
+                        break;
+                        case 'Ciclo riproduttivo' :
+                             fwrite($stream,'**'.$attribute->getData('name').'**'.PHP_EOL);
+                             switch($attribute->getRawData('value')) {
+                                 case 'Annuale':
+                                     fwrite($stream,':   ☉'.PHP_EOL);
+                                 break;
+                                 case 'Biennale':
+                                     fwrite($stream,':   ⚇'.PHP_EOL);
+                                 break;
+                                 default :
+                                     fwrite($stream,':   '.$attribute->getRawData('value').PHP_EOL);
+                                 break;
+                             }
+                        break;
+                        case 'Portamento' :
+                             fwrite($stream,'**'.$attribute->getData('name').'**'.PHP_EOL);
+                             switch($attribute->getRawData('value')) {
+                                 case 'Pianta perenne erbacea':
+                                     fwrite($stream,':   ↓'.PHP_EOL);
+                                 break;
+                                 case 'Cespuglio':
+                                     fwrite($stream,':   ⏉'.PHP_EOL);
+                                 break;
+                                 case 'Albero':
+                                     fwrite($stream,':   ☨'.PHP_EOL);
+                                 break;
+                                 default :
+                                     fwrite($stream,':   '.$attribute->getRawData('value').PHP_EOL);
+                                 break;
+                             }
+                        break;
+                        default: 
+                            fwrite($stream,'**'.$attribute->getData('name').'**'.PHP_EOL);
+                            fwrite($stream,':   '.$attribute->getRawData('value').PHP_EOL);
+                        break;
+                    }
                 }
                 fwrite($stream,PHP_EOL);
             }
@@ -112,7 +168,7 @@ class TaxaExport {
             $imageColl = $taxa->getTaxaImageColl();
             if ($imageColl->count() > 0) {
                 foreach($imageColl->getItems() as $key=>$image) {
-                    fwrite($stream,'![]('.$image->getPath().')'.PHP_EOL);
+                    fwrite($stream,'![]('.$basePath.$image->getUrl().')'.PHP_EOL);
                 }
                 fwrite($stream,PHP_EOL);
             }
@@ -123,7 +179,7 @@ class TaxaExport {
             $lastPosition = 0;
             if ($dicoItemColl->count() >0) {
                 foreach ($dicoItemColl->getItems() as $dicoItem) {
-                    if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getData('taxa_id') != 0) {
+                    if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getData('taxa_id') != 0 && $dicoItem->getRawData('status') == 1) {
                         array_push($childrensIds, $dicoItem->getData('taxa_id')); 
                     }
                     if ($dicoItem->getData('text') != '') {
@@ -133,15 +189,17 @@ class TaxaExport {
                            $positions[substr($dicoItem->getData('id'),0,-1).'0']= $lastPosition;
                            $positions[substr($dicoItem->getData('id'),0,-1).'1']= $lastPosition;
                         }
-                        fwrite($stream,'* '.str_repeat('&#160;', (strlen($dicoItem->getData('id')))));
+                        fwrite($stream,'| '.str_repeat('&#160;', (strlen($dicoItem->getData('id')))));
                         fwrite($stream,$positions[$dicoItem->getData('id')].' '.$dicoItem->getData('text'));
-                        if ($dicoItem->getData('taxa_id')!= '') {
+                        if ($dicoItem->getData('taxa_id')!= '' && $dicoItem->getRawData('status') == 0) {
+                            fwrite($stream, ' '.$dicoItem->getRawData('initials').' '.$dicoItem->getRawData('name'));
+                        } else if ($dicoItem->getData('taxa_id')!= '' && $dicoItem->getRawData('status') == 1) {
                             fwrite($stream, ' ['.$dicoItem->getRawData('initials').' '.$dicoItem->getRawData('name').'](#t'.$dicoItem->getData('taxa_id').')');
                         }
                         fwrite($stream,PHP_EOL);
                     }
                 }
-                fwrite($stream,PHP_EOL);
+                fwrite($stream,PHP_EOL.'---------------'.PHP_EOL.PHP_EOL);
                 $taxaToDo = array_merge($childrensIds,$taxaToDo);
             }
         }
@@ -158,7 +216,7 @@ class TaxaExport {
                 case 'doc':
                 case 'pdf':
                 case 'html':
-                    $cmd = 'pandoc -f markdown+definition_lists --latex-engine=xelatex -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
+                    $cmd = 'pandoc -f markdown+definition_lists+line_blocks --latex-engine=xelatex -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
                     $error = shell_exec($cmd);
                     unlink($tempFileName);
                     if (!is_file($tempFileName.'.'.$format)) {
