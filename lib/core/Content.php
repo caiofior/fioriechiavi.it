@@ -106,7 +106,13 @@ abstract class Content {
                 property_exists($this->db,'cache') &&
 		$this->db->cache instanceof Zend\Cache\Storage\Adapter\AbstractAdapter
             ) 
-            $this->db->cache->setItem('metadata_'.$table,self::$metadata[$table]);
+            try {
+                $this->db->cache->setItem('metadata_'.$table,self::$metadata[$table]);
+            } catch (\Exception $e) {
+                if (strpos($e->getMessage(), 'chmod(\'') !== 0) {
+                    throw $e;
+                }
+            }
             }
       if (array_key_exists($table, self::$metadata)) {
          $this->primary = self::$metadata[$table]['primaryKey'];

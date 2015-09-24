@@ -39,6 +39,18 @@ class TaxaExport {
      */
     const ODT='odt';
      /**
+     * LATEX constant
+     */
+    const LATEX='latex';
+    /**
+     * PLAIN constant
+     */
+    const PLAIN='plain';
+    /**
+     * RTF constant
+     */
+    const RTF='rtf';
+     /**
      * EPUB constant
      */
     const EPUB='epub';
@@ -96,6 +108,8 @@ class TaxaExport {
         } else {
             $taxa->loadFromId($this->rootId);
             fwrite($stream, '#1 Flora d\'Italia - Chiave '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name').PHP_EOL.PHP_EOL);
+            
+            
         }
         $count = 0;
         while (sizeof($taxaToDo)>0) {
@@ -106,7 +120,7 @@ class TaxaExport {
             $taxa->loadFromId($taxaId);
             $taxaDone[$taxaId]=$taxa->getData('name');
             if ($count++%10 == 0) {
-                file_put_contents('php://stderr', $count."\t".$taxa->getData('name').str_repeat(' ', 20)."\r");
+                file_put_contents('php://stderr', $count."\t". (memory_get_peak_usage()/1024/1024)." Mb\t".$taxa->getData('name').str_repeat(' ', 20)."\r");
             }
             $taxaParentColl =  $taxa->getParentColl()->getItems();
             if ($taxa->getData('id') != 1) { 
@@ -116,10 +130,22 @@ class TaxaExport {
             if ($taxa->getData('id') != $this->rootId) {
                 end($taxaParentColl);
                 $parentTaxa = current($taxaParentColl);
-                fwrite($stream,'['.$parentTaxa->getRawData('taxa_kind_initials').' '.$parentTaxa->getData('name').'](#t'.$parentTaxa->getData('id').')'.PHP_EOL.PHP_EOL);
+                if (is_object($parentTaxa)) {
+                    fwrite($stream,'['.$parentTaxa->getRawData('taxa_kind_initials').' '.$parentTaxa->getData('name').'](#t'.$parentTaxa->getData('id').')'.PHP_EOL.PHP_EOL);
+                }
+                if($this->db->config->externalUrl != '') {
+                    fwrite($stream,'[Scheda aggiornata - Segnala osservazione]('.$this->db->config->externalUrl.'?id='.$taxa->getData('id').')'.PHP_EOL.PHP_EOL);
+                }
             }
             if ($taxa->getData('description') != '') {
                 fwrite($stream, $taxa->getData('description').PHP_EOL.PHP_EOL);
+            }
+            
+            $regionColl = $taxa->getRegionColl();
+            $regionColl = $regionColl->filterByAttributeValue('1','selected');
+            if ($regionColl->count() >0) {
+                $regionImageUrl = $this->getRegionImage($regionColl->getFieldsAsArray('id'));
+                fwrite($stream,'![Diffusione]('.$basePath.$regionImageUrl.')'.PHP_EOL.PHP_EOL);
             }
             
             $attributeColl = $taxa->getTaxaAttributeColl();
@@ -138,7 +164,7 @@ class TaxaExport {
                             fwrite($stream,'**'.$attribute->getData('name').'**'.PHP_EOL);
                              switch($attribute->getRawData('value')) {
                                  case 'Specie endemica':
-                                     fwrite($stream,':   ●'.PHP_EOL);
+                                     fwrite($stream,':   ● Specie endemica'.PHP_EOL);
                                  break;
                              }
                         break;
@@ -146,10 +172,10 @@ class TaxaExport {
                              fwrite($stream,'**'.$attribute->getData('name').'**'.PHP_EOL);
                              switch($attribute->getRawData('value')) {
                                  case 'Annuale':
-                                     fwrite($stream,':   ☉'.PHP_EOL);
+                                     fwrite($stream,':   ☉ Annuale'.PHP_EOL);
                                  break;
                                  case 'Biennale':
-                                     fwrite($stream,':   ⚇'.PHP_EOL);
+                                     fwrite($stream,':   ⚇ Biennale'.PHP_EOL);
                                  break;
                                  default :
                                      fwrite($stream,':   '.$attribute->getRawData('value').PHP_EOL);
@@ -160,13 +186,13 @@ class TaxaExport {
                              fwrite($stream,'**'.$attribute->getData('name').'**'.PHP_EOL);
                              switch($attribute->getRawData('value')) {
                                  case 'Pianta perenne erbacea':
-                                     fwrite($stream,':   ↓'.PHP_EOL);
+                                     fwrite($stream,':   ↓ Pianta perenne erbacea'.PHP_EOL);
                                  break;
                                  case 'Cespuglio':
-                                     fwrite($stream,':   ⏉'.PHP_EOL);
+                                     fwrite($stream,':   ⏉ Cespuglio'.PHP_EOL);
                                  break;
                                  case 'Albero':
-                                     fwrite($stream,':   ☨'.PHP_EOL);
+                                     fwrite($stream,':   ☨ Albero'.PHP_EOL);
                                  break;
                                  default :
                                      fwrite($stream,':   '.$attribute->getRawData('value').PHP_EOL);
@@ -194,6 +220,31 @@ class TaxaExport {
                     fwrite($stream,'![]('.$basePath.$altitudeImageUrl.')'.PHP_EOL);
                     
                 }
+                $from = '';
+                $to = '';
+                $fromName = $attributeColl->filterByAttributeValue('Inizio fioritura','name')->getFirst()->getRawData('value');
+                $toName = $attributeColl->filterByAttributeValue('Fine fioritura','name')->getFirst()->getRawData('value');
+                $nameToNumber=$this->db->config->attributes->floweringNames->toArray();
+                if (array_key_exists($fromName,$nameToNumber)) {
+                    $from = $nameToNumber[$fromName];
+                }
+                if (array_key_exists($toName,$nameToNumber)) {
+                    $to = $nameToNumber[$toName];
+                }
+                if (
+                     $from != '' &&
+                     $to != ''
+                ) {
+                    $floweringImageUrl = $this->getFloweringImage(
+                            $from,
+                            $to
+                    );
+                    fwrite($stream,'**Fioritura**'.PHP_EOL);
+                    fwrite($stream,':   da '.$fromName.' a '.$toName.PHP_EOL.PHP_EOL);
+                    fwrite($stream,'![]('.$basePath.$floweringImageUrl.')'.PHP_EOL);
+                    
+                }
+                
             }
             fwrite($stream,PHP_EOL);
             $imageColl = $taxa->getTaxaImageColl();
@@ -234,7 +285,7 @@ class TaxaExport {
                 $taxaToDo = array_merge($childrensIds,$taxaToDo);
             }
         }
-        file_put_contents('php://stderr', 'Create Index'.str_repeat(' ', 20)."\r");
+        file_put_contents('php://stderr', "\n".'Create Index'.str_repeat(' ', 20)."\r");
         if(count($taxaDone)>0) {
             asort($taxaDone);
             foreach($taxaDone as $taxaId => $taxaName) {
@@ -243,17 +294,20 @@ class TaxaExport {
             }
         }
         switch ($format) {
-                case 'epub':
+                case 'plain':    
+                case 'rtf':
+                case 'latex':
+                case 'html':
+                case 'html5':
                 case 'odt':
                 case 'doc':
                 case 'docx':
                 case 'pdf':
-                    $cmd = 'pandoc -f markdown+definition_lists+line_blocks --latex-engine=xelatex -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
-                case 'html':
-                case 'html5':   
+                    $cmd = 'pandoc --toc-depth=5 -f markdown+definition_lists+line_blocks --latex-engine=xelatex -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
+                case 'epub':
                     file_put_contents('php://stderr', 'Exporting'.str_repeat(' ', 20)."\r");
                     if (!isset($cmd)) {
-                        $cmd = 'pandoc -t '.$format.' -f markdown+definition_lists+line_blocks --latex-engine=xelatex -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
+                        $cmd = 'pandoc --toc-depth=5 -t '.$format.' -f markdown+definition_lists+line_blocks -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
                     }
                     $error = shell_exec($cmd);
                     unlink($tempFileName);
@@ -269,7 +323,7 @@ class TaxaExport {
         file_put_contents('php://stderr', 'Done'.str_repeat(' ', 20)."\r");
     }
     /**
-     * Gets the image url, if image is not present creates it
+     * Gets altitude image url, if image is not present creates it
      * @param integer $from
      * @param integer $to
      * @return string image Url
@@ -305,6 +359,76 @@ class TaxaExport {
         return $imageUrl;
     }
     /**
+     * Gets flowering image url, if image is not present creates it
+     * @param integer $from
+     * @param integer $to
+     * @return string image Url
+     */
+    private function getFloweringImage($from,$to) {
+        $from = preg_replace('/[^0-9]/','',$from);
+        $to = preg_replace('/[^0-9]/','',$to);
+        $nameFile = md5($from.'-'.$to);
+        $basePath = $this->db->baseDir;
+        $imageUrl = DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'merged_flower';
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.substr($nameFile, 0,1);
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.substr($nameFile, 1,1);
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.$nameFile.'.png';
+        if (!is_file($basePath.$imageUrl)) {
+            $images =array($this->db->baseDir.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'flower'.DIRECTORY_SEPARATOR.'months.png');
+            for($c = $from ; $c <= $to ;$c++) {
+                array_push(
+                    $images,
+                    $this->db->baseDir.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'flower'.DIRECTORY_SEPARATOR.str_pad($c,2,'0',STR_PAD_LEFT).'.png'
+                );
+            }
+            $this->mergeImages($images,$basePath.$imageUrl);
+        }        
+        return $imageUrl;
+    }
+    /**
+     * Gets region image url, if image is not present creates it
+     * @param array $regionArray
+     * @return string image Url
+     */
+    private function getRegionImage(array $regionArray) {
+        sort($regionArray);
+        $nameFile = md5(implode('-',$regionArray));
+        $basePath = $this->db->baseDir;
+        $imageUrl = DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'merged_map';
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.substr($nameFile, 0,1);
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.substr($nameFile, 1,1);
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.$nameFile.'.png';
+        if (!is_file($basePath.$imageUrl)) {
+            $images =array($this->db->baseDir.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'map'.DIRECTORY_SEPARATOR.'italia_white.png');
+            foreach ($regionArray as $c) {
+                array_push(
+                    $images,
+                    $this->db->baseDir.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'map'.DIRECTORY_SEPARATOR.str_pad($c,2,'0',STR_PAD_LEFT).'.png'
+                );
+            }
+            $this->mergeImages($images,$basePath.$imageUrl);
+        }        
+        return $imageUrl;
+    }
+    /**
      * Merges images array of path in one
      * @param array $images array of file names
      * @param string $destPath destination file
@@ -324,6 +448,7 @@ class TaxaExport {
                         if (!imagecopy($destImageResource,$imageResource,0,0,0,0,imagesx($imageResource),imagesy($imageResource))) {
                             throw new \Exception('Unable to copy the image '.$imagePath,1509231631);
                         }
+                        imagedestroy($imageResource);
                     }
                 break;
                 default :
@@ -336,6 +461,7 @@ class TaxaExport {
                     if (!imagepng($destImageResource,$destPath)) {
                         throw new \Exception('Unable to write the file '.$destPath,1509231630);
                     }
+                    imagedestroy($destImageResource);
                 break;
                 default :
                     throw new \Exception('File type '.strtolower(pathinfo($imagePath,PATHINFO_EXTENSION)).' not supported',1509231628);

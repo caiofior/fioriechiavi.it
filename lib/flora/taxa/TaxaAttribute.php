@@ -35,7 +35,7 @@ class TaxaAttribute extends \Content
              array_key_exists('iDisplayStart',$criteria ) &&
              array_key_exists('iDisplayLength',$criteria )
          )
-            $sql .= ' LIMIT '.intval($criteria['iDisplayStart']).','.intval($criteria['iDisplayLength']);
+        $sql .= ' LIMIT '.intval($criteria['iDisplayStart']).','.intval($criteria['iDisplayLength']);
         $resultSet =  $this->db->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         return $resultSet->toArray();
    }
@@ -45,8 +45,10 @@ class TaxaAttribute extends \Content
     * @return int
     */
    public function countAllValues($criteria) {
-      $sql = 'SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE TRUE ';
-      $sql .= $this->setFilter ($criteria);
+      $sql = 'SELECT COUNT(*) FROM ( 
+                SELECT `value` FROM `taxa_attribute_value` WHERE TRUE ';
+      $sql .=   $this->setFilter ($criteria);
+      $sql .= ') AS v';
       $resultSet =  $this->db->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
       $result = $resultSet->toArray();
       $result = array_shift($result);
@@ -66,6 +68,7 @@ class TaxaAttribute extends \Content
                   $sql .= ' AND `value` LIKE "'.  addslashes($criteria['sSearch']).'%"';
             }
       $sql .= ' AND `taxa_attribute_id`='.intval($this->data['id']);
+      $sql .= ' GROUP BY `value`';
       return $sql;
    }
    /**
