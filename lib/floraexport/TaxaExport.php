@@ -135,6 +135,10 @@ class TaxaExport {
                 }
                 if($this->db->config->externalUrl != '') {
                     fwrite($stream,'[Scheda aggiornata - Segnala osservazione]('.$this->db->config->externalUrl.'?id='.$taxa->getData('id').')'.PHP_EOL.PHP_EOL);
+                    if ($format == self::PDF) {
+                        $qrUrl = $this->getQrOnlineUrl($taxa->getData('id'));
+                        fwrite($stream,'![]('.$this->db->baseDir.$qrUrl.')'.PHP_EOL.PHP_EOL);
+                    }
                 }
             }
             if ($taxa->getData('description') != '') {
@@ -425,6 +429,28 @@ class TaxaExport {
                 );
             }
             $this->mergeImages($images,$basePath.$imageUrl);
+        }        
+        return $imageUrl;
+    }
+    
+    private function getQrOnlineUrl($taxaId) {
+        $nameFile = str_pad($taxaId,3,'0',STR_PAD_LEFT);
+        $basePath = $this->db->baseDir;
+        $imageUrl = DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'qr';
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.substr($nameFile, 0,1);
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.substr($nameFile, 1,1);
+        if (!is_dir($basePath.$imageUrl)) {
+            mkdir($basePath.$imageUrl);
+        }
+        $imageUrl .= DIRECTORY_SEPARATOR.$nameFile.'.png';
+        if (!is_file($basePath.$imageUrl)) {
+            \QRcode::png($this->db->config->externalUrl.'?id='.$taxaId, $basePath.$imageUrl);
         }        
         return $imageUrl;
     }

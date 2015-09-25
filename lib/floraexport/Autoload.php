@@ -33,7 +33,7 @@ class Autoload {
          $class = __CLASS__;
          self::$instance = new $class();
       }
-
+      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'phpqrcode-git'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'full'.DIRECTORY_SEPARATOR.'qrlib.php';
       require __DIR__.DIRECTORY_SEPARATOR.'TaxaExport.php';
       return self::$instance;
    }

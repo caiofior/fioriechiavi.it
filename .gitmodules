@@ -37,3 +37,6 @@
 [submodule "js/fancyBox"]
 	path = js/fancyBox
 	url = https://github.com/fancyapps/fancyBox.git
+[submodule "lib/phpqrcode-git"]
+	path = lib/phpqrcode-git
+	url = git://git.code.sf.net/p/phpqrcode/git
