@@ -23,7 +23,7 @@ function statusChangeCallback(response) {
       statusChangeCallback(response);
     });
   }
-  $("input:submit").unbind("click").click(function (e) {
+  $("input:submit[name='login']").unbind("click").click(function (e) {
    $("#ajaxLoader").show();
    $(".notValid").removeClass("notValid");
    $(".errorMessage").remove();

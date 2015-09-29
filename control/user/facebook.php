@@ -26,6 +26,7 @@ switch ($_REQUEST['action']) {
                 $facebookSession = new \Zend\Session\Container('facebook_id');
                 $facebookSession->facebook_id=$fb->getData('userID');
                 if ($GLOBALS['db']->config->background->useAJAX == true) {
+		    $argv=array(1=>$fb->getData('userID'));
                     require __DIR__ .'/../../shell/facebook.php';
                 } else {
                     pclose(popen('php ' . $GLOBALS['db']->baseDir . 'shell/facebook.php  '.$fb->getData('userID').' > /dev/null &', 'r'));
