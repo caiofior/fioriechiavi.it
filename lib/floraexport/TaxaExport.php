@@ -43,6 +43,10 @@ class TaxaExport {
      */
     const LATEX='latex';
     /**
+     * CONTEXT constant
+     */
+    const CONTEXT='context';
+    /**
      * PLAIN constant
      */
     const PLAIN='plain';
@@ -301,6 +305,7 @@ class TaxaExport {
                 case 'plain':    
                 case 'rtf':
                 case 'latex':
+                case 'context':    
                 case 'html':
                 case 'html5':
                 case 'odt':
