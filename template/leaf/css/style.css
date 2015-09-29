@@ -44,6 +44,7 @@ label{
 }
 .top-menu {
 	float:right;
+        padding-right:2%; 
 }
 .top-menu ul li{
 	display:inline-block;
@@ -717,8 +718,16 @@ a.hvr-shutter-in-horizontal:hover:before,a.hvr-shutter-in-horizontal:focus:befor
     border: 2px solid;
     border-radius: 25px;
 }
+.selectedPage {
+    font-weight: bold;
+}
 a.notextdecoration {
     text-decoration: none;
+}
+#signalObservationButton,
+#signalObservationLink {
+    font-size: 19.6px;
+    font-weight: bold;
 }
 /*-- responsive-design starts-here --*/
 
@@ -1147,6 +1156,9 @@ a.notextdecoration {
 	.about-section-top-grid, .about-section-middle-grid, .about-section-bottom-grid {
 		padding: 2.2em 0;
 	}
+        .plantImage img {
+		width: 80%;
+	} 
 	.flat-phone img {
 		width: 70%;
 	}
@@ -1338,6 +1350,9 @@ a.notextdecoration {
 	}
 }
 @media screen and (max-width: 480px) {
+        .github {
+            display: none;
+        }
 	.header-left {
 		padding: 0;
 	}
@@ -1492,6 +1507,9 @@ a.notextdecoration {
 	}
 }
 @media screen and (max-width: 320px) {
+        .github {
+            display: none;
+        }
 	.copyright {
 		text-align: center;
 	}
@@ -1521,6 +1539,9 @@ a.notextdecoration {
 		margin-left: 0.1em;
 		font-size: 0.9em;
 	}
+        .plantImage img {
+		width: 80%;
+	} 
 	.subscribe img {
 		width: 13%;
 	}

@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
 <head>
-<link href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('style/leaf/css/bootstrap.css.gz');?>" rel='stylesheet' type='text/css' />
+<link href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('template/leaf/css/bootstrap.css.gz');?>" rel='stylesheet' type='text/css' />
 <!-- Custom Theme files -->
-<link href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('style/leaf/css/style-cleaned.css.gz');?>" rel="stylesheet" type="text/css" media="all" />
+<link href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('template/leaf/css/style-cleaned.css.gz');?>" rel="stylesheet" type="text/css" media="all" />
 <!-- Custom Theme files -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -36,7 +36,7 @@
 		<div class="container">
 			<div class="col-md-4 header-left">
                             <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>">
-				<img src="style/leaf/images/logo.jpg" alt="<?php echo $GLOBALS['db']->config->siteName; ?>" />
+				<img src="template/leaf/images/logo.jpg" alt="<?php echo $GLOBALS['db']->config->siteName; ?>" />
                             </a>
 			</div>
 			<div class="col-md-8 header-right">
@@ -52,12 +52,12 @@
                         <div class="col-xs-offset-1 header-right">
                             <?php if($GLOBALS['db']->config->socialPages->facebook != '') : ?>
                             <a rel="nofollow" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->facebook; ?>">
-                                <img src="style/leaf/images/fb.png" alt="Facebook" />
+                                <img src="template/leaf/images/fb.png" alt="Facebook" />
                             </a>
                             <?php endif; 
                             if($GLOBALS['db']->config->socialPages->googlePlus != '') : ?>
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->googlePlus; ?>">
-                                <img src="style/leaf/images/gp.png" alt="Google +" />
+                                <img src="template/leaf/images/gp.png" alt="Google +" />
                             </a>
                             <?php endif; ?>
                         </div>
