@@ -59,6 +59,11 @@
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->googlePlus; ?>">
                                 <img src="template/leaf/images/gp.png" alt="Google +" />
                             </a>
+                            <?php endif;
+                            if($GLOBALS['db']->config->socialPages->scribd != '') : ?>
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->scribd; ?>">
+                                <img src="template/leaf/images/sd.png" alt="Scibd" />
+                            </a>
                             <?php endif; ?>
                         </div>
                 </div>
