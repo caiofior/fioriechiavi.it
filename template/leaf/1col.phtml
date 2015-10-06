@@ -18,7 +18,14 @@
 <?php $GLOBALS['template']->renderBlock('head'); ?>
 </head>
 <body>
-        <?php if ($GLOBALS['db']->config->googleAnalitycs != '') : ?>
+        <?php if (
+                $GLOBALS['db']->config->googleAnalitycs != '' &&
+                (
+			!array_key_exists('profile', $GLOBALS) ||
+			!is_object($GLOBALS['profile']) ||
+	                $GLOBALS['profile']->getData('role_id') != 1
+		)
+        ) : ?>
     	<script>
 	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
