@@ -1,6 +1,6 @@
 <form method="post" action="#">
    <label for="taxasearch">Cerca: </label>
-   <input id="taxasearch" name="taxasearch" value="">
+   <input id="taxasearch" type="search" name="taxasearch" value="">
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>search.php">Ricerca avanzata</a>
    <br/>
    <span><?php $moreDicoItemTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
