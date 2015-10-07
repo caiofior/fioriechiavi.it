@@ -140,10 +140,11 @@ abstract class Content {
             throw new \Exception('No database table associated with this content',1409011101);
         }
         $select = $this->table->getSql()->select()->where(array($this->primary=>$id));
-        $data = $this->table->select($this->table->selectWith($select))->current();
+        $data = $this->table->selectWith($select)->current();
         if (is_object($data))
             $this->data = $data->getArrayCopy();
         else {
+           $this->data=array();
            $mysqli = $this->table->getAdapter()->getDriver()->getConnection()->getResource(); 
            if (is_numeric($mysqli->errno) && $mysqli->errno != 0) { 
             throw new \Exception('Error on query '.$select->getSqlString($this->table->getAdapter()->getPlatform()).' '.$mysqli->errno.' '.$mysqli->error,1401301242);

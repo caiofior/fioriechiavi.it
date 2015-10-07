@@ -8,6 +8,10 @@ namespace flora\taxa;
  * @author caiofior
  */
 class TaxaSearch extends \Content {
+    /**
+     * Taxa reference
+     * @var \flora\taxa\Taxa $taxa
+     */
     private $taxa;
     /**
      * Associates the database table
@@ -17,7 +21,7 @@ class TaxaSearch extends \Content {
         parent::__construct($db, 'taxa_search');
     }
     /**
-     * Loads taza search from taxa
+     * Loads taxa search from taxa
      * @param \flora\taxa\Taxa $taxa
      */
     public function loadFromTaxa(\flora\taxa\Taxa $taxa) {
@@ -30,7 +34,6 @@ class TaxaSearch extends \Content {
      */
     public function update() {
         $message = '';
-        
         if(!array_key_exists('taxa_id', $this->data) || $this->data['taxa_id'] == '') {
             $this->db->query('INSERT INTO `taxa_search` SET `taxa_id` = ' . intval($this->taxa->getData('id'))
             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
