@@ -17,16 +17,10 @@ if (array_key_exists('sEcho', $_REQUEST)) {
          $row=array();
          foreach($columns as $column) {
             $data = $taxaObservation->getRawData($column);
-            $vector_size = mcrypt_get_iv_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
-            $cid = urlencode(mcrypt_encrypt(
-                    $GLOBALS['db']->config->crypt->cipher,
-                    $GLOBALS['db']->config->crypt->key,
-                    $GLOBALS['db']->config->crypt->seed.$taxaObservation->getData('id'),
-                    $GLOBALS['db']->config->crypt->mode,substr($GLOBALS['db']->config->crypt->iv,0,$vector_size)
-            ));
             if ($column == 'actions') {
-               $data = '<a class="actions modify" title="Modifica" href="?task=observation&amp;action=edit&amp;cid='.$cid.'">Modifica</a>
-                   <a class="actions delete" title="Cancella" href="?task=observation&amp;action=delete&amp;cid='.$cid.'">Cancella</a>';
+               $cid = $this->getTemplate()->encodeId($taxaObservation->getData('id'));
+               $data = '<a class="actions modify" title="Modifica" href="?task=observation&amp;action=edit&amp;cid='.urlencode($cid).'">Modifica</a>
+                   <a class="actions delete" title="Cancella" href="?task=observation&amp;action=delete&amp;cid='.urlencode($cid).'">Cancella</a>';
             } 
             $row[] = $data;     
          }
@@ -57,15 +51,7 @@ case 'edit':
          $taxaObservation = new \floraobservation\TaxaObservation($GLOBALS['db']);
          
          if (array_key_exists('cid', $_REQUEST)) {
-	    $vector_size = mcrypt_get_iv_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
-	    $_REQUEST['id'] = mcrypt_decrypt(
-	            $GLOBALS['db']->config->crypt->cipher,
-	            $GLOBALS['db']->config->crypt->key,
-	            $_REQUEST['cid'],
-	            $GLOBALS['db']->config->crypt->mode,
-	            substr($GLOBALS['db']->config->crypt->iv,0,$vector_size)
-	            );
-	            $_REQUEST['id']=substr($_REQUEST['id'],strlen($GLOBALS['db']->config->crypt->seed));
+	    $_REQUEST['id'] = $this->getTemplate()->decodeId($_REQUEST['cid']);
          }
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxaObservation->loadFromId($_REQUEST['id']);
@@ -86,15 +72,7 @@ case 'edit':
 case 'delete' :
    $taxaObservation = new \floraobservation\TaxaObservation($GLOBALS['db']);
    if (array_key_exists('cid', $_REQUEST)) {
-    $vector_size = mcrypt_get_iv_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
-    $_REQUEST['id'] = mcrypt_decrypt(
-            $GLOBALS['db']->config->crypt->cipher,
-            $GLOBALS['db']->config->crypt->key,
-            $_REQUEST['cid'],
-            $GLOBALS['db']->config->crypt->mode,
-            substr($GLOBALS['db']->config->crypt->iv,0,$vector_size)
-            );
-    $_REQUEST['id']=substr($_REQUEST['id'],strlen($GLOBALS['db']->config->crypt->seed));
+    $_REQUEST['id'] = $this->getTemplate()->decodeId($_REQUEST['cid']);
    }
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
       $taxaObservation->loadFromId($_REQUEST['id']);

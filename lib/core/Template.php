@@ -161,7 +161,21 @@ class Template {
     * @return string
     */
    public static function encodeId ($id) {
-      return mcrypt_encrypt($GLOBALS['config']->crypt->cipher,$GLOBALS['user']->getData('login'),$id,$GLOBALS['config']->crypt->mode ,$GLOBALS['config']->crypt->iv);
+      $vector_size = mcrypt_get_iv_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
+      if (strlen($GLOBALS['db']->config->crypt->iv) < $vector_size) {
+          throw new Exception('The mcrypt iv is too short, it must be at least '.$vector_size.' long',1509141707);
+      }
+      $key_size = mcrypt_get_key_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
+      if (strlen($GLOBALS['db']->config->crypt->key) < $key_size) {
+          throw new Exception('The mcrypt key is too short, it must be at least '.$key_size.' long',1509141707);
+      }
+      return mcrypt_encrypt(
+        $GLOBALS['db']->config->crypt->cipher,
+        substr($GLOBALS['db']->config->crypt->key,0,$key_size),
+        $GLOBALS['db']->config->crypt->seed.$id,
+        $GLOBALS['db']->config->crypt->mode,
+        substr($GLOBALS['db']->config->crypt->iv,0,$vector_size)
+      );
    } 
    /**
     * Decodes id for url
@@ -169,7 +183,22 @@ class Template {
     * @return string
     */
    public static function decodeId ($code) {
-      return trim(mcrypt_decrypt($GLOBALS['config']->crypt->cipher,$GLOBALS['user']->getData('login'),$code,$GLOBALS['config']->crypt->mode,$GLOBALS['config']->crypt->iv ));
+      $vector_size = mcrypt_get_iv_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
+      if (strlen($GLOBALS['db']->config->crypt->iv) < $vector_size) {
+          throw new Exception('The mcrypt iv is too short, it must be at least '.$vector_size.' long',1509141707);
+      }
+      $key_size = mcrypt_get_key_size($GLOBALS['db']->config->crypt->cipher,$GLOBALS['db']->config->crypt->mode);
+      if (strlen($GLOBALS['db']->config->crypt->key) < $key_size) {
+          throw new Exception('The mcrypt key is too short, it must be at least '.$vector_size.' long',1509141707);
+      }
+      $id = mcrypt_decrypt(
+        $GLOBALS['db']->config->crypt->cipher,
+        substr($GLOBALS['db']->config->crypt->key,0,$key_size),
+        $code,
+        $GLOBALS['db']->config->crypt->mode,
+        substr($GLOBALS['db']->config->crypt->iv,0,$vector_size)
+        );
+      return substr($id,strlen($GLOBALS['db']->config->crypt->seed));
    }
    /**
     * Add modify timestamp to file url
