@@ -148,16 +148,18 @@ class TaxaSearch extends \Content {
             $parentTaxaId = intval($taxaParentObj->parent_taxa_id);
             $taxaSearchObj = $this->db->query('SELECT `lft`,`rgt` FROM `taxa_search` WHERE `taxa_id` = '.$parentTaxaId
             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
-            $taxaParentNsmObj = $this->db->query('SELECT `taxa_id` FROM `taxa_search` WHERE
-                `lft` <='.intval($taxaSearchObj->lft).' AND `rgt` >='.intval($taxaSearchObj->lft).' 
-                 ORDER BY `rgt`-`lft` ASC
-                 LIMIT 1 '
-            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
-            if(method_exists($taxaParentNsmObj,'taxa_id')) {
-                $parentTaxaIdNsm =  $taxaParentNsmObj->taxa_id;
-                $updateFtr = $parentTaxaId != $parentTaxaIdNsm;
+            if (is_object($taxaSearchObj)) {
+                $taxaParentNsmObj = $this->db->query('SELECT `taxa_id` FROM `taxa_search` WHERE
+                    `lft` <='.intval($taxaSearchObj->lft).' AND `rgt` >='.intval($taxaSearchObj->lft).' 
+                     ORDER BY `rgt`-`lft` ASC
+                     LIMIT 1 '
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+                if(method_exists($taxaParentNsmObj,'taxa_id')) {
+                    $parentTaxaIdNsm =  $taxaParentNsmObj->taxa_id;
+                    $updateFtr = $parentTaxaId != $parentTaxaIdNsm;
+                }
+                unset($taxaParentNsmObj);
             }
-            unset($taxaParentNsmObj);
         }
         
         $this->db->query('LOCK TABLES `taxa_search` WRITE,`dico_item` WRITE', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);

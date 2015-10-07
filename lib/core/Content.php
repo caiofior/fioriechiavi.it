@@ -144,8 +144,10 @@ abstract class Content {
         if (is_object($data))
             $this->data = $data->getArrayCopy();
         else {
-           $mysqli = $this->table->getAdapter()->getDriver()->getConnection()->getResource();  
-           throw new \Exception('Error on query '.$select->getSqlString($this->table->getAdapter()->getPlatform()).' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+           $mysqli = $this->table->getAdapter()->getDriver()->getConnection()->getResource(); 
+           if (is_numeric($mysqli->errno) && $mysqli->errno != 0) { 
+            throw new \Exception('Error on query '.$select->getSqlString($this->table->getAdapter()->getPlatform()).' '.$mysqli->errno.' '.$mysqli->error,1401301242);
+           }
         }
     }
      /**
