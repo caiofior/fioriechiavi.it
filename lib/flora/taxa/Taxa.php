@@ -146,7 +146,7 @@ class Taxa extends \Content {
     }
 
     /**
-     * Sets teh regions associated with a taxa
+     * Sets the regions associated with a taxa
      * @param array $regions
      */
     public function setRegions(array $regions) {
