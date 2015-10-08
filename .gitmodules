@@ -40,3 +40,6 @@
 [submodule "lib/phpqrcode-git"]
 	path = lib/phpqrcode-git
 	url = git://git.code.sf.net/p/phpqrcode/git
+[submodule "style/bootstrap"]
+	path = style/bootstrap
+	url = https://github.com/twbs/bootstrap.git
