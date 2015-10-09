@@ -32,8 +32,8 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
    }
 ?>
 <div>
-   <?php echo str_repeat('&#160;', strlen($dicoItem->getData('id'))-1); ?>
-   <?php echo $positions[$dicoItem->getData('id')]; ?>
+   <?php echo str_repeat('&#160;', max(0,strlen($dicoItem->getData('id'))-1));  ?>
+   <?php if (array_key_exists($dicoItem->getData('id'), $positions)) echo $positions[$dicoItem->getData('id')]; ?>
    <span><?php echo $label;?></span>
 </div>
 <?php endforeach; ?>
