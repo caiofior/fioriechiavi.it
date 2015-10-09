@@ -41,11 +41,12 @@ class Taxa extends \Content {
                 )
                 ->where('`taxa`.`id` = ' . intval($id))
                 ->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id', array('taxa_kind_initials' => 'initials', 'taxa_kind_id_name' => 'name','taxa_kind_ord'=>'ord'), \Zend\Db\Sql\Select::JOIN_LEFT);
+        $this->data = array();
         $data = $this->table->selectWith($select)->current();
         if (is_object($data)) {
             $this->data = $data->getArrayCopy();
-            $this->rawData = $this->data;
         }
+        $this->rawData = $this->data;
     }
 
     /**
@@ -369,10 +370,11 @@ class Taxa extends \Content {
     }
     /**
      * Upadates search table data
+     * @return message errors
      */
     public function updateSearch() {
         $taxaSearch = $this->getTaxaSearch();
-        $taxaSearch->update();
+        return $taxaSearch->update();
     }
     /**
      * Upadates search table data

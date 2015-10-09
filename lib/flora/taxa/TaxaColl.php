@@ -40,12 +40,14 @@ class TaxaColl extends \ContentColl {
        $select ->columns(array('*',
                     'status' => new \Zend\Db\Sql\Predicate\Expression('
                 (               
-                    IFNULL(LENGTH(taxa.description),0)+
+                    IFNULL(LENGTH(`taxa`.`description`),0)+
                     IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`taxa`.`id`),0)+
                     IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa`.`id`),0)+
                     IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)
-                ) > 0
-               ')))->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id',array('taxa_kind_initials'=>'initials','taxa_kind_id_name'=>'name'), \Zend\Db\Sql\Select::JOIN_LEFT);
+                ) > 0'),
+                    'taxa_kind_initials' => new \Zend\Db\Sql\Predicate\Expression('(SELECT `initials` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id` )'),
+                    'taxa_kind_name' => new \Zend\Db\Sql\Predicate\Expression('(SELECT `name` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id` )'),            
+                ));
        $select = $this->setFilter($select,$criteria);
        return $select;
     }
@@ -86,7 +88,7 @@ class TaxaColl extends \ContentColl {
       if (array_key_exists('moreDicoItems', $criteria) && $criteria['moreDicoItems'] != '') {
          $select->columns(array('*','dico_item_count'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT COUNT(*) FROM `dico_item` WHERE  `dico_item`.`parent_taxa_id`=`taxa`.`id` )')));
          $initials = explode(':',$criteria['moreDicoItems']);
-         $select->where(' `taxa_kind`.`initials` IN ("'.  implode('","', $initials).'")');
+         $select->where(' (SELECT `initials` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id` ) IN ("'.  implode('","', $initials).'")');
          $select->order('dico_item_count DESC');
       }
       if (
@@ -94,7 +96,7 @@ class TaxaColl extends \ContentColl {
                $criteria['status'] == true) {
          $select->where('
                 (               
-                    IFNULL(LENGTH(taxa.description),0)+
+                    IFNULL(LENGTH(`taxa`.`description`),0)+
                     IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`taxa`.`id`),0)+
                     IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa`.`id`),0)+
                     IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)

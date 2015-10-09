@@ -115,7 +115,7 @@ class TaxaSearch extends \Content {
                 if (array_key_exists($floweringValue['value'],$nameToNumber)){
                     $floweringValues[]= $nameToNumber[$floweringValue['value']];    
                 } else {
-                    $message .= 'Taxa '.$this->taxa->getData('name').' '.$this->taxa->getData('id').' has a wrong flowering attributes <br/>';
+                    $message .= 'Taxa '.$this->taxa->getData('name').' '.$this->taxa->getData('id').' has a wrong flowering attributes'.PHP_EOL;
                 }
             }
             $floweringValues = array_filter($floweringValues);
@@ -186,7 +186,7 @@ class TaxaSearch extends \Content {
                     $this->db->query('UNLOCK TABLES', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
                     $this->db->query('DELETE FROM `taxa_search` WHERE `taxa_id` = ' . intval($this->taxa->getData('id'))
                     , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-                    $message .= 'Taxa '.$this->taxa->getData('name').' '.$this->taxa->getData('id').' has no parent <br/>';
+                    $message .= 'Taxa '.$this->taxa->getData('name').' '.$this->taxa->getData('id').' has no parent'.PHP_EOL;
                 }
             }
             $updateFtr =true;
