@@ -23,25 +23,35 @@ $( "#taxasearch" ).autocomplete({
       }
 });
 $("#searchForm").on("click","a.showNext",function (e) {
-    el = $(this).next();
+    var el = $(this).next();
     el.toggle();
     if(!el.is(":visible")) {
-        el.find("option").removeAttr("selected");
+        el.find("input[type=hidden]").val(1);
+        el.find("option").attr("selected","selected");
+        el.find("div select").trigger("change",{dontReset:true});
     }
     e.preventDefault();
 });
 $("#searchForm").on("click","a.selectAll",function (e) {
+    $(this).parent().find("div input[type=hidden]").val(1);
     $(this).parent().find("div select option").attr("selected","selected");
     $(this).parent().find("div select").trigger("change",{dontReset:true});
     e.preventDefault();
 });
-$("#searchForm").on("change","input,select",function (e,data) {
+$("#searchForm").on("change","input[type!=hidden],select",function (e,data) {
     if (
             typeof data !== 'object' ||
             !data.hasOwnProperty("dontReset") || 
             data.dontReset !== true
             ) {
         $("#start").val(0);
+    }
+    if($(this).prop("tagName") == "SELECT") {
+        var val=1;
+        if ($(this).children("option").size() != $(this).children("option:selected").size()) {
+            val=0;
+        }
+        $(this).siblings("input[type=hidden]").val(val);
     }
     $.ajax({
         url: $(this).parents("form").first().attr("action")+"?action=search",

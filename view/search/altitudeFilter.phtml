@@ -3,11 +3,23 @@ if (!isset($floraSearch)) {
     $floraSearch = $this->object;
 }
 $altitudeArray = $floraSearch->getFilteredAltitudeArray(true);
+$altitudeAll = 1;
+if (array_key_exists('altitude_all',$_REQUEST))    {
+    $altitudeAll = $_REQUEST['altitude_all'];
+}
 ?>
+<input type="hidden" id="altitude_all" name="altitude_all" value="<?php echo $altitudeAll;?>"/>
 <select id="altitude" name="altitude[]" multiple="multiple" size="<?php echo sizeof($altitudeArray);?>">
 <?php foreach ($altitudeArray as $altitude=>$altitudeData) :
     $selected='';
-    if (is_array($altitudeData) && array_key_exists('selected', $altitudeData) && $altitudeData['selected'] != '') {
+    if  (
+            $altitudeAll == 1 ||
+            (
+                is_array($altitudeData) &&
+                array_key_exists('selected', $altitudeData) &&
+                $altitudeData['selected'] != ''
+            )
+        ) {
         $selected=' selected="selected"';
     }
     ?>

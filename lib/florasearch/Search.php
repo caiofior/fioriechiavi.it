@@ -707,18 +707,20 @@ class Search {
             $select->where('`taxa_search`.`rgt` <= (SELECT `rgt` FROM `taxa_search` WHERE `taxa_id` = '.intval($this->request['taxasearchid']).')');
         }
         if  (
+                array_key_exists('region_all', $this->request) && 
+                $this->request['region_all'] == 0 &&
                 array_key_exists('region', $this->request) && 
                 is_array($this->request['region']) && 
-                $this->regionColl->count() != sizeof($this->request['region']) &&
                 !in_array('region',$avoid)
             ) {
             $this->request['region']=array_map('intval',$this->request['region']);
             $select->where('`taxa_search`.`taxa_id` IN (SELECT `taxa_id` FROM `taxa_region` WHERE `region_id` IN('.implode(',',$this->request['region']).'))');
         }
         if  (
+                array_key_exists('altitude_all', $this->request) &&
+                $this->request['altitude_all'] == 0 &&
                 array_key_exists('altitude', $this->request) && 
                 is_array($this->request['altitude']) && 
-                sizeof($this->request['altitude']) < sizeof($this->altitude) &&
                 !in_array('altitude',$avoid)
             ) {
             $this->request['altitude']=array_map('intval',$this->request['altitude']);
@@ -727,9 +729,10 @@ class Search {
             ');
         }
         if  (
+                array_key_exists('flowering_all', $this->request) && 
+                $this->request['flowering_all'] == 0 &&
                 array_key_exists('flowering', $this->request) && 
                 is_array($this->request['flowering']) && 
-                sizeof($this->request['flowering']) < sizeof($this->flowering) &&
                 !in_array('flowering',$avoid)
             ) {
             $this->request['flowering']=array_map('intval',$this->request['flowering']);
@@ -738,9 +741,10 @@ class Search {
             ');
         }
         if  (
+                array_key_exists('posture_all', $this->request) &&
+                $this->request['posture_all'] == 0 &&
                 array_key_exists('posture', $this->request) &&
                 is_array($this->request['posture']) &&
-                sizeof(array_diff($this->request['posture'],$this->getPostureArray())) <> 0 &&
                 !in_array('posture',$avoid)
             ) {
             $this->request['posture']=array_map('addslashes',$this->request['posture']);
@@ -749,9 +753,10 @@ class Search {
             ');
         }
         if  (
+                array_key_exists('biologicForm_all', $this->request) && 
+                $this->request['biologicForm_all'] == 0 &&
                 array_key_exists('biologicForm', $this->request) && 
                 is_array($this->request['biologicForm']) &&
-                sizeof(array_diff($this->getBiologicFormArray(),$this->request['biologicForm'])) <> 0 &&
                 !in_array('biologicForm',$avoid)
             ) {
             $this->request['biologicForm']=array_map('addslashes',$this->request['biologicForm']);
@@ -760,9 +765,10 @@ class Search {
             ');
         }
         if  (
+                array_key_exists('community_all', $this->request) &&
+                $this->request['comunity_all'] == 0 &&
                 array_key_exists('community', $this->request) &&
                 is_array($this->request['community']) &&
-                sizeof(array_diff($this->request['community'],$this->getCommunityArray())) <> 0 &&
                 !in_array('community',$avoid)
             ) {
             $this->request['community']=array_map('addslashes',$this->request['community']);

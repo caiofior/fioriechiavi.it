@@ -3,11 +3,23 @@ if (!isset($floraSearch)) {
     $floraSearch = $this->object;
 }
 $biologicFormArray = $floraSearch->getFilteredBiologicFormArray(true);
+$biologicFormAll = 1;
+if (array_key_exists('biologicForm_all',$_REQUEST))    {
+    $biologicFormAll = $_REQUEST['biologicForm_all'];
+}
 ?>
+<input type="hidden" id="biologicForm_all" name="biologicForm_all" value="<?php echo $biologicFormAll; ?>"/>
 <select id="biologicForm" name="biologicForm[]" multiple="multiple" size="<?php echo sizeof($biologicFormArray);?>">
 <?php foreach ($biologicFormArray as $biologicFormData) :
     $selected='';
-    if (is_array($biologicFormData) && array_key_exists('selected', $biologicFormData) && $biologicFormData['selected'] != '') {
+    if (
+            $biologicFormAll == 1 ||
+            (
+                is_array($biologicFormData) &&
+                array_key_exists('selected', $biologicFormData) &&
+                $biologicFormData['selected'] != ''
+            )
+        ) {
         $selected=' selected="selected"';
     }
     ?>

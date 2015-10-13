@@ -11,42 +11,6 @@ if (!array_key_exists('start', $_REQUEST)) {
 if (!array_key_exists('pagelength', $_REQUEST)) {
     $_REQUEST['pagelength']=10;
 }
-if (
-    !array_key_exists('region', $_REQUEST)||
-    !is_array($_REQUEST['region'])
-   ) {
-    $_REQUEST['region']=$floraSearch->getRegionColl()->getFieldsAsArray('id');
-}
-if (
-    !array_key_exists('altitude', $_REQUEST)||
-    !is_array($_REQUEST['altitude'])
-   ) {
-    $_REQUEST['altitude']=$floraSearch->getAltitudeArray();
-}
-if (
-    !array_key_exists('flowering', $_REQUEST)||
-    !is_array($_REQUEST['flowering'])
-   ) {
-    $_REQUEST['flowering']=$floraSearch->getFloweringArray();
-}
-if (
-    !array_key_exists('posture', $_REQUEST)||
-    !is_array($_REQUEST['posture'])
-   ) {
-    $_REQUEST['posture']=$floraSearch->getPostureArray();
-}
-if (
-    !array_key_exists('biologicForm', $_REQUEST)||
-    !is_array($_REQUEST['biologicForm'])
-   ) {
-    $_REQUEST['biologicForm']=$floraSearch->getBiologicFormArray();
-}
-if (
-    !array_key_exists('community', $_REQUEST)||
-    !is_array($_REQUEST['community'])
-   ) {
-    $_REQUEST['community']=$floraSearch->getCommunityArray();
-}
 $floraSearch->setRequest($_REQUEST);
 switch ($_REQUEST['action']) {
     case 'autocomplete':

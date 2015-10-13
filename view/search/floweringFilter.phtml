@@ -3,11 +3,23 @@ if (!isset($floraSearch)) {
     $floraSearch = $this->object;
 }
 $floweringArray = $floraSearch-> getFilteredFloweringArray(true);
+$floweringAll = 1;
+if (array_key_exists('flowering_all',$_REQUEST))    {
+    $floweringAll = $_REQUEST['flowering_all'];
+}
 ?>
+<input type="hidden" id="flowering_all" name="flowering_all" value="<?php echo $floweringAll; ?>"/>
 <select id="flowering" name="flowering[]" multiple="multiple" size="<?php echo sizeof($floweringArray);?>">
 <?php foreach ($floweringArray as $flowering=>$floweringData) :
     $selected='';
-    if (is_array($floweringData) && array_key_exists('selected', $floweringData) && $floweringData['selected'] != '') {
+    if (
+            $floweringAll == 1 ||
+            (
+                    is_array($floweringData) &&
+                    array_key_exists('selected', $floweringData) &&
+                    $floweringData['selected'] != ''
+            )
+        ) {
         $selected=' selected="selected"';
     }
     ?>
