@@ -158,11 +158,7 @@ $(document).ready(function() {
          response);
       }
     });
-   }
-   
-   addAutocomplete($(".prevAttibuteValue"));
-   
-   $(".attribute.actions.delete").click(function (e) {
+    $(".attribute.actions.delete").click(function (e) {
       el =  $(this).parent("div.attContainer");
       $(this).dialog({
          buttons: {
@@ -174,6 +170,11 @@ $(document).ready(function() {
       });
       e.preventDefault();
    });
+   }
+   
+   addAutocomplete($(".prevAttibuteValue"));
+   
+   
    $("input, textarea, select").change(function (e){
       $(".saved").hide();
       $(".tosave").show();

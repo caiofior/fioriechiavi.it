@@ -1,9 +1,7 @@
 <div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica chiave dicotomica</h2>
 </div>
-<?php
-$taxa = $this->object;
-?>
+<?php $taxa = $this->object; ?>
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/administrator/taxa.css');?>">
 <form method="post" action="#">
    <input type="hidden" name="id" id="id" value="<?php echo $taxa->getData('id');?>">
@@ -26,9 +24,9 @@ $taxa = $this->object;
 </form>
 <form class="uploadForm" <?php if (!array_key_exists('dicotext', $_REQUEST)) : ?>style="display:none;"<?php endif;?> method="post" action="?task=dico&amp;action=preview&amp;id=<?php echo $taxa->getData('id');?>">
    <?php if (array_key_exists('dicotext', $_REQUEST)) : ?>
-   <div class="errorMessage">Il formato in input è obbligatorio</div>
+   <div class="errorMessage"><span>Il formato in input è obbligatorio</span></div>
    <?php endif;?>
-   <div id="uploadFormatChoose" <?php if (!array_key_exists('dicotext', $_REQUEST)) : ?>style="display:none;"<?php endif;?>> Seleziona un formato</div>
+   <div id="uploadFormatChoose" <?php if (!array_key_exists('dicotext', $_REQUEST)) : ?>style="display:none;"<?php endif;?>>Seleziona un formato</div>
    <label for="upload_format">Formato</label>
    <select id="upload_format" name="upload_format">
       <option value="">--</option>

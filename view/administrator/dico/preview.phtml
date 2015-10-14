@@ -1,9 +1,7 @@
 <div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica una chiave dicotomica</h2>
 </div>
-<?php
-$dico = $this->object;
-?>
+<?php $dico = $this->object; ?>
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/administrator/taxa.css');?>">
 <form method="post" action="?task=dico&amp;action=update">
    <input type="hidden" name="id" id="id" value="<?php echo  $_REQUEST['id'];?>"/>
@@ -16,7 +14,7 @@ $dicoItemColl = $dico->dicoItemColl;
 if (property_exists($dicoItemColl,'errors')) {
    switch ($dicoItemColl->errors->code) {
       case 1410141230 : ?>
-   <p class="error">Ci sono delle voci non correttamente appariate <?php echo $dicoItemColl->errors->items; ?></p>
+    <p class="errorMessage"><span>Ci sono delle voci non correttamente appariate <?php echo $dicoItemColl->errors->items; ?></span></p>
 <?php break;
    }
 }
@@ -38,5 +36,6 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
 </div>
 <?php endforeach; ?>
 </div>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=edit&amp;id=<?php echo  $_REQUEST['id'];?>">Annulla</a>
    <input type="submit" value="Aggiorna la chiave con questi valori" />
 </form>
