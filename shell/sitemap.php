@@ -20,6 +20,22 @@ $newTaxaColl->loadAll(array(
     'sSortDir_0'=>'DESC',
     'status'=>true
 ));
+fwrite($handler,<<<EOT
+    <url>
+      <loc>{$GLOBALS['db']->config->baseUrl}</loc>
+       <priority>1</priority>
+    </url>
+    <url>
+      <loc>{$GLOBALS['db']->config->baseUrl}search.php</loc>
+       <priority>1</priority>
+    </url>
+    <url>
+      <loc>{$GLOBALS['db']->config->baseUrl}map.php</loc>
+       <priority>1</priority>
+    </url>
+      
+EOT
+);
 if($newTaxaColl->count() > 0):
    foreach($newTaxaColl->getItems() as $newTaxa) : 
    fwrite($handler,<<<EOT

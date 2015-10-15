@@ -2,6 +2,7 @@
    <label for="taxasearch">Cerca: </label>
    <input id="taxasearch" type="search" name="taxasearch" value="">
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>search.php">Ricerca avanzata</a>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>map.php">Mappa</a>
    <br/>
    <span><?php $moreDicoItemTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
     $moreDicoItemTaxaColl->loadAll(array(
