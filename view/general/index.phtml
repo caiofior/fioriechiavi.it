@@ -3,7 +3,7 @@
    <input id="taxasearch" type="search" name="taxasearch" value="">
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>search.php">Ricerca avanzata</a>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>map.php">Taxa presenti</a>
-   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>observation.php">Osservazioni</a>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>observation.php">Osservazioni botaniche</a>
    <br/>
    <span><?php $moreDicoItemTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
     $moreDicoItemTaxaColl->loadAll(array(

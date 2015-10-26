@@ -12,13 +12,13 @@ $taxaObservationColl->loadAll(array(
 ));
 $radius = 12;
 $pointsString='[';
-foreach ($taxaObservationColl->getItems() as $taxaObservation):
+foreach ($taxaObservationColl->getItems() as $index=>$taxaObservation):
     $taxa = $taxaObservation->getTaxa();
     if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->x() != '' && $taxaObservation->getPoint()->y() != '') {
         $pointsString .= '{latitude:'.$taxaObservation->getPoint()->x().',longitude:'.$taxaObservation->getPoint()->y().'},';
     } ?>
 <div>
-    <p><strong><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxa->getData('id');?>"><?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?></a></strong></p>
+    <p><strong><?php echo chr(65+$index); ?>) <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxa->getData('id');?>"><?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?></a></strong></p>
     <p><em><?php echo $taxaObservation->getData('title'); ?></em></p>
     <p><?php echo strftime('%e  %B  %Y',date_format(new DateTime($taxaObservation->getData('datetime')),'U')); ?></p>
     <p><?php echo $taxaObservation->getData('description'); ?></p>
