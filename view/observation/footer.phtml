@@ -1,0 +1,7 @@
+<?php if($GLOBALS['db']->config->useCDN === true) : ?>
+<script src="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+<script src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('js/observation.min.js.gz');?>"></script>
+<?php else : ?>
+<script type="text/javascript" src="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('/js/fancyBox/source/jquery.fancybox.pack.js');?>"></script>
+<script src="<?php echo $GLOBALS['db']->config->staticUrl;?>js/observation.js"></script>
+<?php endif; ?>

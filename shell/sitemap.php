@@ -33,7 +33,11 @@ fwrite($handler,<<<EOT
       <loc>{$GLOBALS['db']->config->baseUrl}map.php</loc>
        <priority>1</priority>
     </url>
-      
+    <url>
+      <loc>{$GLOBALS['db']->config->baseUrl}observation.php</loc>
+       <priority>1</priority>
+    </url>
+        
 EOT
 );
 if($newTaxaColl->count() > 0):

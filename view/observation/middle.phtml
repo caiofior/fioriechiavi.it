@@ -1,0 +1,49 @@
+<h2>Ultime osservazioni botaniche</h2>
+<div id="map-canvas" style="width: 100%; height: 400px;"></div>
+<?php
+$taxaObservationColl = new \floraobservation\TaxaObservationColl($GLOBALS['db']);
+$taxaObservationColl->loadAll(array(
+    'iDisplayStart'=>0,
+    'iDisplayLength'=>10,
+    'sColumns'=>'datetime',
+    'iSortingCols'=>'1',
+    'iSortCol_0'=>'0',
+    'sSortDir_0'=>'DESC'
+));
+$radius = 12;
+$pointsString='[';
+foreach ($taxaObservationColl->getItems() as $taxaObservation):
+    $taxa = $taxaObservation->getTaxa();
+    if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->x() != '' && $taxaObservation->getPoint()->y() != '') {
+        $pointsString .= '{latitude:'.$taxaObservation->getPoint()->x().',longitude:'.$taxaObservation->getPoint()->y().'},';
+    } ?>
+<div>
+    <p><strong><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxa->getData('id');?>"><?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?></a></strong></p>
+    <p><em><?php echo $taxaObservation->getData('title'); ?></em></p>
+    <p><?php echo strftime('%e  %B  %Y',date_format(new DateTime($taxaObservation->getData('datetime')),'U')); ?></p>
+    <p><?php echo $taxaObservation->getData('description'); ?></p>
+    <?php $taxaObservationImage = $taxaObservation->getTaxaObservationImageColl(array('iDisplayStart'=>0,'iDisplayLength'=>1))->getFirst();
+    $thumbnailImageUrl = null;
+    try {
+    $thumbnailImageUrl = $taxaObservationImage->getUrl(array('x'=>300,'y'=>200));
+    } catch (Exception $e) {}
+    if (!is_null($thumbnailImageUrl)) : ?>
+    <a class="fancybox" href="<?php echo $taxaObservationImage->getUrl(); ?>">
+    <img src="<?php echo $thumbnailImageUrl; ?>">
+    </a>
+    <?php endif; ?>
+</div>
+<?php endforeach;
+if ($taxaObservationColl->count() > 1) {
+    $radius -= sqrt($taxaObservationColl->getMultiPoint()->envelope()->area())^3;
+}
+$pointsString .=']'; 
+$centroid = $taxaObservationColl->getMultiPoint()->centroid();
+if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search->key != '') : ?>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $GLOBALS['db']->config->search->key; ?>"></script>
+<?php endif; ?>
+<script>
+    points = <?php echo $pointsString; ?>;
+    centroid = {latitude:<?php echo $centroid->x(); ?>,longitude:<?php echo $centroid->y(); ?>};
+    radius = <?php echo $radius; ?>;
+</script>

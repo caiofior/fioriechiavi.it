@@ -2,26 +2,24 @@
 <?php
 $statement = $GLOBALS['db']->query('
     SELECT `node`.`taxa_id` ,
-    (COUNT(`parent`.`taxa_id`) - 1) AS `depth` ,
+    (SELECT 
+        COUNT(*) FROM `taxa_search` AS `parent` 
+        WHERE 
+        `node`.`lft` BETWEEN `parent`.`lft` AND `parent`.`rgt` 
+    ) - 1 AS `depth` ,
     (SELECT `name` FROM `taxa` WHERE `taxa`.`id`=`node`.`taxa_id`) AS `name` ,
     ( SELECT `initials` FROM `taxa_kind` WHERE `id` =
         (SELECT `taxa_kind_id` FROM `taxa` WHERE `taxa`.`id`=`node`.`taxa_id`)
-    ) AS `taxa_kind_initials` ,
-    (
-        (               
-            IFNULL(LENGTH((SELECT `description` FROM `taxa` WHERE `taxa`.`id`=`node`.`taxa_id`)),0) +
-            IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`node`.`taxa_id`),0) +
-            IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`node`.`taxa_id`),0) +
-            IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`node`.`taxa_id`),0)
-            
-        ) > 0    
+    ) AS `taxa_kind_initials`
+    FROM `taxa_search` as `node`
+    WHERE 
+    (               
+        IFNULL(LENGTH((SELECT `description` FROM `taxa` WHERE `taxa`.`id`=`node`.`taxa_id`)),0) +
+        IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`node`.`taxa_id`),0) +
+        IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`node`.`taxa_id`),0) +
+        IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`node`.`taxa_id`),0)
 
-    ) AS `status`
-    FROM `taxa_search` as `node` ,
-    `taxa_search` as `parent`
-    WHERE `node`.`lft` BETWEEN `parent`.`lft` AND `parent`.`rgt`
-    GROUP BY `node`.`taxa_id`
-    HAVING `status` =1
+    ) > 0
     ORDER BY `node`.`lft`
     ');
 $resource = $statement->execute();
@@ -33,14 +31,13 @@ while ($resultSet->valid()) :
     $data = $resultSet->current();
 ?>
 <p>
-<?php if($data['status'] == 1) : ?>
-    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $data['taxa_id']; ?>">
-<?php endif; 
-echo str_repeat(' ', $data['depth']).$data['taxa_kind_initials'].' '.$data['name']; 
-?>
+<a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $data['taxa_id']; ?>">
+<?php echo str_repeat(' ', $data['depth']).$data['taxa_kind_initials'].' '.$data['name']; ?>
+</a>
+<?php  if ($GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>
+<a class="actions modify blank" title="Modifica" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $data['taxa_id']; ?>">Modifica</a>
+<?php endif;?>
 </p>
-<?php if($data['status'] == 1) : ?>
-    </a>
-<?php endif;
+<?php 
     $resultSet->next();
 endwhile;

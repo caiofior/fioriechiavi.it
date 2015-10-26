@@ -31,9 +31,8 @@ class TaxaObservation extends \Content
        $select = $this->table->getSql()->select();
        $select->columns(array('*',
            'point'=>new \Zend\Db\Sql\Expression('asText(position)')
-           ));
-       $select->where(array($this->primary=>$id));
-       $data = $this->table->select($this->table->selectWith($select))->current();
+           ))->where(array($this->primary=>$id));
+       $data = $this->table->selectWith($select)->current();
        if (is_object($data)) {
             $this->data = $data->getArrayCopy();
             $this->rawData = $this->data;
@@ -79,7 +78,7 @@ class TaxaObservation extends \Content
        }
    }
     /**
-     * Geths the associated taxa onservation image collection
+     * Gets the associated taxa observation image collection
      * @return \floraobservation\TaxaObservationImageColl
      */
     public function getTaxaObservationImageColl() {
@@ -120,5 +119,16 @@ class TaxaObservation extends \Content
      */
     public function setPoint (\Point $point) {
         $this->point = $point;
+    }
+    /**
+     * Gets the associated taxa
+     * @return \flora\Taxa
+     */
+    public function getTaxa() {
+        $taxa = new \flora\taxa\Taxa($this->db);
+        if (array_key_exists('taxa_id', $this->data) && $this->data['taxa_id'] != '') {
+            $taxa->loadFromId($this->data['taxa_id']);
+        }
+        return $taxa;
     }
 }

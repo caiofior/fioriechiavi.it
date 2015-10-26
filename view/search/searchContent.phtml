@@ -27,18 +27,19 @@ sort($pages);
 <?php
 $taxaColl = $floraSearch->getTaxaColl();
 foreach($taxaColl->getItems() as $taxa):?>
-    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxa->getData('id');?>">
     <div>
-        <div><?php echo $taxa->getRawData('taxa_kind_initials');?> <?php echo $taxa->getData('name');?></div>
-        <div>
-        <?php
+    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $taxa->getData('id');?>">
+        <?php echo $taxa->getRawData('taxa_kind_initials');?> <?php echo $taxa->getData('name');
         $image= $taxa->getTaxaImageColl()->getFirst();
         if ($image->getUrl() != '') :
         $imageUrl = $GLOBALS['db']->config->staticUrl.$image->getUrl(); 
         ?>
         <img src="<?php echo $imageUrl;?>" alt="Immagine <?php echo $taxa->getData('name');?>"/>
-        <?php endif; ?></div>
-    </div>
+        <?php endif; ?>
     </a>
+    <?php  if ($GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>
+    <a class="actions modify blank" title="Modifica" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $taxa->getData('id');?>">Modifica</a>
+    <?php endif; ?>
+    </div>
 <?php endforeach;?>
 </div>

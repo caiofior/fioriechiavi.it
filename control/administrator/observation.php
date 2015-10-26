@@ -2,7 +2,7 @@
 if (array_key_exists('sEcho', $_REQUEST)) {
       $result = array();
       $taxaObservationColl = new \floraobservation\TaxaObservationColl($GLOBALS['db']);
-      if($GLOBALS['profile']->getData('role_id')) {
+      if($GLOBALS['profile']->getData('role_id') == 3) {
           $_REQUEST['profile_id']=$GLOBALS['profile']->getData('id');
       }
       $taxaObservationColl->loadAll($_REQUEST);
