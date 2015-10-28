@@ -40,25 +40,76 @@ if  (
         is_array($argv) &&
         array_key_exists(1, $argv)
     ) {
-    $statement = $GLOBALS['db']->query('SELECT `id` FROM `taxa` ORDER BY `id` ASC LIMIT '.intval($argv[1]).','.intval($GLOBALS['db']->config->indexing->splitEvery));
+    $statement = $GLOBALS['db']->query('
+        SELECT `id` ,
+        (SELECT `dico_item`.`parent_taxa_id` FROM `dico_item` WHERE `dico_item`.`taxa_id` = `taxa`.`id` ORDER BY `dico_item`.`parent_taxa_id` DESC LIMIT 1) as `parent_taxa_id`
+        FROM `taxa` ORDER BY `id` ASC LIMIT '.intval($argv[1]).','.intval($GLOBALS['db']->config->indexing->splitEvery));
 } else {
-    $statement = $GLOBALS['db']->query('SELECT `id` FROM `taxa` ORDER BY `id` ASC');
+    $statement = $GLOBALS['db']->query('
+        SELECT `id` ,
+        (SELECT `dico_item`.`parent_taxa_id` FROM `dico_item` WHERE `dico_item`.`taxa_id` = `taxa`.`id` ORDER BY `dico_item`.`parent_taxa_id` DESC  LIMIT 1) as `parent_taxa_id`
+        FROM `taxa` ORDER BY `id` ASC');
 }
 $resultSet = new \Zend\Db\ResultSet\ResultSet();
 $resultSet->initialize($statement->execute());
 $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-$c=0;
+
+$statement = $GLOBALS['db']->query('ALTER TABLE `taxa_search` DISABLE KEYS');
+$statement->execute();
+$statement = $GLOBALS['db']->query('ALTER TABLE `taxa_search_attribute` DISABLE KEYS');
+$statement->execute();
+
+$doneIds=array();
+$parentIds=array();
+$todoIds =array();
 do {
-    $c++;
-    $id = $resultSet->current()->id;
-    $taxa->loadFromId($id);
-    $message = $taxa->updateSearch();
-    if ($message != '') {
-        echo $message.PHP_EOL;
+    unset($id);
+    if ($resultSet->valid()) {
+        $id = $resultSet->current()->id;
+        $parentIds[$id]=$resultSet->current()->parent_taxa_id;
+        array_unshift($todoIds,$id);
+        $resultSet->next();
     }
-    $resultSet->next();
-} while ($resultSet->valid());
-echo 'Number of taxa '.$c.PHP_EOL;
+    $id = array_shift($todoIds);
+    $shifts =0;
+       
+    while (
+            $id > 1 &&
+            !in_array($parentIds[$id],$doneIds) &&
+            $shifts++ < count($todoIds)
+          ) {
+    
+        array_push($todoIds, $id);
+        $id = array_shift($todoIds);
+    }
+    
+    if (
+            $id == 1 ||
+            in_array($parentIds[$id],$doneIds)
+        ) {
+        
+        $taxa->loadFromId($id);
+        $message = $taxa->updateSearch();
+        if ($message != '') {
+            echo $message;
+        }
+        array_unshift($doneIds,$id);
+        
+    }
+    
+} while (count($todoIds)>0 || $resultSet->valid());
+
+$statement = $GLOBALS['db']->query('ALTER TABLE `taxa_search` ENABLE KEYS');
+$statement->execute();
+$statement = $GLOBALS['db']->query('ALTER TABLE `taxa_search_attribute` ENABLE KEYS');
+$statement->execute();
+
+$statement = $GLOBALS['db']->query('OPTIMIZE TABLE `taxa_search`');
+$statement->execute();
+$statement = $GLOBALS['db']->query('OPTIMIZE TABLE `taxa_search_attribute`');
+$statement->execute();
+
+echo 'Number of taxa '.count($doneIds).PHP_EOL;
 $sql = '
 SELECT 
 ROUND(((data_length + index_length) / 1024 / 1024), 2) as size

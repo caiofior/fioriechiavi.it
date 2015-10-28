@@ -145,12 +145,12 @@ class TaxaSearch extends \Content {
         
         $taxaParentObj = $this->db->query('SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id` ='.intval($this->taxa->getData('id'))
             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
-        
-        
+                   
         if (is_object($taxaParentObj) && is_numeric($taxaParentObj->parent_taxa_id)) {
             $parentTaxaId = intval($taxaParentObj->parent_taxa_id);
             $taxaSearchObj = $this->db->query('SELECT `lft`,`rgt` FROM `taxa_search` WHERE `taxa_id` = '.$parentTaxaId
             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE)->current();
+          
             if (is_object($taxaSearchObj)) {
                 $taxaParentNsmObj = $this->db->query('SELECT `taxa_id` FROM `taxa_search` WHERE
                     `lft` <='.intval($taxaSearchObj->lft).' AND `rgt` >='.intval($taxaSearchObj->lft).' 
@@ -166,6 +166,7 @@ class TaxaSearch extends \Content {
         }
         
         $this->db->query('LOCK TABLES `taxa_search` WRITE,`dico_item` WRITE', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+             
         if (is_object($taxaSearchObj)) {
             $parLft = $taxaSearchObj->lft;
             $this->db->query('UPDATE `taxa_search` SET 
