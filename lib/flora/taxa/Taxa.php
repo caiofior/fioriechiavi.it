@@ -79,6 +79,8 @@ class Taxa extends \Content {
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('ALTER TABLE `taxa_search` ORDER BY `taxa_id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $taxaSearch = new \flora\taxa\TaxaSearch($this->db);
+        $taxaSearch->generateSitemap();
 
     }
 
@@ -103,6 +105,8 @@ class Taxa extends \Content {
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('ALTER TABLE `taxa_search` ORDER BY `taxa_id` DESC'
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $taxaSearch = new \flora\taxa\TaxaSearch($this->db);
+        $taxaSearch->generateSitemap();
     }
 
     /**

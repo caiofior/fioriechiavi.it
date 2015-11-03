@@ -219,5 +219,76 @@ class TaxaSearch extends \Content {
         WHERE `lft` > '.intval($rgt), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE); 
         $this->db->query('DELETE FROM `taxa_search` WHERE `taxa_id` = ' . intval($this->taxa->getData('id')), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('DELETE FROM `taxa_search_attribute` WHERE `taxa_id` = ' . intval($this->taxa->getData('id')), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
-    } 
+    }
+    /**
+     * Generates the sitemap
+     */
+    public function generateSitemap() {
+        $handler = fopen(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'sitemap.xml', 'w');
+        fwrite($handler,<<<EOT
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+EOT
+        );
+
+        $newTaxaColl  = new \flora\taxa\TaxaColl($this->db);
+        $newTaxaColl->loadAll(array(
+            'iDisplayStart'=>0,
+            'iDisplayLength'=>200,
+            'sColumns'=>'change_datetime',
+            'iSortingCols'=>'1',
+            'iSortCol_0'=>'0',
+            'sSortDir_0'=>'DESC',
+            'status'=>true
+        ));
+        fwrite($handler,<<<EOT
+    <url>
+      <loc>{$this->db->config->baseUrl}</loc>
+       <priority>1</priority>
+    </url>
+    <url>
+      <loc>{$this->db->config->baseUrl}search.php</loc>
+       <priority>1</priority>
+    </url>
+    <url>
+      <loc>{$this->db->config->baseUrl}map.php</loc>
+       <priority>1</priority>
+    </url>
+    <url>
+      <loc>{$this->db->config->baseUrl}observation.php</loc>
+       <priority>1</priority>
+    </url>
+        
+EOT
+        );
+        if($newTaxaColl->count() > 0):
+            foreach($newTaxaColl->getItems() as $newTaxa) : 
+                fwrite($handler,<<<EOT
+    <url>
+      <loc>{$this->db->config->baseUrl}?id={$newTaxa->getData('id')}</loc>
+
+EOT
+                );
+                if ($newTaxa->getData('change_datetime') != '' ):
+                    $data = substr($newTaxa->getData('change_datetime'),0,10);
+                    fwrite($handler,<<<EOT
+      <lastmod>{$data}</lastmod>
+
+EOT
+                );
+                endif;
+                fwrite($handler,<<<EOT
+    </url>
+
+EOT
+                );
+            endforeach;
+        endif;
+        fwrite($handler,<<<EOT
+</urlset>
+EOT
+        );
+        fclose($handler);
+    }
 }
