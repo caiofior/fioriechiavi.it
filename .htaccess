@@ -16,3 +16,6 @@
   ExpiresByType text/css                  "access plus 1 year"
   ExpiresByType application/javascript    "access plus 1 year"
   ExpiresByType text/javascript           "access plus 1 year"
+  ExpiresByType application/x-gzip        "access plus 1 year"
+  ExpiresByType image/swf                 "access plus 1 year"
+  ExpiresByType application/x-shockwave-flash "access plus 1 year"
