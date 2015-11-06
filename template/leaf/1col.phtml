@@ -63,18 +63,23 @@
                 <div class="container">
                         <div class="col-xs-offset-1 header-right">
                             <?php if($GLOBALS['db']->config->socialPages->facebook != '') : ?>
-                            <a rel="nofollow" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->facebook; ?>">
+                            <a rel="nofollow" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->facebook; ?>" title="Facebook">
                                 <img src="template/leaf/images/fb.png" alt="Facebook" />
                             </a>
                             <?php endif; 
                             if($GLOBALS['db']->config->socialPages->googlePlus != '') : ?>
-                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->googlePlus; ?>">
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->googlePlus; ?>" title="Google +">
                                 <img src="template/leaf/images/gp.png" alt="Google +" />
                             </a>
                             <?php endif;
                             if($GLOBALS['db']->config->socialPages->scribd != '') : ?>
-                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->scribd; ?>">
-                                <img src="template/leaf/images/sd.png" alt="Scibd" />
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->scribd; ?>" title="Scribd">
+                                <img src="template/leaf/images/sd.png" alt="Scribd" />
+                            </a>
+                            <?php endif;
+                            if($GLOBALS['db']->config->socialPages->issuu != '') : ?>
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->issuu; ?>" title="Issuu">
+                                <img src="template/leaf/images/issuu.png" alt="Issuu" />
                             </a>
                             <?php endif; ?>
                         </div>
