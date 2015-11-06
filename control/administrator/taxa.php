@@ -54,6 +54,7 @@ if (array_key_exists('sEcho', $_REQUEST)) {
 if (!array_key_exists('action',$_REQUEST)) {
    $_REQUEST['action']=null;
 }
+       
 switch ($_REQUEST['action']) {
 case 'edit':
    $this->getTemplate()->setBlock('middle','administrator/taxa/edit.phtml');
@@ -170,7 +171,16 @@ case 'edit':
                  array_key_exists('children_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_id'])
              ) {
              $dicoItem = new flora\dico\DicoItem($GLOBALS['db']);
-             $dicoItem->loadFromIdAndTaxa($_REQUEST['children_dico_id'],$_REQUEST['children_dico_item_id']);
+             $dicoItem->loadFromIdAndDico($_REQUEST['children_dico_id'],$_REQUEST['children_dico_item_id']);
+             $dicoItem->setData($taxa->getData('id'), 'taxa_id');
+             $dicoItem->replace();
+         }
+         if (
+                 array_key_exists('children_add_dico_item_id', $_REQUEST) && is_numeric($_REQUEST['children_add_dico_item_id']) &&
+                 array_key_exists('children_add_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_add_dico_id'])
+             ) {
+             $dicoItem = new flora\dico\AddDicoItem($GLOBALS['db']);
+             $dicoItem->loadFromIdAndDico($_REQUEST['children_add_dico_id'],$_REQUEST['children_add_dico_item_id']);
              $dicoItem->setData($taxa->getData('id'), 'taxa_id');
              $dicoItem->replace();
          }
@@ -182,6 +192,8 @@ case 'edit':
                 );
          if (array_key_exists('children_dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
+         } else if (array_key_exists('children_add_dico_id', $_REQUEST)) {
+            header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=add_dico&action=edit&id='.$_REQUEST['children_add_dico_id']);
          } else if (array_key_exists('submit_create_key', $_REQUEST) && array_key_exists('dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['dico_id']);
          } else if (array_key_exists('submit_back', $_REQUEST) ){
@@ -193,6 +205,27 @@ case 'edit':
       }
    }
    break; 
+   case 'deleteadddico':
+    if (array_key_exists('add_dico_id', $_REQUEST) &&  $_REQUEST['add_dico_id'] != '') {
+        $addDico = new \flora\dico\AddDico($GLOBALS['db']);
+        $addDico->loadFromId($_REQUEST['add_dico_id']);
+        $addDico->delete();
+    }
+    header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$_REQUEST['id']);
+    exit();
+    break;
+case 'add_dico':
+    if (!array_key_exists('dico_name', $_REQUEST) ||$_REQUEST['dico_name']=='') {
+        $this->addValidationMessage('dico_name','Il nome della chiave dicotomica è obbligatorio');
+    }
+    if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
+        $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+        $taxa->loadFromId($_REQUEST['id']);
+        $taxa->addDico(array('name'=>$_REQUEST['dico_name']));
+    }
+    $this->getTemplate()->setBlock('middle','administrator/taxa/edit.phtml');
+    $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml'); 
+    break;
 case 'delete' :
    $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {

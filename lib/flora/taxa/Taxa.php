@@ -7,7 +7,7 @@ namespace flora\taxa;
  *
  * @author caiofior
  */
-class Taxa extends \Content {
+class Taxa extends \Content implements \flora\dico\DicoInt {
 
     /**
      * Associates the database table
@@ -118,6 +118,9 @@ class Taxa extends \Content {
         }
         foreach ($this->getTaxaAttributeColl()->getItems() as $attribute) {
             $attribute->delete();
+        }
+        foreach ($this->getAddDicoColl()->getItems() as $addDico) {
+            $addDico->delete();
         }
         $this->db->query('DELETE FROM `taxa_region` 
          WHERE `taxa_id`=' . intval($this->data['id'])
@@ -321,8 +324,8 @@ class Taxa extends \Content {
     }
 
     /**
-     * Returns a collection of the parents of a taxa
-     * @return \flora\taxa\TaxaColl
+     * Returns a collection of dico items
+     * @return \flora\dico\DicoItemColl
      */
     public function getDicoItemColl($edit = false) {
         $dicoItemColl = new \flora\dico\DicoItemColl($this->db);
@@ -389,13 +392,35 @@ class Taxa extends \Content {
     }
     /**
      * Instantiates the taxa search object
-     * @param \flora\taxa\Taxa $taxa
-     * @return \flora\taxa\TaxaSearch
      */
     private function getTaxaSearch() {
         $taxaSearch = new \flora\taxa\TaxaSearch($this->db);
         $taxaSearch->loadFromTaxa($this);
         return $taxaSearch;
+    }
+    /**
+     * Get Additional dico collection
+     * @param \flora\taxa\Taxa $taxa
+     * @return \flora\taxa\TaxaSearch
+     */
+    public function getAddDicoColl() {
+        $addDicoColl = new \flora\dico\AddDicoColl($this->db);
+        if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
+            $addDicoColl->loadAll(array('taxa_id'=>$this->data['id']));
+        }
+        return $addDicoColl;
+    }
+    /**
+     * Adds a dico to a taxa
+     * @param array $data
+     */
+    public function addDico($data) {
+        if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
+            $data['taxa_id']=$this->data['id'];
+            $addDico = new \flora\dico\AddDico($this->db);
+            $addDico->setData($data);
+            $addDico->insert();
+        }
     }
 
 }

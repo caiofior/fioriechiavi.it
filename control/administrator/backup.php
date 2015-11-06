@@ -18,7 +18,7 @@ case 'backuptaxa':
    if ($GLOBALS['config']->database->password != '') {
        $command .= ' -p'.$GLOBALS['config']->database->password;
    }
-   $command .= ' '.$GLOBALS['config']->database->database.' taxa_kind region taxa taxa_region taxa_attribute taxa_attribute_value taxa_image dico_item --replace --no-create-db --no-create-info --compact --skip-extended-insert ';
+   $command .= ' '.$GLOBALS['config']->database->database.' taxa_kind region taxa taxa_region taxa_attribute taxa_attribute_value taxa_image dico_item add_dico add_dico_item --replace --no-create-db --no-create-info --compact --skip-extended-insert ';
    $temporaryFileName= tempnam(sys_get_temp_dir(),'');
    $command .= ' -r '.$temporaryFileName;
    exec($command);

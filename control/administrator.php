@@ -19,6 +19,9 @@ switch ($_REQUEST['task']) {
    case 'dico':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'dico.php';       
       break;
+   case 'add_dico':
+      require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'add_dico.php';       
+      break;
    case 'taxa_category':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'taxa_category.php';       
       break;

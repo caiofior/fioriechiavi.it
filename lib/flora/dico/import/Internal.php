@@ -9,7 +9,7 @@ class Internal implements \flora\dico\import\Import {
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
-   public function import  (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
+   public function import  (\flora\dico\DicoItemIntColl  $dicoItemColl, $stream) {
       $dicoItemColl->emptyColl();
       $cols = array('id','text','taxa_id');
       while($row = fgetcsv($stream,1000,"\t")) {

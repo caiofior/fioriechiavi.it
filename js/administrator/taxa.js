@@ -61,6 +61,17 @@ $(document).ready(function() {
               $(this).val("");
       }
     });
+    $(".deleteAddDico").click(function (e){
+        e.preventDefault();
+        $(this).dialog({
+           buttons: {
+              "Confermi la cancellazione della chiave aggiuntiva ?": function() {
+                   window.location =  $(this).attr("href");
+              }
+           }
+        });
+        
+    });
     $("a.loadMarkup").click(function (e){
        $("div.mce-tinymce").hide();
        $("#description_markup_container").show();
@@ -90,6 +101,10 @@ $(document).ready(function() {
           $("#regions option").prop("selected",false);
        }
        e.preventDefault();
+    });
+    $("a.add_dico_button").click(function(e) {
+       $("#add_add_dico").toggle();
+       e.preventDefault(); 
     });
     $("#attribute_name, #attribute_value").change(function (e){
        $("#attribute_missing_name").hide();

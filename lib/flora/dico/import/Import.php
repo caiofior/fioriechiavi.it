@@ -9,5 +9,5 @@ interface Import {
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
-   public function import (\flora\dico\DicoItemColl $dicoItemColl, $stream);
+   public function import (\flora\dico\DicoItemIntColl $dicoItemColl, $stream);
 }

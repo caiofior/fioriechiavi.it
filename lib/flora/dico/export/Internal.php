@@ -9,7 +9,7 @@ class Internal implements \flora\dico\export\Export {
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
-   public function export (\flora\dico\DicoItemColl $dicoItemColl, $stream) {
+   public function export (\flora\dico\DicoItemIntColl  $dicoItemColl, $stream) {
       foreach ($dicoItemColl->getItems() as $dicoItem) {
          fwrite($stream,$dicoItem->getData('id'));
          fwrite($stream,"\t");

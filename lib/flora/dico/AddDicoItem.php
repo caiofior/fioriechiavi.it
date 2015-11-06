@@ -5,11 +5,11 @@ if (!class_exists('\Autoload')) {
    \Autoload::getInstance();
 }
 /**
- * Taxa dicotomic key item class
+ * Additional Taxa dicotomic key item class
  *
  * @author caiofior
  */
-class DicoItem extends \Content implements \flora\dico\DicoItemInt
+class AddDicoItem extends \Content implements \flora\dico\DicoItemInt
 {
    /**
     * Associates the database table
@@ -17,43 +17,8 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
     */
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
       set_error_handler(create_function('', ''),E_USER_WARNING);
-      parent::__construct($db, 'dico_item');
+      parent::__construct($db, 'add_dico_item');
       restore_error_handler();
-   }
-   /**
-    * Not usable
-    * @param int $id
-    * @throws \Exception
-    * @see loadFromIdAndDico
-    */
-   public function loadFromId ($id) {
-      throw new \Exception('Deprecated see loadFromIdAndtaxa',1509141504);
-   }
-   /**
-    * Load data fro dico id and id
-    * @param type $dico_id
-    * @param type $id
-    */
-   public function loadFromIdAndDico($dico_id,$id) {
-      $this->data['parent_taxa_id']=$dico_id;
-      $this->rawData['parent_taxa_id']=$dico_id;
-      $this->data['id']=$id;
-      $this->rawData['id']=$id;
-      $data = $this->table->select(array(
-          'parent_taxa_id'=>$this->data['parent_taxa_id'],
-          'id'=>$this->data['id']
-      ))->current();
-      if (is_object($data)) {
-          $this->data = array_filter($data->getArrayCopy(),  create_function('$val', 'return !is_null($val);'));
-          $this->rawData = $this->data;
-      } else {
-         $this->data = array (
-             'id'=>$id,
-             'parent_taxa_id'=>$dico_id,
-             'text'=>''
-             );
-         $this->rawData = $this->data;
-      }
    }
    /**
     * Not usable
@@ -73,27 +38,27 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
    public function insert() {
       throw new \Exception('Deprecated see replace',1509141504);
    }
-    /**
+   /**
      * Replaces dico item data
      */
    public function replace() {
         if (
-                !array_key_exists('parent_taxa_id', $this->data) &&
-                array_key_exists('parent_taxa_id', $this->rawData)
+                !array_key_exists('dico_id', $this->data) &&
+                array_key_exists('dico_id', $this->rawData)
                 ) {
-        $this->data['parent_taxa_id'] = $this->rawData['parent_taxa_id'];
+        $this->data['dico_id'] = $this->rawData['dico_id'];
         }
         if (array_key_exists('taxa_id',$this->rawData)) {
             $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
-            (id,parent_taxa_id,text,taxa_id)
+            (id,dico_id,text,taxa_id)
             VALUES
-            ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
+            ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['dico_id']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
             ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         } else {
             $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
-            (id,parent_taxa_id,text)
+            (id,dico_id,text)
             VALUES
-            ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'")
+            ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['dico_id']).',"'.  addslashes($this->rawData['text']).'")
             ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         }
    }
@@ -104,12 +69,12 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
        if (
                array_key_exists('id', $this->rawData) && 
                $this->rawData['id'] != '' &&
-               array_key_exists('parent_taxa_id', $this->rawData) && 
-               $this->rawData['parent_taxa_id'] != ''
+               array_key_exists('dico_id', $this->rawData) && 
+               $this->rawData['dico_id'] != ''
            ) {
             $this->db->query('DELETE FROM `'.$this->table->getTable().'` 
               WHERE `id`="'.addslashes($this->rawData['id']).'"
-              AND `parent_taxa_id`='.intval($this->rawData['parent_taxa_id']),
+              AND `dico_id`='.intval($this->rawData['dico_id']),
             \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
            }
    }
@@ -136,17 +101,32 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
       return $childrenCodeArray;
    }
    /**
-    * Gets the associated taxa
-    * @return \flora\taxa\Taxa
+    * Load data fro dico id and id
+    * @param type $dico_id
+    * @param type $id
     */
-   public function getTaxa() {
-      $taxa = new \flora\taxa\Taxa($this->db);
-      if (array_key_exists('taxa_id',$this->rawData) && $this->rawData['taxa_id'] != '') {
-         $taxa->loadFromId($this->rawData['taxa_id']);
+   public function loadFromIdAndDico($dico_id,$id) {
+      $this->data['dico_id']=$dico_id;
+      $this->rawData['dico_id']=$dico_id;
+      $this->data['id']=$id;
+      $this->rawData['id']=$id;
+      $data = $this->table->select(array(
+          'dico_id'=>$this->data['dico_id'],
+          'id'=>$this->data['id']
+      ))->current();
+      if (is_object($data)) {
+          $this->data = array_filter($data->getArrayCopy(),  create_function('$val', 'return !is_null($val);'));
+          $this->rawData = $this->data;
+      } else {
+         $this->data = array (
+             'id'=>$id,
+             'dico_id'=>$dico_id,
+             'text'=>''
+             );
+         $this->rawData = $this->data;
       }
-      return $taxa;
    }
-    /**
+   /**
     * Removes the association with taxa
     */
    public function removesTaxaAssociation() {

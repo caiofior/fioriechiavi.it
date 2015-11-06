@@ -9,5 +9,5 @@ interface Export {
     * @param \flora\dico\DicoItemColl $dicoItemColl
     * @param resorice $stream
     */
-   public function export (\flora\dico\DicoItemColl $dicoItemColl, $stream);
+   public function export (\flora\dico\DicoItemIntColl  $dicoItemColl, $stream);
 }

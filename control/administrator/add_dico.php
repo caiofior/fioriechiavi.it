@@ -6,9 +6,9 @@ switch ($_REQUEST['action']) {
 case 'edit':
 case 'deletetaxaassociation':
 case 'update':
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-   $taxa->loadFromId($_REQUEST['id']);
-   $dicoItemColl = $taxa->getDicoItemColl(); 
+   $dico = new \flora\dico\AddDico($GLOBALS['db']);
+   $dico->loadFromId($_REQUEST['id']);
+   $dicoItemColl = $dico->getDicoItemColl(); 
    if ($_REQUEST['action'] == 'deletetaxaassociation') {
       $dicoItemColl = $dicoItemColl->filterByAttributeValue($_REQUEST['children_dico_item_id'], 'id');
       $dicoItemColl->getFirst()->removesTaxaAssociation();
@@ -22,41 +22,45 @@ case 'update':
             rewind($resouce);
             $dicoItemColl = $dicoItemColl->importAndSave($_REQUEST['upload_format'],$resouce);  
          }
+   } else if ($_REQUEST['action'] == 'edit' && array_key_exists('submit', $_REQUEST)) {
+       $dico->setData($_REQUEST);
+       $dico->update();
    }
-   $this->getTemplate()->setObjectData($taxa);
-   $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
-   $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
+   $this->getTemplate()->setObjectData($dico);
+   $this->getTemplate()->setBlock('middle','administrator/add_dico/edit.phtml');
+   $this->getTemplate()->setBlock('footer','administrator/add_dico/footer.phtml');  
    if (
            $_REQUEST['action'] == 'deletetaxaassociation' ||
            $_REQUEST['action'] == 'update'
       ) {
-      header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['id']);
+      header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=add_dico&action=edit&id='.$_REQUEST['id']);
       exit;
    }
    break; 
 case 'deletetaxaitem':  
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-   $taxa->loadFromId($_REQUEST['id']);
-   $dicoItemColl = $taxa->getDicoItemColl(); 
+   $dico = new \flora\dico\AddDico($GLOBALS['db']);
+   $dico->loadFromId($_REQUEST['id']);
+   $dicoItemColl = $dico->getDicoItemColl(); 
    $dicoItemColl = $dicoItemColl->filterByAttributeValue($_REQUEST['children_dico_item_id'], 'id');
    $dicoItemColl->getFirst()->delete();
-   header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['id']);
+   
+   header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=add_dico&action=edit&id='.$_REQUEST['id']);
    exit;
 break;
 case 'createtaxaassociation':
-      $dicoItem = new \flora\dico\DicoItem($GLOBALS['db']);
-      $dicoItem->loadFromIdAndDico($_REQUEST['id'],$_REQUEST['id_dico']);
-      $dicoItem->setData($_REQUEST['taxa_id'], 'taxa_id');
-      $dicoItem->replace();
+    $dicoItem = new \flora\dico\AddDicoItem($GLOBALS['db']);
+    $dicoItem->loadFromIdAndDico($_REQUEST['id'],$_REQUEST['id_dico']);
+    $dicoItem->setData($_REQUEST['taxa_id'], 'taxa_id');
+    $dicoItem->replace();
    exit;
    break;
 case 'delete' :
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+   $dico = new \flora\dico\AddDico($GLOBALS['db']);
    if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
-      $taxa->loadFromId($_REQUEST['id']);
-      $taxa->getDicoItemColl()->emptyDicoItems();
+      $dico->loadFromId($_REQUEST['id']);
+      $dico->getDicoItemColl()->emptyDicoItems();
    }
-   header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['id']);
+   header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=add_dico&action=edit&id='.$_REQUEST['id']);
    exit;
    break;
 case 'jeditable' :
@@ -226,9 +230,9 @@ case 'upload':
    exit;
    break;
 case 'preview' :
-   $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
-   $taxa->loadFromId($_REQUEST['id']);
-   $dicoItemColl = $taxa->getDicoItemColl();
+   $dico = new \flora\dico\AddDico($GLOBALS['db']);
+   $dico->loadFromId($_REQUEST['id']);
+   $dicoItemColl = $dico->getDicoItemColl();
    if (array_key_exists('filename',$_REQUEST) && $_REQUEST['filename'] != '') {
       $inputFile = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload'.DIRECTORY_SEPARATOR.$_REQUEST['filename'];
       $resouce = fopen($inputFile,'r');
@@ -237,13 +241,16 @@ case 'preview' :
       fwrite($resouce, $_REQUEST['dicotext']);
       rewind($resouce);
    }
-   $this->getTemplate()->setObjectData($taxa);
-   $this->getTemplate()->setBlock('middle','administrator/dico/preview.phtml');
-   $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
+   $this->getTemplate()->setObjectData($dico);
+   $this->getTemplate()->setBlock('middle','administrator/add_dico/preview.phtml');
+   $this->getTemplate()->setBlock('footer','administrator/add_dico/footer.phtml');  
    try{
-   $taxa->dicoItemColl = $dicoItemColl->import($_REQUEST['upload_format'],$resouce);
+   if (!array_key_exists('upload_format', $_REQUEST)) {
+       throw new \Exception('Missing input parameter',1511041211);
+   }
+   $dico->dicoItemColl = $dicoItemColl->import($_REQUEST['upload_format'],$resouce);
    } catch (\Exception $e) {
-      $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');   
+      $this->getTemplate()->setBlock('middle','administrator/add_dico/edit.phtml');   
    }
    
    break;

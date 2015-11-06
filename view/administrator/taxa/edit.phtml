@@ -15,6 +15,7 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
 <div id="breadcrump">
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica un taxa</h2>
 </div>
+<div>
 <form method="post" action="#" enctype="multipart/form-data">
    <input type="hidden" id="id" name="id" value="<?php echo $taxa->getData('id')?>">
    <input type="hidden" id="dico_id" name="dico_id" value="<?php echo $taxa->getData('dico_id')?>">
@@ -24,6 +25,12 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
    <?php endif; ?>
    <?php if (array_key_exists('children_dico_item_id', $_REQUEST)): ?>
    <input type="hidden" id="children_dico_item_id" name="children_dico_item_id" value="<?php echo $_REQUEST['children_dico_item_id'];?>">
+   <?php endif;
+   if (array_key_exists('children_add_dico_id', $_REQUEST)): ?>
+   <input type="hidden" id="children_add_dico_id" name="children_add_dico_id" value="<?php echo $_REQUEST['children_add_dico_id'];?>">
+   <?php endif; ?>
+   <?php if (array_key_exists('children_add_dico_item_id', $_REQUEST)): ?>
+   <input type="hidden" id="children_add_dico_item_id" name="children_add_dico_item_id" value="<?php echo $_REQUEST['children_add_dico_item_id'];?>">
    <?php endif;
    if (is_numeric($taxa->getData('id')) && $taxa->getData('status') == true) : ?>
    <div>
@@ -37,7 +44,7 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
-      <?php if (!array_key_exists('children_dico_item_id', $_REQUEST)): ?>
+      <?php if (!array_key_exists('children_dico_item_id', $_REQUEST) && !array_key_exists('children_add_dico_item_id', $_REQUEST)): ?>
       <input type="submit" name="submit_back" value="Salva e torna">
       <?php endif; ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
@@ -159,3 +166,18 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
    </div>
 </form>
+<a href="#" class="add_dico_button">Aggiungi chiave dicotomica</a>
+<form id="add_add_dico" style="display:none;" method="post" action="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=add_dico&amp;id=<?php echo $taxa->getData('id')?>">
+    <input id="dico_name" name="dico_name" value="">
+    <input type="submit" name="submit" value="Aggiungi">
+</form>
+<?php
+$additionalDicoColl = $taxa->getAddDicoColl();
+foreach($additionalDicoColl->getItems() as $additionalDico): ?>
+<ul>
+    <li>
+        <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=add_dico&action=edit&id=<?php echo $additionalDico->getData('id'); ?>"><?php echo $additionalDico->getData('name'); ?></a>
+        <a class="deleteAddDico actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=deleteadddico&amp;id=<?php echo $taxa->getData('id');?>&amp;add_dico_id=<?php echo $additionalDico->getData('id'); ?>" title="Cancella Chiave">Cancella chiave</a>
+    </li>
+</ul>
+<?php endforeach; ?>
