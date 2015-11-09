@@ -6,7 +6,7 @@ $("#searchContent").on("click","#paginationContainer a.pageSelector",function(e)
 $("#emtpytaxasearch").click(function(e){
      $("#taxasearch").val("");
      $("#taxasearchid").val("");
-     $("#taxasearchid").trigger("change",{dontReset:true});
+     $("#text").trigger("change",{dontReset:true});
      e.preventDefault();
 });
 $( "#taxasearch" ).autocomplete({
@@ -14,7 +14,7 @@ $( "#taxasearch" ).autocomplete({
       select: function( e, ui ) {
          $("#taxasearch").val(ui.item.label);
          $("#taxasearchid").val(ui.item.value);
-         $("#taxasearchid").trigger("change",{dontReset:true});
+         $("#taxasearch").trigger("change",{dontReset:true});
          e.preventDefault();
       },
       change: function (e, ui) {
