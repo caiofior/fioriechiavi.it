@@ -104,6 +104,9 @@ class TaxaColl extends \ContentColl {
              '); 
          
       }
+      if (array_key_exists('used_taxa_id', $criteria) && $criteria['used_taxa_id'] != '') {
+          $select->where(' `id`  IN (SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id`= '.intval($criteria['used_taxa_id']).')  ');
+      }
       return $select;
     }
 }

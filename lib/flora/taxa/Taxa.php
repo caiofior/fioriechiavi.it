@@ -399,9 +399,19 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
         return $taxaSearch;
     }
     /**
+     * Get dico collection of taxa dico with references to this element
+     * @return \flora\taxa\TaxaColl
+     */
+    public function getUsedInDicoColl() {
+        $usedInDicoColl = new \flora\taxa\TaxaColl($this->db);
+        if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
+            $usedInDicoColl->loadAll(array('used_taxa_id'=>$this->data['id']));
+        }
+        return $usedInDicoColl;
+    }
+    /**
      * Get Additional dico collection
-     * @param \flora\taxa\Taxa $taxa
-     * @return \flora\taxa\TaxaSearch
+     * @return \flora\dico\AddDicoColl
      */
     public function getAddDicoColl() {
         $addDicoColl = new \flora\dico\AddDicoColl($this->db);

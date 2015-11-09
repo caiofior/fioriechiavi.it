@@ -40,7 +40,7 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       <div class="tosave" style="display: none;">
          <p>Salva la pagina per vederne l'anteprima</p>
       </div>
-   <div>
+   </div>
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
@@ -156,7 +156,7 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       <div class="tosave" style="display: none;">
          <p>Salva la pagina per vederne l'anteprima</p>
       </div>
-   <div>
+   </div>
    <?php endif; ?>
    <div>
       <input type="submit" name="submit" value="Salva">
@@ -166,18 +166,41 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
    </div>
 </form>
+<div>
 <a href="#" class="add_dico_button">Aggiungi chiave dicotomica</a>
 <form id="add_add_dico" style="display:none;" method="post" action="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=add_dico&amp;id=<?php echo $taxa->getData('id')?>">
     <input id="dico_name" name="dico_name" value="">
     <input type="submit" name="submit" value="Aggiungi">
 </form>
+<div>
 <?php
-$additionalDicoColl = $taxa->getAddDicoColl();
-foreach($additionalDicoColl->getItems() as $additionalDico): ?>
+$dicoColl = $taxa->getUsedInDicoColl();
+if ($dicoColl->count()>0) : ?>
+<h5>Chiavi dicotomiche in cui questo taxa è presente</h5>
 <ul>
+<?php 
+endif;
+foreach($dicoColl->getItems() as $dico): ?>
+    <li>
+        <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $dico->getData('id'); ?>"><?php echo $dico->getRawData('taxa_kind_initials'); ?> <?php echo $dico->getData('name'); ?></a>
+    </li>
+<?php endforeach;
+if ($dicoColl->count()>0) : ?>
+</ul>    
+<?php endif;
+$additionalDicoColl = $taxa->getAddDicoColl();
+if ($additionalDicoColl->count()>0) : ?>
+<h5>Chiavi dicotomiche aggiuntive in cui questo taxa è presente</h5>
+<ul>
+<?php endif; 
+foreach($additionalDicoColl->getItems() as $additionalDico): ?>
     <li>
         <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=add_dico&action=edit&id=<?php echo $additionalDico->getData('id'); ?>"><?php echo $additionalDico->getData('name'); ?></a>
         <a class="deleteAddDico actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=deleteadddico&amp;id=<?php echo $taxa->getData('id');?>&amp;add_dico_id=<?php echo $additionalDico->getData('id'); ?>" title="Cancella Chiave">Cancella chiave</a>
     </li>
+<?php endforeach; 
+if ($additionalDicoColl->count()>0) : ?>
 </ul>
-<?php endforeach; ?>
+<?php endif; 
+?>
+</div>
