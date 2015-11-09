@@ -63,7 +63,7 @@ class TaxaSearch extends \Content {
             " ",
             COALESCE((SELECT GROUP_CONCAT(`text` SEPARATOR " ") FROM `dico_item` WHERE `parent_taxa_id` = ' . intval($this->taxa->getData('id')).'),""),
             " ",
-            COALESCE((SELECT `name` FROM `add_dico` WHERE `taxa_id` = ' . intval($this->taxa->getData('id')).'),""),
+            COALESCE((SELECT GROUP_CONCAT(`name` SEPARATOR " ") FROM `add_dico` WHERE `taxa_id` = ' . intval($this->taxa->getData('id')).'),""),
             " ",
             COALESCE((SELECT GROUP_CONCAT(`text` SEPARATOR " ") FROM `add_dico_item` WHERE `dico_id` IN (SELECT `id` FROM `add_dico` WHERE `taxa_id` = ' . intval($this->taxa->getData('id')).')),"")
             ) WHERE `taxa_id` = ' . intval($this->taxa->getData('id')), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
