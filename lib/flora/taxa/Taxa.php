@@ -410,6 +410,17 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
         return $usedInDicoColl;
     }
     /**
+     * Get add dico collection of taxa dico with references to this element
+     * @return \flora\dico\AddDicoColl
+     */
+    public function getUsedAddDicoColl() {
+        $addDicoColl = new \flora\dico\AddDicoColl($this->db);
+        if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
+            $addDicoColl->loadAll(array('used_taxa_id'=>$this->data['id']));
+        }
+        return $addDicoColl;
+    }
+    /**
      * Get Additional dico collection
      * @return \flora\dico\AddDicoColl
      */

@@ -30,6 +30,9 @@ class AddDicoColl extends \ContentColl {
       if (array_key_exists('taxa_id', $criteria) && $criteria['taxa_id'] != '') {
           $select->where(' `taxa_id` = '.intval($criteria['taxa_id']));
       }
+      if (array_key_exists('used_taxa_id', $criteria) && $criteria['used_taxa_id'] != '') {
+          $select->where(' `id`  IN (SELECT `dico_id` FROM `add_dico_item` WHERE `taxa_id`= '.intval($criteria['used_taxa_id']).')  ');
+      }
       return $select;
     }
 }

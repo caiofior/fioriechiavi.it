@@ -188,9 +188,23 @@ foreach($dicoColl->getItems() as $dico): ?>
 if ($dicoColl->count()>0) : ?>
 </ul>    
 <?php endif;
+$usedAdditionalDicoColl = $taxa->getUsedAddDicoColl();
+if ($usedAdditionalDicoColl->count()>0) : ?>
+<h5>Chiavi dicotomiche aggiuntive in cui questo taxa è presente</h5>
+<ul>
+<?php 
+endif;
+foreach($usedAdditionalDicoColl->getItems() as $dico): ?>
+    <li>
+        <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=add_dico&action=edit&id=<?php echo $dico->getData('id'); ?>"><?php echo $dico->getData('name'); ?></a>
+    </li>
+<?php endforeach;
+if ($usedAdditionalDicoColl->count()>0) : ?>
+</ul>    
+<?php endif;
 $additionalDicoColl = $taxa->getAddDicoColl();
 if ($additionalDicoColl->count()>0) : ?>
-<h5>Chiavi dicotomiche aggiuntive in cui questo taxa è presente</h5>
+<h5>Chiavi dicotomiche aggiuntive</h5>
 <ul>
 <?php endif; 
 foreach($additionalDicoColl->getItems() as $additionalDico): ?>
