@@ -21,8 +21,8 @@ $pointsString='[';?>
 <div id="map-canvas" style="width: 100%; height: 400px;"></div>
 <div class="observationColl">
 <?php foreach($taxaObservationColl->getItems() as $index => $taxaObservation) :
-    if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->x() != '' && $taxaObservation->getPoint()->y() != '') {
-        $pointsString .= '{latitude:'.$taxaObservation->getPoint()->x().',longitude:'.$taxaObservation->getPoint()->y().'},';
+    if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->y() != '' && $taxaObservation->getPoint()->x() != '') {
+        $pointsString .= '{latitude:'.$taxaObservation->getPoint()->y().',longitude:'.$taxaObservation->getPoint()->x().'},';
     }
     $taxaObservationImage = $taxaObservation->getTaxaObservationImageColl(array('iDisplayStart'=>0,'iDisplayLength'=>1))->getFirst();
     $thumbnailImageUrl = null;
@@ -50,7 +50,7 @@ if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search-
 <?php endif; ?>
 <script>
     points = <?php echo $pointsString; ?>;
-    centroid = {latitude:<?php echo $centroid->x(); ?>,longitude:<?php echo $centroid->y(); ?>};
+    centroid = {latitude:<?php echo $centroid->y(); ?>,longitude:<?php echo $centroid->x(); ?>};
     radius = <?php echo $radius; ?>;
 </script>
 <?php 

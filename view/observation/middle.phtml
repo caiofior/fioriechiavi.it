@@ -14,8 +14,8 @@ $radius = 12;
 $pointsString='[';
 foreach ($taxaObservationColl->getItems() as $index=>$taxaObservation):
     $taxa = $taxaObservation->getTaxa();
-    if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->x() != '' && $taxaObservation->getPoint()->y() != '') {
-        $pointsString .= '{latitude:'.$taxaObservation->getPoint()->x().',longitude:'.$taxaObservation->getPoint()->y().'},';
+    if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->y() != '' && $taxaObservation->getPoint()->x() != '') {
+        $pointsString .= '{latitude:'.$taxaObservation->getPoint()->y().',longitude:'.$taxaObservation->getPoint()->x().'},';
     } ?>
 <div>
     <p><strong><?php echo chr(65+$index); ?>) <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxa->getData('id');?>"><?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?></a></strong></p>
@@ -44,6 +44,6 @@ if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search-
 <?php endif; ?>
 <script>
     points = <?php echo $pointsString; ?>;
-    centroid = {latitude:<?php echo $centroid->x(); ?>,longitude:<?php echo $centroid->y(); ?>};
+    centroid = {latitude:<?php echo $centroid->y(); ?>,longitude:<?php echo $centroid->x(); ?>};
     radius = <?php echo $radius; ?>;
 </script>
