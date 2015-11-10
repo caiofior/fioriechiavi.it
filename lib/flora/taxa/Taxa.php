@@ -48,6 +48,38 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
         }
         $this->rawData = $this->data;
     }
+    
+    /**
+     * Loads data from its id
+     * @param int $id
+     */
+    public function loadFromAttributeValue($attributeId, $value) {
+        if (
+                !is_object($this->table) ||
+                !$this->table instanceof \Zend\Db\TableGateway\TableGateway
+        ) {
+            throw new \Exception('No database table associated with this content', 1409011101);
+        }
+        $select = $this->table->getSql()->select()
+                ->columns(array('*',
+                    'status' => new \Zend\Db\Sql\Predicate\Expression('
+                (               
+                    IFNULL(LENGTH(taxa.description),0)+
+                    IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)
+                ) > 0
+               '))
+                )
+                ->where('`taxa`.`id` = (SELECT `taxa_id` FROM `taxa_attribute_value` WHERE `taxa_attribute_id` = '.intval($attributeId).' AND `value` = "'.  addslashes($value).'" LIMIT 1)')
+                ->join('taxa_kind', 'taxa.taxa_kind_id=taxa_kind.id', array('taxa_kind_initials' => 'initials', 'taxa_kind_id_name' => 'name','taxa_kind_ord'=>'ord'), \Zend\Db\Sql\Select::JOIN_LEFT);
+        $this->data = array();
+        $data = $this->table->selectWith($select)->current();
+        if (is_object($data)) {
+            $this->data = $data->getArrayCopy();
+        }
+        $this->rawData = $this->data;
+    }
 
     /**
      * Loads data from its id

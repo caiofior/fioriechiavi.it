@@ -61,7 +61,22 @@ endif;
 <?php
 if ($taxa->getData('description') != '') : ?>
 <div itemprop="description">
-<?php echo $taxa->getData('description'); ?>
+<?php
+$description =  $taxa->getData('description');
+if ($GLOBALS['db']->config->attributes->progress != '') {
+    preg_match_all('/{t([[:digit:]]+)}/',$description,$items);
+    if (is_array($items) && array_key_exists(1, $items)) {
+        $relTaxa = new \flora\taxa\Taxa($GLOBALS['db']);
+        foreach ($items[1] as $progessNumber) {
+            $relTaxa->loadFromAttributeValue($GLOBALS['db']->config->attributes->progress,$progessNumber);
+            if ($relTaxa->getData('id') != '') {
+                $description = str_replace('{t'.$progessNumber.'}', '<a href="'.$GLOBALS['db']->config->baseUrl.'?id='.$relTaxa->getData('id').'">'.$relTaxa->getData('taxa_kind_initials').' '.$relTaxa->getData('name').'</a>', $description);
+            }
+        }
+    }
+}
+echo $description;
+?>
 </div>    
 <?php endif;
 require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php'); 
