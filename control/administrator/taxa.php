@@ -201,6 +201,8 @@ case 'edit':
          } else {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'));
          }
+         flush();
+         sleep(2);
          exit(); 
       }
    }
