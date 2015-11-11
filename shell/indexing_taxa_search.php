@@ -41,13 +41,11 @@ if  (
         array_key_exists(1, $argv)
     ) {
     $statement = $GLOBALS['db']->query('
-        SELECT `id` ,
-        (SELECT `dico_item`.`parent_taxa_id` FROM `dico_item` WHERE `dico_item`.`taxa_id` = `taxa`.`id` ORDER BY `dico_item`.`parent_taxa_id` DESC LIMIT 1) as `parent_taxa_id`
+        SELECT `id`
         FROM `taxa` ORDER BY `id` ASC LIMIT '.intval($argv[1]).','.intval($GLOBALS['db']->config->indexing->splitEvery));
 } else {
     $statement = $GLOBALS['db']->query('
-        SELECT `id` ,
-        (SELECT `dico_item`.`parent_taxa_id` FROM `dico_item` WHERE `dico_item`.`taxa_id` = `taxa`.`id` ORDER BY `dico_item`.`parent_taxa_id` DESC  LIMIT 1) as `parent_taxa_id`
+        SELECT `id`
         FROM `taxa` ORDER BY `id` ASC');
 }
 $resultSet = new \Zend\Db\ResultSet\ResultSet();
@@ -66,7 +64,18 @@ do {
     unset($id);
     if ($resultSet->valid()) {
         $id = $resultSet->current()->id;
-        $parentIds[$id]=$resultSet->current()->parent_taxa_id;
+        
+        
+        $parentIds[$id]=array();
+        $statement = $GLOBALS['db']->query('
+            SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id` = '.$id.' ORDER BY `dico_item`.`parent_taxa_id` DESC
+        ');
+        $parentResultSet = new \Zend\Db\ResultSet\ResultSet();
+        $parentResultSet->initialize($statement->execute());
+        while($parentResultSet->valid()) {
+            $parentIds[$id][]=$parentResultSet->current()->parent_taxa_id;
+            $parentResultSet->next();
+        }
         array_unshift($todoIds,$id);
         $resultSet->next();
     }
@@ -82,10 +91,9 @@ do {
         array_push($todoIds, $id);
         $id = array_shift($todoIds);
     }
-    
     if (
             $id == 1 ||
-            in_array($parentIds[$id],$doneIds)
+            count(array_intersect($parentIds[$id],$doneIds)) > 0
         ) {
         
         $taxa->loadFromId($id);
