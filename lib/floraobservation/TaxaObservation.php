@@ -33,12 +33,12 @@ class TaxaObservation extends \Content
            'point'=>new \Zend\Db\Sql\Expression('asText(position)')
            ))->where(array($this->primary=>$id));
        $data = $this->table->selectWith($select)->current();
+       $mysqli = $this->table->getAdapter()->getDriver()->getConnection()->getResource();
        if (is_object($data)) {
             $this->data = $data->getArrayCopy();
             $this->rawData = $this->data;
        }
-       else {
-           $mysqli = $this->table->getAdapter()->getDriver()->getConnection()->getResource();  
+       else if($mysqli->errno > 0) {
            throw new \Exception('Error on query '.$select->getSqlString($this->table->getAdapter()->getPlatform()).' '.$mysqli->errno.' '.$mysqli->error,1401301242);
        }
        $this->getCoordinates();

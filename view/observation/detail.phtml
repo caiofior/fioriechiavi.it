@@ -1,23 +1,24 @@
-<h2>Ultime osservazioni botaniche</h2>
+<?php
+$taxaObservation = $this->object;
+$taxa = $taxaObservation->getTaxa();
+?>
+<h2>Osservazione di <?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?> del <?php echo strftime('%e  %B  %Y',date_format(new DateTime($taxaObservation->getData('datetime')),'U')); ?></h2>
 <div id="map-canvas" style="width: 100%; height: 400px;"></div>
 <?php
-$taxaObservationColl = $this->object;
 $radius = 12;
 $pointsString='[';
-foreach ($taxaObservationColl->getItems() as $index=>$taxaObservation):
-    $taxa = $taxaObservation->getTaxa();
-    if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->y() != '' && $taxaObservation->getPoint()->x() != '') {
-        $pointsString .= '{latitude:'.$taxaObservation->getPoint()->y().',longitude:'.$taxaObservation->getPoint()->x().'},';
-    } ?>
+if (is_object($taxaObservation->getPoint()) && $taxaObservation->getPoint()->y() != '' && $taxaObservation->getPoint()->x() != '') {
+    $pointsString .= '{latitude:'.$taxaObservation->getPoint()->y().',longitude:'.$taxaObservation->getPoint()->x().'},';
+} ?>
 <div>
-    <p><strong><?php echo chr(65+$index); ?>) <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>observation.php?id=<?php echo $taxaObservation->getData('id');?>"><?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?></a></strong></p>
+    <p><strong><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxa->getData('id'); ?>"><?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?></a></strong></p>
     <p><em><?php echo $taxaObservation->getData('title'); ?></em></p>
     <p><?php echo strftime('%e  %B  %Y',date_format(new DateTime($taxaObservation->getData('datetime')),'U')); ?></p>
     <p><?php echo $taxaObservation->getData('description'); ?></p>
     <?php $taxaObservationImage = $taxaObservation->getTaxaObservationImageColl(array('iDisplayStart'=>0,'iDisplayLength'=>1))->getFirst();
     $thumbnailImageUrl = null;
     try {
-    $thumbnailImageUrl = $taxaObservationImage->getUrl(array('x'=>300,'y'=>200));
+    $thumbnailImageUrl = $taxaObservationImage->getUrl(array('x'=>600,'y'=>400));
     } catch (Exception $e) {}
     if (!is_null($thumbnailImageUrl)) : ?>
     <a class="fancybox" href="<?php echo $taxaObservationImage->getUrl(); ?>">
@@ -25,12 +26,9 @@ foreach ($taxaObservationColl->getItems() as $index=>$taxaObservation):
     </a>
     <?php endif; ?>
 </div>
-<?php endforeach;
-if ($taxaObservationColl->count() > 1) {
-    $radius -= sqrt($taxaObservationColl->getMultiPoint()->envelope()->area())^3;
-}
+<?php 
 $pointsString .=']'; 
-$centroid = $taxaObservationColl->getMultiPoint()->centroid();
+$centroid = $taxaObservation->getPoint();
 if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search->key != '') : ?>
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $GLOBALS['db']->config->search->key; ?>"></script>
 <?php endif; ?>

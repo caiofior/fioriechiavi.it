@@ -235,21 +235,6 @@ class TaxaSearch extends \Content {
         fwrite($handler,<<<EOT
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-EOT
-        );
-
-        $newTaxaColl  = new \flora\taxa\TaxaColl($this->db);
-        $newTaxaColl->loadAll(array(
-            'iDisplayStart'=>0,
-            'iDisplayLength'=>200,
-            'sColumns'=>'change_datetime',
-            'iSortingCols'=>'1',
-            'iSortCol_0'=>'0',
-            'sSortDir_0'=>'DESC',
-            'status'=>true
-        ));
-        fwrite($handler,<<<EOT
     <url>
       <loc>{$this->db->config->baseUrl}</loc>
        <priority>1</priority>
@@ -266,11 +251,51 @@ EOT
       <loc>{$this->db->config->baseUrl}observation.php</loc>
        <priority>1</priority>
     </url>
-        
+
 EOT
         );
-        if($newTaxaColl->count() > 0):
-            foreach($newTaxaColl->getItems() as $newTaxa) : 
+        $newTaxaObservationColl  = new \floraobservation\TaxaObservationColl($this->db);
+        $newTaxaObservationColl->loadAll(array(
+            'iDisplayStart'=>0,
+            'iDisplayLength'=>100,
+            'sColumns'=>'datetime',
+            'iSortingCols'=>'1',
+            'iSortCol_0'=>'0',
+            'sSortDir_0'=>'DESC'
+        ));
+        foreach($newTaxaObservationColl->getItems() as $newTaxaObservation) : 
+        fwrite($handler,<<<EOT
+    <url>
+      <loc>{$this->db->config->baseUrl}observation.php?id={$newTaxaObservation->getData('id')}</loc>
+
+EOT
+                );
+                if ($newTaxaObservation->getData('datetime') != '' ):
+                    $data = substr($newTaxaObservation->getData('datetime'),0,10);
+                    fwrite($handler,<<<EOT
+      <lastmod>{$data}</lastmod>
+
+EOT
+                );
+                endif;
+                fwrite($handler,<<<EOT
+    </url>
+
+EOT
+                );
+        endforeach;
+        $newTaxaColl  = new \flora\taxa\TaxaColl($this->db);
+        $newTaxaColl->loadAll(array(
+            'iDisplayStart'=>0,
+            'iDisplayLength'=>200-$newTaxaObservationColl->count(),
+            'sColumns'=>'change_datetime',
+            'iSortingCols'=>'1',
+            'iSortCol_0'=>'0',
+            'sSortDir_0'=>'DESC',
+            'status'=>true
+        ));
+        
+        foreach($newTaxaColl->getItems() as $newTaxa) : 
                 fwrite($handler,<<<EOT
     <url>
       <loc>{$this->db->config->baseUrl}?id={$newTaxa->getData('id')}</loc>
@@ -290,8 +315,8 @@ EOT
 
 EOT
                 );
-            endforeach;
-        endif;
+        endforeach;
+        
         fwrite($handler,<<<EOT
 </urlset>
 EOT

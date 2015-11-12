@@ -31,7 +31,7 @@ $pointsString='[';?>
     } catch (Exception $e) {}
     if (!is_null($thumbnailImageUrl)) : ?>
 <div class="item">
-    <a id="observation_<?php echo $index;?>"><strong><?php echo chr(65+$index).') '.$taxaObservation->getData('title');?></strong></a>
+    <a id="observation_<?php echo $index;?>" href="<?php echo $GLOBALS['db']->config->baseUrl;?>observation.php?id=<?php echo $taxaObservation->getData('id');?>"><strong><?php echo chr(65+$index).') '.$taxaObservation->getData('title');?></strong></a>
     <a class="fancybox" href="<?php echo $taxaObservationImage->getUrl(); ?>">
     <img src="<?php echo $thumbnailImageUrl; ?>">
     </a>

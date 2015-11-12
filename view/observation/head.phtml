@@ -1,2 +1,11 @@
-<?php $title = $GLOBALS['db']->config->siteName; ?>
-<title><?php echo $title;?> :: Osservazioni</title>
+<?php 
+$taxaObservation = $this->object;
+$title = $GLOBALS['db']->config->siteName;
+if ($taxaObservation instanceof \floraobservation\TaxaObservation) {
+    $taxa = $taxaObservation->getTaxa();
+    $title .= ' :: Osservazione di '.$taxa->getData('taxa_kind_initials').' '.$taxa->getData('name').' del '.strftime('%e  %B  %Y',date_format(new DateTime($taxaObservation->getData('datetime')),'U'));
+} else {
+    $title .= ' :: Osservazioni';
+}
+?>
+<title><?php echo $title;?></title>
