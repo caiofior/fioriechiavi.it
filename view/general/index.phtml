@@ -64,7 +64,7 @@ if ($taxa->getData('description') != '') : ?>
 <?php
 $description =  $taxa->getData('description');
 if ($GLOBALS['db']->config->attributes->progress != '') {
-    preg_match_all('/{t([[:digit:]]+)}/',$description,$items);
+    preg_match_all('/{t([[:alnum:]\/]+)}/',$description,$items);
     if (is_array($items) && array_key_exists(1, $items)) {
         $relTaxa = new \flora\taxa\Taxa($GLOBALS['db']);
         foreach ($items[1] as $progessNumber) {
