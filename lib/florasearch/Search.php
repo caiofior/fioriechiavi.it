@@ -165,12 +165,14 @@ class Search {
         $select = $this->content->getTable()->getSql()->select();
         $select->join('taxa', 'taxa.id=taxa_search.taxa_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
         $select->join('taxa_kind', 'taxa_kind.id=taxa.taxa_kind_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-        $sqlCount = '
-                SELECT COUNT(DISTINCT `p`.`taxa_id`) FROM `taxa_search` AS `p`
-                WHERE p.`lft` > `taxa_search`.`lft`
-                AND p.`rgt` < `taxa_search`.`rgt`
-                AND p.`text` <> ""
-                ';
+        
+        $selectCount = new \Zend\Db\Sql\Select();
+        $selectCount->from(array('p'=>'taxa_search'));
+        $selectCount->columns(array('count'=>new \Zend\Db\Sql\Expression('COUNT(DISTINCT `p`.`taxa_id`)')));
+        $selectCount->where('`p`.`lft` >= `taxa_search`.`lft`');
+        $selectCount->where('`p`.`rgt` <= `taxa_search`.`rgt`');
+        $selectCount->where('`p`.`text` <> ""');
+        
         $select->limit(10);
         $select->where(' (`taxa_search`.`rgt` - `taxa_search`.`lft`) > 2 ');
         $select->where(' `taxa_id` != 1'); 
@@ -179,14 +181,15 @@ class Search {
         }
         if (array_key_exists('sSearch', $this->request) && $this->request['sSearch'] != '') {          
            $select->having('`count` > 0');
-           $sqlCount .= ' AND MATCH (`text`) AGAINST ( "'.addslashes($this->request['sSearch']).'" IN NATURAL LANGUAGE MODE)';
+           $selectCount->where('MATCH (`p`.`text`) AGAINST ( "'.addslashes($this->request['sSearch']).'" IN NATURAL LANGUAGE MODE)');
         }
+    
         $select->columns(array(
             'id'=>new \Zend\Db\Sql\Expression('`taxa`.`id`'),
             'name'=>new \Zend\Db\Sql\Expression('`taxa`.`name`'),
             'taxa_kind_initials'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`initials`'),
             'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`name`'),
-            'count'=>new \Zend\Db\Sql\Expression('( '.$sqlCount.' )')
+            'count'=>new \Zend\Db\Sql\Expression('( '.$selectCount->getSqlString($this->db->getPlatform()).' )')
         ));
         try{
                $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
