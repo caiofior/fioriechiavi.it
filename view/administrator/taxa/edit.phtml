@@ -46,8 +46,10 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       <input type="submit" name="submit" value="Salva">
       <?php if (!array_key_exists('children_dico_item_id', $_REQUEST) && !array_key_exists('children_add_dico_item_id', $_REQUEST)): ?>
       <input type="submit" name="submit_back" value="Salva e torna">
-      <?php endif; ?>
+      <?php endif; 
+      if ($taxa->getData('id') != '') : ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
+      <?php endif; ?>
    </div>
    <div>
    <label for="taxa_kind_id_name">Categoria</label>
@@ -162,8 +164,10 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       <input type="submit" name="submit" value="Salva">
       <?php if (!array_key_exists('children_dico_item_id', $_REQUEST)): ?>
       <input type="submit" name="submit_back" value="Salva e torna">
-      <?php endif; ?>
+      <?php endif; 
+      if ($taxa->getData('id') != '') : ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
+      <?php endif; ?>
    </div>
 </form>
 <div>

@@ -165,26 +165,28 @@ class Search {
         $select = $this->content->getTable()->getSql()->select();
         $select->join('taxa', 'taxa.id=taxa_search.taxa_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
         $select->join('taxa_kind', 'taxa_kind.id=taxa.taxa_kind_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
-        $select->columns(array(
-            'id'=>new \Zend\Db\Sql\Expression('`taxa`.`id`'),
-            'name'=>new \Zend\Db\Sql\Expression('`taxa`.`name`'),
-            'taxa_kind_initials'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`initials`'),
-            'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`name`'),
-            'count'=>new \Zend\Db\Sql\Expression('( 
+        $sqlCount = '
                 SELECT COUNT(`p`.`taxa_id`) FROM `taxa_search` AS `p`
                 WHERE p.`lft` >= `taxa_search`.`lft`
                 AND p.`rgt` <= `taxa_search`.`rgt`
                 AND p.`text` <> ""
-                ) ')
-        ));
+                ';
         $select->limit(10);
         if (array_key_exists('term', $this->request) && $this->request['term'] != '') {
            $this->request['sSearch']=$this->request['term'];
         }
         if (array_key_exists('sSearch', $this->request) && $this->request['sSearch'] != '') {
            $select->where(' ( `taxa`.`name` LIKE "'.addslashes($this->request['sSearch']).'%" OR `taxa`.`description` LIKE "'.addslashes($this->request['sSearch']).'%" ) ');
+           $sqlCount .= ' AND `p`.`taxa_id` IN (SELECT `id` FROM `taxa` WHERE `name` LIKE "'.addslashes($this->request['sSearch']).'%" OR `taxa`.`description` LIKE "'.addslashes($this->request['sSearch']).'%") ';
         }
         $select->where(' (`taxa_search`.`rgt` - `taxa_search`.`lft`) > 2 ');
+        $select->columns(array(
+            'id'=>new \Zend\Db\Sql\Expression('`taxa`.`id`'),
+            'name'=>new \Zend\Db\Sql\Expression('`taxa`.`name`'),
+            'taxa_kind_initials'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`initials`'),
+            'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`name`'),
+            'count'=>new \Zend\Db\Sql\Expression('( '.$sqlCount.' )')
+        ));
         try{
                $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
                $results = $statement->execute();
