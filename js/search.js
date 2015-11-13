@@ -10,7 +10,7 @@ $("#emtpytaxasearch").click(function(e){
      e.preventDefault();
 });
 $( "#taxasearch" ).autocomplete({
-      source: "?action=autocomplete",
+      source: "?action=autocomplete&sSearch="+$("#text").val(),
       select: function( e, ui ) {
          $("#taxasearch").val(ui.item.label);
          $("#taxasearchid").val(ui.item.value);

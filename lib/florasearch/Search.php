@@ -166,18 +166,19 @@ class Search {
         $select->join('taxa', 'taxa.id=taxa_search.taxa_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
         $select->join('taxa_kind', 'taxa_kind.id=taxa.taxa_kind_id',array(), \Zend\Db\Sql\Select::JOIN_LEFT);
         $sqlCount = '
-                SELECT COUNT(`p`.`taxa_id`) FROM `taxa_search` AS `p`
-                WHERE p.`lft` >= `taxa_search`.`lft`
-                AND p.`rgt` <= `taxa_search`.`rgt`
+                SELECT COUNT(DISTINCT `p`.`taxa_id`) FROM `taxa_search` AS `p`
+                WHERE p.`lft` > `taxa_search`.`lft`
+                AND p.`rgt` < `taxa_search`.`rgt`
                 AND p.`text` <> ""
                 ';
         $select->limit(10);
+        $select->where(' `taxa_id` != 1'); 
         if (array_key_exists('term', $this->request) && $this->request['term'] != '') {
-           $this->request['sSearch']=$this->request['term'];
+           $select->where(' ( `taxa`.`name` LIKE "'.addslashes($this->request['term']).'%" OR `taxa`.`description` LIKE "'.addslashes($this->request['term']).'%" ) '); 
         }
-        if (array_key_exists('sSearch', $this->request) && $this->request['sSearch'] != '') {
-           $select->where(' ( `taxa`.`name` LIKE "'.addslashes($this->request['sSearch']).'%" OR `taxa`.`description` LIKE "'.addslashes($this->request['sSearch']).'%" ) ');
-           $sqlCount .= ' AND `p`.`taxa_id` IN (SELECT `id` FROM `taxa` WHERE `name` LIKE "'.addslashes($this->request['sSearch']).'%" OR `taxa`.`description` LIKE "'.addslashes($this->request['sSearch']).'%") ';
+        if (array_key_exists('sSearch', $this->request) && $this->request['sSearch'] != '') {          
+           $select->having('`count` > 0');
+           $sqlCount .= ' AND MATCH (`text`) AGAINST ( "'.addslashes($this->request['sSearch']).'" IN NATURAL LANGUAGE MODE)';
         }
         $select->where(' (`taxa_search`.`rgt` - `taxa_search`.`lft`) > 2 ');
         $select->columns(array(
