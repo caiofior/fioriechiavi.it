@@ -3,6 +3,13 @@ echo 'Start at '.date('d/m/Y H:i:s').PHP_EOL;
 if(!array_key_exists('db', $GLOBALS)) {
     require __DIR__.'/../include/pageboot.php';
 }
+echo 'Searching images '.date('d/m/Y H:i:s').PHP_EOL;
+$images = array();
+$imagesBaseDir = $GLOBALS['db']->baseDir.'images'.DIRECTORY_SEPARATOR.'taxa';
+$imagesIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($imagesBaseDir,FilesystemIterator::SKIP_DOTS));
+foreach($imagesIterator as $image) {
+    $images[] = str_replace($imagesBaseDir,'',$image->getRealPath());
+}
 
 echo 'Cleaned up search table '.date('d/m/Y H:i:s').PHP_EOL;
 $statement = $GLOBALS['db']->query('TRUNCATE TABLE `taxa_search`');
@@ -14,6 +21,7 @@ $statement = $GLOBALS['db']->query('
 
 $resultSet = new \Zend\Db\ResultSet\ResultSet();
 $resultSet->initialize($statement->execute());
+
 $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
 
 $statement = $GLOBALS['db']->query('ALTER TABLE `taxa_search` DISABLE KEYS');
@@ -59,6 +67,9 @@ do {
             count(array_intersect($parentIds[$id],$doneIds)) > 0
         ) {
         $message = $taxa->updateSearch();
+        $imagesColl = $taxa->getTaxaImageColl();
+        $imagesNames = $imagesColl->getFieldsAsArray('filename');
+        $images = array_diff($images,$imagesNames);
         if ($message != '') {
             echo $message;
         }
@@ -70,8 +81,52 @@ do {
 } while ($shifts == 0 || $resultSet->valid());
 foreach ($todoIds as $id ) {
     $taxa->loadFromId($id);
+    $imagesNames = $imagesColl->getFieldsAsArray('filename');
+    $images = array_diff($images,$imagesNames);
     echo 'Taxa '.$taxa->getData('name').' '.$taxa->getData('id').' has no parent'.PHP_EOL;
 }
+if (count($images) > 0) {
+    echo 'Deleted '.count($images).' unused images'.PHP_EOL;
+}
+foreach($images as $image) {
+    unlink($imagesBaseDir.$image);
+}
+
+$statement = $GLOBALS['db']->query('
+    DELETE FROM `taxa_image` WHERE `id` IN (
+        SELECT * FROM
+        (
+            SELECT `id` FROM `taxa_image`
+            WHERE (SELECT `id` FROM `taxa` WHERE `id`=`taxa_image`.`taxa_id`) IS NULL
+        ) AS t
+    )
+');
+$statement->execute();
+
+$statement = $GLOBALS['db']->query('
+    DELETE FROM `taxa_observation` WHERE
+    `id` IN (
+    SELECT * FROM
+    (
+        SELECT `id` FROM `taxa_observation`
+        WHERE (SELECT `id` FROM `taxa` WHERE `id`=`taxa_observation`.`taxa_id`) IS NULL
+    ) AS t
+    )
+');
+$statement->execute();
+
+$statement = $GLOBALS['db']->query('
+    DELETE FROM `taxa_observation_image` WHERE
+    `id` IN (
+    SELECT * FROM
+    (
+        SELECT `id` FROM `taxa_observation_image`
+        WHERE (SELECT `id` FROM `taxa_observation` WHERE `id`=`taxa_observation_image`.`taxa_observation_id`) IS NULL
+    ) AS t
+    );
+');
+$statement->execute();
+
 $statement = $GLOBALS['db']->query('ALTER TABLE `taxa_search` ENABLE KEYS');
 $statement->execute();
 $statement = $GLOBALS['db']->query('ALTER TABLE `taxa_search_attribute` ENABLE KEYS');
