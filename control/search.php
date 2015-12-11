@@ -53,16 +53,20 @@ switch ($_REQUEST['action']) {
    break;
    case 'Esporta':
    case 'export':
-       //header('Content-Type: text/plain');
+       $separator = ',';
+       if (array_key_exists('separator', $_REQUEST)) {
+           $separator = chr($_REQUEST['separator']);
+       }
        $filename='taxa';
        if (array_key_exists('taxasearch',$_REQUEST) && $_REQUEST['taxasearch'] != '') {
         $filename = $_REQUEST['taxasearch'];
        }
        header('Content-Encoding: UTF-8');
        header('Content-Type: application/vnd.ms-excel');
-       header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
+       header('Content-Disposition: attachment;filename="'.$filename.'.csv"');
        header('Cache-Control: max-age=0');
-       echo "\xEF\xBB\xBF";
+       $out = fopen('php://output', 'w');
+       fwrite($out, "\xEF\xBB\xBF");
        if ($GLOBALS['profile'] instanceof \login\user\Profile) {
         unset($_REQUEST['start']);
         unset($_REQUEST['pagelength']);
@@ -98,13 +102,14 @@ switch ($_REQUEST['action']) {
                }
            }
            array_walk($data, create_function('&$value,$key','
-               $value="\"".str_replace("\"","\'",$value)."\"";
+               $value=str_replace("\"","\'",$value);
                '));
            if ($c == 0) {
-               echo implode(',',  array_keys($data)).PHP_EOL;    
+               echo fputcsv($out,array_keys($data),$separator);    
            }
-           echo implode(',',$data).PHP_EOL;
+           echo fputcsv($out,$data,$separator);
        }
+       fclose($out);
        exit;
        breaK;
 }

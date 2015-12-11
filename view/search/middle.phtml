@@ -6,10 +6,18 @@
    <input id="taxasearch" name="taxasearch" value="">
    <input type="hidden" id="taxasearchid" name="taxasearchid" value="">
    <a id="emtpytaxasearch" class="notextdecoration" href="#" title="Cancella">◀</a>
+   <span class="exportContainer" style="display: none;">
    <input id="exportButton" type="submit" name="action" value="Esporta"/>
+   <label for="separator">Sep.</label>
+   <select id="separator" name="separator">
+       <option value="59">;</option>
+       <option value="44">,</option>
+       <option value="9">TAB</option>
+   </select>
    <?php if (!$GLOBALS['profile'] instanceof \login\user\Profile) : ?>
    <span>Registrati e potrai scaricare tutti i taxa trovati, non una sola pagina alla volta.</span>
    <?php endif; ?>
+   </span>
 </div>
 <div>
     <label for="text">Testo</label>

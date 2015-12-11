@@ -44,7 +44,10 @@ $("#searchForm").on("click","a.selectAll",function (e) {
     $(this).parent().find("div select").trigger("change",{dontReset:true});
     e.preventDefault();
 });
-$("#searchForm").on("change","input[type!=hidden],select",function (e,data) {
+if($(".github").css("display") != "none") {
+    $(".exportContainer").show();
+}
+$("#searchForm").on("change","input[type!=hidden],select[name!=separator]",function (e,data) {
     if (
             typeof data !== 'object' ||
             !data.hasOwnProperty("dontReset") || 
