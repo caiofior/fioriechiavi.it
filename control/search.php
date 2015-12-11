@@ -51,6 +51,62 @@ switch ($_REQUEST['action']) {
       echo json_encode($result);
       exit;
    break;
+   case 'Esporta':
+   case 'export':
+       //header('Content-Type: text/plain');
+       $filename='taxa';
+       if (array_key_exists('taxasearch',$_REQUEST) && $_REQUEST['taxasearch'] != '') {
+        $filename = $_REQUEST['taxasearch'];
+       }
+       header('Content-Encoding: UTF-8');
+       header('Content-Type: application/vnd.ms-excel');
+       header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
+       header('Cache-Control: max-age=0');
+       echo "\xEF\xBB\xBF";
+       if ($GLOBALS['profile'] instanceof \login\user\Profile) {
+        unset($_REQUEST['start']);
+        unset($_REQUEST['pagelength']);
+        $floraSearch->setRequest($_REQUEST);
+       }
+       
+       $taxaColl = $floraSearch->getTaxaColl();
+       $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+       $taxaAttributeColl = new \flora\taxa\TaxaAttributeColl($GLOBALS['db']);
+       $taxaAttributeColl->loadAll();
+       $attributeNames = $taxaAttributeColl->getFieldsAsArray('name');
+       foreach($taxaColl->getItems() as $c => $taxaSearch) {
+           $taxa->loadFromId($taxaSearch->getData('id'));
+           $data=array(
+               'id'=>$taxaSearch->getData('id'),
+               'name'=>$taxaSearch->getData('name'),
+               'taxa_kind_id_name'=>$taxa->getData('taxa_kind_id_name'),
+               'description'=>$taxa->getData('description'),
+               'col_id'=>$taxa->getData('col_id'),
+               'eol_id'=>$taxa->getData('eol_id'),
+           );
+           $taxaAttributeColl = $taxa->getTaxaAttributeColl();
+           $rawAttributeValues = array();
+           foreach($taxaAttributeColl->getItems() as $taxaAttribute) {
+               $rawAttributeValues[$taxaAttribute->getData('name')]=$taxaAttribute->getRawData('value');
+           }
+           $attributeValues=array_flip($attributeNames);
+           foreach($attributeValues as $name=>$value) {
+               if (array_key_exists($name, $rawAttributeValues)) {
+                   $data[$name]=$rawAttributeValues[$name];
+               } else {
+                   $data[$name]='';
+               }
+           }
+           array_walk($data, create_function('&$value,$key','
+               $value="\"".str_replace("\"","\'",$value)."\"";
+               '));
+           if ($c == 0) {
+               echo implode(',',  array_keys($data)).PHP_EOL;    
+           }
+           echo implode(',',$data).PHP_EOL;
+       }
+       exit;
+       breaK;
 }
 $this->getTemplate()->setObjectData($floraSearch);
 $this->getTemplate()->setBlock('head','search/head.phtml');

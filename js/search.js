@@ -13,7 +13,8 @@ $( "#taxasearch" ).autocomplete({
       source: function(request, response) {
         $.getJSON("#", {
             action:"autocomplete",
-            sSearch: $("#text").val()
+            sSearch: $("#text").val(),
+            term:$("#taxasearch").val()
         },response);
       },
       select: function( e, ui ) {
