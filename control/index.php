@@ -37,7 +37,7 @@ switch ($_REQUEST['action']) {
             $taxaObservation->setData(Parsedown::instance()->line(strip_tags($_REQUEST['description'])),'description'); 
             $taxaObservation->setData($GLOBALS['profile']->getData('id'),'profile_id');
             $taxaObservation->setData(0,'valid');
-            $taxaObservation->setPoint(new \Point(floatval($_REQUEST['latitude']), $_REQUEST['longitude']));
+            $taxaObservation->setPoint(new \Point(floatval($_REQUEST['latitude']), floatval($_REQUEST['longitude'])));
             $taxaObservation->insert();
             $taxaObservationImageColl = $taxaObservation->getTaxaObservationImageColl();
             $targetDir = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp';
