@@ -3,6 +3,9 @@ $sessionDir = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'tmp';
 if (!is_dir($sessionDir)) {
     mkdir($sessionDir); 
 }
+if (!is_dir($sessionDir)) {
+    throw new Exception('Unable to create temporary directory '.$sessionDir,1512250906);
+}
 if (rand(0,10) == 0) {
     if ($handle = opendir($sessionDir)) {
         while (false !== ($file = readdir($handle))) { 
@@ -28,6 +31,9 @@ $loader = new Zend\Loader\StandardAutoloader(array(
     'fallback_autoloader' => true
 ));
 $loader->register();
+}
+if (!isset($configArray) || !is_array($configArray)) {
+    throw new Exception('Config file is wrong',1512250909);
 }
 $config = new Zend\Config\Config($configArray);
 $db = new Zend\Db\Adapter\Adapter($config->database->toArray());
