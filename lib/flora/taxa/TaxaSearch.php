@@ -261,7 +261,8 @@ EOT
             'sColumns'=>'datetime',
             'iSortingCols'=>'1',
             'iSortCol_0'=>'0',
-            'sSortDir_0'=>'DESC'
+            'sSortDir_0'=>'DESC',
+	    'valid'=>true
         ));
         foreach($newTaxaObservationColl->getItems() as $newTaxaObservation) : 
         fwrite($handler,<<<EOT
