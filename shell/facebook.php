@@ -32,18 +32,3 @@ array_walk_recursive($user_profile, function($val,$index,$fb) {
     }
 ,$fb);
 $GLOBALS['profile']->update();
-ob_start();
-require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_user.php';
-$html = new \Zend\Mime\Part(ob_get_clean());
-$html->type = 'text/html';
-
-$body = new \Zend\Mime\Message();
-$body->setParts(array($html));
-
-$message = new \Zend\Mail\Message();
-$message
-   ->addTo($GLOBALS['profile']->getData('email'))
-   ->addFrom($GLOBALS['config']->mail_from)
-   ->setSubject('Nuovo utente sul sito '.$GLOBALS['config']->siteName)
-   ->setBody($body);
-$GLOBALS['transport']->send($message);

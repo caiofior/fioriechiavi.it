@@ -35,7 +35,8 @@ class FacebookInstantiator implements \login\user\UserInstantiator  {
         if ($insert) {
             $profile->setData(array(
                 'active'=>1,
-                'role_id'=>3
+                'role_id'=>3,
+		'isNew'=>1
             ));
             $profile->insert();
             $fb->setData($profile->getData('id'), 'profile_id');
@@ -44,6 +45,7 @@ class FacebookInstantiator implements \login\user\UserInstantiator  {
             if ($profile->getData('active') != 1) {
                 throw new \Exception('User not active',1504151435);
             }
+	    $fb->setData(0,'isNew');
             $fb->update();
         }
         return $fb;

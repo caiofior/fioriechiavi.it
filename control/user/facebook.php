@@ -25,6 +25,23 @@ switch ($_REQUEST['action']) {
                 }
                 $facebookSession = new \Zend\Session\Container('facebook_id');
                 $facebookSession->facebook_id=$fb->getData('userID');
+		if($fb->getRawData('isNew') == 1) {
+                     ob_start();
+                     require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_user.php';
+                     $html = new \Zend\Mime\Part(ob_get_clean());
+                     $html->type = 'text/html';
+                     
+                     $body = new \Zend\Mime\Message();
+                     $body->setParts(array($html));
+                     
+                     $message = new \Zend\Mail\Message();
+                     $message
+                        ->addTo($GLOBALS['profile']->getData('email'))
+                        ->addFrom($GLOBALS['config']->mail_from)
+                        ->setSubject('Nuovo utente sul sito '.$GLOBALS['config']->siteName)
+                        ->setBody($body);
+                     $GLOBALS['transport']->send($message);
+		}
                 if ($GLOBALS['db']->config->background->useAJAX == true) {
 		    $argv=array(1=>$fb->getData('userID'));
                     require __DIR__ .'/../../shell/facebook.php';
