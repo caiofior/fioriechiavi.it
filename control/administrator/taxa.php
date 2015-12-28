@@ -458,8 +458,11 @@ case 'get_col_id_list':
     curl_setopt_array($ch,array(
          CURLOPT_RETURNTRANSFER => true
     ));
-    $response = unserialize(curl_exec($ch));
-    if (is_array($response)) {
+    $responseString = curl_exec($ch);
+    $response = @unserialize($responseString);
+    if ($response === false || !is_array($response)) {
+        echo 'Errorre nel collegamento al server '.$GLOBALS['db']->config->catalogOfLife->wsEndpoint.' '.$responseString;
+    } else {
         require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'colList.phtml';
     }
    }
