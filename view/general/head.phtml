@@ -30,4 +30,18 @@ if (
 <?php 
       endif;
    endif; ?>
+<?php 
+$cid  = null;
+if (
+        array_key_exists('profile', $GLOBALS) &&
+        is_object($GLOBALS['profile']) &&
+        $GLOBALS['profile']->getData('id') != ''
+    ) {
+    $cid = urlencode($this->encodeId($GLOBALS['profile']->getData('id')));
+}
+if (is_null($cid)) : ?>
+<link rel="alternate" type="application/rss+xml" title="Ultime osservazioni" href="<?php echo $GLOBALS['db']->config->baseUrl;?>rss.php">
+<?php else : ?>
+<link rel="alternate" type="application/rss+xml" title="Ultime osservazioni" href="<?php echo $GLOBALS['db']->config->baseUrl;?>rss.php?key=<?php echo $cid; ?>">
+<?php endif; ?>
 <title><?php echo $title;?></title>

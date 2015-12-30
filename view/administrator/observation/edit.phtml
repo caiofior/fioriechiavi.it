@@ -20,13 +20,16 @@ if (array_key_exists('id', $_REQUEST)) {
    <input id="title" name="title" value="<?php echo $taxaObservation->getData('title')?>">
    </div>
    <div>
-   <div>
    <label for="description">Descrizione</label>
    <textarea id="description" name="description"><?php echo $taxaObservation->getData('description')?></textarea>
    </div>
    <div>
+   <?php if($GLOBALS['profile']->getData('role_id') == 3) : ?>
+   Validata :<?php echo ($taxaObservation->getData('valid')==1 ? 'Sì' : 'No' );?>
+   <?php else : ?>
    <label for="valid">Validata</label>
    <input type="checkbox" id="valid" name="valid" <?php echo ($taxaObservation->getData('valid')==1 ? 'checked' : '' );?>>
+   <?php endif; ?>
    </div>
    <div>
    <?php
@@ -51,6 +54,7 @@ if (array_key_exists('id', $_REQUEST)) {
    endif;
    endif;
    endforeach; ?>
+   </div>
    <div>
       <input type="submit" name="submit" value="Salva">
    </div>
