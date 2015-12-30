@@ -81,7 +81,22 @@
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->issuu; ?>" title="Issuu">
                                 <img src="template/leaf/images/issuu.png" alt="Issuu" />
                             </a>
-                            <?php endif; ?>
+                            <?php endif;
+                            $cid  = null;
+                            if (
+                                    array_key_exists('profile', $GLOBALS) &&
+                                    is_object($GLOBALS['profile']) &&
+                                    $GLOBALS['profile']->getData('id') != ''
+                                ) {
+                                $cid = urlencode($this->encodeId($GLOBALS['profile']->getData('id')));
+                            }
+                            $rssUrl = $GLOBALS['db']->config->baseUrl.'rss.php';
+                            if (!is_null($cid)) {
+                                $rssUrl .= '?key='.$cid;
+                            } ?>
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $rssUrl; ?>" title="RSS">
+                                <img src="template/leaf/images/rss.png" alt="RSS" />
+                            </a>
                         </div>
                 </div>
                 <?php endif; ?>

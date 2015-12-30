@@ -1,4 +1,6 @@
 <?php
+$taxaObservationColl = new \floraobservation\TaxaObservationColl($GLOBALS['db']);
+$taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
 $filter = array(
     'iDisplayStart'=>0,
     'iDisplayLength'=>10,
@@ -23,8 +25,17 @@ if (
             }
         }
     }
+} else {
+    $taxaColl->loadAll(array(
+    'iDisplayStart'=>0,
+    'iDisplayLength'=>10,
+    'sColumns'=>'change_datetime',
+    'iSortingCols'=>'1',
+    'iSortCol_0'=>'0',
+    'sSortDir_0'=>'DESC',
+    'images'=>1
+));
 }
-$taxaObservationColl = new \floraobservation\TaxaObservationColl($GLOBALS['db']);
 $taxaObservationColl->loadAll($filter);
 $taxaObservation = $taxaObservationColl->getFirst();
 $dateTime = date_create_from_format('Y-m-d H:i:s',$taxaObservation->getData('datetime'));
@@ -51,7 +62,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>'.PHP_EOL;?>
 <?php
 foreach($taxaObservationColl->getItems() as $taxaObservation) :
     $taxa = $taxaObservation->getTaxa();
-    $dateTime = date_create_from_format('Y-m-d H:i:s',$taxaObservation->getData('datetime'));
+    $dateTime = date_create_from_format('Y-m-d H:i:s',$taxa->getData('datetime'));
 ?>
             <item>
                 <title><?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?> - <?php echo $taxaObservation->getData('title'); ?></title>
@@ -69,9 +80,27 @@ foreach($taxaObservationColl->getItems() as $taxaObservation) :
 		        <?php echo $taxaObservation->getData('description'); ?>]]></description>
                 <?php if (is_object($dateTime)) : 
                 ?><pubDate><?php echo $dateTime->format(DateTime::RSS);?></pubDate><?php
+                echo PHP_EOL; endif; 
+                ?><guid><?php echo $GLOBALS['config']->baseUrl;?>observation.php?id=<?php echo $taxaObservation->getData('id');?></guid>
+            </item>
+<?php endforeach;
+foreach($taxaColl->getItems() as $taxa) :
+    $dateTime = date_create_from_format('Y-m-d H:i:s',$taxaObservation->getData('change_datetime'));
+?>
+            <item>
+                <title><?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?></title>
+                <?php if ($taxaObservation->getData('valid')==1) : 
+                ?><link><?php echo $GLOBALS['config']->baseUrl;?>?id=<?php echo $taxa->getData('id');?></link><?php
                 echo PHP_EOL; endif; ?>
-                <guid><?php echo $GLOBALS['config']->baseUrl;?>observation.php?id=<?php echo $taxaObservation->getData('id');?></guid>
-
+                <description><![CDATA[<?php
+                $image = $taxa->getTaxaImageColl()->getFirst();
+                if (is_object($image)) :
+                ?><img url="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>" title="<?php echo $taxa->getData('taxa_kind_initials'); ?> <?php echo $taxa->getData('name'); ?>"><?php endif;?> 
+		        <?php echo $taxa->getData('description'); ?>]]></description>
+                <?php if (is_object($dateTime)) : 
+                ?><pubDate><?php echo $dateTime->format(DateTime::RSS);?></pubDate><?php
+                echo PHP_EOL; endif; 
+                ?><guid><?php echo $GLOBALS['config']->baseUrl;?>?id=<?php echo $taxa->getData('id');?></guid>
             </item>
 <?php endforeach; ?>
         </channel>

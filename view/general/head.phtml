@@ -39,9 +39,9 @@ if (
     ) {
     $cid = urlencode($this->encodeId($GLOBALS['profile']->getData('id')));
 }
-if (is_null($cid)) : ?>
-<link rel="alternate" type="application/rss+xml" title="Ultime osservazioni" href="<?php echo $GLOBALS['db']->config->baseUrl;?>rss.php">
-<?php else : ?>
-<link rel="alternate" type="application/rss+xml" title="Ultime osservazioni" href="<?php echo $GLOBALS['db']->config->baseUrl;?>rss.php?key=<?php echo $cid; ?>">
-<?php endif; ?>
+$rssUrl = $GLOBALS['db']->config->baseUrl.'rss.php';
+if (!is_null($cid)) {
+    $rssUrl .= '?key='.$cid;
+} ?>
+<link rel="alternate" type="application/rss+xml" title="Ultime osservazioni" href="<?php echo $rssUrl;?>">
 <title><?php echo $title;?></title>
