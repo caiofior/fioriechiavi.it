@@ -251,7 +251,11 @@ class TaxaSearch extends \Content {
       <loc>{$this->db->config->baseUrl}observation.php</loc>
        <priority>1</priority>
     </url>
-
+    <url>
+      <loc>{$this->db->config->baseUrl}rss.php</loc>
+       <priority>1</priority>
+    </url>
+      
 EOT
         );
         $newTaxaObservationColl  = new \floraobservation\TaxaObservationColl($this->db);
