@@ -2,6 +2,11 @@
 <input type="hidden" id="start" name="start" value="<?php echo $_REQUEST['start'];?>">
 <input type="hidden" id="pagelength" name="pagelength" value="<?php echo $_REQUEST['pagelength'];?>">
 <div>
+    <label for="text">Testo</label>
+    <input id="text" name="text" type="search" value="<?php echo (array_key_exists('text', $_REQUEST) ? $_REQUEST['text']: '') ?>">
+    <input id="search" type="submit" name="action" value="Cerca"/>
+</div>
+<div>
    <label for="taxasearch">Appartenenti al taxa</label>
    <input id="taxasearch" name="taxasearch" value="">
    <input type="hidden" id="taxasearchid" name="taxasearchid" value="">
@@ -18,10 +23,6 @@
    <span>Registrati e potrai scaricare tutti i taxa trovati, non una sola pagina alla volta.</span>
    <?php endif; ?>
    </span>
-</div>
-<div>
-    <label for="text">Testo</label>
-    <input id="text" name="text" type="search" value="<?php echo (array_key_exists('text', $_REQUEST) ? $_REQUEST['text']: '') ?>">
 </div>
 <a href="#" class="showNext">Filtro avanzato</a>
 <div style="display: none;">

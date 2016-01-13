@@ -1,6 +1,7 @@
 $("#searchButton").hide();
 $("#searchContent").on("click","#paginationContainer a.pageSelector",function(e){
-    $("#start").val($(this).data("page")).trigger("change",{dontReset:true});
+    $("#start").val($(this).data("page"));
+    updateForm(this, e,{dontReset:true});
     e.preventDefault();
 });
 $("#emtpytaxasearch").click(function(e){
@@ -47,7 +48,13 @@ $("#searchForm").on("click","a.selectAll",function (e) {
 if($(".github").css("display") != "none") {
     $(".exportContainer").show();
 }
-$("#searchForm").on("change","input[type!=hidden],select[name!=separator]",function (e,data) {
+$("#search").click(function(e){
+    e.preventDefault();
+});
+$("#searchForm").on("change","input[type!=hidden],select[name!=separator]",function(e,data){
+    updateForm(this, e,data);
+});
+function updateForm(el, e,data) {
     if (
             typeof data !== 'object' ||
             !data.hasOwnProperty("dontReset") || 
@@ -55,16 +62,16 @@ $("#searchForm").on("change","input[type!=hidden],select[name!=separator]",funct
             ) {
         $("#start").val(0);
     }
-    if($(this).prop("tagName") == "SELECT") {
+    if($(el).prop("tagName") == "SELECT") {
         var val=1;
-        if ($(this).children("option").size() != $(this).children("option:selected").size()) {
+        if ($(this).children("option").size() != $(el).children("option:selected").size()) {
             val=0;
         }
-        $(this).siblings("input[type=hidden]").val(val);
+        $(el).siblings("input[type=hidden]").val(val);
     }
     $.ajax({
-        url: $(this).parents("form").first().attr("action")+"?action=search",
-        data: $(this).parents("form").first().serializeArray(),
+        url: $(el).parents("form").first().attr("action")+"?action=search",
+        data: $(el).parents("form").first().serializeArray(),
         method:"post",
         async : false,
         success : function (data) {
@@ -72,5 +79,5 @@ $("#searchForm").on("change","input[type!=hidden],select[name!=separator]",funct
                 $("#"+name).html(value);    
             });
         }
-    });  
-});
+    }); 
+}
