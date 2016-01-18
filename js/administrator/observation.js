@@ -46,4 +46,8 @@ $(document).ready(function() {
               map: map
         });
     }
+    $("#show_metadata").click(function(e){
+        $("#metadata").toggle();
+        e.preventDefault();
+    });
 });

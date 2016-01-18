@@ -26,11 +26,12 @@ class TaxaObservationImage extends \Content
       throw new \Exception('Deprecated, see moveInsert',1410021642);
    }
    /**
-    * Deprecated, see moveInsert
+    * Updates image transformation
     * @throws Exception
     */
    public function update() {
-      throw new \Exception('Deprecated, see moveInsert',1410021642);
+      $this->deleteThumbnails();
+      parent::update();
    }
    /**
     * Insert the data and saves the image path
@@ -189,6 +190,16 @@ class TaxaObservationImage extends \Content
         }
         $thumbnail_gd_image = imagecreatetruecolor($thumbnail_image_width, $thumbnail_image_height);
         imagecopyresampled($thumbnail_gd_image, $source_gd_image, 0, 0, 0, 0, $thumbnail_image_width, $thumbnail_image_height, $source_image_width, $source_image_height);
+        $transform = array();
+        if (array_key_exists('transform', $this->data) && $this->data['transform'] != '') {
+            $transform = unserialize($this->data['transform']);
+        }
+        if (array_key_exists('rotate', $transform)) {
+            $transf_gd_image = imagecreatetruecolor($thumbnail_image_width, $thumbnail_image_height);
+            imagecopy($transf_gd_image,$thumbnail_gd_image,0,0,0,0,$thumbnail_image_width, $thumbnail_image_height);
+            $thumbnail_gd_image = imagerotate($transf_gd_image,floatval($transform['rotate']),0);
+            imagedestroy($transf_gd_image);
+        }
         switch ($source_image_type) {
             case IMAGETYPE_GIF:
                 imagegif($thumbnail_gd_image, $thumbnail_image_path);
@@ -205,5 +216,15 @@ class TaxaObservationImage extends \Content
         }
         imagedestroy($source_gd_image);
         imagedestroy($thumbnail_gd_image);
+    }
+    /**
+     * Deletes image thumnails
+     */
+    private function deleteThumbnails() {
+        $thumnailFiles = glob(self::imageBaseDir.'*'.$this->data['filename']);
+        array_shift($thumnailFiles);
+        foreach($thumnailFiles as $thumnailFile) {
+            unlink($thumnailFile);
+        }
     }
 }

@@ -10,7 +10,10 @@ if (array_key_exists('id', $_REQUEST)) {
    <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=observation">Elenco delle osservazioni</a></p> &gt; <h2>Osservazione</h2>
 </div>
 <form method="post" action="#">
-
+   <div>
+      <input type="submit" name="submit" value="Salva">
+      <input type="submit" name="submit_back" value="Salva e torna">
+   </div>
    <div>
    <label for="datetime">Data e ora</label>
    <input id="datetime" name="datetime" readonly="readonly" value="<?php echo $taxaObservation->getData('datetime')?>">
@@ -35,12 +38,39 @@ if (array_key_exists('id', $_REQUEST)) {
    <?php
    $taxaObservationImageColl = $taxaObservation->getTaxaObservationImageColl();
    foreach($taxaObservationImageColl->getItems() as $taxaObservationImage):
-        $imagePath = $taxaObservationImage->getPath();
-        if (is_file($imagePath)) :
-   ?>
-   <img src="<?php echo $GLOBALS['db']->config->staticUrl.$taxaObservationImage->getUrl();?>" />
+       $imagePath = $taxaObservationImage->getPath();
+       $thumbnailImageUrl = null;
+        try {
+        $thumbnailImageUrl = $taxaObservationImage->getUrl(array('x'=>600,'y'=>400));
+        } catch (Exception $e) {}
+        if (!is_null($thumbnailImageUrl)) : ?>        
+        <img src="<?php echo $thumbnailImageUrl; ?>">
+        <?php
+            else :
+            if (is_file($imagePath)) :
+        ?>
+        <img src="<?php echo $GLOBALS['db']->config->staticUrl.$taxaObservationImage->getUrl();?>" />
+        <?php endif;
+           endif;
+        $transform = array();
+        if ($taxaObservationImage->getData('transform') != '') {
+            $transform = unserialize($taxaObservationImage->getData('transform'));
+        }
+        ?>
+        <div>
+        <label for="rotate">Rotazione</label>
+        <select id="rotate" name="rotate[<?php echo $taxaObservationImage->getData('id'); ?>]">
+            <option></option>
+            <option value="270"<?php echo (array_key_exists('rotate',$transform) && $transform['rotate']=='270' ? ' selected="selected"' : ''); ?>>90 ° Destra</option>
+            <option value="90"<?php echo (array_key_exists('rotate',$transform) && $transform['rotate']=='90' ? ' selected="selected"' : ''); ?>>90 ° Sinistra</option>
+            <option value="180"<?php echo (array_key_exists('rotate',$transform) && $transform['rotate']=='180' ? ' selected="selected"' : ''); ?>>Capovolgi</option>
+        </select>
+        </div>
+   </div>
+    <p><a id="show_metadata" href="#">Visualizza metadati</a></p>
+   <div id="metadata" style="display: none;">
    <?php 
-   if (function_exists('exif_read_data') && is_file($imagePath)) :
+    if (function_exists('exif_read_data') && is_file($imagePath)) :
     $exif = exif_read_data($taxaObservationImage->getPath());
     foreach ($exif as $key => $section) :
         if (is_array($section)) :
@@ -52,11 +82,11 @@ if (array_key_exists('id', $_REQUEST)) {
         <?php endif;
      endforeach;
    endif;
-   endif;
    endforeach; ?>
    </div>
    <div>
       <input type="submit" name="submit" value="Salva">
+      <input type="submit" name="submit_back" value="Salva e torna">
    </div>
 </form>
 <script>

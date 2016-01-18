@@ -39,7 +39,8 @@ case 'edit':
    $this->getTemplate()->setBlock('footer','administrator/observation/footer.phtml');  
    if (
             array_key_exists('xhrValidate', $_REQUEST) ||
-            array_key_exists('submit', $_REQUEST)
+            array_key_exists('submit', $_REQUEST) ||
+            array_key_exists('submit_back', $_REQUEST)
       ) {
       if (!array_key_exists('title', $_REQUEST) ||$_REQUEST['title']=='') {
           $this->addValidationMessage('title','Il titolo è obbligatorio');
@@ -47,7 +48,11 @@ case 'edit':
       if (!array_key_exists('description', $_REQUEST) ||$_REQUEST['description']=='') {
           $this->addValidationMessage('description','La descrizione è obbligatoria');
       }
-      if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
+      if (
+              (
+              array_key_exists('submit_back', $_REQUEST) ||
+              array_key_exists('submit', $_REQUEST)
+              ) && $this->formIsValid()) {
          $taxaObservation = new \floraobservation\TaxaObservation($GLOBALS['db']);
          
          if (array_key_exists('cid', $_REQUEST)) {
@@ -56,6 +61,19 @@ case 'edit':
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxaObservation->loadFromId($_REQUEST['id']);
          }
+         if (array_key_exists('rotate', $_REQUEST) && is_array($_REQUEST['rotate'])) {
+             $taxaObservationImage = new \flora\taxa\TaxaObservationImage($GLOBALS['db']);
+             foreach($_REQUEST['rotate'] as $image_id=>$rotation) {
+                $taxaObservationImage->loadFromId($image_id);
+                $trasform = array();
+                if ($rotation!='') {
+                    $trasform['rotate']=$rotation;
+                }
+                $taxaObservationImage->setData(serialize($trasform),'transform');
+                $taxaObservationImage->update();
+             } 
+         } 
+         
          $taxaObservation->setData($_REQUEST);
          $taxaObservation->setData((array_key_exists('valid', $_REQUEST)?1:0),'valid');
 
@@ -64,7 +82,12 @@ case 'edit':
          } else {
             $taxaObservation->insert();
          }
-         header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=observation');
+         if (array_key_exists('submit_back', $_REQUEST)) {
+            header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=observation');
+         } else {
+             $cid = $this->getTemplate()->encodeId($taxaObservation->getData('id'));
+             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=observation&action=edit&cid='.urlencode($cid));
+         }
          exit(); 
       }
    }
