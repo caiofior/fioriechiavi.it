@@ -146,7 +146,18 @@ class TaxaExport {
                 }
             }
             if ($taxa->getData('description') != '') {
-                fwrite($stream, $taxa->getData('description').PHP_EOL.PHP_EOL);
+                $description = $taxa->getData('description');
+                preg_match_all('/{t([[:alnum:]\/]+)}/',$description,$items);
+                if (is_array($items) && array_key_exists(1, $items)) {
+                    $relTaxa = new \flora\taxa\Taxa($GLOBALS['db']);
+                    foreach ($items[1] as $progessNumber) {
+                        $relTaxa->loadFromAttributeValue($GLOBALS['db']->config->attributes->progress,$progessNumber);
+                        if ($relTaxa->getData('id') != '') {
+                            $description = str_replace('{t'.$progessNumber.'}', '['.$relTaxa->getData('taxa_kind_initials').' '.$relTaxa->getData('name').'](#t'.$relTaxa->getData('id').')', $description);
+                        }
+                    }
+                }
+                fwrite($stream, $description.PHP_EOL.PHP_EOL);
             }
             
             $regionColl = $taxa->getRegionColl();

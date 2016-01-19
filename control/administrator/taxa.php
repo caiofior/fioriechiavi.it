@@ -91,14 +91,18 @@ case 'edit':
          $taxa->setData($_REQUEST);
 
          $action='Crea';
-         if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
-            $action='Modifica';
-            $taxa->update();
-         } else {
+         $secondUpdate = false;
+         if (!array_key_exists('id', $_REQUEST) || !is_numeric($_REQUEST['id'])) {
             $taxa->insert();
+         } else {
+            $action='Modifica'; 
+            $secondUpdate = true;   
          }
+         
+         
          if (key_exists('regions', $_REQUEST)) {
             $taxa->setRegions($_REQUEST['regions']);
+            $secondUpdate = true;
          }
          
          $taxa->deleteAllTaxaAttributes();
@@ -117,8 +121,11 @@ case 'edit':
                   ) continue;
                $attributeName = $_REQUEST['attribute_name_list'][$attributeKey];
                $taxa->addTaxaAttribute($attributeName, $attributeValue);
-               
-            }   
+            }
+            $secondUpdate = true;
+         }
+         if ($secondUpdate ==  true) {
+             $taxa->update();
          }
          $taxaImageColl = $taxa->getTaxaImageColl();
          if (
