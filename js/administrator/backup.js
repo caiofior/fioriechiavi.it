@@ -22,13 +22,17 @@
     });
     $(".reindexAJAX").click(function (e){
         $(".reindexAjaxLoader").show();
-        $.get(
-                $(this).attr("href"),
-                function(data){
+        $.ajax({
+                url : $(this).attr("href"),
+                success: function(data, textStatus, jqXHR ){
                     $("#reindexLog").html(data);
                     $(".reindexAjaxLoader").hide();
+                },
+                error : function( jqXHR,textStatus,errorThrown) {
+                    $("#reindexLog").html("Errore "+textStatus);
+                    $(".reindexAjaxLoader").hide();
                 }
-              );
+            });
         e.preventDefault();
     });
 up = new plupload.Uploader({

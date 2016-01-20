@@ -32,6 +32,7 @@ $statement->execute();
 $doneIds=array();
 $parentIds=array();
 $todoIds =array();
+$progress = 0;
 do {
     unset($id);
     if ($resultSet->valid()) {
@@ -78,12 +79,20 @@ do {
     } else {
         array_push($todoIds, $id);
     }
+    if($GLOBALS['db']->config->background->sleep != '' && $progress++%100 == 0) {
+        sleep($GLOBALS['db']->config->background->sleep);
+        echo 'Sleep '.$progress.PHP_EOL;
+    }
 } while ($shifts == 0 || $resultSet->valid());
 foreach ($todoIds as $id ) {
     $taxa->loadFromId($id);
     $imagesNames = $imagesColl->getFieldsAsArray('filename');
     $images = array_diff($images,$imagesNames);
     echo 'Taxa '.$taxa->getData('name').' '.$taxa->getData('id').' has no parent'.PHP_EOL;
+    if($GLOBALS['db']->config->background->sleep != '' && $progress++%100 == 0) {
+        sleep($GLOBALS['db']->config->background->sleep);
+        echo 'Sleep '.$progress.PHP_EOL;
+    }
 }
 if (count($images) > 0) {
     echo 'Deleted '.count($images).' unused images'.PHP_EOL;
@@ -91,7 +100,6 @@ if (count($images) > 0) {
 foreach($images as $image) {
     unlink($imagesBaseDir.$image);
 }
-
 $statement = $GLOBALS['db']->query('
     DELETE FROM `taxa_image` WHERE `id` IN (
         SELECT * FROM
