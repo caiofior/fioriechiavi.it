@@ -80,6 +80,7 @@ do {
         array_push($todoIds, $id);
     }
     if($GLOBALS['db']->config->background->sleep != '' && $progress++%100 == 0) {
+        set_time_limit(max(90,$GLOBALS['db']->config->background->sleep*2));
         sleep($GLOBALS['db']->config->background->sleep);
         echo 'Sleep '.$progress.PHP_EOL;
     }
@@ -90,7 +91,8 @@ foreach ($todoIds as $id ) {
     $images = array_diff($images,$imagesNames);
     echo 'Taxa '.$taxa->getData('name').' '.$taxa->getData('id').' has no parent'.PHP_EOL;
     if($GLOBALS['db']->config->background->sleep != '' && $progress++%100 == 0) {
-        sleep($GLOBALS['db']->config->background->sleep);
+        set_time_limit(max(90,$GLOBALS['db']->config->background->sleep*2));
+	sleep($GLOBALS['db']->config->background->sleep);
         echo 'Sleep '.$progress.PHP_EOL;
     }
 }

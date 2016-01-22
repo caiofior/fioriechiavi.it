@@ -19,7 +19,7 @@ sort($pages);
         $class=' selectedPage';
     }
     ?>
-    <a href="?start=<?php echo $page*$_REQUEST['pagelength'];?>" class="pageSelector<?php echo $class;?>" data-page="<?php echo $page*$_REQUEST['pagelength'];?>"><?php echo $page+1;?></a>
+    <a href="?start=<?php echo $page*$_REQUEST['pagelength'].(array_key_exists('text', $_REQUEST) ? '&amp;text='.$_REQUEST['text']: '')?>" class="pageSelector<?php echo $class;?>" data-page="<?php echo $page*$_REQUEST['pagelength'];?>"><?php echo $page+1;?></a>
     <?php if ($page <$lastPage && !in_array($page+1, $pages)) :?>…<?php endif;?>
 <?php endforeach; ?>
 </div>

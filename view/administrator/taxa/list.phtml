@@ -10,10 +10,6 @@
 $role = $GLOBALS['profile']->getRole();
 if ($role->getData('id') >0 && $role->getData('id') <= 1) : ?>
 <a class="actions add" title="Aggiungi" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit">Aggiungi</a><br/>
-<?php endif; 
-if ($GLOBALS['db']->config->background->useAJAX == true) :?>
-<a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=backup&action=reindex_ajax" class="reindexAJAX" >Indicizza</a>
-<img class="reindexAjaxLoader" src="<?php echo $GLOBALS['db']->config->baseUrl;?>/style/general/images/ajax-loader.gif" style="display: none;">
 <?php endif; ?>
 <table id="taxa">
    	<thead>
