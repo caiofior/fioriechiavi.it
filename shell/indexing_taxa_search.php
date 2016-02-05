@@ -32,7 +32,6 @@ $statement->execute();
 $doneIds=array();
 $parentIds=array();
 $todoIds =array();
-$progress = 0;
 do {
     unset($id);
     if ($resultSet->valid()) {
@@ -79,10 +78,13 @@ do {
     } else {
         array_push($todoIds, $id);
     }
-    if($GLOBALS['db']->config->background->sleep != '' && $progress++%100 == 0) {
-        set_time_limit(max(90,$GLOBALS['db']->config->background->sleep*2));
-        sleep($GLOBALS['db']->config->background->sleep);
-        echo 'Sleep '.$progress.PHP_EOL;
+    if(php_sapi_name() != 'cli') {
+        echo str_repeat(' ', 50).PHP_EOL;
+        ob_flush();
+        set_time_limit(30);
+        if ($GLOBALS['db']->config->background->sleep != '') {
+            usleep($GLOBALS['db']->config->background->sleep);
+        }
     }
 } while ($shifts == 0 || $resultSet->valid());
 foreach ($todoIds as $id ) {
@@ -90,10 +92,13 @@ foreach ($todoIds as $id ) {
     $imagesNames = $imagesColl->getFieldsAsArray('filename');
     $images = array_diff($images,$imagesNames);
     echo 'Taxa '.$taxa->getData('name').' '.$taxa->getData('id').' has no parent'.PHP_EOL;
-    if($GLOBALS['db']->config->background->sleep != '' && $progress++%100 == 0) {
-        set_time_limit(max(90,$GLOBALS['db']->config->background->sleep*2));
-	sleep($GLOBALS['db']->config->background->sleep);
-        echo 'Sleep '.$progress.PHP_EOL;
+    if(php_sapi_name() != 'cli') {
+        echo str_repeat(' ', 50).PHP_EOL;
+        ob_flush();
+        set_time_limit(30);
+        if ($GLOBALS['db']->config->background->sleep != '') {
+            usleep($GLOBALS['db']->config->background->sleep);
+        }
     }
 }
 if (count($images) > 0) {
