@@ -3,11 +3,12 @@
 <head>
 <?php if($GLOBALS['db']->config->useCDN === true) : ?>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('template/leaf/css/style-cleaned.css.gz');?>" rel="stylesheet" type="text/css" media="all" />
 <?php else: ?>
 <link href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('style/bootstrap/dist/css/bootstrap.css');?>" rel="stylesheet" type="text/css" media="all">
+<link href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('template/leaf/css/style-cleaned.css');?>" rel="stylesheet" type="text/css" media="all" />
 <?php endif; ?>
 <!-- Custom Theme files -->
-<link href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('template/leaf/css/style-cleaned.css.gz');?>" rel="stylesheet" type="text/css" media="all" />
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/general/index.css');?>" property="stylesheet"/>
 <!-- Custom Theme files -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,12 +47,12 @@
         <div id="fb-root"></div>
 	<header class="header">
 		<div class="container">
-			<div class="col-md-4 header-left">
+			<div class="col-sm-4 header-left">
                             <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>">
 				<img src="template/leaf/images/logo.jpg" alt="<?php echo $GLOBALS['db']->config->siteName; ?>" />
                             </a>
 			</div>
-			<div class="col-md-8 header-right">
+			<div class="col-sm-8 header-right">
 				<nav class="top-menu">
                                     <?php $GLOBALS['template']->renderBlock('header'); ?>
 				</nav>

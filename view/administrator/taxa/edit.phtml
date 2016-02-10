@@ -82,26 +82,6 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       <textarea id="description" name="description"><?php echo $taxa->getData('description')?></textarea>
    </div>
    <div>
-      <div>
-         <label for="regions">Regioni</label> <a class="selectAllRegions" href="#">Seleziona/Deseleziona tutte</a>
-      </div>
-      <div>
-         
-   <select id="regions" name="regions[]" size="15" multiple="multiple">
-      <?php
-      $regionColl = $taxa->getRegionColl();
-      foreach ($regionColl->getItems() as $region) : 
-         $selected = '';
-         if ($region->getRawData('selected')==1) {
-            $selected = 'selected="delected"';   
-         }
-      ?>
-      <option <?php echo $selected; ?> value="<?php echo $region->getData('id');?>"><?php echo $region->getData('name');?></option>
-      <?php endforeach; ?>
-   </select>
-         </div>
-   </div>
-   <div>
       <p>Aggiungi attibuto:</p>
       <div class="attributeTable">
          <label for="attribute_name" >Attributo</label>
@@ -127,6 +107,26 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       }
       ?>
       </div>
+   </div>
+   <div>
+      <div>
+         <label for="regions">Regioni</label> <a class="selectAllRegions" href="#">Seleziona/Deseleziona tutte</a>
+      </div>
+      <div>
+         
+   <select id="regions" name="regions[]" size="15" multiple="multiple">
+      <?php
+      $regionColl = $taxa->getRegionColl();
+      foreach ($regionColl->getItems() as $region) : 
+         $selected = '';
+         if ($region->getRawData('selected')==1) {
+            $selected = 'selected="delected"';   
+         }
+      ?>
+      <option <?php echo $selected; ?> value="<?php echo $region->getData('id');?>"><?php echo $region->getData('name');?></option>
+      <?php endforeach; ?>
+   </select>
+         </div>
    </div>
    <div>
        <label>Aggiungi file</label>
