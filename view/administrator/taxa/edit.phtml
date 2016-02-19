@@ -72,16 +72,6 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
     <div id="eol_id_list" style="display:none;"></div>
    </div>
    <div>
-      <label for="description">Descrizione</label> <a class="loadMarkup" href="#">Carica Markup</a>
-      <div style="display: none;" id="description_markup_container">
-         <label for="description">Incolla il codice di markup</label><br/>
-         <textarea cols="80" rows="20" class="notEditable" id="description_markup" name="description_markup"></textarea><br/>
-         <a class="confirmLoad" href="#">Carica</a>
-         <a class="cancelLoad" href="#">Annulla</a>
-      </div>
-      <textarea id="description" name="description"><?php echo $taxa->getData('description')?></textarea>
-   </div>
-   <div>
       <p>Aggiungi attibuto:</p>
       <div class="attributeTable">
          <label for="attribute_name" >Attributo</label>
@@ -107,6 +97,16 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       }
       ?>
       </div>
+   </div>
+   <div>
+      <label for="description">Descrizione</label> <a class="loadMarkup" href="#">Carica Markup</a>
+      <div style="display: none;" id="description_markup_container">
+         <label for="description">Incolla il codice di markup</label><br/>
+         <textarea cols="80" rows="20" class="notEditable" id="description_markup" name="description_markup"></textarea><br/>
+         <a class="confirmLoad" href="#">Carica</a>
+         <a class="cancelLoad" href="#">Annulla</a>
+      </div>
+      <textarea id="description" name="description"><?php echo $taxa->getData('description')?></textarea>
    </div>
    <div>
       <div>
