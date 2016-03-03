@@ -51,6 +51,27 @@ class AddDicoItemColl extends \ContentColl implements \flora\dico\DicoItemIntCol
         return $select;
     }
     /**
+     * Sort criteria
+     * @param \flora\dico\DicoItem $a
+     * @param \flora\dico\DicoItem $b
+     * @return int
+     */
+    public static function customSort($a, $b) {
+        $a = $a->getData(self::$sortCriteria['field']);
+        $b = $b->getData(self::$sortCriteria['field']);
+        if ($a === $b) {
+            return 0;
+        }
+        for ($c = 0; $c < min(strlen($a), strlen($b)); $c++) {
+            if ($a[$c] == $b[$c]) {
+                continue;
+            }
+            return ($a[$c] < $b[$c]) ? -1 : 1;
+        }
+        return (strlen($a) < strlen($b)) ? -1 : 1;
+    }
+    
+    /**
      * Filter collection by attribute and value
      * @param mixed $value
      * @param mixed $field

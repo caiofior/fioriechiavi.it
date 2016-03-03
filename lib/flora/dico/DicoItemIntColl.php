@@ -33,4 +33,11 @@ Interface DicoItemIntColl {
      * @return \flora\dico\DicoItemColl
      */
     public function filterByAttributeValue($value, $field);
+    /**
+     * Sort criteria
+     * @param \flora\dico\DicoItem $a
+     * @param \flora\dico\DicoItem $b
+     * @return int
+     */
+    public static function customSort($a, $b);
 }

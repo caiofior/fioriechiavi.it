@@ -57,7 +57,7 @@ class DicoItemColl extends \ContentColl implements \flora\dico\DicoItemIntColl {
      * @param \flora\dico\DicoItem $b
      * @return int
      */
-    protected static function customSort($a, $b) {
+    public static function customSort($a, $b) {
         $a = $a->getData(self::$sortCriteria['field']);
         $b = $b->getData(self::$sortCriteria['field']);
         if ($a === $b) {

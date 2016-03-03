@@ -71,7 +71,7 @@ case 'jeditable' :
            strlen($_REQUEST['id']) > 1 &&
            is_numeric(substr($_REQUEST['id'],1))
        ) {
-         $dicoItem = new \flora\dico\DicoItem($GLOBALS['db']);
+         $dicoItem = new \flora\dico\AddDicoItem($GLOBALS['db']);
          $dicoItem->loadFromIdAndDico($_REQUEST['id_dico'],substr($_REQUEST['id'],1));
          $dicoItem->setData($_REQUEST['value'], 'text');
          $dicoItem->replace();
