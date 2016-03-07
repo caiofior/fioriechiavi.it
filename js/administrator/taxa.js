@@ -173,8 +173,8 @@ $(document).ready(function() {
          response);
       }
     });
-    $(".attribute.actions.delete").click(function (e) {
-      el =  $(this).parent("div.attContainer");
+    $(".attribute.actions.delete").unbind("click").click(function (e) {
+      el =  $(this).closest("div.attContainer");
       $(this).dialog({
          buttons: {
             "Confermi la cancellazione dell' attributo?": function() {
@@ -284,7 +284,6 @@ $(document).ready(function() {
          buttons: {
             "Confermi la cancellazione dell'immagine?": function() {
                $(this).dialog('destroy');
-               el.find("[name='image_name_list[]']").val(value["name"]).trigger("change");
                el.remove();
             }
          }

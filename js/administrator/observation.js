@@ -41,11 +41,20 @@ $(document).ready(function() {
             scrollwheel: false,
             center: latLong
         });
-        new google.maps.Marker({
+        marker = new google.maps.Marker({
               position: latLong,
-              map: map
+              map: map,
+	      draggable:true
         });
+	$("#update_position").show().click(function(e){
+	  $("#latitude").attr("readonly",false).val(marker.getPosition().lat());
+	  $("#longitude").attr("readonly",false).val(marker.getPosition().lng());
+	});
     }
+    $.datepicker.setDefaults($.datepicker.regional["it"]);
+    $("#update_datetime").click(function(e){
+        $("#datetime").attr("readonly",false).datepicker({ "dateFormat": "yy-mm-dd"});
+    });
     $("#show_metadata").click(function(e){
         $("#metadata").toggle();
         e.preventDefault();

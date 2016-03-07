@@ -76,7 +76,14 @@ case 'edit':
          
          $taxaObservation->setData($_REQUEST);
          $taxaObservation->setData((array_key_exists('valid', $_REQUEST)?1:0),'valid');
-
+	 if (
+	 	array_key_exists('longitude',$_REQUEST) && 
+		$_REQUEST['longitude'] != '' &&
+		array_key_exists('latitude',$_REQUEST) && 
+		$_REQUEST['latitude'] != ''
+	 ) {
+	 	$taxaObservation->setPoint(new \Point(floatval($_REQUEST['longitude']),floatval($_REQUEST['latitude'])));
+	 }
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxaObservation->update();
          } else {

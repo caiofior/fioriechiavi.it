@@ -15,7 +15,7 @@ if (array_key_exists('id', $_REQUEST)) {
       <input type="submit" name="submit_back" value="Salva e torna">
    </div>
    <div>
-   <label for="datetime">Data e ora</label>
+   <label for="datetime">Data e ora</label><input type="button" id="update_datetime" name="update_datetime" value="Modifica">
    <input id="datetime" name="datetime" readonly="readonly" value="<?php echo $taxaObservation->getData('datetime')?>">
    </div>
    <div>
@@ -87,6 +87,15 @@ if (array_key_exists('id', $_REQUEST)) {
    <div>
       <input type="submit" name="submit" value="Salva">
       <input type="submit" name="submit_back" value="Salva e torna">
+      <input type="button" style="display:none;" id="update_position" name="update_position" value="Aggiorna posizione">     
+   </div>
+   <div>
+	<label for="latitude">Latitudine</label>
+         <input id="latitude" name="latitude" readonly="readonly" value="<?php echo $taxaObservation->getPoint()->y();?>">
+   </div>
+   <div>
+	<label for="longitude">Longitude</label>
+        <input id="longitude" name="longitude" readonly="readonly" value="<?php echo $taxaObservation->getPoint()->x();?>">
    </div>
 </form>
 <script>

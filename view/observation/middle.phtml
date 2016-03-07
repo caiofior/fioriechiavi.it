@@ -32,7 +32,7 @@ foreach ($taxaObservationColl->getItems() as $index=>$taxaObservation):
 </div>
 <?php endforeach;
 if ($taxaObservationColl->count() > 1) {
-    $radius -= sqrt($taxaObservationColl->getMultiPoint()->envelope()->area())^3;
+    $radius -= sqrt($taxaObservationColl->getMultiPoint()->envelope()->area())^2;
 }
 $pointsString .=']'; 
 $centroid = $taxaObservationColl->getMultiPoint()->centroid();
