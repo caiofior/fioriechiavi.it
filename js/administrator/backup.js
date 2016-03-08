@@ -42,16 +42,7 @@ up = new plupload.Uploader({
         runtimes : 'html5,flash,silverlight,html4',
         url : "administrator.php?task=backup&action=restore",
         multi_selection : false,
-        // Maximum file size
-        max_file_size : '2mb',
- 
         chunk_size: '1mb',
- 
-        // Specify what files to browse for
-        filters : [
-            {title : "TXT files", extensions : "txt,csv,sql"}
-        ],
-        
         init : {
             FilesAdded: function(up, files) {
                 $(".restoreAjaxLoader").show();
