@@ -38,6 +38,17 @@ $(document).ready(function() {
        window.location.reload();
        e.preventDefault();
     });
+    $(".deleteTaxaAssociation").click(function (e){
+        e.preventDefault();
+        $(this).dialog({
+           buttons: {
+              "Confermi la cancellazione dell'associazione con il taxa?": function() {
+                   window.location =  $(this).attr("href");
+              }
+           }
+        });
+        
+    });
     $(".deleteButton").click(function (e){
         e.preventDefault();
         $(this).dialog({
@@ -72,11 +83,7 @@ $(document).ready(function() {
         runtimes : 'html5,flash,silverlight,html4',
         url : "administrator.php?task=dico&action=upload&taxa_id="+$("#id").val(),
         multi_selection : false,
-        // Maximum file size
-        max_file_size : '2mb',
- 
         chunk_size: '1mb',
- 
         // Specify what files to browse for
         filters : [
             {title : "CSV files", extensions : "txt,csv"}
