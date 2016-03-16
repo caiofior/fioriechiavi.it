@@ -25,6 +25,8 @@
 <body>
         <?php if (
                 $GLOBALS['db']->config->googleAnalitycs != '' &&
+                $this->getControl()->getPage() != 'user.php' &&
+                $this->getControl()->getPage() != 'administrator.php' &&
                 (
 			!array_key_exists('profile', $GLOBALS) ||
 			!is_object($GLOBALS['profile']) ||
