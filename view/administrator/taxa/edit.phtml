@@ -1,7 +1,9 @@
 <?php
 $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
+$canEdit = true;
 if (array_key_exists('id', $_REQUEST)) {
    $taxa->loadFromId($_REQUEST['id']);
+   $canEdit = $taxa->profileCanEdit($GLOBALS['profile']);
 } else {
    $taxa->setData($_REQUEST);
 }
@@ -43,12 +45,16 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
    </div>
    <?php endif; ?>
    <div>
+      <?php if ($canEdit) : ?> 
       <input type="submit" name="submit" value="Salva">
       <?php if (!array_key_exists('children_dico_item_id', $_REQUEST) && !array_key_exists('children_add_dico_item_id', $_REQUEST)): ?>
       <input type="submit" name="submit_back" value="Salva e torna">
       <?php endif; 
       if ($taxa->getData('id') != '') : ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
+      <?php endif;
+      else: ?>
+      <p>Non sei abilitato alla modifica di questo taxa</p>
       <?php endif; ?>
    </div>
    <div>
@@ -72,7 +78,7 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
     <div id="eol_id_list" style="display:none;"></div>
    </div>
    <div>
-      <p>Aggiungi attibuto:</p>
+      <p>Aggiungi attributo:</p>
       <div class="attributeTable">
          <label for="attribute_name" >Attributo</label>
          <label for="attribute_value" >Valore</label>
@@ -86,14 +92,14 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       <div id="attribute_template">
       <?php 
       $attribute =new \flora\taxa\TaxaAttribute($GLOBALS['db']);
-         require __DIR__.'/attributeBlock.phtml'; 
+         require __DIR__.'/attributeBlock.phtml';
       ?>
       </div>
       <div id="attribute_list">
       <?php 
       $attributeColl = $taxa->getTaxaAttributeColl(); 
       foreach ($attributeColl->getItems() as $attribute) {
-         require __DIR__.'/attributeBlock.phtml'; 
+         require __DIR__.'/attributeBlock.phtml';
       }
       ?>
       </div>
@@ -161,21 +167,25 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
    </div>
    <?php endif; ?>
    <div>
+      <?php if ($canEdit) : ?>  
       <input type="submit" name="submit" value="Salva">
       <?php if (!array_key_exists('children_dico_item_id', $_REQUEST)): ?>
       <input type="submit" name="submit_back" value="Salva e torna">
       <?php endif; 
       if ($taxa->getData('id') != '') : ?>
       <a class="saved" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&action=edit&id=<?php echo $taxa->getData('id')?>">Chiave dicotomica</a>
-      <?php endif; ?>
+      <?php endif;
+      endif; ?>
    </div>
 </form>
 <div>
+<?php if ($canEdit) : ?>    
 <a href="#" class="add_dico_button">Aggiungi chiave dicotomica</a>
 <form id="add_add_dico" style="display:none;" method="post" action="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=add_dico&amp;id=<?php echo $taxa->getData('id')?>">
     <input id="dico_name" name="dico_name" value="">
     <input type="submit" name="submit" value="Aggiungi">
 </form>
+<?php endif; ?>
 <div>
 <?php
 $dicoColl = $taxa->getUsedInDicoColl();

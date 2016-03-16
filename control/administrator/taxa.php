@@ -2,6 +2,7 @@
 if (array_key_exists('sEcho', $_REQUEST)) {
       $result = array();
       $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
+      $taxaColl->filterForProfile($GLOBALS['profile']);
       $taxaColl->loadAll($_REQUEST);
       $result['sEcho']=intval($_REQUEST['sEcho']);
       $request = $_REQUEST;
@@ -89,114 +90,115 @@ case 'edit':
             $taxa->loadFromId($_REQUEST['id']);
          }
          $taxa->setData($_REQUEST);
-
-         $action='Crea';
-         $secondUpdate = false;
-         if (!array_key_exists('id', $_REQUEST) || !is_numeric($_REQUEST['id'])) {
-            $taxa->insert();
-         } else {
-            $action='Modifica'; 
-            $secondUpdate = true;   
-         }
-         
-         
-         if (key_exists('regions', $_REQUEST)) {
-            $taxa->setRegions($_REQUEST['regions']);
-            $secondUpdate = true;
-         }
-         
-         $taxa->deleteAllTaxaAttributes();
-         
-         if (
-                 array_key_exists('attribute_name_list', $_REQUEST) &&
-                 is_array($_REQUEST['attribute_name_list']) &&
-                 array_key_exists('attribute_value_list', $_REQUEST) &&
-                 is_array($_REQUEST['attribute_value_list'])
-                 ) {
-            foreach ($_REQUEST['attribute_value_list'] as $attributeKey => $attributeValue) {
-               if (
-                     $attributeValue == '' ||
-                     !array_key_exists($attributeKey, $_REQUEST['attribute_name_list']) ||
-                     $_REQUEST['attribute_name_list'][$attributeKey] == ''
-                  ) continue;
-               $attributeName = $_REQUEST['attribute_name_list'][$attributeKey];
-               $taxa->addTaxaAttribute($attributeName, $attributeValue);
-            }
-            $secondUpdate = true;
-         }
-         if ($secondUpdate ==  true) {
-             $taxa->update();
-         }
-         $taxaImageColl = $taxa->getTaxaImageColl();
-         if (
-               array_key_exists('image_id_list', $_REQUEST) &&
-               is_array($_REQUEST['image_id_list'])
-            ) {
-               
-            $idc = $taxaImageColl->getFieldsAsArray('id');
-            $taxaImage = new \flora\taxa\TaxaImage($GLOBALS['db']);
-            foreach(array_diff($idc,$_REQUEST['image_id_list']) as $id) {
-               $taxaImage->loadFromId($id);
-               $taxaImage->delete();
+         if ($taxa->profileCanEdit($GLOBALS['profile'])) {
+            $action='Crea';
+            $secondUpdate = false;
+            if (!array_key_exists('id', $_REQUEST) || !is_numeric($_REQUEST['id'])) {
+               $taxa->insert();
+            } else {
+               $action='Modifica'; 
+               $secondUpdate = true;   
             }
 
-         }
-        $taxaImageColl = $taxa->getTaxaImageColl();
-         
-         
-         if (
-            array_key_exists('image_name_list', $_REQUEST) &&
-            is_array($_REQUEST['image_name_list'])
-            ) {
-                foreach ($_REQUEST['image_name_list'] as $imageName) {
-                   if (
-                           $imageName == '' ||
-                           !is_file($GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$imageName)
-                           ) continue;
-                   $taxaImage = $taxaImageColl->addItem();
-                   $taxaImage->moveInsert($GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$imageName);
-                }
+
+            if (key_exists('regions', $_REQUEST)) {
+               $taxa->setRegions($_REQUEST['regions']);
+               $secondUpdate = true;
             }
-            
+
+            $taxa->deleteAllTaxaAttributes();
+
             if (
-                    isset($_FILES) &&
-                    is_array($_FILES) &&
-                    is_array($_FILES['traditional_image']) && 
-                    $_FILES['traditional_image']['error'] ==0 &&
-                    $_FILES['traditional_image']['name'] != '' &&
-                    is_file($_FILES['traditional_image']['tmp_name'])
+                    array_key_exists('attribute_name_list', $_REQUEST) &&
+                    is_array($_REQUEST['attribute_name_list']) &&
+                    array_key_exists('attribute_value_list', $_REQUEST) &&
+                    is_array($_REQUEST['attribute_value_list'])
                     ) {
-                    $fileName = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$_FILES['traditional_image']['name'];
-                    if (move_uploaded_file($_FILES['traditional_image']['tmp_name'], $fileName)) {
-                        $taxaImage = $taxaImageColl->addItem();
-                        $taxaImage->moveInsert($fileName);
-                    }
+               foreach ($_REQUEST['attribute_value_list'] as $attributeKey => $attributeValue) {
+                  if (
+                        $attributeValue == '' ||
+                        !array_key_exists($attributeKey, $_REQUEST['attribute_name_list']) ||
+                        $_REQUEST['attribute_name_list'][$attributeKey] == ''
+                     ) continue;
+                  $attributeName = $_REQUEST['attribute_name_list'][$attributeKey];
+                  $taxa->addTaxaAttribute($attributeName, $attributeValue);
+               }
+               $secondUpdate = true;
             }
-         
-         if (
-                 array_key_exists('children_dico_item_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_item_id']) &&
-                 array_key_exists('children_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_id'])
-             ) {
-             $dicoItem = new flora\dico\DicoItem($GLOBALS['db']);
-             $dicoItem->loadFromIdAndDico($_REQUEST['children_dico_id'],$_REQUEST['children_dico_item_id']);
-             $dicoItem->setData($taxa->getData('id'), 'taxa_id');
-             $dicoItem->replace();
+            if ($secondUpdate ==  true) {
+                $taxa->update();
+            }
+            $taxaImageColl = $taxa->getTaxaImageColl();
+            if (
+                  array_key_exists('image_id_list', $_REQUEST) &&
+                  is_array($_REQUEST['image_id_list'])
+               ) {
+
+               $idc = $taxaImageColl->getFieldsAsArray('id');
+               $taxaImage = new \flora\taxa\TaxaImage($GLOBALS['db']);
+               foreach(array_diff($idc,$_REQUEST['image_id_list']) as $id) {
+                  $taxaImage->loadFromId($id);
+                  $taxaImage->delete();
+               }
+
+            }
+           $taxaImageColl = $taxa->getTaxaImageColl();
+
+
+            if (
+               array_key_exists('image_name_list', $_REQUEST) &&
+               is_array($_REQUEST['image_name_list'])
+               ) {
+                   foreach ($_REQUEST['image_name_list'] as $imageName) {
+                      if (
+                              $imageName == '' ||
+                              !is_file($GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$imageName)
+                              ) continue;
+                      $taxaImage = $taxaImageColl->addItem();
+                      $taxaImage->moveInsert($GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$imageName);
+                   }
+               }
+
+               if (
+                       isset($_FILES) &&
+                       is_array($_FILES) &&
+                       is_array($_FILES['traditional_image']) && 
+                       $_FILES['traditional_image']['error'] ==0 &&
+                       $_FILES['traditional_image']['name'] != '' &&
+                       is_file($_FILES['traditional_image']['tmp_name'])
+                       ) {
+                       $fileName = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp'.DIRECTORY_SEPARATOR.$_FILES['traditional_image']['name'];
+                       if (move_uploaded_file($_FILES['traditional_image']['tmp_name'], $fileName)) {
+                           $taxaImage = $taxaImageColl->addItem();
+                           $taxaImage->moveInsert($fileName);
+                       }
+               }
+
+            if (
+                    array_key_exists('children_dico_item_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_item_id']) &&
+                    array_key_exists('children_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_dico_id'])
+                ) {
+                $dicoItem = new flora\dico\DicoItem($GLOBALS['db']);
+                $dicoItem->loadFromIdAndDico($_REQUEST['children_dico_id'],$_REQUEST['children_dico_item_id']);
+                $dicoItem->setData($taxa->getData('id'), 'taxa_id');
+                $dicoItem->replace();
+            }
+            if (
+                    array_key_exists('children_add_dico_item_id', $_REQUEST) && is_numeric($_REQUEST['children_add_dico_item_id']) &&
+                    array_key_exists('children_add_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_add_dico_id'])
+                ) {
+                $dicoItem = new flora\dico\AddDicoItem($GLOBALS['db']);
+                $dicoItem->loadFromIdAndDico($_REQUEST['children_add_dico_id'],$_REQUEST['children_add_dico_item_id']);
+                $dicoItem->setData($taxa->getData('id'), 'taxa_id');
+                $dicoItem->replace();
+            }
+            $log = new \log\Log($GLOBALS['db']);
+            $log->add(
+                    $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),
+                    $action,
+                    $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name')
+                   );
          }
-         if (
-                 array_key_exists('children_add_dico_item_id', $_REQUEST) && is_numeric($_REQUEST['children_add_dico_item_id']) &&
-                 array_key_exists('children_add_dico_id', $_REQUEST) && is_numeric($_REQUEST['children_add_dico_id'])
-             ) {
-             $dicoItem = new flora\dico\AddDicoItem($GLOBALS['db']);
-             $dicoItem->loadFromIdAndDico($_REQUEST['children_add_dico_id'],$_REQUEST['children_add_dico_item_id']);
-             $dicoItem->setData($taxa->getData('id'), 'taxa_id');
-             $dicoItem->replace();
-         }
-         $log = new \log\Log($GLOBALS['db']);
-         $log->add(
-                 $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),
-                 $action,
-                 $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name')
-                );
          if (array_key_exists('children_dico_id', $_REQUEST)) {
             header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=dico&action=edit&id='.$_REQUEST['children_dico_id']);
          } else if (array_key_exists('children_add_dico_id', $_REQUEST)) {

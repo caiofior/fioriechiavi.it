@@ -45,3 +45,35 @@ $(document).ready(function() {
         }
     });
 });
+$("#taxa_id").autocomplete({
+   source: function (request, response) {
+      $.getJSON("#", {
+         task: "user",
+         action:"taxalist",
+         term:$( "#taxa_id" ).val(),
+         taxa_list: $( "#taxa_id" ).parents("form").find("#taxa_list input[name=taxa_list\\[\\]]").serialize(),
+      }, 
+      response);
+   },
+   select: function(e, ui ) {
+       $("#taxa_list").append("<div>"+ui.item.label+" <a class='remove_taxa' href='#'>X</a><input type='hidden' name='taxa_list[]' value='"+ui.item.value+"'/></div>");
+       $("#taxa_id").val("");
+       removeTaxa ();
+       e.preventDefault();
+   }
+});
+removeTaxa ();
+function removeTaxa () {
+    $(".remove_taxa").click(function (e) {
+        p =  $(this).parent("div");
+        $(this).dialog({
+           buttons: {
+              "Confermi la cancellazione del taxa?": function() {
+                    $(this).dialog('close');
+                    p.remove();
+              }
+           }
+        });
+        e.preventDefault();
+    });
+}

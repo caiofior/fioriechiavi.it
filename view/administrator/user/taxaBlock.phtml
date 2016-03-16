@@ -1,0 +1,7 @@
+<?php foreach($taxaColl->getItems() as $taxa): ?>
+<div>
+    <?php echo $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); ?>
+    <a class="remove_taxa" href="#">X</a>
+    <input type="hidden" name="taxa_list[]" value="<?php echo $taxa->getData('id'); ?>"/>
+</div>
+<?php endforeach; 

@@ -475,5 +475,32 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
             $addDico->insert();
         }
     }
+    /**
+     * Test if taxa can be edited
+     * @param \login\user\Profile $filterForTaxaprofile
+     * @return bool
+     */
+    public function profileCanEdit(\login\user\Profile $filterForTaxaprofile) {
+	if($filterForTaxaprofile->getEditableTaxaColl()->count() ==0) {
+	   return true;
+	}
+        $sql = 'SELECT COUNT(`id`) FROM `taxa` 
+              LEFT JOIN taxa_search ON taxa.id=taxa_search.taxa_id
+              WHERE `id` = '. intval($this->data['id']).' AND ( FALSE';
+        foreach($filterForTaxaprofile->getEditableTaxaColl()->getItems() as $taxa) {
+              $resultSet = $this->db->query('SELECT `lft`,`rgt` FROM `taxa_search` 
+              WHERE `taxa_id` = '. intval($taxa->getData('id'))
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+              $resultSet = $resultSet->toArray();
+              $taxaSearch = array_shift($resultSet);
+              $sql .= ' OR (`lft` >= '.$taxaSearch['lft'].' AND `rgt` <= '.$taxaSearch['rgt'].')';
+        }
+        $sql .= ')';
+        $resultSet = $this->db->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $resultSet = $resultSet->toArray();
+        $count = array_shift($resultSet);
+        $count = array_shift($count);
+        return $count == 1;
+    }
 
 }

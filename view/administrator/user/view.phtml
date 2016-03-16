@@ -73,6 +73,19 @@ endforeach; ?>
     <?php endforeach;  ?>
     </select>
     <div>
+        <p>Aggiungi un taxa:</p>
+        <div class="taxaTable">
+         <input id="taxa_id" name="taxa_id">
+        </div>
+        <div id="taxa_list">
+            <p>Elenco</p>
+            <?php
+            $taxaColl = $this->object->getEditableTaxaColl();
+            require __DIR__.'/taxaBlock.phtml';
+            ?>
+        </div>
+    </div>
+    <div>
       <input type="submit" name="submit" value="Salva">
     </div>
     </div>

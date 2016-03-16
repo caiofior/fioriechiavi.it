@@ -6,6 +6,11 @@ namespace flora\taxa;
  * @author caiofior
  */
 class TaxaColl extends \ContentColl {
+     /**
+     * Filter for profile
+     * @var login\user\profile 
+     */
+      private $filterForTaxaprofile=null;
       /**
        * Relation with th content
        * @param type $db
@@ -29,6 +34,13 @@ class TaxaColl extends \ContentColl {
                 parent::loadAll($criteria);
               }
           }
+      }
+      /**
+       * Filters taxa for profile
+       * @param \login\user\Profile $filterForTaxaprofile
+       */
+      public function filterForProfile(\login\user\Profile $filterForTaxaprofile) {
+          $this->filterForTaxaprofile=$filterForTaxaprofile;
       }
       /**
       * Customizes select statement
@@ -106,6 +118,22 @@ class TaxaColl extends \ContentColl {
       }
       if (array_key_exists('used_taxa_id', $criteria) && $criteria['used_taxa_id'] != '') {
           $select->where(' `id`  IN (SELECT `parent_taxa_id` FROM `dico_item` WHERE `taxa_id`= '.intval($criteria['used_taxa_id']).')  ');
+      }
+      if (is_object($this->filterForTaxaprofile)) {
+          if($this->filterForTaxaprofile->getEditableTaxaColl()->count() >0) {
+	          $select->join('taxa_search','taxa.id=taxa_search.taxa_id', \Zend\Db\Sql\Select::SQL_STAR, \Zend\Db\Sql\Select::JOIN_LEFT);
+	          $sqlFilter = '( FALSE';
+	          foreach($this->filterForTaxaprofile->getEditableTaxaColl()->getItems() as $taxa) {
+	              $resultSet = $this->content->getDb()->query('SELECT `lft`,`rgt` FROM `taxa_search` 
+	              WHERE `taxa_id` = '. intval($taxa->getData('id'))
+	                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+	              $resultSet = $resultSet->toArray();
+	              $taxaSearch = array_shift($resultSet);
+	              $sqlFilter .= ' OR (`lft` >= '.$taxaSearch['lft'].' AND `rgt` <= '.$taxaSearch['rgt'].')';
+	          }
+	          $sqlFilter .= ' )';
+	          $select->where($sqlFilter);
+	  }
       }
       return $select;
     }

@@ -50,5 +50,38 @@ class Profile extends \Content
                 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         parent::delete();
     }
-
+    /**
+     * Sets editable taxa
+     * @param array $taxaList
+     */
+    public function setEditableTaxa(array $taxaList) {
+        if (array_key_exists('id', $this->data) && $this->data['id'] != '')
+            $this->db->query('DELETE FROM `profile_taxa` 
+              WHERE `profile_id`=' . intval($this->data['id'])
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        foreach ($taxaList as $taxa) {
+            $this->db->query('INSERT INTO `profile_taxa` 
+              (`profile_id`,`taxa_id`)
+              VALUES
+              (' . intval($this->data['id']) . ',"' . addslashes($taxa) . '")'
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        }
+    }
+    /**
+     * Sets editable taxa
+     * @return \flora\taxa\TaxaColl
+     */
+    public function getEditableTaxaColl() {
+        $taxaColl = new \flora\taxa\TaxaColl($this->db);
+        $resultSet = $this->db->query('SELECT `taxa_id` FROM `profile_taxa` 
+              WHERE `profile_id` = '. intval($this->data['id'])
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $taxaOr = new \flora\taxa\Taxa($this->db);
+        foreach ($resultSet->toArray() as $result) {
+            $taxa = clone $taxaOr;
+            $taxa->loadFromId($result['taxa_id']);
+            $taxaColl->appendItem($taxa);
+        }
+        return $taxaColl;
+    }
 }

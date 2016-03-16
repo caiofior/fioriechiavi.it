@@ -62,6 +62,11 @@ switch ($_REQUEST['action']) {
       if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
          $_REQUEST['active']=(array_key_exists('active', $_REQUEST)?1:0); 
          $profile->setData($_REQUEST);
+         $taxaList = array();
+         if (array_key_exists('taxa_list', $_REQUEST) && is_array($_REQUEST['taxa_list'])) {
+             $taxaList = $_REQUEST['taxa_list'];
+         } 
+         $profile->setEditableTaxa($taxaList);
          $profile->update();
          header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=user&action=view&id='.$profile->getData('id'));
          exit(); 
@@ -84,5 +89,30 @@ switch ($_REQUEST['action']) {
          $profile->delete();
       }
       exit;
+   case 'taxalist' :
+   $excludeTaxa = array();
+   if (array_key_exists('taxa_list',$_REQUEST) && $_REQUEST['taxa_list'] != '') {
+      parse_str ($_REQUEST['taxa_list'],$excludeTaxa);
+      $excludeTaxa = $excludeTaxa['taxa_list'];
+      
+   }
+   $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
+   $taxaColl->loadAll($_REQUEST);
+   $result = array();
+   foreach ($taxaColl->getItems() as $taxa) {
+      if (in_array($taxa->getData('id'), $excludeTaxa)) {
+         continue;
+      }
+      $result[] = array(
+          'value'=>$taxa->getData('id'),
+          'label'=>$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name')
+      );
+   } 
+   header('Content-Type: application/json');
+   header('Pragma: cache');
+   header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
+   header('Cache-Control: max-age=3600, must-revalidate, public ');
+   echo json_encode($result);
+   exit;
    break;
 }
