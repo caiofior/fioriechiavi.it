@@ -43,7 +43,18 @@ if ($taxa->getData('name') != '') :
    <?php
    endforeach;
 endif;
-?>
+if (
+          $GLOBALS['db']->config->adsense != '' && 
+          (
+               !array_key_exists('profile', $GLOBALS) ||
+               !is_object($GLOBALS['profile']) ||
+                         $GLOBALS['profile']->getData('role_id') != 1
+           )
+  ) { 
+echo $GLOBALS['db']->config->adsense;
+} ?>
+
+
 <div>
 <?php if($taxa->getRawData('taxa_kind_ord') > 3) : ?>    
     <?php if ($GLOBALS['profile'] instanceof \login\user\Profile) : ?>
