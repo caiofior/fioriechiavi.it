@@ -25,16 +25,19 @@ class TaxaColl extends \ContentColl {
       public function loadAll(array $criteria=null) {
           parent::loadAll($criteria);
           if ( $this->count() == 0 && 
-                  (
-                    !array_key_exists('iDisplayStart', $criteria) ||
-                    $criteria['iDisplayStart']==0
-                  ) &&
-                  (
-                    !array_key_exists('sSearch', $criteria) ||
-                    $criteria['sSearch']==''
-                  )
+               !array_key_exists('moreDicoItems', $criteria) &&
+               !array_key_exists('images', $criteria) &&
                   
-                  ) {
+                    (
+                      !array_key_exists('iDisplayStart', $criteria) ||
+                      $criteria['iDisplayStart']==0
+                    ) &&
+                    (
+                      !array_key_exists('sSearch', $criteria) ||
+                      $criteria['sSearch']==''
+                    )
+
+                  ){
               $taxaKindColl = new \flora\taxa\TaxaKindColl($this->content->getDb());
               $taxaKindColl->loadAll();
               $defaultTaxaFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
