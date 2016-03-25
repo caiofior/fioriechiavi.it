@@ -199,7 +199,7 @@ case 'resettaxa':
        $command .= ' -p'.$GLOBALS['config']->database->password;
    }
    $command .= ' '.$GLOBALS['config']->database->database.' ';
-   $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE taxa_kind; TRUNCATE TABLE region; TRUNCATE TABLE taxa; TRUNCATE TABLE taxa_region; TRUNCATE TABLE taxa_attribute; TRUNCATE TABLE taxa_attribute_value; TRUNCATE TABLE taxa_image;SET FOREIGN_KEY_CHECKS=1"';
+   $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE taxa_kind; TRUNCATE TABLE region; TRUNCATE TABLE taxa; TRUNCATE TABLE taxa_region; TRUNCATE TABLE taxa_attribute; TRUNCATE TABLE taxa_attribute_value; TRUNCATE TABLE taxa_image; TRUNCATE TABLE dico_item; TRUNCATE TABLE add_dico; TRUNCATE TABLE add_dico_item; SET FOREIGN_KEY_CHECKS=1"';
    exec($command);
    header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=backup');  
    exit();  
@@ -216,13 +216,12 @@ case 'resetutenti':
        $command .= ' -p'.$GLOBALS['config']->database->password;
    }
    $command .= ' '.$GLOBALS['config']->database->database.' ';
-   $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE user; TRUNCATE TABLE profile; TRUNCATE TABLE contact; TRUNCATE TABLE contact_parent;SET FOREIGN_KEY_CHECKS=1"';
+   $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE login; TRUNCATE TABLE facebook; TRUNCATE TABLE facebook_graph; TRUNCATE TABLE profile; TRUNCATE TABLE profile_taxa; TRUNCATE TABLE contact; TRUNCATE TABLE contact_parent; SET FOREIGN_KEY_CHECKS=1"';
    exec($command);
    $logDir = $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'log';
    if (!is_dir($logDir)) {
        mkdir($logDir);
    }
-   pclose(popen('php ' . $GLOBALS['db']->baseDir . 'shell/indexing_taxa_search.php > '.$logDir.'/reindex.txt &', 'r'));
    header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=backup');  
    exit();
    break;
