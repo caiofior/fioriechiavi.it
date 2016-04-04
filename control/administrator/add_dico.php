@@ -23,6 +23,9 @@ case 'update':
             $dicoItemColl = $dicoItemColl->importAndSave($_REQUEST['upload_format'],$resouce);  
          }
    } else if ($_REQUEST['action'] == 'edit' && array_key_exists('submit', $_REQUEST)) {
+       if (!array_key_exists('is_list', $_REQUEST)) {
+            $_REQUEST['is_list']='';
+       }
        $dico->setData($_REQUEST);
        $dico->update();
    }

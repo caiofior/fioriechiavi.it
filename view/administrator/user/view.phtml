@@ -73,6 +73,9 @@ endforeach; ?>
     <?php endforeach;  ?>
     </select>
     <div>
+        <div>
+        Scadenza: <input id="expire" name="expire" value="<?php echo $this->object->getData('expire'); ?>">
+        </div>
         <p>Aggiungi un taxa:</p>
         <div class="taxaTable">
          <input id="taxa_id" name="taxa_id">

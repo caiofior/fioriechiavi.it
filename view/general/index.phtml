@@ -48,7 +48,11 @@ if (
           (
                !array_key_exists('profile', $GLOBALS) ||
                !is_object($GLOBALS['profile']) ||
-                         $GLOBALS['profile']->getData('role_id') != 1
+               $GLOBALS['profile']->getData('role_id') != 1 ||
+               (
+                       $GLOBALS['profile']->getData('expire') != '' &&
+                       date_diff(date_create(),date_create_from_format('Y-m-d',$GLOBALS['profile']->getData('expire')))->format('%a')>0
+               )
            )
   ) { 
 echo $GLOBALS['db']->config->adsense;

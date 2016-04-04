@@ -22,7 +22,7 @@ if (array_key_exists('sEcho', $_REQUEST)) {
             } else if ($column == 'taxa_kind_id') {
                $data=$taxa->getRawData('taxa_kind_initials');
             } else if ($column == 'actions') {
-               if($taxa->getData('id') > 1) {
+               
                $data = '
                    <a class="actions modify" title="Modifica" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a>
                    <a class="actions delete" title="Cancella" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>
@@ -32,16 +32,6 @@ if (array_key_exists('sEcho', $_REQUEST)) {
                                           <a class="actions view blank" title="Modifica" href="'.$GLOBALS['db']->config->baseUrl.'?id='.$taxa->getData('id').'">Visualizza</a>
                        ';     
                    }
-               } else {
-                   $data = '
-                   <a class="actions modify" title="Modifica" href="?task=dico&amp;action=edit&amp;id='.$taxa->getData('id').'">Chiave dicotomica</a>
-                   ';
-                   if ($taxa->getRawData('status') == true) {
-                   $data .= '
-                                          <a class="actions view blank" title="Modifica" href="'.$GLOBALS['db']->config->baseUrl.'?id='.$taxa->getData('id').'">Visualizza</a>
-                       ';     
-                   }
-               }
                
             } 
             $row[] = $data;     
@@ -88,6 +78,9 @@ case 'edit':
          $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxa->loadFromId($_REQUEST['id']);
+         }
+         if (!array_key_exists('is_list', $_REQUEST)) {
+            $_REQUEST['is_list']='';
          }
          $taxa->setData($_REQUEST);
          if ($taxa->profileCanEdit($GLOBALS['profile'])) {

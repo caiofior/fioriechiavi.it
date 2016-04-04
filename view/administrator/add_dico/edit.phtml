@@ -6,6 +6,10 @@
 <form method="post" action="#">
    <input type="hidden" name="id" id="id" value="<?php echo $dico->getData('id');?>">
    <input id="name" name="name" value="<?php echo $dico->getData('name');?>">
+   <div>
+    <label for="is_list">Voci come lista</label>
+    <input type="checkbox" id="is_list" name="is_list" value="1" <?php if($dico->getData('is_list')!='') echo 'checked="checked"';?>>
+   </div>
    <input id="downloadDico" type="submit" name="submit" value="Aggiorna"/>
 </form>
 <?php if ($dico->getData('taxa_id') > 1) : ?>

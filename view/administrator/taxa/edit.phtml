@@ -156,6 +156,10 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
       require __DIR__.'/imageBlock.phtml'; }
       ?>
       </div>
+   <div>
+    <label for="is_list">Voci come lista</label>
+    <input type="checkbox" id="is_list" name="is_list" value="1" <?php if($taxa->getData('is_list')!='') echo 'checked="checked"';?>>
+   </div>
    <?php if (is_numeric($taxa->getData('id')) && $taxa->getData('status') == true ) : ?>
    <div>
       <div class="saved">

@@ -45,6 +45,8 @@ $(document).ready(function() {
         }
     });
 });
+$.datepicker.setDefaults($.datepicker.regional["it"]);
+$("#expire").datepicker({ "dateFormat": "yy-mm-dd"});
 $("#taxa_id").autocomplete({
    source: function (request, response) {
       $.getJSON("#", {
