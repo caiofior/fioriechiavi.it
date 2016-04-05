@@ -24,7 +24,11 @@ case 'update':
          }
    }
    $this->getTemplate()->setObjectData($taxa);
-   $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
+   if ($taxa->getData('is_list') == 1) {
+       $this->getTemplate()->setBlock('middle','administrator/dico/edit_list.phtml');
+   } else {
+        $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
+   }
    $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
    if (
            $_REQUEST['action'] == 'deletetaxaassociation' ||

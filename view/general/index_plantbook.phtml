@@ -57,8 +57,6 @@ if (
   ) { 
 echo $GLOBALS['db']->config->adsense;
 } ?>
-
-
 <div>
 <?php if($taxa->getRawData('taxa_kind_ord') > 3) : ?>    
     <?php if ($GLOBALS['profile'] instanceof \login\user\Profile) : ?>
@@ -96,77 +94,11 @@ echo $description;
 <?php endif;
 require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php'); 
 if ($taxa->getData('description') != '') :
-require (__DIR__.DIRECTORY_SEPARATOR.'map.php'); 
 $attributeColl = $taxa->getTaxaAttributeColl();
    if ($attributeColl->count() > 0) : ?>
 <div class="attribute_list">
       <?php foreach($attributeColl->getItems() as $attribute) :
          switch ($attribute->getData('name')) : 
-            case 'Inizio fioritura' :
-            break;
-            case 'Fine fioritura' :
-            break;
-            case 'Limite altitudinale inferiore' :
-            break;
-            case 'Limite altitudinale superiore' :
-            break;
-            case 'Diffusione' : ?>
-      <p>
-            <?php echo $attribute->getData('name');?> :
-            <span>
-               <?php switch($attribute->getRawData('value')) :
-                  case 'Specie endemica':?>
-               ●
-               <?php
-                  break;
-               endswitch;
-               echo $attribute->getRawData('value');?>
-            </span>
-      </p>
-            <?php 
-            break;
-          case 'Ciclo riproduttivo' : ?>
-      <p>
-            <?php echo $attribute->getData('name');?> :
-            <span>
-               <?php switch($attribute->getRawData('value')) :
-                  case 'Annuale':?>
-               ☉
-               <?php
-                  break;
-                  case 'Biennale':?>
-               ⚇
-               <?php
-                  break;
-               endswitch;
-               echo $attribute->getRawData('value');?>
-            </span>
-      </p>
-            <?php 
-            break;
-            case 'Portamento' : ?>
-      <p>
-            <?php echo $attribute->getData('name');?> :
-            <span>
-               <?php switch($attribute->getRawData('value')) :
-                  case 'Pianta perenne erbacea':?>
-               ↓
-               <?php
-                  break;
-                  case 'Cespuglio':?>
-               ⏉
-               <?php
-                  break;
-                  case 'Albero':?>
-               ☨
-               <?php
-                  break;
-               endswitch;
-               echo $attribute->getRawData('value');?>
-            </span>
-      </p>
-            <?php 
-            break;
             default:
             ?>
       <p>
@@ -180,19 +112,6 @@ $attributeColl = $taxa->getTaxaAttributeColl();
 </div>
 <div class="clear"></div>
 <footer>
-<?php  
-if (
-        $attributeColl->filterByAttributeValue('Limite altitudinale inferiore','name')->getFirst()->getRawData('value') != '' &&
-        $attributeColl->filterByAttributeValue('Limite altitudinale superiore','name')->getFirst()->getRawData('value') != ''
-    ) {
-      require (__DIR__.DIRECTORY_SEPARATOR.'altitude.php');
-   }
-if (
-        $attributeColl->filterByAttributeValue('Inizio fioritura','name')->getFirst()->getRawData('value') != '' &&
-        $attributeColl->filterByAttributeValue('Fine fioritura','name')->getFirst()->getRawData('value') != ''
-    ) {
-      require (__DIR__.DIRECTORY_SEPARATOR.'flowering.php');
-   } ?>
    <?php endif;
    $imageColl = $taxa->getTaxaImageColl();
    if ($imageColl->count() > 0) : ?>

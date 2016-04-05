@@ -52,6 +52,13 @@ class Template {
       $this->templateFileName = $templateFileName;
    }
    /**
+    * Gets template name
+    * @return string
+    */
+   public function getTemplate() {
+      return $this->templateFileName;
+   }
+   /**
     * Sets the template file name
     * @param string $templateFileName
     */
