@@ -17,6 +17,15 @@ if (rand(0,10) == 0) {
         closedir($handle); 
     }
 }
+if (!extension_loaded('mcrypt')) {
+    throw new Exception('Mcrypt extension is required',1604061516);
+}
+if (!extension_loaded('curl')) {
+    throw new Exception('cURL extension is required',1604061518);
+}
+if (!extension_loaded('mysql') && !extension_loaded('mysqli')) {
+    throw new Exception('Mysql extension is required',1604061517);
+}
 session_save_path($sessionDir);
 require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
