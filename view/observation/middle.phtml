@@ -4,4 +4,11 @@
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>map.php">Taxa presenti</a>
 </div>
 <h2>Ultime osservazioni botaniche</h2>
-<?php require __DIR__.'/middleContent.php';?>
+<div id="map-canvas" style="width: 100%; height: 400px;"></div>
+<?php
+if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search->key != '') : ?>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $GLOBALS['db']->config->search->key; ?>"></script>
+<?php endif; ?>
+<div id="observationContent">
+<?php require __DIR__.'/middleContent.phtml';?>
+</div>

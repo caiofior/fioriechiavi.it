@@ -1,5 +1,7 @@
 <?php
-$taxaObservationColl = $this->object;
+if (!isset( $taxaObservationColl)) {
+   $taxaObservationColl = $this->object;
+}
 $pageBuffer=5;
 $lastPage = intval($taxaObservationColl->countAll()/$_REQUEST['pagelength']);
 $GLOBALS['lastPage']=$lastPage;
@@ -21,7 +23,6 @@ sort($pages);
     <?php if ($page <$lastPage && !in_array($page+1, $pages)) :?>…<?php endif;?>
 <?php endforeach; ?>
 </div>
-<div id="map-canvas" style="width: 100%; height: 400px;"></div>
 <?php
 $radius = 12;
 $pointsString='[';
@@ -48,17 +49,19 @@ foreach ($taxaObservationColl->getItems() as $index=>$taxaObservation):
 </div>
 <?php endforeach;
 if ($taxaObservationColl->count() > 1) {
-    $radius -= sqrt($taxaObservationColl->getMultiPoint()->envelope()->area())^2;
+    $radius -= sqrt($taxaObservationColl->getMultiPoint()->envelope()->area());
 }
 $pointsString .=']'; 
 $centroid = $taxaObservationColl->getMultiPoint()->centroid();
-if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search->key != '') : ?>
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $GLOBALS['db']->config->search->key; ?>"></script>
-<?php endif; ?>
+?>
 <script>
     points = <?php echo $pointsString; ?>;
     centroid = {latitude:<?php echo $centroid->y(); ?>,longitude:<?php echo $centroid->x(); ?>};
     radius = <?php echo $radius; ?>;
-    updateMap();
+    if(typeof map == "undefined") {
+    	window.onload = function () {updateMap();}
+    } else {
+	updateMap();
+    }
 </script>
 
