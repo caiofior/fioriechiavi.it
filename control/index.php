@@ -24,7 +24,6 @@ switch ($_REQUEST['action']) {
            $taxaObservation = $taxaObservationColl->addItem();
            if (!(
                    $_REQUEST['title'] == '' ||
-                   $_REQUEST['description'] == '' ||
                    $_REQUEST['latitude'] == '' ||
                    $_REQUEST['longitude'] == '' ||
                    !is_array($_FILES) ||

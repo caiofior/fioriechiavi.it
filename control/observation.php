@@ -37,6 +37,10 @@ if ($taxaObservation->getData('id') == '') {
     $this->getTemplate()->setObjectData($taxaObservationColl);
     $this->getTemplate()->setBlock('middle','observation/middle.phtml');
 }
+if (array_key_exists('xhr',$_REQUEST) && $_REQUEST['xhr'] == 1) {
+   require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'observation'.DIRECTORY_SEPARATOR.'middleContent.phtml';
+   exit;
+}
 $this->getTemplate()->setBlock('head','observation/head.phtml');
 $this->getTemplate()->setBlock('footer','observation/footer.phtml');
 
