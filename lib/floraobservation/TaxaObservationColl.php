@@ -33,10 +33,11 @@ class TaxaObservationColl extends \ContentColl {
      * @return int
      */
     public function countAll($criteria = array()) {
-      $select = $this->content->getTable()->getSql()->select()->columns(array(new \Zend\Db\Sql\Expression('COUNT(*)')));
+      $select = $this->content->getTable()->getSql()->select();
       $select = $this->setFilter($select,$criteria);
+      $select->columns(array('count'=>new \Zend\Db\Sql\Expression('COUNT(*)')));
       $statement = $this->content->getTable()->getSql()->prepareStatementForSqlObject($select);
-      $results = $statement->execute();
+      $results = $statement->execute();      
       $resultSet = new \Zend\Db\ResultSet\ResultSet();
       $resultSet->initialize($results);
       if (is_object($resultSet->current())) {

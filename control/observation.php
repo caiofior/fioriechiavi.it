@@ -1,6 +1,15 @@
 <?php
 $this->getTemplate()->setBlock('middle','observation/detail.phtml');
 $taxaObservation = new \floraobservation\TaxaObservation($GLOBALS['db']);
+if (!array_key_exists('action', $_REQUEST)) {
+   $_REQUEST['action']=null;
+}
+if (!array_key_exists('start', $_REQUEST)) {
+    $_REQUEST['start']=0;
+}
+if (!array_key_exists('pagelength', $_REQUEST)) {
+    $_REQUEST['pagelength']=10;
+}
 if (array_key_exists('id', $_REQUEST) && $_REQUEST['id'] != '') {
     $taxaObservation->loadFromId($_REQUEST['id']);
     if(!$taxaObservation->getData('valid')) {
@@ -17,8 +26,8 @@ if (array_key_exists('id', $_REQUEST) && $_REQUEST['id'] != '') {
 if ($taxaObservation->getData('id') == '') {
     $taxaObservationColl = new \floraobservation\TaxaObservationColl($GLOBALS['db']);
     $taxaObservationColl->loadAll(array(
-        'iDisplayStart'=>0,
-        'iDisplayLength'=>10,
+        'iDisplayStart'=>$_REQUEST['start'],
+        'iDisplayLength'=>$_REQUEST['pagelength'],
         'sColumns'=>'datetime',
         'iSortingCols'=>'1',
         'iSortCol_0'=>'0',
