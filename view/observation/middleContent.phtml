@@ -3,7 +3,7 @@ if (!isset( $taxaObservationColl)) {
    $taxaObservationColl = $this->object;
 }
 $pageBuffer=5;
-$lastPage = intval($taxaObservationColl->countAll()/$_REQUEST['pagelength']);
+$lastPage = intval($taxaObservationColl->countAll(array('valid'=>true))/$_REQUEST['pagelength'])-1;
 $GLOBALS['lastPage']=$lastPage;
 $currentpage=min($lastPage,intval($_REQUEST['start']/$_REQUEST['pagelength']));
 $pages =array(0,$lastPage);
@@ -49,7 +49,8 @@ foreach ($taxaObservationColl->getItems() as $index=>$taxaObservation):
 </div>
 <?php endforeach;
 if ($taxaObservationColl->count() > 1) {
-    $radius -= sqrt($taxaObservationColl->getMultiPoint()->envelope()->area());
+    $radius = 8-log10($taxaObservationColl->getMultiPoint()->envelope()->area());
+    
 }
 $pointsString .=']'; 
 $centroid = $taxaObservationColl->getMultiPoint()->centroid();
@@ -57,7 +58,7 @@ $centroid = $taxaObservationColl->getMultiPoint()->centroid();
 <script>
     points = <?php echo $pointsString; ?>;
     centroid = {latitude:<?php echo $centroid->y(); ?>,longitude:<?php echo $centroid->x(); ?>};
-    radius = <?php echo $radius; ?>;
+    radius = <?php echo intval($radius); ?>;
     if(typeof map == "undefined") {
     	window.onload = function () {updateMap();}
     } else {

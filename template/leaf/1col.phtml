@@ -67,22 +67,22 @@
                         <div class="col-xs-offset-1 header-right">
                             <?php if($GLOBALS['db']->config->socialPages->facebook != '') : ?>
                             <a rel="nofollow" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->facebook; ?>" title="Facebook">
-                                <img src="template/leaf/images/fb.png" alt="Facebook" />
+                                <img class="social facebook" src="template/leaf/images/empty.png" alt="Facebook" />
                             </a>
                             <?php endif; 
                             if($GLOBALS['db']->config->socialPages->googlePlus != '') : ?>
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->googlePlus; ?>" title="Google +">
-                                <img src="template/leaf/images/gp.png" alt="Google +" />
+                                <img class="social google" src="template/leaf/images/empty.png" alt="Google +" />
                             </a>
                             <?php endif;
                             if($GLOBALS['db']->config->socialPages->scribd != '') : ?>
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->scribd; ?>" title="Scribd">
-                                <img src="template/leaf/images/sd.png" alt="Scribd" />
+                                <img class="social scribd" src="template/leaf/images/empty.png" alt="Scribd" />
                             </a>
                             <?php endif;
                             if($GLOBALS['db']->config->socialPages->issuu != '') : ?>
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->issuu; ?>" title="Issuu">
-                                <img src="template/leaf/images/issuu.png" alt="Issuu" />
+                                <img class="social issuu" src="template/leaf/images/empty.png" alt="Issuu" />
                             </a>
                             <?php endif;
                             $cid  = null;
@@ -98,7 +98,7 @@
                                 $rssUrl .= '?key='.$cid;
                             } ?>
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $rssUrl; ?>" title="RSS">
-                                <img src="template/leaf/images/rss.png" alt="RSS" />
+                                <img class="social rss" src="template/leaf/images/empty.png" alt="RSS" />
                             </a>
                         </div>
                 </div>

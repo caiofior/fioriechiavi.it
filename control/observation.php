@@ -32,7 +32,7 @@ if ($taxaObservation->getData('id') == '') {
         'iSortingCols'=>'1',
         'iSortCol_0'=>'0',
         'sSortDir_0'=>'DESC',
-	'valid'=>true
+        'valid'=>true
     ));
     $this->getTemplate()->setObjectData($taxaObservationColl);
     $this->getTemplate()->setBlock('middle','observation/middle.phtml');
