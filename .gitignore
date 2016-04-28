@@ -18,3 +18,5 @@
 /images/merged_map/
 /images/qr/
 /images/taxa_observation600x400/
+/db/
+/shell/importdb.sh
