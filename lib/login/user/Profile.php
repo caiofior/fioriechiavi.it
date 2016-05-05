@@ -14,6 +14,13 @@ class Profile extends \Content
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
       parent::__construct($db, 'profile');
    }
+   /**
+    * Sets the uuid
+    */
+   public function insert() {
+      $this->data['token']= new \Zend\Db\Sql\Predicate\Expression('UUID()');
+      parent::insert();
+   }
     /**
      * Gets the user role object
      * @return \login\user\UserRole

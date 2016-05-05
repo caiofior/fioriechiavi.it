@@ -62,7 +62,7 @@ $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
    }   
 }
 $db->config = $config;
-
+ 
 require __DIR__.'/../lib/floraobservation/Autoload.php';
 floraobservation\Autoload::getInstance();
 

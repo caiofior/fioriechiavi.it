@@ -8,8 +8,38 @@ $baseDir = __DIR__.'/../db/search';
 if (!is_dir($baseDir)) {
    mkdir($baseDir);
 }
-while (($word = fgets($wordH)) !== false) {
-   $word = iconv('UTF-8', 'ISO-8859-1',trim($word));
+$words = array();
+while (($rawWord = fgets($wordH)) !== false) {
+   $rawWord = trim($rawWord);
+   $word = '';
+   $error = false;
+   $wrongOrd = array();
+   for ($c =0; $c < strlen($rawWord); $c++) {
+         $char = $rawWord[$c];
+         if (ord($char)>127) {
+            $error = true;
+            $wrongOrd[] = ord($char);
+            continue;
+         } else if (sizeof($wrongOrd)>0) {
+           $char = fixChars($wrongOrd);
+           $wrongOrd = array();         
+         }
+         $word .= $char;
+      }
+      if (sizeof($wrongOrd)>0) {
+         $word .= fixChars($wrongOrd);
+      }
+   $words[] = $word;
+}
+fclose($wordH);
+$taxaRes = $mysql->query('SELECT name FROM `taxa` WHERE `taxa_kind_id` = 12 OR `taxa_kind_id` = 7');
+while ($word = $taxaRes->fetch_object()) {
+   preg_match("/^(\w+)/",strtolower(trim($word->name)),$matches);
+   $word = current($matches);
+   $words[] = $word;
+}
+$words = array_unique($words);
+foreach($words as $word) {
    $taxaRes = $mysql->query('SELECT taxa.id ,
    taxa.name ,
    (SELECT `initials` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id` ) as taxa_kind_initials,
@@ -34,7 +64,7 @@ while (($word = fgets($wordH)) !== false) {
    }
    file_put_contents($baseDir,json_encode($searchResult,JSON_FORCE_OBJECT));
 }
-fclose($wordH);
+
 $taxaRes = $mysql->query('SELECT * ,
    (SELECT `initials` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id` ) as taxa_kind_initials,
    (SELECT `name` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id` ) as taxa_kind_name,            
@@ -89,7 +119,7 @@ while ($taxa = $taxaRes->fetch_object()) {
       $taxa->attribute[]=$attribute;
    }
    
-   $regionRes = $mysql->query('SELECT name FROM taxa_region
+   $regionRes = $mysql->query('SELECT region.id,region.name FROM taxa_region
       LEFT JOIN region ON region.id=taxa_region.region_id
       WHERE taxa_id='.$taxa->id);
    $taxa->region=array();
@@ -101,4 +131,15 @@ while ($taxa = $taxaRes->fetch_object()) {
       mkdir($baseDir.'/'.$thousand);
    }
    file_put_contents($baseDir.'/'.$thousand.'/'.$taxa->id.'.json',json_encode($taxa,JSON_FORCE_OBJECT));
+}
+function fixChars ($wrongOrd) {
+   $char = '';
+   foreach($wrongOrd as $pos=>$ord) {
+      $bin = decbin($ord);
+      if ($pos == 0 && strlen($bin) == 8 && substr($bin,0,3) == '111') {
+         $bin = '110'.substr($bin,3);
+      }
+      $char .= chr(bindec($bin));
+   }
+   return $char;
 }
