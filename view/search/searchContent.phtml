@@ -3,7 +3,7 @@ if (!isset($floraSearch)) {
     $floraSearch = $this->object;
 }
 $pageBuffer=5;
-$lastPage = intval($floraSearch->getTaxaCountAll()/$_REQUEST['pagelength']);
+$lastPage = max(intval($floraSearch->getTaxaCountAll()/$_REQUEST['pagelength'])-1,1);
 $GLOBALS['lastPage']=$lastPage;
 $currentpage=min($lastPage,intval($_REQUEST['start']/$_REQUEST['pagelength']));
 $pages =array(0,$lastPage);
