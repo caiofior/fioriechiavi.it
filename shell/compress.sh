@@ -7,3 +7,5 @@ java -jar /home/caiofior/bin/compiler.jar --js /home/caiofior/public_html/fiorie
 java -jar /home/caiofior/bin/compiler.jar --js /home/caiofior/public_html/fioriechiavi.it/js/observation.js | gzip > /home/caiofior/public_html/fioriechiavi.it/js/observation.min.js.gz
 yui-compressor /home/caiofior/public_html/fioriechiavi.it/template/leaf/css/style-cleaned.css | gzip > /home/caiofior/public_html/fioriechiavi.it/template/leaf/css/style-cleaned.css.gz
 yui-compressor /home/caiofior/public_html/fioriechiavi.it/template/leaf/css/bootstrap.css | gzip > /home/caiofior/public_html/fioriechiavi.it/template/leaf/css/bootstrap.css.gz
+yui-compressor /home/caiofior/public_html/fioriechiavi.it/template/plantbook/css/style-cleaned.css | gzip > /home/caiofior/public_html/fioriechiavi.it/template/plantbook/css/style-cleaned.css.gz
+yui-compressor /home/caiofior/public_html/fioriechiavi.it/template/plantbook/css/bootstrap.css | gzip > /home/caiofior/public_html/fioriechiavi.it/template/plantbook/css/bootstrap.css.gz
