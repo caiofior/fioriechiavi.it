@@ -25,11 +25,13 @@ case 'update':
    }
    $this->getTemplate()->setObjectData($taxa);
    if ($taxa->getData('is_list') == 1) {
-       $this->getTemplate()->setBlock('middle','administrator/dico/edit_list.phtml');
+      $this->getTemplate()->setBlock('middle','administrator/dico/edit_list.phtml');
+      $this->getTemplate()->setBlock('footer','administrator/dico/footer_list.phtml');
    } else {
-        $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
+      $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');
+      $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');
    }
-   $this->getTemplate()->setBlock('footer','administrator/dico/footer.phtml');  
+     
    if (
            $_REQUEST['action'] == 'deletetaxaassociation' ||
            $_REQUEST['action'] == 'update'
@@ -82,6 +84,7 @@ case 'jeditable' :
    break;
 case 'taxalist':
    $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
+   $_REQUEST['images']=1;
    $taxaColl->loadAll($_REQUEST);
    $result = array();
    foreach ($taxaColl->getItems() as $taxa) {
@@ -250,6 +253,136 @@ case 'preview' :
       $this->getTemplate()->setBlock('middle','administrator/dico/edit.phtml');   
    }
    
+   break;
+case 'uploadImage':
+   header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+   header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+   header('Cache-Control: no-store, no-cache, must-revalidate');
+   header('Cache-Control: post-check=0, pre-check=0', false);
+   header('Pragma: no-cache');
+
+   @set_time_limit(5 * 60);
+   $m = new stdClass();
+   $m->jsonrpc = 2.0;
+   $m->error = new stdClass();
+   $m->id = 'id';
+
+   // Uncomment this one to fake upload time
+   // usleep(5000);
+
+   $targetDir = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp';
+   
+   if (!is_dir($targetDir)) {
+      mkdir($targetDir);
+   }
+   $cleanupTargetDir = true; // Remove old files
+   $maxFileAge = 5 * 3600; // Temp file age in seconds
+   if (!file_exists($targetDir)) {
+           @mkdir($targetDir);
+   }
+   if (!is_dir($targetDir)) {
+      $m->error->code = 105;
+      $m->error->message = 'Directory temporanea non accessibile in scrittura '.$targetDir;
+      echo json_encode($m);
+      exit;
+   }
+ 
+   if (isset($_REQUEST['name'])) {
+           $fileName = $_REQUEST['name'];
+   } elseif (!empty($_FILES)) {
+           $fileName = $_FILES['file']['name'];
+   } else if ($in = fopen('php://input', 'rb')) {
+      $nextIsName=false;
+      while ($buff = fgets($in, 4096)) {
+         if ($nextIsName) {
+            $buff = trim($buff);
+            if ($buff != '') {
+               $fileName = $buff;
+               break;
+            }
+         } else if (preg_match('/name="name"/',$buff)) {
+            $nextIsName=true;
+         }
+      }
+   } else {
+           $fileName = uniqid('file_');
+   }
+ 
+   $filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
+
+   $chunk = isset($_REQUEST['chunk']) ? intval($_REQUEST['chunk']) : 0;
+   $chunks = isset($_REQUEST['chunks']) ? intval($_REQUEST['chunks']) : 0;
+
+
+   if ($cleanupTargetDir) {
+           if (!is_dir($targetDir) || !$dir = opendir($targetDir)) {
+                   $m->error->code = 100;
+                   $m->error->message = 'Directory temporanea non disponibile '.$targetDir;
+                   echo json_encode($m);
+                   exit;
+           }
+
+           while (($file = readdir($dir)) !== false) {
+                   $tmpfilePath = $targetDir . DIRECTORY_SEPARATOR . $file;
+                   if ($tmpfilePath == $filePath.'.part') {
+                           continue;
+                   }
+                   if (preg_match('/\.part$/', $file) && (filemtime($tmpfilePath) < time() - $maxFileAge)) {
+                           @unlink($tmpfilePath);
+                   }
+           }
+           closedir($dir);
+   }	
+
+
+   if (!$out = @fopen($filePath.'.part', $chunks ? 'ab' : 'wb')) {
+                   $m->error->code = 102;
+                   $m->error->message = 'Errore nell\'apertura del flusso in input';
+                   echo json_encode($m);
+                   exit;
+   }
+
+   if (!empty($_FILES)) {
+           if ($_FILES['file']['error'] || !is_uploaded_file($_FILES['file']['tmp_name'])) {
+                   $m->error->code = 103;
+                   $m->error->message = 'Errore nello spostamento del file caricato';
+                   echo json_encode($m);
+                   exit;
+           }
+
+           // Read binary input stream and append it to temp file
+           if (!$in = @fopen($_FILES['file']['tmp_name'], 'rb')) {
+                   $m->error->code = 101;
+                   $m->error->message = 'Errore nello spostamento del file caricato';
+                   echo json_encode($m);
+                   exit;
+           }
+   } else {	
+           if (!$in = @fopen('php://input', 'rb')) {
+                   $m->error->code = 101;
+                   $m->error->message = 'Errore nello spostamento del file caricato';
+                   echo json_encode($m);
+                   exit;
+           }
+   }
+
+   while ($buff = fread($in, 4096)) {
+           fwrite($out, $buff);
+   }
+
+   @fclose($out);
+   @fclose($in);
+
+   // Check if file has been uploaded
+   if (!$chunks || $chunk == $chunks - 1) {
+           // Strip the temp .part suffix off 
+           rename($filePath.'.part', $filePath);
+   }  
+   $m = new stdClass();
+   $m->jsonrpc = 2.0;
+   $m->result = $fileName;
+   echo json_encode($m);
+   exit;
    break;
 default:
    $this->getTemplate()->setBlock('middle','administrator/taxa/list.phtml');
