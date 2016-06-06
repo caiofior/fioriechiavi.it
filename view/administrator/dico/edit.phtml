@@ -77,7 +77,7 @@ foreach ($taxaItemColl->getItems() as $taxaItem):
       <a class="restoreTaxaButton actions close" href="#" title="Chiudi">Chiudi</a>
    </form>
    <?php else: 
-      if ($taxaItem->getRawData('name') != ''):  ?>
+      if ($taxaItem->getRawData('name') != '' || $taxaItem->getRawData('taxa_id') != ''):  ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $taxaItem->getData('taxa_id');?>"><?php echo $taxaItem->getRawData('initials');?> <?php echo $taxaItem->getRawData('name');?></a>
    <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $taxaItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
       <?php endif; 
