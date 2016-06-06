@@ -30,6 +30,23 @@ ul{
 label{
 	margin:0;
 }
+img.social {
+   height: 22px;
+   width: 22px;
+   background:url(../images/social.svgz);
+}
+img.social.google {
+    background-position: -22px 0px;
+}
+img.social.rss {
+    background-position: -44px 0px;
+}
+img.social.issuu {
+    background-position: -66px 0px;
+}
+img.social.scribd {
+    background-position: -88px 0px;
+}
 /*-----start-header----*/
 .header{
 	background:#ff2d55;

@@ -63,7 +63,7 @@ foreach ($taxaItemColl->getItems() as $taxaItem):
 ?>
 <div>
    <?php echo str_repeat('&#160;', strlen($taxaItem->getData('id'))-1); ?>
-   <?php echo $positions[$taxaItem->getData('id')]; ?>
+   <?php echo (key_exists($taxaItem->getData('id'), $positions)?$positions[$taxaItem->getData('id')]:''); ?>
    <span id="d<?php echo $taxaItem->getData('id'); ?>" class="editable<?php echo $missing;?>"><?php echo $label;?></span>
    <a class="editDicoItem actions edit" href="#"title="Modifica">Modifica</a>
    <?php if($taxaItem->getRawData('possible_taxa') === true) : ?>

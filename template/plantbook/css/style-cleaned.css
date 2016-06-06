@@ -30,6 +30,23 @@ ul{
 label{
 	margin:0;
 }
+img.social {
+   height: 22px;
+   width: 22px;
+   background:url(../images/social.svgz);
+}
+img.social.google {
+    background-position: -22px 0px;
+}
+img.social.rss {
+    background-position: -44px 0px;
+}
+img.social.issuu {
+    background-position: -66px 0px;
+}
+img.social.scribd {
+    background-position: -88px 0px;
+}
 /*-----start-header----*/
 .header{
 	background:#e3ec6f;
@@ -56,8 +73,10 @@ label{
 .top-menu ul li a:hover {
 	color:#92132c;
 }
-.header-left img {
-	width: 100%;
+.header-left a span{
+        color:#207823;
+        font-weight:400;
+        font-size:2em;
 }
 .features-section {
 	padding:5em 0 7em 0;
