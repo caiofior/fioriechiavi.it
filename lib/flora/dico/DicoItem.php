@@ -78,6 +78,12 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
      */
    public function replace() {
         if (
+            !array_key_exists('id', $this->data) ||
+            !array_key_exists('id', $this->rawData)
+            ) {
+               throw new \Exception('Dico item id is missing');
+        }
+        if (
                 !array_key_exists('parent_taxa_id', $this->data) &&
                 array_key_exists('parent_taxa_id', $this->rawData)
                 ) {

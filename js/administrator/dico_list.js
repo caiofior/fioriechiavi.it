@@ -1,4 +1,13 @@
 $(document).ready(function() {
+    $(".addDico").click(function(e) {
+      $("#dico_error").hide();
+      e.preventDefault();
+      if ($(".addText").val() == "") {
+          $("#dico_error").show();          
+      } else {
+          $(this).parent("form").trigger("submit");
+      }
+    });
     $(".addTaxaButton").click(function(e) {
       $(this).hide().siblings(".addTaxa").show();
       e.preventDefault();

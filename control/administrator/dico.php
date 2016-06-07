@@ -26,8 +26,27 @@ case 'update':
    $this->getTemplate()->setObjectData($taxa);
    if ($taxa->getData('is_list') == 1) {
       if (array_key_exists('submit', $_REQUEST)) {
-         var_dump($_REQUEST);
-         die();
+         $dicoItemColl->emptyDicoItems();
+         $dicoItems = array();
+         $lastId = '';
+         if (array_key_exists('addText', $_REQUEST) && $_REQUEST['addText'] != '') {
+            if (!array_key_exists('addPhotoId', $_REQUEST)) {
+               $_REQUEST['addPhotoId']='';
+            }
+            if (substr($lastId,-1) == '1') {
+               $id = $lastId.'0';
+            } else {
+               $id = substr($lastId,0,-1).'1';
+            }
+            
+            $dicoItem = $dicoItemColl->addItem();
+            $dicoItem->setData(array(
+                'id'=>$id,
+                'text'=>$_REQUEST['addText'],
+                'photo_id'=>$_REQUEST['addPhotoId']
+            ));
+            $dicoItem->replace();
+         }
       }
       $this->getTemplate()->setBlock('middle','administrator/dico/edit_list.phtml');
       $this->getTemplate()->setBlock('footer','administrator/dico/footer_list.phtml');
