@@ -25,6 +25,10 @@ case 'update':
    }
    $this->getTemplate()->setObjectData($taxa);
    if ($taxa->getData('is_list') == 1) {
+      if (array_key_exists('submit', $_REQUEST)) {
+         var_dump($_REQUEST);
+         die();
+      }
       $this->getTemplate()->setBlock('middle','administrator/dico/edit_list.phtml');
       $this->getTemplate()->setBlock('footer','administrator/dico/footer_list.phtml');
    } else {

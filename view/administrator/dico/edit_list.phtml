@@ -4,6 +4,7 @@
 <?php $taxa = $this->object; ?>
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/administrator/taxa.css');?>">
 <form method="post" action="#">
+   <input type="submit" name="submit" value="Salva">
    <input type="hidden" name="id" id="id" value="<?php echo $taxa->getData('id');?>">
 <?php if ($taxa->getData('id') > 1) : ?>
 <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&action=edit&id=<?php echo $taxa->getData('id')?>">Modifica taxa</a>
@@ -35,6 +36,7 @@ foreach ($taxaItemColl->getItems() as $id => $taxaItem):
    <?php if ($taxaItem->getRawData('name') == '') : ?>
    <a class="addTaxaButton actions add" href="#"title="Aggiungi Taxa">Aggiungi Taxa</a>
    <span style="display:none;" class="addTaxa" method="post" action="?task=taxa&amp;action=edit&amp;children_dico_id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $taxaItem->getData('id');?>">
+      <input name="children_dico_item_id[]" value="<?php echo $taxaItem->getData('id');?>"/>
       <input class="taxaName" name="name[]"/>
       <a class="createTaxa" title="Premi CTRL per copiare il nome senza creare l'associazione con il taxa"/>
       <a class="restoreTaxaButton actions close" href="#" title="Chiudi">Chiudi</a>
@@ -51,6 +53,7 @@ foreach ($taxaItemColl->getItems() as $id => $taxaItem):
 </div>
 <?php endforeach; ?>
 </div>
+<input type="submit" name="submit" value="Salva">
 </form>
 <a class="actions update" href="#" title="Aggiorna">Aggiorna</a>
 <a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>
