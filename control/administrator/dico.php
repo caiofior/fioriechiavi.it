@@ -26,9 +26,39 @@ case 'update':
    $this->getTemplate()->setObjectData($taxa);
    if ($taxa->getData('is_list') == 1) {
       if (array_key_exists('submit', $_REQUEST)) {
-         $dicoItemColl->emptyDicoItems();
-         $dicoItems = array();
          $lastId = '';
+         $dicoItemColl->emptyDicoItems();
+         if (array_key_exists('text', $_REQUEST) && is_array($_REQUEST['text'])) {
+            foreach($_REQUEST['text'] as $key=>$text) {
+                  if (
+                          substr($lastId,-1) == '1' ||
+                          $lastId==''
+                  ) {
+                     $id = $lastId.'0';
+                  } else {
+                     $id = substr($lastId,0,-1).'1';
+                  }
+
+                  $dicoItem = $dicoItemColl->addItem();
+                  if ($_REQUEST['name'][$key] != '') {
+                     $dicoItem->setData(array(
+                        'id'=>$id,
+                        'text'=>$text,
+                        'photo_name'=>$_REQUEST['name'][$key]
+                    ));
+                  } else {
+                     $dicoItem->setData(array(
+                         'id'=>$id,
+                         'text'=>$text,
+                         'photo_id'=>$_REQUEST['photo_id'][$key]
+                     ));
+                  }
+                  $dicoItem->replace();
+                  $lastId=$id;
+            }
+            
+         } 
+         
          if (array_key_exists('addText', $_REQUEST) && $_REQUEST['addText'] != '') {
             if (!array_key_exists('addPhotoId', $_REQUEST)) {
                $_REQUEST['addPhotoId']='';
@@ -43,7 +73,7 @@ case 'update':
             $dicoItem->setData(array(
                 'id'=>$id,
                 'text'=>$_REQUEST['addText'],
-                'photo_id'=>$_REQUEST['addPhotoId']
+                'photo_name'=>$_REQUEST['addPhotoId']
             ));
             $dicoItem->replace();
          }

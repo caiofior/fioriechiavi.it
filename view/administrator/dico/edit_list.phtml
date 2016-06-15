@@ -9,19 +9,8 @@
 <?php if ($taxa->getData('id') > 1) : ?>
 <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&action=edit&id=<?php echo $taxa->getData('id')?>">Modifica taxa</a>
 <?php endif; ?>
-<a class="actions update" href="#" title="Aggiorna">Aggiorna</a>
-<a class="hideMissing actions hide" href="#" title="Nascondi mancanti">Nascondi mancanti</a>
 <a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>
 <div>
-<div>
-   <input class="addText" name="addText">
-   <p id="dico_error" style="display: none;">Indicare il titolo dell'elemento</p>
-   <span>
-   <input type="hidden" name="addPhotoId">    
-   <a class="uploadImage" href="#">Carica immagine</a>
-   </span>
-   <a class="addDico" href="#">Aggiungi elemento</a>
-</div>
 <?php
 $dicoItemColl = $taxa->getDicoItemColl();
 $positions = array();
@@ -42,15 +31,27 @@ foreach ($dicoItemColl->getItems() as $id => $dicoItem):?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $dicoItem->getData('taxa_id');?>"><?php echo $dicoItem->getRawData('initials');?> <?php echo $dicoItem->getRawData('name');?></a>
    <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
    <?php endif; ?>
+   <?php $photoUrl = $dicoItem->getPhotoUrl();
+   if ($photoUrl !== false) :?>
+   <img src="<?php echo $GLOBALS['db']->config->baseUrl.$photoUrl; ?>">
+   <?php endif; ?>
    <span>
-   <input type="hidden" name="photo_id[]">    
+   <input type="hidden" name="photo_id[]" value="<?php echo $dicoItem->getData('photo_id');?>">    
    <a class="uploadImage" href="#">Carica immagine</a>
    </span>
    <a class="deleteTaxaItem actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=deletetaxaitem&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>" title="Cancella voce">Cancella voce</a>
 </div>
 <?php endforeach; ?>
+<div>
+   <input class="addText" name="addText">
+   <p id="dico_error" style="display: none;">Indicare il titolo dell'elemento</p>
+   <span>
+   <input type="hidden" name="addPhotoId">    
+   <a class="uploadImage" href="#">Carica immagine</a>
+   </span>
+   <a class="addDico" href="#">Aggiungi elemento</a>
+</div>
 </div>
 <input type="submit" name="submit" value="Salva">
 </form>
-<a class="actions update" href="#" title="Aggiorna">Aggiorna</a>
 <a class="deleteButton actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=delete&amp;id=<?php echo $taxa->getData('id');?>" title="Cancella">Cancella</a>

@@ -11,6 +11,10 @@ if (!class_exists('\Autoload')) {
  */
 class DicoItem extends \Content implements \flora\dico\DicoItemInt
 {
+    /**
+    * Base directory
+    */
+   const imageBaseDir = 'images/dico';
    /**
     * Associates the database table
     * @param \Zend\Db\Adapter\Adapter $db
@@ -89,18 +93,44 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
                 ) {
         $this->data['parent_taxa_id'] = $this->rawData['parent_taxa_id'];
         }
-        if (array_key_exists('taxa_id',$this->rawData)) {
-            $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
-            (id,parent_taxa_id,text,taxa_id)
-            VALUES
-            ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
-            ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        if (array_key_exists('photo_name',$this->rawData)) {
+           $photoPath = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . $this->rawData['photo_name'];
+           if(is_file($photoPath)) {
+              if (!key_exists('photo_id',$this->rawData) || $this->rawData['photo_id']=='') {
+                 $result = $this->db->query('SELECT MAX(`photo_id`)+1 as next_photo_id FROM  `'.$this->table->getTable().'`', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+                 $this->rawData['photo_id'] = $result->current()->next_photo_id;
+                 $this->createPhotoPath($this->rawData['photo_id'],$photoPath);
+              }
+           }
+        }
+        if (array_key_exists('photo_id',$this->rawData)) {
+         if (array_key_exists('taxa_id',$this->rawData)) {
+             $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
+             (id,parent_taxa_id,text,taxa_id,photo_id)
+             VALUES
+             ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).','.intval($this->rawData['photo_id']).')
+             ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         } else {
+             $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
+             (id,parent_taxa_id,text,photo_id)
+             VALUES
+             ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['photo_id']).')
+             ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         }
         } else {
-            $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
-            (id,parent_taxa_id,text)
-            VALUES
-            ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'")
-            ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         if (array_key_exists('taxa_id',$this->rawData)) {
+             $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
+             (id,parent_taxa_id,text,taxa_id)
+             VALUES
+             ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'",'.intval($this->rawData['taxa_id']).')
+             ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         } else {
+             $this->db->query('REPLACE  INTO `'.$this->table->getTable().'` 
+             (id,parent_taxa_id,text)
+             VALUES
+             ("'.addslashes($this->rawData['id']).'",'.intval($this->rawData['parent_taxa_id']).',"'.  addslashes($this->rawData['text']).'")
+             ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         } 
         }
    }
    /**
@@ -159,5 +189,64 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
       unset($this->data['taxa_id']); 
       unset($this->rawData['taxa_id']);
       $this->replace();
+   }
+   /**
+    * Gets the base file name
+    * @return string
+    */
+   private function getBaseFileName() {
+      return $this->db->baseDir.'/'.self::imageBaseDir;
+   }
+   /**
+    * Create the photopath
+    * @param int $id
+    * @param string $inputFile
+    * @return string
+    */
+   private function createPhotoPath($id,$inputFile) {
+      $destFileName = $this->getBaseFileName();
+      set_error_handler(create_function('', 'throw new \Exception("Unable to create directory '.$destFileName.'",1410021647);'),E_WARNING);
+      if (!is_dir($destFileName))
+         mkdir($destFileName);
+      restore_error_handler();
+      $destinationUrl = '';
+      $fullId = str_pad($id, 6, '0', STR_PAD_LEFT);
+      for ($c = 0; $c < strlen($fullId)-2; $c+=2 ) {
+         $destinationUrl .= '/'.substr($fullId, $c, 2);
+         set_error_handler(create_function('', 'throw new \Exception("Unable to create directory '.$destFileName.'",1410021647);'),E_WARNING);
+         if (!is_dir($destFileName.$destinationUrl))
+            mkdir($destFileName.$destinationUrl);
+         restore_error_handler();
+      }
+      $destinationUrl .= DIRECTORY_SEPARATOR.substr($fullId, -2);
+      $oldFiles = glob($destFileName.$destinationUrl.'*');
+      foreach($oldFiles as $oldFile) {
+         unlink($oldFile);
+      }
+      $destinationUrl .= '.'.pathinfo($inputFile, PATHINFO_EXTENSION);
+      rename($inputFile, $destFileName.$destinationUrl);
+   }
+   /**
+    * Return photo url
+    * @return boolean|string
+    */
+   public function getPhotoUrl() {
+      $destFileName = $this->getBaseFileName();
+      if (!is_dir($destFileName))
+         return false;
+      $destinationUrl = '';
+      $fullId = str_pad($this->data['photo_id'], 6, '0', STR_PAD_LEFT);
+      for ($c = 0; $c < strlen($fullId)-2; $c+=2 ) {
+         $destinationUrl .= '/'.substr($fullId, $c, 2);
+         if (!is_dir($destFileName.$destinationUrl))
+            return false;
+      }
+      $destinationUrl .= DIRECTORY_SEPARATOR.substr($fullId, -2);
+      $files = glob($destFileName.$destinationUrl.'*');
+      $file = current($files);
+      if (!is_file($file)) {
+         return false;
+      }
+      return preg_replace('/^\//','',str_replace($this->db->baseDir, '', $file));
    }
 }
