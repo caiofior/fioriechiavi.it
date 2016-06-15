@@ -107,7 +107,7 @@ case 'jeditable' :
    break;
 case 'taxalist':
    $taxaColl = new \flora\taxa\TaxaColl($GLOBALS['db']);
-   $_REQUEST['images']=1;
+   $_REQUEST['doNotCreate']=1;
    $taxaColl->loadAll($_REQUEST);
    $result = array();
    foreach ($taxaColl->getItems() as $taxa) {

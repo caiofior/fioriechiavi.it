@@ -27,6 +27,7 @@ class TaxaColl extends \ContentColl {
           if ( $this->count() == 0 && 
                !array_key_exists('moreDicoItems', $criteria) &&
                !array_key_exists('images', $criteria) &&
+               !array_key_exists('doNotCreate', $criteria) &&
                   
                     (
                       !array_key_exists('iDisplayStart', $criteria) ||
