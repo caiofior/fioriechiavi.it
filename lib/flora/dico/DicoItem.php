@@ -95,7 +95,7 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
         }
         if (array_key_exists('photo_name',$this->rawData)) {
            $photoPath = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . $this->rawData['photo_name'];
-           if(is_file($photoPath)) {
+           if(is_file($photoPath)) {              
               if (!key_exists('photo_id',$this->rawData) || $this->rawData['photo_id']=='') {
                  $result = $this->db->query('SELECT MAX(`photo_id`)+1 as next_photo_id FROM  `'.$this->table->getTable().'`', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
                  $this->rawData['photo_id'] = $result->current()->next_photo_id;

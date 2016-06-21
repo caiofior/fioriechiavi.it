@@ -40,16 +40,18 @@ case 'update':
                   }
 
                   $dicoItem = $dicoItemColl->addItem();
-                  if ($_REQUEST['name'][$key] != '') {
+                  if ($_REQUEST['photo_name'][$key] != '') {
                      $dicoItem->setData(array(
                         'id'=>$id,
                         'text'=>$text,
-                        'photo_name'=>$_REQUEST['name'][$key]
+                        'taxa_id'=>$_REQUEST['taxa_id'][$key],
+                        'photo_name'=>$_REQUEST['photo_name'][$key]
                     ));
                   } else {
                      $dicoItem->setData(array(
                          'id'=>$id,
                          'text'=>$text,
+                         'taxa_id'=>$_REQUEST['taxa_id'][$key],
                          'photo_id'=>$_REQUEST['photo_id'][$key]
                      ));
                   }
@@ -68,7 +70,6 @@ case 'update':
             } else {
                $id = substr($lastId,0,-1).'1';
             }
-            
             $dicoItem = $dicoItemColl->addItem();
             $dicoItem->setData(array(
                 'id'=>$id,

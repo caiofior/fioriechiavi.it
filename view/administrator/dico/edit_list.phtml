@@ -21,13 +21,15 @@ foreach ($dicoItemColl->getItems() as $id => $dicoItem):?>
    <input name="text[]" value="<?php echo $dicoItem->getData('text');?>"> 
    <?php if ($dicoItem->getRawData('name') == '') : ?>
    <a class="addTaxaButton actions add" href="#"title="Aggiungi Taxa">Aggiungi Taxa</a>
-   <span style="display:none;" class="addTaxa" method="post" action="?task=taxa&amp;action=edit&amp;children_dico_id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>">
-      <input name="children_dico_item_id[]" value="<?php echo $dicoItem->getData('id');?>"/>
+   <span style="display:none;" class="addTaxa" >
+      <input type="hidden" name="children_dico_item_id[]" value="<?php echo $dicoItem->getData('id');?>"/>
+      <input type="hidden" name="taxa_id[]" value="<?php echo $dicoItem->getData('taxa_id');?>"/>
       <input class="taxaName" name="name[]"/>
-      <a class="createTaxa" title="Premi CTRL per copiare il nome senza creare l'associazione con il taxa"/>
+      <a class="createTaxa" title="Premi CTRL per copiare il nome senza creare l'associazione con il taxa" data-url="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;children_dico_id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>">Crea</a>
       <a class="restoreTaxaButton actions close" href="#" title="Chiudi">Chiudi</a>
    </span>
    <?php else: ?>
+   <input type="hidden" name="taxa_id[]" value="<?php echo $dicoItem->getData('taxa_id');?>"/>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $dicoItem->getData('taxa_id');?>"><?php echo $dicoItem->getRawData('initials');?> <?php echo $dicoItem->getRawData('name');?></a>
    <a class="deleteTaxaAssociation actions delete" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dico&amp;action=deletetaxaassociation&amp;id=<?php echo $taxa->getData('id');?>&amp;children_dico_item_id=<?php echo $dicoItem->getData('id');?>" title="Cancella associazione">Cancella associazione</a>
    <?php endif; ?>
@@ -36,6 +38,7 @@ foreach ($dicoItemColl->getItems() as $id => $dicoItem):?>
    <img src="<?php echo $GLOBALS['db']->config->baseUrl.$photoUrl; ?>">
    <?php endif; ?>
    <span>
+   <input type="hidden" name="photo_name[]"/>    
    <input type="hidden" name="photo_id[]" value="<?php echo $dicoItem->getData('photo_id');?>">    
    <a class="uploadImage" href="#">Carica immagine</a>
    </span>
@@ -46,7 +49,7 @@ foreach ($dicoItemColl->getItems() as $id => $dicoItem):?>
    <input class="addText" name="addText">
    <p id="dico_error" style="display: none;">Indicare il titolo dell'elemento</p>
    <span>
-   <input type="hidden" name="addPhotoId">    
+   <input type="hidden" name="addPhotoId">
    <a class="uploadImage" href="#">Carica immagine</a>
    </span>
    <a class="addDico" href="#">Aggiungi elemento</a>

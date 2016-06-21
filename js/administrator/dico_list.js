@@ -1,13 +1,4 @@
 $(document).ready(function() {
-    $(".addDico").click(function(e) {
-      $("#dico_error").hide();
-      e.preventDefault();
-      if ($(".addText").val() == "") {
-          $("#dico_error").show();          
-      } else {
-          $(this).parent("form").trigger("submit");
-      }
-    });
     $(".addTaxaButton").click(function(e) {
       $(this).hide().siblings(".addTaxa").show();
       e.preventDefault();
@@ -16,7 +7,7 @@ $(document).ready(function() {
        $(this).parent("form").hide().siblings(".addTaxaButton").show();
        e.preventDefault();
     });
-    $("input:submit").unbind("click");
+   $("input:submit").unbind("click");
    $( ".taxaName" ).autocomplete({
     source: "?task=dico&action=taxalist",
     select: function( e, ui ) {
@@ -24,33 +15,14 @@ $(document).ready(function() {
              $(this).val(ui.item.label);
              e.preventDefault();
          } else {
-            $.ajax({
-               url: "?task=dico&action=createtaxaassociation",
-               data: {
-                  "id":$('#id').val(),
-                  "id_dico":$(this).siblings("input[name='children_dico_item_id']").val(),
-                  "taxa_id":ui.item.value
-               },
-               async : false
-             });
-            window.location.reload();
+            $(this).siblings("input[name=taxa_id\\[\\]]").val(ui.item.value);
+            $("input[name=submit]").click();
          }
       }
    });
-    $( ".update" ).click(function (e){
-       window.location.reload();
-       e.preventDefault();
-    });
     $(".deleteTaxaAssociation").click(function (e){
-        e.preventDefault();
-        $(this).dialog({
-           buttons: {
-              "Confermi la cancellazione dell'associazione con il taxa?": function() {
-                   window.location =  $(this).attr("href");
-              }
-           }
-        });
-        
+        $(this).siblings("input[name=taxa_id\\[\\]]").val("");
+        $("input[name=submit]").click();
     });
     $(".deleteButton").click(function (e){
         e.preventDefault();
@@ -67,17 +39,9 @@ $(document).ready(function() {
        $(this).prev().trigger("click");
        e.preventDefault();
     });
-    $(".hideMissing").click (function (e){
-       $(".editable.missing").parent("div").toggle();
-       e.preventDefault();
-    });
-    $(".downloadButton").click (function (e){
-       $("form.downloadForm").toggle();
-       e.preventDefault();
-    });
-    $(".uploadButton").click (function (e){
-       $("form.uploadForm").toggle();
-       e.preventDefault();
+    $(".createTaxa").click(function(e) {
+      window.location = $(this).data("url")+"&name="+$(this).siblings("input[name=name\\[\\]]").val();
+      e.preventDefault();
     });
     $(".uploadImage").each(function (id,button) {
         new plupload.Uploader({
@@ -96,7 +60,7 @@ $(document).ready(function() {
                  up.start();
             },
             UploadComplete: function(up, files) {
-                $(button).siblings("input").val(files[0]['name']);
+                $(button).siblings("input[name=photo_name\\[\\]], input[name=addPhotoId]").val(files[0]['name']);
                 $(button).append("<img src='tmp/"+files[0]['name']+"'>");
             },
         },

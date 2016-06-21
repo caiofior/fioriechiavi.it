@@ -92,7 +92,11 @@ echo $description;
 ?>
 </div>    
 <?php endif;
-require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php'); 
+if($taxa->getData('is_list') == 1) {
+   require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems_list.php'); 
+} else {
+   require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php'); 
+}
 if ($taxa->getData('description') != '') :
 $attributeColl = $taxa->getTaxaAttributeColl();
    if ($attributeColl->count() > 0) : ?>
