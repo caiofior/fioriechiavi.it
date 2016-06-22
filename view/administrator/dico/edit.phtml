@@ -19,6 +19,7 @@
    <select id="download_format" name="download_format">
       <option value="internal">Tal quale</option>
       <option value="pignatti">Pignatti</option>
+      <option value="simonetti">Simonetti</option>
    </select>
    <input id="downloadDico" type="submit" name="dowload" value="Scarica"/>
 </form>
@@ -32,6 +33,7 @@
       <option value="">--</option>
       <option value="internal">Tal quale</option>
       <option value="pignatti">Pignatti</option>
+      <option value="simonetti">Simonetti</option>
    </select><br/>
    <textarea cols="80" rows="20" id="dicotext" name="dicotext"><?php if (array_key_exists('dicotext', $_REQUEST)) echo $_REQUEST['dicotext']; ?></textarea><br/>
    <input id="uploadDico" type="submit" value="Carica"/>

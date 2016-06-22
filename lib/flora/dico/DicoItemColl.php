@@ -97,6 +97,12 @@ class DicoItemColl extends \ContentColl implements \flora\dico\DicoItemIntColl {
                 }
                 $exportClass = new \flora\dico\export\Pignatti();
                 break;
+            case 'simonetti':
+                if (!class_exists('flora\dico\export\Simonetti')) {
+                    require __DIR__ . '/export/Simonetti.php';
+                }
+                $exportClass = new \flora\dico\export\Simonetti();
+                break;    
             default :
                 throw new \Exception('No output format is provided', 1410081107);
                 break;
@@ -129,6 +135,12 @@ class DicoItemColl extends \ContentColl implements \flora\dico\DicoItemIntColl {
                     require __DIR__ . '/import/Pignatti.php';
                 }
                 $importClass = new \flora\dico\import\Pignatti();
+                break;
+            case 'simonetti':
+                if (!class_exists('flora\dico\import\Simonetti')) {
+                    require __DIR__ . '/import/Simonetti.php';
+                }
+                $importClass = new \flora\dico\import\Simonetti();
                 break;
             default :
                 throw new \Exception('No input format is provided', 1410081107);
