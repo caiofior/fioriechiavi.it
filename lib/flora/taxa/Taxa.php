@@ -437,7 +437,7 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
     public function getUsedInDicoColl() {
         $usedInDicoColl = new \flora\taxa\TaxaColl($this->db);
         if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
-            $usedInDicoColl->loadAll(array('used_taxa_id'=>$this->data['id']));
+            $usedInDicoColl->loadAll(array('doNotCreate'=>1,'used_taxa_id'=>$this->data['id']));
         }
         return $usedInDicoColl;
     }
@@ -448,7 +448,7 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
     public function getUsedAddDicoColl() {
         $addDicoColl = new \flora\dico\AddDicoColl($this->db);
         if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
-            $addDicoColl->loadAll(array('used_taxa_id'=>$this->data['id']));
+            $addDicoColl->loadAll(array('doNotCreate'=>1,'used_taxa_id'=>$this->data['id']));
         }
         return $addDicoColl;
     }

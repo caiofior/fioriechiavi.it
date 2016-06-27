@@ -54,6 +54,7 @@ $(document).ready(function() {
          success : function (data, textStatus, jqXHR ) {
             $("#saved").show();
             $("#saveCategoryTaxaOrder").hide();
+            window.location.reload();
          }  
       });
    });
