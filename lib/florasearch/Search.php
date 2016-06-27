@@ -449,6 +449,12 @@ class Search {
      */
     public function getFilteredPostureArray($removeEmpty=false) {
         $posture = array();
+        if (
+            !array_key_exists('Portamento',$this->attributeId) ||
+            !is_numeric($this->attributeId['Portamento'])
+            ) {
+            return $posture;
+        }
         $select=$this->createSelect(array('posture'));
         $select->columns(array(
             'taxa_id'
@@ -640,6 +646,12 @@ class Search {
      */
     public function getFilteredBiologicFormArray($removeEmpty=false) {
         $biologicForm = array();
+        if (
+            !array_key_exists('Forma biologica',$this->attributeId) ||
+            !is_numeric($this->attributeId['Forma biologica'])
+            ) {
+            return $biologicForm;
+        }
         $select=$this->createSelect(array('biologicForm'));
         $select->columns(array(
             'taxa_id'

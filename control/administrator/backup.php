@@ -2,47 +2,42 @@
 if (!array_key_exists('action',$_REQUEST)) {
    $_REQUEST['action']=null;
 }
-$enabled = strpos(exec('mysql --version'), 'mysql') === 0;
-$enabled &= strpos(exec('mysqldump --version'), 'mysqldump') === 0;
-$enabled &= $GLOBALS['config']->database->driver == 'Mysqli';
-$enabled = (bool)$enabled;
+$enabled = true;
 switch ($_REQUEST['action']) {
 case 'backuptaxa':
-   $command = 'mysqldump ';
-   if ($GLOBALS['config']->database->hostname != '') {
-       $command .= ' -h '.$GLOBALS['config']->database->hostname;
-   }
-   if ($GLOBALS['config']->database->username != '') {
-       $command .= ' -u '.$GLOBALS['config']->database->username;
-   }
-   if ($GLOBALS['config']->database->password != '') {
-       $command .= ' -p'.$GLOBALS['config']->database->password;
-   }
-   $command .= ' '.$GLOBALS['config']->database->database.' taxa_kind region taxa taxa_region taxa_attribute taxa_attribute_value taxa_image dico_item add_dico add_dico_item --replace --no-create-db --no-create-info --compact --skip-extended-insert ';
+   require $GLOBALS['db']->baseDir.'/lib/shuttle-export/dumper.php';
+
+   $world_dumper = \Shuttle_Dumper::create(array(
+    'host' => $GLOBALS['config']->database->hostname,
+    'username' => $GLOBALS['config']->database->username,
+    'password' => $GLOBALS['config']->database->password,
+    'db_name' => $GLOBALS['config']->database->database,
+    'include_tables' => array('taxa_kind', 'region', 'taxa', 'taxa_region', 'taxa_attribute', 'taxa_attribute_value', 'taxa_image', 'dico_item', 'add_dico', 'add_dico_item'),
+    'charset'=>$GLOBALS['config']->database->charset
+   ));
    $temporaryFileName= tempnam(sys_get_temp_dir(),'');
-   $command .= ' -r '.$temporaryFileName;
-   exec($command);
+   $world_dumper->dump($temporaryFileName);
    header('Content-Description: File Transfer');
-   header('Content-Type: text/plain; charset='.mysqli_character_set_name($GLOBALS['db']->getDriver()->getConnection()->getResource())); 
+   header('Content-Type: text/plain; charset='.mysqli_character_set_name($GLOBALS['db']->getDriver()->getConnection()->getResource()));
    header('Content-Disposition: attachment; filename="backup_taxa_'.date('Y-m-d').'.sql"'); 
    echo file_get_contents($temporaryFileName);
+   
    exit;
    break; 
 case 'backuputenti':
-   $command = 'mysqldump ';
-   if ($GLOBALS['config']->database->hostname != '') {
-       $command .= ' -h '.$GLOBALS['config']->database->hostname;
-   }
-   if ($GLOBALS['config']->database->username != '') {
-       $command .= ' -u '.$GLOBALS['config']->database->username;
-   }
-   if ($GLOBALS['config']->database->password != '') {
-       $command .= ' -p'.$GLOBALS['config']->database->password;
-   }
-   $command .= ' '.$GLOBALS['config']->database->database.' profile_role profile login facebook facebook_graph contact --replace --no-create-db --no-create-info --compact --skip-extended-insert ';
+   require $GLOBALS['db']->baseDir.'/lib/shuttle-export/dumper.php';
+
+   $world_dumper = \Shuttle_Dumper::create(array(
+    'host' => $GLOBALS['config']->database->hostname,
+    'username' => $GLOBALS['config']->database->username,
+    'password' => $GLOBALS['config']->database->password,
+    'db_name' => $GLOBALS['config']->database->database,
+    'include_tables' => array('profile_role', 'profile', 'login', 'facebook', 'facebook_graph', 'contact'),
+    'charset'=>$GLOBALS['config']->database->charset
+   ));
    $temporaryFileName= tempnam(sys_get_temp_dir(),'');
-   $command .= ' -r '.$temporaryFileName;
-   exec($command);
+   $world_dumper->dump($temporaryFileName);
+   
    header('Content-Description: File Transfer');
    header('Content-Type: text/plain; charset='.mysqli_character_set_name($GLOBALS['db']->getDriver()->getConnection()->getResource()));
    header('Content-Disposition: attachment; filename="backup_utenti_'.date('Y-m-d').'.sql"'); 
@@ -67,6 +62,7 @@ case 'restore' :
    $targetDir = sys_get_temp_dir()  . DIRECTORY_SEPARATOR . 'plupload';
    $cleanupTargetDir = true; // Remove old files
    $maxFileAge = 5 * 3600; // Temp file age in seconds
+   $fileName = uniqid('file_');
    if (!file_exists($targetDir)) {
            @mkdir($targetDir);
    }
@@ -87,8 +83,6 @@ case 'restore' :
             $nextIsName=true;
          }
       }
-   } else {
-           $fileName = uniqid('file_');
    }
    
    $filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
@@ -164,64 +158,71 @@ case 'restore' :
            rename($filePath.'.part', $filePath);
    }
    
-   $command = 'mysql ';
-   if ($GLOBALS['config']->database->hostname != '') {
-       $command .= ' -h '.$GLOBALS['config']->database->hostname;
-   }
-   if ($GLOBALS['config']->database->username != '') {
-       $command .= ' -u '.$GLOBALS['config']->database->username;
-   }
-   if ($GLOBALS['config']->database->password != '') {
-       $command .= ' -p'.$GLOBALS['config']->database->password;
-   }
-   $command .= ' '.$GLOBALS['config']->database->database;
-   $charset = 'latin1';
-   if ($GLOBALS['config']->database->charset != '' ) {
-       $charset = $GLOBALS['config']->database->charset;
-   }
-   $command .= ' --default-character-set='.$charset;
-   $command .= ' < '.$filePath;
-   exec($command);
+   require $GLOBALS['db']->baseDir.'/lib/noLimitDumpRestore/noLimitDumpRestore.php';
+   noLimitDumpRestore($GLOBALS['db'],$filePath);
+   
    $m = new stdClass();
    $m->jsonrpc = 2.0;
    echo json_encode($m);
    exit;
     break;
 case 'resettaxa':
-    $command = 'mysql ';
-   if ($GLOBALS['config']->database->hostname != '') {
-       $command .= ' -h '.$GLOBALS['config']->database->hostname;
-   }
-   if ($GLOBALS['config']->database->username != '') {
-       $command .= ' -u '.$GLOBALS['config']->database->username;
-   }
-   if ($GLOBALS['config']->database->password != '') {
-       $command .= ' -p'.$GLOBALS['config']->database->password;
-   }
-   $command .= ' '.$GLOBALS['config']->database->database.' ';
-   $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE taxa_kind; TRUNCATE TABLE region; TRUNCATE TABLE taxa; TRUNCATE TABLE taxa_region; TRUNCATE TABLE taxa_attribute; TRUNCATE TABLE taxa_attribute_value; TRUNCATE TABLE taxa_image; TRUNCATE TABLE dico_item; TRUNCATE TABLE add_dico; TRUNCATE TABLE add_dico_item; SET FOREIGN_KEY_CHECKS=1"';
-   exec($command);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE taxa_kind'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE region'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE taxa'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE taxa_region'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+
+   $GLOBALS['db']->query('TRUNCATE TABLE taxa_attribute'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE taxa_attribute_value'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE taxa_image'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE dico_item'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+
+   $GLOBALS['db']->query('TRUNCATE TABLE add_dico'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);   
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE add_dico_item'
+                , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);  
+   
    header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=backup');  
    exit();  
    break; 
 case 'resetutenti':
-    $command = 'mysql ';
-   if ($GLOBALS['config']->database->hostname != '') {
-       $command .= ' -h '.$GLOBALS['config']->database->hostname;
-   }
-   if ($GLOBALS['config']->database->username != '') {
-       $command .= ' -u '.$GLOBALS['config']->database->username;
-   }
-   if ($GLOBALS['config']->database->password != '') {
-       $command .= ' -p'.$GLOBALS['config']->database->password;
-   }
-   $command .= ' '.$GLOBALS['config']->database->database.' ';
-   $command .= ' -e "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE login; TRUNCATE TABLE facebook; TRUNCATE TABLE facebook_graph; TRUNCATE TABLE profile; TRUNCATE TABLE profile_taxa; TRUNCATE TABLE contact; TRUNCATE TABLE contact_parent; SET FOREIGN_KEY_CHECKS=1"';
-   exec($command);
-   $logDir = $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'log';
-   if (!is_dir($logDir)) {
-       mkdir($logDir);
-   }
+   $GLOBALS['db']->query('TRUNCATE TABLE login'
+             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE facebook'
+             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE facebook_graph'
+             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE profile'
+             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE profile_taxa'
+             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE contact'
+             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
+   $GLOBALS['db']->query('TRUNCATE TABLE contact_parent'
+             , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+   
    header('Location: '.$GLOBALS['db']->config->baseUrl.'administrator.php?task=backup');  
    exit();
    break;

@@ -23,7 +23,7 @@ $(document).ready(function() {
                            url: $(this).attr("href"),
                            async : false
                            });
-                        ct.dataTable().fnDraw();
+                        rg.dataTable().fnDraw();
                         $( this ).dialog( "close" );
                      }
                   }

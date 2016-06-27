@@ -43,3 +43,6 @@
 [submodule "style/bootstrap"]
 	path = style/bootstrap
 	url = https://github.com/twbs/bootstrap.git
+[submodule "lib/shuttle-export"]
+	path = lib/shuttle-export
+	url = https://github.com/2createStudio/shuttle-export
