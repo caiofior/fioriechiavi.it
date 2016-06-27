@@ -6,7 +6,7 @@ if(!preg_match('/http(s)?:\\/\\/'.$_SERVER['SERVER_NAME'].'/', $GLOBALS['db']->c
    {
        setcookie($c_id, NULL, 1, '/', '.'.$_SERVER['SERVER_NAME']);
    }
-   header('Location :'.$GLOBALS['db']->config->baseUrl);
+   header('Location: '.$GLOBALS['db']->config->baseUrl);
    exit;
 }
 $control->setPage(__FILE__);
