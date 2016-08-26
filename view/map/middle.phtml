@@ -1,3 +1,13 @@
+<?php
+$ob_started = false;
+if (
+      property_exists($GLOBALS['db'],'cache') &&
+		$GLOBALS['db']->cache instanceof Zend\Cache\Storage\Adapter\AbstractAdapter &&
+      $GLOBALS['db']->cache->getItem('map') == ''
+        ) :
+   $ob_started = true;
+   ob_start();
+?>
 <div>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>">Home</a>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>search.php">Ricerca avanzata</a>
@@ -46,3 +56,9 @@ while ($resultSet->valid()) :
 <?php 
     $resultSet->next();
 endwhile;
+else :
+   echo $GLOBALS['db']->cache->getItem('map');
+endif;
+if ($ob_started == true) {
+   $GLOBALS['db']->cache->setItem('map',ob_get_flush());
+}

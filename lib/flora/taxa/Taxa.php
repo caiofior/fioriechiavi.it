@@ -412,6 +412,12 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
      * @return message errors
      */
     public function updateSearch() {
+       if (
+         property_exists($this->db,'cache') &&
+         $this->db->cache instanceof \Zend\Cache\Storage\Adapter\AbstractAdapter
+        ) {
+          $this->db->cache->setItem('map','');
+        }
         $taxaSearch = $this->getTaxaSearch();
         return $taxaSearch->update();
     }
