@@ -108,6 +108,7 @@ function getDatatableMetadata(el) {
    });
    return metadata;
 }
+if($(".github").css("display") != "none") {
 $("a.taxaPreview").each(function(id,el){
     $(el).tooltip({
         content:function (callback) {
@@ -115,3 +116,4 @@ $("a.taxaPreview").each(function(id,el){
         }
     });
 });
+}

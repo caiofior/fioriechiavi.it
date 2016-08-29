@@ -16,11 +16,8 @@
 .clear {
    clear: both;
 }
-#imageSnipets span {
+#imageSnipets div {
    float:left;
-}
-#imageSnipets span div{
-   width:300px;
 }
 .socialContainer {
    float: left;
@@ -69,7 +66,4 @@ a.actions.download {
 }
 a.actions.upload {
    background-position: -144px 0px;
-}
-a.externalLink {
-	display:inline;
 }
