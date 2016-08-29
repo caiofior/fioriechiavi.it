@@ -108,3 +108,10 @@ function getDatatableMetadata(el) {
    });
    return metadata;
 }
+$("a.taxaPreview").each(function(id,el){
+    $(el).tooltip({
+        content:function (callback) {
+          return $.get($(el).attr("href"),{"action":"preview"}, function(data) {callback(data)});
+        }
+    });
+});

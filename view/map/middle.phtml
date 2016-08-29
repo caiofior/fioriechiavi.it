@@ -46,7 +46,7 @@ while ($resultSet->valid()) :
     $data = $resultSet->current();
 ?>
 <p>
-<a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $data['taxa_id']; ?>">
+<a class="taxaPreview" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $data['taxa_id']; ?>">
 <?php echo str_repeat(' ', $data['depth']).$data['taxa_kind_initials'].' '.$data['name']; ?>
 </a>
 <?php  if ($GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>

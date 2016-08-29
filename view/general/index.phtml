@@ -88,6 +88,8 @@ if ($GLOBALS['db']->config->attributes->progress != '') {
             $relTaxa->loadFromAttributeValue($GLOBALS['db']->config->attributes->progress,$progessNumber);
             if ($relTaxa->getData('id') != '') {
                 $description = str_replace('{t'.$progessNumber.'}', '<a href="'.$GLOBALS['db']->config->baseUrl.'?id='.$relTaxa->getData('id').'">'.$relTaxa->getData('taxa_kind_initials').' '.$relTaxa->getData('name').'</a>', $description);
+            } else {
+                $description = str_replace('{t'.$progessNumber.'}', $progessNumber, $description);
             }
         }
     }

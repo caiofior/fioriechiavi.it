@@ -18,6 +18,11 @@ if (!array_key_exists('action', $_REQUEST)) {
    $_REQUEST['action']=null;
 }
 switch ($_REQUEST['action']) {
+   case 'preview':
+      header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
+      require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'general'.DIRECTORY_SEPARATOR.'preview.php';
+      exit;
+      exit;
    case 'signalObservation':
        if(sizeof($_POST)>0) {
            $taxaObservationColl = $taxa->getTaxaObservationColl();

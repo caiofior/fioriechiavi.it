@@ -70,3 +70,6 @@ a.actions.download {
 a.actions.upload {
    background-position: -144px 0px;
 }
+a.externalLink {
+	display:inline;
+}

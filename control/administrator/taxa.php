@@ -458,7 +458,9 @@ case 'get_col_id_list':
    if (array_key_exists('taxa_name', $_REQUEST) && $_REQUEST['taxa_name'] != '') {
     $ch = curl_init($GLOBALS['db']->config->catalogOfLife->wsEndpoint.urlencode($_REQUEST['taxa_name']));
     curl_setopt_array($ch,array(
-         CURLOPT_RETURNTRANSFER => true
+         CURLOPT_RETURNTRANSFER => true,
+         CURLOPT_CONNECTTIMEOUT => 10,
+         CURLOPT_TIMEOUT => 10,
     ));
     $responseString = curl_exec($ch);
     $response = @unserialize($responseString);

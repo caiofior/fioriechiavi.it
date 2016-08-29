@@ -28,9 +28,9 @@ $(document).ready(function() {
 	          typeof value["pagemap"] == "object" &&
 	   	  typeof value["pagemap"]["cse_thumbnail"] == "object") {
 	      $("#imageSnipets").append(
-	      "<span><img src=\""+
+	      "<a href=\""+value["link"]+"\" class=\"externalLink\"><img src=\""+
 	      value["pagemap"]["cse_thumbnail"][0]["src"]+
-	      "\" alt=\""+value["title"]+"\"/><div>"+value["title"]+"</div></span>"
+	      "\" alt=\""+value["title"]+"\"/><div>"+value["title"]+"</div></a>"
 	      );
 	   }
         });
