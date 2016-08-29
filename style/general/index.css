@@ -18,6 +18,8 @@
 }
 #imageSnipets div {
    float:left;
+   width:300px;
+   height:300px;
 }
 .socialContainer {
    float: left;
