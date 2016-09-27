@@ -153,8 +153,12 @@ $(document).ready(function() {
             $("#attribute_missing_name").show();
             event.preventDefault();
          } else {
+             
             $("#attribute_missing_name").hide();   
          }
+      },
+      change: function( event, ui ) {
+         $("#attribute_value").trigger("change");
       }
     });
     function addAutocomplete (el) {

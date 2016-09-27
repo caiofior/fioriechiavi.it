@@ -108,10 +108,10 @@ class TaxaExport {
         $taxaDone=array();
         $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
         if ($this->rootId == 1) {
-            fwrite($stream, '#1 Flora d\'Italia - Chiave d\'insieme'.PHP_EOL.PHP_EOL);
+            fwrite($stream, '#1 '.$this->db->config->siteName.' - Chiave d\'insieme'.PHP_EOL.PHP_EOL);
         } else {
             $taxa->loadFromId($this->rootId);
-            fwrite($stream, '#1 Flora d\'Italia - Chiave '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name').PHP_EOL.PHP_EOL);
+            fwrite($stream, '#1 '.$this->db->config->siteName.' - Chiave '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name').PHP_EOL.PHP_EOL);
             
             
         }
