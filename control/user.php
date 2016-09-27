@@ -1,4 +1,5 @@
 <?php
+$this->getTemplate()->setBlock('middle','error/cookies.phtml');
 $this->getTemplate()->setBlock('head','user/head.phtml');
 if (!array_key_exists('task', $_REQUEST))
    $_REQUEST['task']=null;
