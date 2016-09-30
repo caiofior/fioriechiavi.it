@@ -108,7 +108,7 @@ switch ($_REQUEST['action']) {
                      ->setSubject('Nuova osservazionione sul sito'.$GLOBALS['config']->siteName)
                      ->setBody($body);
                   $GLOBALS['transport']->send($message);
-           }catch (\Exception $e) {}
+           } catch (\Exception $e) {}
            header('Location: '.$GLOBALS['db']->config->baseUrl.'index.php?id='.$taxa->getData('id').'&insertObservation=1');
            exit;
        } else {

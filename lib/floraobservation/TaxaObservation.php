@@ -47,7 +47,9 @@ class TaxaObservation extends \Content
     * Inserts the data and add the coordinates
     */
    public function insert() {
-       $this->data['datetime']=date('Y-m-d H:i:s');
+       if ($this->data['datetime'] == '') {
+         $this->data['datetime']=date('Y-m-d H:i:s');
+       }
        $this->updateCoordinates();
        parent::insert();
    }

@@ -20,6 +20,7 @@ if (
    $db->session->plain_pwd= $_REQUEST['password'];
 }
 else if (
+        pathinfo($_SERVER['SCRIPT_FILENAME'],PATHINFO_BASENAME) != 'xhr.php' &&
         array_key_exists('action', $_REQUEST) &&
         $_REQUEST['action']=='register' &&
         array_key_exists('username', $_REQUEST) &&
@@ -43,7 +44,13 @@ else if (
          }
       }
    } else {
-      $user = \login\user\LoginInstantiator::createLoginInstance($db, $_REQUEST['username'],$_REQUEST['password']);
+      if ($_REQUEST['username'] == '') {
+         $control->addValidationMessage('username_register','Nome utente vuoto');
+      } else if ($_REQUEST['password'] == '') {
+         $control->addValidationMessage('password_register','Password vuota');
+      } else {
+         $user = \login\user\LoginInstantiator::createLoginInstance($db, $_REQUEST['username'],$_REQUEST['password']);
+      }
    }
    $auth->getStorage()->clear();
    if (is_numeric(session_id())) session_destroy();
