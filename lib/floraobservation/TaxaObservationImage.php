@@ -208,7 +208,7 @@ class TaxaObservationImage extends \Content
                 imagejpeg($thumbnail_gd_image, $thumbnail_image_path, 90);
                 break;
             case IMAGETYPE_PNG:
-                imagepng($thumbnail_gd_image, $thumbnail_image_path, 90);
+                imagepng($thumbnail_gd_image, $thumbnail_image_path, 9);
                 break;
             default:
                 throw new \Exception('Image type not supported '.$source_image_type,1508051433);
