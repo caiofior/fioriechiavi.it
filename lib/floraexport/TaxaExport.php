@@ -291,7 +291,11 @@ class TaxaExport {
                            $positions[substr($dicoItem->getData('id'),0,-1).'1']= $lastPosition;
                         }
                         fwrite($stream,'| '.str_repeat('&#160;', (strlen($dicoItem->getData('id')))));
-                        fwrite($stream,$positions[$dicoItem->getData('id')].' '.$dicoItem->getData('text'));
+                        if (array_key_exists($dicoItem->getData('id'),$positions)) {
+                           fwrite($stream,$positions[$dicoItem->getData('id')].' '.$dicoItem->getData('text'));
+                        } else {
+                           fwrite($stream,$dicoItem->getData('text'));
+                        }
                         if ($dicoItem->getData('taxa_id')!= '' && $dicoItem->getRawData('status') == 0) {
                             fwrite($stream, ' '.$dicoItem->getRawData('initials').' '.$dicoItem->getRawData('name'));
                         } else if ($dicoItem->getData('taxa_id')!= '' && $dicoItem->getRawData('status') == 1) {
