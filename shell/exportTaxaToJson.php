@@ -32,7 +32,7 @@ while (($rawWord = fgets($wordH)) !== false) {
    $words[] = $word;
 }
 fclose($wordH);
-$taxaRes = $mysql->query('SELECT name FROM `taxa` WHERE `taxa_kind_id` IN (SELECT `id` FROM `taxa_kind` WHERE `initials` IN ("Sp","Sp.","Gen.","Gen"))');
+$taxaRes = $mysql->query('SELECT name FROM `taxa` WHERE `taxa_kind_id` = 12 OR `taxa_kind_id` = 7');
 while ($word = $taxaRes->fetch_object()) {
    preg_match("/^(\w+)/",strtolower(trim($word->name)),$matches);
    $word = current($matches);
@@ -86,9 +86,10 @@ if (!is_dir($baseDir)) {
 while ($taxa = $taxaRes->fetch_object()) {
    
    $dicoRes = $mysql->query('SELECT 
-      `dico_item`.`taxa_id`,      
-      `dico_item`.`text`,
-      `taxa`.`name`,
+      dico_item.id,      
+      dico_item.taxa_id,      
+      dico_item.text,
+      taxa.name,
       (SELECT `initials` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id` ) as taxa_kind_initials,
       (SELECT `name` FROM `taxa_kind` WHERE `taxa_kind`.`id`=`taxa`.`taxa_kind_id` ) as taxa_kind_name,            
       (               
@@ -96,14 +97,22 @@ while ($taxa = $taxaRes->fetch_object()) {
          IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`taxa`.`id`),0)+
          IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa`.`id`),0)+
          IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)
-      ) > 0 as status
-      FROM `dico_item`
-      LEFT JOIN `taxa` ON `taxa`.`id`=`dico_item`.`taxa_id`
-      WHERE `parent_taxa_id`='.$taxa->id.'
-      ORDER BY `dico_item`.`id` ');
+      ) > 0 as status,
+      dico_item.photo_id
+      FROM dico_item
+      LEFT JOIN taxa ON taxa.id=dico_item.taxa_id
+      WHERE parent_taxa_id='.$taxa->id);
    $taxa->dico=array();
    while ($dico = $dicoRes->fetch_object()) {
+	   if ($dico->photo_id > 0) {
+		  $dicoObj = new \flora\dico\DicoItem($GLOBALS['db']);
+		  $dicoObj->loadFromIdAndDico($taxa->id,$dico->id);
+		  $dico->photo_path = str_replace('images/dico/','',$dicoObj->getPhotoUrl());
+	  }
+	  unset($dico->id);
+	  unset($dico->photo_id);
       $taxa->dico[]=$dico;
+      
    }
    
    $imageRes = $mysql->query('SELECT * FROM taxa_image WHERE taxa_id='.$taxa->id);

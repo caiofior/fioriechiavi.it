@@ -302,6 +302,10 @@ class TaxaExport {
                             fwrite($stream, ' ['.$dicoItem->getRawData('initials').' '.$dicoItem->getRawData('name').'](#t'.$dicoItem->getData('taxa_id').')');
                         }
                         fwrite($stream,PHP_EOL);
+                        if ($dicoItem->getData('photo_id') >0) {
+							fwrite($stream,'![]('.$basePath.$dicoItem->getPhotoUrl().')'.PHP_EOL);
+							fwrite($stream,PHP_EOL);
+						}                        
                     }
                 }
                 fwrite($stream,PHP_EOL.'---------------'.PHP_EOL.PHP_EOL);
