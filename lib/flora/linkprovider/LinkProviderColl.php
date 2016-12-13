@@ -78,7 +78,7 @@ class LinkProviderColl extends \ContentColl {
 					$linkProvider->getRawData('link') == '' && 
 					(
 						$linkProvider->getRawData('datetime') == '' ||
-						$dateTime->diff(date_create())->format('%d') > 7
+						$dateTime->diff(date_create())->format('%d') > 180
 					)
 					) {
 						$linkProvider->retriveData($this->taxa);
