@@ -32,7 +32,7 @@ while (($rawWord = fgets($wordH)) !== false) {
    $words[] = $word;
 }
 fclose($wordH);
-$taxaRes = $mysql->query('SELECT name FROM `taxa` WHERE `taxa_kind_id` = 12 OR `taxa_kind_id` = 7');
+$taxaRes = $mysql->query('SELECT name FROM `taxa` WHERE `taxa_kind_id` IN (SELECT `id` FROM `taxa_kind` WHERE `initials` = "Sp" OR `initials` = "Gen." OR `initials` = "Sp." OR `initials` = "Gen")');
 while ($word = $taxaRes->fetch_object()) {
    preg_match("/^(\w+)/",strtolower(trim($word->name)),$matches);
    $word = current($matches);
@@ -84,7 +84,6 @@ if (!is_dir($baseDir)) {
    mkdir($baseDir);
 }
 while ($taxa = $taxaRes->fetch_object()) {
-   
    $dicoRes = $mysql->query('SELECT 
       dico_item.id,      
       dico_item.taxa_id,      
@@ -128,7 +127,7 @@ while ($taxa = $taxaRes->fetch_object()) {
    while ($attribute = $attributeRes->fetch_object()) {
       $taxa->attribute[]=$attribute;
    }
-   
+      var_dump($taxa->attribute);
    $regionRes = $mysql->query('SELECT region.id,region.name FROM taxa_region
       LEFT JOIN region ON region.id=taxa_region.region_id
       WHERE taxa_id='.$taxa->id);

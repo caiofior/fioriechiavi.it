@@ -13,11 +13,11 @@ if (array_key_exists('id', $_REQUEST)) {
    <input type="hidden" id="id" name="id" value="<?php echo $content->getData('id')?>">
    <div>
    <label for="title">Titolo</label>
-   <input id="title" name="title" value="<?php echo $content->getData('title')?>">
+   <input id="title" name="title" value="<?php echo htmlentities($content->getData('title'))?>">
    </div>
    <div>
    <label for="abstract">Sommario</label>
-   <input id="abstract" name="abstract" value="<?php echo $content->getData('abstract')?>">
+   <input id="abstract" name="abstract" value="<?php echo htmlentities($content->getData('abstract'))?>">
    </div>
    <div>
    <label for="content_field">Contenuto</label>

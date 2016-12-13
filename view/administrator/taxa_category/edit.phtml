@@ -11,11 +11,11 @@ if (array_key_exists('id', $_REQUEST)) {
    <input type="hidden" id="id" name="id" value="<?php echo $taxaKind->getData('id')?>">
    <div>
    <label for="initials">Sigla</label>
-   <input id="initials" name="initials" value="<?php echo $taxaKind->getData('initials')?>">
+   <input id="initials" name="initials" value="<?php echo htmlentities($taxaKind->getData('initials'))?>">
    </div>
    <div>
    <label for="name">Nome</label>
-   <input id="name" name="name" value="<?php echo $taxaKind->getData('name')?>">
+   <input id="name" name="name" value="<?php echo htmlentities($taxaKind->getData('name'))?>">
    </div>
    <div>
    <label for="description">Descrizione</label>

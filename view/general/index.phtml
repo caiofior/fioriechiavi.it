@@ -214,13 +214,22 @@ if (
 </div>
 <?php endif; ?>
 <div>
- <a class="blank" rel="nofollow" href="http://it.wikipedia.org/wiki/<?php echo urlencode(str_replace(' ', '_', $taxa->getData('name')));?>">Cerca su Wikipedia</a>
- <a class="blank" rel="nofollow" href="https://www.google.it/#q=site:www.actaplantarum.org+inurl:flora_info.php+<?php echo urlencode($taxa->getData('name'));?>">Cerca scheda su Acta plantorum</a>
+ <a class="blank" href="http://it.wikipedia.org/wiki/<?php echo urlencode(str_replace(' ', '_', $taxa->getData('name')));?>">Cerca su Wikipedia</a>
+ <?php
+$linkProviderColl = $taxa->getLinkProviderColl();
+$linkProviderColl->retriveFirst();
+$actaPlanctorum = $linkProviderColl->filterByAttributeValue('actaplanctorum','name');
+$actaPlanctorum = $actaPlanctorum->getFirst();
+if ($actaPlanctorum->getRawData('link') != ''): ?>
+ <a class="blank" href="<?php echo $actaPlanctorum->getRawData('link'); ?>">Acta plantorum</a>
+ <?php else : ?>
+ <a class="blank" href="https://www.google.it/#q=site:www.actaplantarum.org+inurl:flora_info.php+<?php echo urlencode($taxa->getData('name'));?>">Cerca scheda su Acta plantorum</a>
+ <?php endif; ?>
 <?php if ($taxa->getData('col_id') != '') :?>
- <a class="blank" rel="nofollow" href="<?php echo $GLOBALS['db']->config->catalogOfLife->landingPage.urlencode($taxa->getData('col_id'));?>">Catalog of life</a>
+ <a class="blank" href="<?php echo $GLOBALS['db']->config->catalogOfLife->landingPage.urlencode($taxa->getData('col_id'));?>">Catalog of life</a>
 <?php endif; ?>
 <?php if ($taxa->getData('eol_id') != '' && $taxa->getData('eol_id') != 0) :?>
- <a class="blank" rel="nofollow" href="<?php echo $GLOBALS['db']->config->encyclopediaOfLife->landingPage.urlencode($taxa->getData('eol_id'));?>">Encyclopedia of life</a>
+ <a class="blank" href="<?php echo $GLOBALS['db']->config->encyclopediaOfLife->landingPage.urlencode($taxa->getData('eol_id'));?>">Encyclopedia of life</a>
 <?php endif; ?>
 </div>
 <?php endif;

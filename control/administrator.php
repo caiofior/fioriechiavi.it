@@ -49,6 +49,9 @@ switch ($_REQUEST['task']) {
    case 'observation':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'observation.php';
       break;
+   case 'link':
+      require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'link.php';
+      break;
    default:
       $this->getTemplate()->setBlock('middle','administrator/dashboard.phtml');
       break;

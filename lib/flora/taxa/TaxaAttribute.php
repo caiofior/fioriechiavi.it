@@ -1,7 +1,7 @@
 <?php
 namespace flora\taxa;
 /**
- * Taka class
+ * Taxa attribite class
  *
  * @author caiofior
  */

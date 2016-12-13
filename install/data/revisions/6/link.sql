@@ -1,0 +1,3 @@
+CREATE TABLE `link_provider` ( `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id', `name` varchar(50) NOT NULL COMMENT 'Provider name', `priority` int(11) NOT NULL COMMENT 'Priority', PRIMARY KEY (`id`), UNIQUE KEY `name` (`name`), KEY `priority` (`priority`) USING BTREE) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE `link_taxa` ( `provider_id` INT(11) NOT NULL COMMENT 'Provider Id' , `taxa_id` INT(11) NOT NULL COMMENT 'Taxa id' , `link` VARCHAR(100) NOT NULL COMMENT 'Link' , `datetime` DATETIME NOT NULL COMMENT 'Last ceck datetime' , UNIQUE `taxa` (`taxa_id`), UNIQUE `Provider id` (`provider_id`)) ENGINE = MyISAM CHARSET=utf8 COLLATE utf8_general_ci COMMENT = 'Link to specific taxa';
+ALTER TABLE `link_taxa` ADD PRIMARY KEY (`provider_id`, `taxa_id`);

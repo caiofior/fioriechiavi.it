@@ -46,3 +46,33 @@
 [submodule "lib/shuttle-export"]
 	path = lib/shuttle-export
 	url = https://github.com/2createStudio/shuttle-export
+[submodule "lib/google-api-php-client"]
+	path = lib/google-api-php-client
+	url = https://github.com/google/google-api-php-client
+[submodule "lib/google-api-php-client-services"]
+	path = lib/google-api-php-client-services
+	url = https://github.com/google/google-api-php-client-services.git
+[submodule "lib/monolog"]
+	path = lib/monolog
+	url = https://github.com/Seldaek/monolog.git
+[submodule "lib/figlog"]
+	path = lib/figlog
+	url = https://github.com/php-fig/log.git
+[submodule "lib/psr7"]
+	path = lib/psr7
+	url = https://github.com/guzzle/psr7.git
+[submodule "lib/http-message"]
+	path = lib/http-message
+	url = https://github.com/php-fig/http-message
+[submodule "lib/guzzle"]
+	path = lib/guzzle
+	url = https://github.com/guzzle/guzzle.git
+[submodule "lib/google-auth-library-php"]
+	path = lib/google-auth-library-php
+	url = https://github.com/google/google-auth-library-php.git
+[submodule "lib/cache"]
+	path = lib/cache
+	url = https://github.com/php-fig/cache.git
+[submodule "lib/promises"]
+	path = lib/promises
+	url = https://github.com/guzzle/promises.git

@@ -1,13 +1,13 @@
 <?php
 namespace flora\taxa;
 /**
- * Description of Taxa Attribute Coll
+ * Collection of Taxa Attribute
  *
  * @author caiofior
  */
 class TaxaAttributeColl extends \ContentColl {
       /**
-       * Relation with th content
+       * Relation with the content
        * @param type $db
        */
       public function __construct($db) {

@@ -1,4 +1,5 @@
 <?php
+register_shutdown_function('server_resource_monitoring');
 echo 'Start at '.date('d/m/Y H:i:s').PHP_EOL;
 if(!array_key_exists('db', $GLOBALS)) {
     require __DIR__.'/../include/pageboot.php';
@@ -80,7 +81,7 @@ do {
     }
     if(php_sapi_name() != 'cli') {
         echo str_repeat(' ', 50).PHP_EOL;
-        ob_flush();
+        flush();
         set_time_limit(30);
         if ($GLOBALS['db']->config->background->sleep != '') {
             usleep($GLOBALS['db']->config->background->sleep);
@@ -168,3 +169,44 @@ $GLOBALS['db']->query('ALTER TABLE `taxa_search` ORDER BY `taxa_id` DESC'
 , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
 echo 'Memory '.  number_format(memory_get_peak_usage()/1024/1024,2).' M'.PHP_EOL;
 echo 'End at '.date('d/m/Y H:i:s').PHP_EOL;
+
+function server_resource_monitoring() {
+    $error_codes = array(
+        1=>'E_ERROR',
+        2=>'E_WARNING',
+        4=>'E_PARSE',
+        8=>'E_NOTICE',   
+        16=>'E_CORE_ERROR',
+        32=>'E_CORE_WARNING',   
+        64=>'E_COMPILE_ERROR',
+        128=>'E_COMPILE_WARNING',   
+        256=>'E_USER_ERROR',
+        512=>'E_USER_WARNING',
+        1024=>'E_USER_NOTICE',
+        2048=>'E_STRICT',
+        4096=>'E_RECOVERABLE_ERROR',
+        8192=>'E_DEPRECATED',
+        16384=>'E_USER_DEPRECATED',
+        32767=>'E_ALL'
+    );
+    $error = error_get_last();
+    $error_message = '';
+    if ($error['type'] != 2 &&
+            $error['type'] != 8 &&
+            $error['type'] != 32 &&
+            $error['type'] != 128 &&
+            $error['type'] != 512 &&
+            $error['type'] != 1024 &&
+            $error['type'] != 2048 &&
+            $error['type'] != 8192 &&
+            $error['type'] != 16384 &&
+            $error['type'] != '') {
+        $error["type"] = $error_codes[$error["type"]];
+        
+        echo "Tipo\t" . $error["type"] . PHP_EOL;
+        echo "Messaggio\t" . $error["message"] . PHP_EOL;
+        echo "File\t" . $error["file"] . PHP_EOL;
+        echo "Linea\t" . $error["line"] . PHP_EOL;
+        
+    }
+}

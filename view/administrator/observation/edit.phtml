@@ -20,11 +20,11 @@ if (array_key_exists('id', $_REQUEST)) {
    </div>
    <div>
    <label for="title">Titolo</label>
-   <input id="title" name="title" value="<?php echo $taxaObservation->getData('title')?>">
+   <input id="title" name="title" value="<?php echo htmlentities($taxaObservation->getData('title'))?>">
    </div>
    <div>
    <label for="description">Descrizione</label>
-   <textarea id="description" name="description"><?php echo $taxaObservation->getData('description')?></textarea>
+   <textarea id="description" name="description"><?php echo htmlentities($taxaObservation->getData('description'))?></textarea>
    </div>
    <div>
    <?php if($GLOBALS['profile']->getData('role_id') == 3) : ?>

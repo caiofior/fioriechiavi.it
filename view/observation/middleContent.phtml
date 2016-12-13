@@ -54,6 +54,7 @@ if ($taxaObservationColl->count() > 1) {
 }
 $pointsString .=']'; 
 $centroid = $taxaObservationColl->getMultiPoint()->centroid();
+if (is_object($centroid)) :
 ?>
 <script>
     points = <?php echo $pointsString; ?>;
@@ -65,4 +66,4 @@ $centroid = $taxaObservationColl->getMultiPoint()->centroid();
 	updateMap();
     }
 </script>
-
+<?php endif;

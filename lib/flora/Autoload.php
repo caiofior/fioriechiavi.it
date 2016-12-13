@@ -46,6 +46,8 @@ class Autoload {
          $class = __CLASS__;
          self::$instance = new $class();
       }
+      require __DIR__.DIRECTORY_SEPARATOR.'linkprovider'.DIRECTORY_SEPARATOR.'LinkProvider.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'linkprovider'.DIRECTORY_SEPARATOR.'LinkProviderColl.php';
 
       require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoInt.php';
       require __DIR__.DIRECTORY_SEPARATOR.'dico'.DIRECTORY_SEPARATOR.'DicoItemInt.php';

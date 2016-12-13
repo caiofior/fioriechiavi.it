@@ -3,8 +3,10 @@ function noLimitDumpRestore($db,$filename) {
 if (!is_file($filename)) {
    throw new \Exception('File is not avaliable '.$filename);
 }
+$disabled_functions = ini_get('disable_functions');
 if (
-        is_callable('shell_exec')
+        is_callable('shell_exec') ||
+        stripos($disabled_functions, 'shell_exec') !== false
    ) {
    $cmd = 'mysql';
    if ($GLOBALS['config']->database->hostname != '') {

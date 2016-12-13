@@ -185,6 +185,15 @@ case 'edit':
                 $dicoItem->setData($taxa->getData('id'), 'taxa_id');
                 $dicoItem->replace();
             }
+            $linkProviderColl = $taxa->getLinkProviderColl();
+            if (array_key_exists('link_actaplanctorum', $_REQUEST) && $_REQUEST['link_actaplanctorum'] != '') {
+               $actaPlanctorum = $linkProviderColl->filterByAttributeValue('actaplanctorum','name');
+               $actaPlanctorum = $actaPlanctorum->getFirst();
+               if($actaPlanctorum->getRawData('link') != $_REQUEST['link_actaplanctorum']) {
+                  $actaPlanctorum->updateLink($taxa,$_REQUEST['link_actaplanctorum']);
+               }
+            }
+            
             $log = new \log\Log($GLOBALS['db']);
             $log->add(
                     $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),
@@ -465,7 +474,7 @@ case 'get_col_id_list':
     $responseString = curl_exec($ch);
     $response = @unserialize($responseString);
     if ($response === false || !is_array($response)) {
-        echo 'Errorre nel collegamento al server '.$GLOBALS['db']->config->catalogOfLife->wsEndpoint.' '.$responseString;
+        echo 'Errore nel collegamento al server '.$GLOBALS['db']->config->catalogOfLife->wsEndpoint.' '.$responseString;
     } else {
         require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'colList.phtml';
     }

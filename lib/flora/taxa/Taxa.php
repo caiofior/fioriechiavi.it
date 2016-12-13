@@ -514,5 +514,17 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
         $count = array_shift($count);
         return $count == 1;
     }
+     /**
+     * Returns a collection of external link providers
+     * @return \flora\dico\DicoItemColl
+     */
+    public function getLinkProviderColl() {
+		$linkProviderColl = new \flora\linkprovider\LinkProviderColl($this->db);
+		if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
+            $linkProviderColl->setTaxa($this);
+            $linkProviderColl->loadAll();
+      }
+      return $linkProviderColl;
+	}
 
 }

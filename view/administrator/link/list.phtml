@@ -1,0 +1,30 @@
+<?php if($GLOBALS['db']->config->useCDN === true) : ?>
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.3/css/jquery.dataTables.min.css">
+<?php else : ?>
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl;?>/js/DataTables/media/css/jquery.dataTables.css">
+<?php endif; ?>
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <h2>Fornitore link esterni</h2>
+</div>
+<a class="actions add" title="Aggiungi" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=link&amp;action=edit">Aggiungi</a><br/>
+<table id="link">
+   	<thead>
+		<tr>
+			<th data-sName="id" data-bVisible="false" >Id</th>
+			<th data-sName="name" >Nome</th>
+            <th data-bSortable="false" data-sName="actions" >Azioni</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="6" class="dataTables_empty">Carico i dati</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th>Id</th>
+			<th>Nome</th>
+            <th>Azioni</th>
+		</tr>
+	</tfoot>
+</table>

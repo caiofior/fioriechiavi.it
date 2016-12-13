@@ -113,7 +113,9 @@ switch ($_REQUEST['task']) {
                         $taxaObservation->setData(strip_tags($observationData['title']),'title');
                         $taxaObservation->setData(strip_tags($observationData['description']),'description');
                         $taxaObservation->setData($profile->getData('id'),'profile_id');
-                        $taxaObservation->setData($dateTime->format('Y-m-d H:i:s'),'datetime');
+						if (is_object($dateTime)) {
+                        	$taxaObservation->setData($dateTime->format('Y-m-d H:i:s'),'datetime');
+						}
                         $taxaObservation->setData(0,'valid');
                         $taxaObservation->setPoint(new \Point(floatval($observationData['longitude']),floatval($observationData['latitude'])));
                         $taxaObservation->insert();
