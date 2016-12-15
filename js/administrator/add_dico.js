@@ -21,16 +21,21 @@ $(document).ready(function() {
              $(this).val(ui.item.label);
              e.preventDefault();
          } else {
-            $.ajax({
-               url: "?task=add_dico&action=createtaxaassociation",
-               data: {
-                  "id":$('#id').val(),
-                  "id_dico":$(this).siblings("input[name='children_add_dico_item_id']").val(),
-                  "taxa_id":ui.item.value
-               },
-               async : false
-             });
-            window.location.reload();
+            if($("input[name=is_list]").val() == 1) {
+                $(this).siblings("input[name=taxa_id\\[\\]]").val(ui.item.value);
+                $("input[name=submit]").click();
+            } else {
+                $.ajax({
+                   url: "?task=add_dico&action=createtaxaassociation",
+                   data: {
+                      "id":$('#id').val(),
+                      "id_dico":$(this).siblings("input[name='children_add_dico_item_id']").val(),
+                      "taxa_id":ui.item.value
+                   },
+                   async : false
+                 });
+                window.location.reload();
+            }
          }
       }
    });
@@ -63,6 +68,10 @@ $(document).ready(function() {
     $( ".editDicoItem" ).click(function (e){
        $(this).prev().trigger("click");
        e.preventDefault();
+    });
+    $(".createTaxa").click(function(e) {
+      window.location = $(this).data("url")+"&name="+$(this).siblings("input[name=name\\[\\]]").val();
+      e.preventDefault();
     });
     $(".hideMissing").click (function (e){
        $(".editable.missing").parent("div").toggle();

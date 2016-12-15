@@ -18,7 +18,7 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
       if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 0) : ?>
       <?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?>
       <?php elseif (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 1) : ?>
-      <a class="taxaPreview" title="Test" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $dicoItem->getData('taxa_id'); ?>"><?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?></a>
+      <a class="taxaPreview" title="Anteprima" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $dicoItem->getData('taxa_id'); ?>"><?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?></a>
       <?php endif; ?>
       </em>
       <?php  if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 1 && $GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>
@@ -38,7 +38,29 @@ foreach($addDicoColl->getItems() as $addDico) :
     $dicoItemColl = $addDico->getDicoItemColl();
     $positions = array();
     $lastPosition = 0;
-    foreach ($dicoItemColl->getItems() as $dicoItem): 
+    if ($addDico->getData('is_list') == 1) :
+       
+   $positions = array();
+   foreach ($dicoItemColl->getItems() as $pos =>$dicoItem): ?>
+   <div>
+      <?php echo $pos+1; ?>
+       <span id="d<?php echo $dicoItem->getData('id'); ?>">
+         <?php echo $dicoItem->getData('text'); ?><em><?php
+         if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 0) : ?>
+         <?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?>
+         <?php elseif (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 1) : ?>
+         <a class="taxaPreview" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $dicoItem->getData('taxa_id'); ?>"><?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?></a>
+         <?php endif; ?>
+         </em>
+         <?php 
+         if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 1 && $GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>
+         <a class="actions modify blank" title="Modifica" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $dicoItem->getData('taxa_id');?>">Modifica</a>
+         <?php endif; ?>
+      </span>
+   </div>
+   <?php endforeach;
+    else :  
+    foreach ($dicoItemColl->getItems() as $dicoItem):        
        $lastCharacter = substr($dicoItem->getData('id'),-1);
        if ($lastCharacter == 0) {
           $lastPosition++;
@@ -55,7 +77,7 @@ foreach($addDicoColl->getItems() as $addDico) :
       if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 0) : ?>
       <?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?>
       <?php elseif (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 1) : ?>
-      <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $dicoItem->getData('taxa_id'); ?>"><?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?></a>
+      <a class="taxaPreview" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $dicoItem->getData('taxa_id'); ?>"><?php echo $dicoItem->getRawData('initials'); ?> <?php echo $dicoItem->getRawData('name'); ?></a>
       <?php endif; ?>
       </em>
       <?php  if (is_numeric($dicoItem->getData('taxa_id')) && $dicoItem->getRawData('status') == 1 && $GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>
@@ -64,4 +86,5 @@ foreach($addDicoColl->getItems() as $addDico) :
    </span>
 </div>
 <?php endforeach;
+      endif;
 endforeach;

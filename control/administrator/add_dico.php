@@ -26,8 +26,58 @@ case 'update':
        if (!array_key_exists('is_list', $_REQUEST)) {
             $_REQUEST['is_list']='';
        }
-       $dico->setData($_REQUEST);
-       $dico->update();
+       
+       if ($dico->getData('is_list') == 1) {
+         
+            $lastId = '';
+            $dicoItemColl->emptyDicoItems();
+            if (array_key_exists('text', $_REQUEST) && is_array($_REQUEST['text'])) {
+               foreach($_REQUEST['text'] as $key=>$text) {
+                     if (
+                             substr($lastId,-1) == '1' ||
+                             $lastId==''
+                     ) {
+                        $id = $lastId.'0';
+                     } else {
+                        $id = substr($lastId,0,-1).'1';
+                     }
+
+                     $dicoItem = $dicoItemColl->addItem();
+                     
+                     $dicoItem->setData(array(
+                         'id'=>$id,
+                         'text'=>$text,
+                         'taxa_id'=>$_REQUEST['taxa_id'][$key]
+                     ));
+                     
+                     $dicoItem->replace();
+                     $lastId=$id;
+               }
+
+            } 
+
+            if (array_key_exists('addText', $_REQUEST) && $_REQUEST['addText'] != '') {
+               if (!array_key_exists('addPhotoId', $_REQUEST)) {
+                  $_REQUEST['addPhotoId']='';
+               }
+               if (substr($lastId,-1) == '1') {
+                  $id = $lastId.'0';
+               } else {
+                  $id = substr($lastId,0,-1).'1';
+               }
+               $dicoItem = $dicoItemColl->addItem();
+               $dicoItem->setData(array(
+                   'id'=>$id,
+                   'text'=>$_REQUEST['addText'],
+                   'photo_name'=>$_REQUEST['addPhotoId']
+               ));
+               $dicoItem->replace();
+            }
+         
+      } else {
+         $dico->setData($_REQUEST);
+         $dico->update();
+        }
    }
    $this->getTemplate()->setObjectData($dico);
    $this->getTemplate()->setBlock('middle','administrator/add_dico/edit.phtml');
