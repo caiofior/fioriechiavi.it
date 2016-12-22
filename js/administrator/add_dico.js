@@ -21,7 +21,7 @@ $(document).ready(function() {
              $(this).val(ui.item.label);
              e.preventDefault();
          } else {
-            if($("input[name=is_list]").val() == 1) {
+            if($("input[name=is_list]:checked").val() == 1) {
                 $(this).siblings("input[name=taxa_id\\[\\]]").val(ui.item.value);
                 $("input[name=submit]").click();
             } else {
