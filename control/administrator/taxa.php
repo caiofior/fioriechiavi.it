@@ -485,7 +485,9 @@ case 'get_eol_id_list':
    if (array_key_exists('taxa_name', $_REQUEST) && $_REQUEST['taxa_name'] != '') {
     $ch = curl_init($GLOBALS['db']->config->encyclopediaOfLife->wsEndpoint.urlencode($_REQUEST['taxa_name']));
     curl_setopt_array($ch,array(
-         CURLOPT_RETURNTRANSFER => true
+         CURLOPT_RETURNTRANSFER => true,
+         CURLOPT_CONNECTTIMEOUT => 10,
+         CURLOPT_TIMEOUT => 10,
     ));
     $response = json_decode(curl_exec($ch));
     if (is_object($response)) {
