@@ -35,21 +35,28 @@ class LinkProvider extends \Content
       if (!interface_exists('flora\linkprovider\provider\Provider')) {
             require __DIR__ . '/provider/Provider.php';
       }
+      $retriveClass = null;
       switch ($this->data['name']) {
          case 'actaplanctorum':
          require __DIR__ . '/provider/Actaplanctorum.php';   
          $retriveClass = new \flora\linkprovider\provider\Actaplanctorum();
          break;
+         case 'dryades':
+         require __DIR__ . '/provider/Dryades.php';   
+         $retriveClass = new \flora\linkprovider\provider\Dryades();
+         break;
       }
-      $link = $retriveClass->retrive($taxa);
-      if ($link !== false) {
-         $this->rawData['link'] = $link;
-         $taxa->getDb()->query('DELETE FROM `link_taxa`
-            WHERE `provider_id` = '.intval($this->getData('id')).' AND `taxa_id` = '.intval($taxa->getData('id'))
-         , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE );
-         $taxa->getDb()->query('INSERT INTO `link_taxa`
-            (`provider_id`,`taxa_id`,`link`,`datetime`)
-            VALUES ('.intval($this->getData('id')).','.intval($taxa->getData('id')).',"'. addslashes($link).'",NOW()) ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+      if (is_object($retriveClass)) {
+         $link = $retriveClass->retrive($taxa);
+         if ($link !== false) {
+            $this->rawData['link'] = $link;
+            $taxa->getDb()->query('DELETE FROM `link_taxa`
+               WHERE `provider_id` = '.intval($this->getData('id')).' AND `taxa_id` = '.intval($taxa->getData('id'))
+            , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE );
+            $taxa->getDb()->query('INSERT INTO `link_taxa`
+               (`provider_id`,`taxa_id`,`link`,`datetime`)
+               VALUES ('.intval($this->getData('id')).','.intval($taxa->getData('id')).',"'. addslashes($link).'",NOW()) ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         }
       }
    }
    /**

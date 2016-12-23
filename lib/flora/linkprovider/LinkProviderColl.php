@@ -52,10 +52,10 @@ class LinkProviderColl extends \ContentColl {
 	   if ($this->taxa instanceof \flora\taxa\Taxa) {
           $select->columns(array(
 			'*',
-			'taxa_id'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `taxa_id` FROM `link_taxa` WHERE `taxa_id`='.intval($this->taxa->getData('id')).' LIMIT 1)'),
-			'link'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `link` FROM `link_taxa` WHERE `taxa_id`='.intval($this->taxa->getData('id')).' LIMIT 1)'),
-			'datetime'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `datetime` FROM `link_taxa` WHERE `taxa_id`='.intval($this->taxa->getData('id')).' LIMIT 1)'),
-         'fixed'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `fixed` FROM `link_taxa` WHERE `taxa_id`='.intval($this->taxa->getData('id')).' LIMIT 1)')     
+			'taxa_id'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `taxa_id` FROM `link_taxa` WHERE `provider_id`=`link_provider`.`id` AND `taxa_id`='.intval($this->taxa->getData('id')).' LIMIT 1)'),
+			'link'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `link` FROM `link_taxa` WHERE `provider_id`=`link_provider`.`id` AND `taxa_id`='.intval($this->taxa->getData('id')).' LIMIT 1)'),
+			'datetime'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `datetime` FROM `link_taxa` WHERE `provider_id`=`link_provider`.`id` AND `taxa_id`='.intval($this->taxa->getData('id')).' LIMIT 1)'),
+            'fixed'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT `fixed` FROM `link_taxa` WHERE `provider_id`=`link_provider`.`id` AND `taxa_id`='.intval($this->taxa->getData('id')).' LIMIT 1)')     
 			));
        }
       return $select;
