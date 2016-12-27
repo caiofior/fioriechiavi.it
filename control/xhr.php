@@ -76,6 +76,56 @@ switch ($_REQUEST['task']) {
          break;
       }
    break;
+   case 'taxa':
+      switch ($_REQUEST['action']) {
+         case 'search':
+            $taxaId = null;
+            if (
+                    array_key_exists('eol_id', $_REQUEST) &&
+                    $_REQUEST['eol_id'] != ''
+                  ) {
+               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa` 
+                WHERE `eol_id`=' . intval($_REQUEST['eol_id'])
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+               $resultSet = $resultSet->toArray();
+               if (sizeof($resultSet)>0) {
+                  $taxaId = current(current($resultSet));
+               }
+            }
+            if (
+                    $taxaId == null &&
+                    array_key_exists('eol_id', $_REQUEST) &&
+                    $_REQUEST['eol_id'] != ''
+                  ) {
+               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa` 
+                WHERE `col_id`="' . addslashes($_REQUEST['col_id']).'"'
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+               $resultSet = $resultSet->toArray();
+               if (sizeof($resultSet)>0) {
+                  $taxaId = current(current($resultSet));
+               }
+            }
+            if (
+                    $taxaId == null &&
+                    array_key_exists('name', $_REQUEST) &&
+                    $_REQUEST['name'] != ''
+                  ) {
+               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa` 
+                WHERE `name` LIKE "%' . addslashes($_REQUEST['name']).'%"'
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+               $resultSet = $resultSet->toArray();
+               if (sizeof($resultSet)>0) {
+                  $taxaId = current(current($resultSet));
+               }
+            }
+            if (is_null($taxaId)) {
+               echo json_encode(false);
+            } else {
+               echo json_encode($GLOBALS['db']->config->baseUrl.'index.php?id='.intval($taxaId));
+            }
+         break;
+      }      
+   break;  
    case 'observation':
       switch ($_REQUEST['action']) {
          case 'signal':
@@ -131,7 +181,7 @@ switch ($_REQUEST['task']) {
                } else {
                   echo json_encode( $result );
             }  
-         break;
+         break; 
          case 'appendimage':
             $result = (object) array('valid' => false);
             file_put_contents('/tmp/request.txt', var_export($_REQUEST,true));

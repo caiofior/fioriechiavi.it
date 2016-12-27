@@ -18,7 +18,7 @@ while ($missing<100) {
          $prog++;
          continue;
       }
-      if (key_exists(1, $matches) && $matches[1] == 'x') {
+      if (key_exists(1, $matches) && key_exists(2, $matches) && $matches[1] == 'x') {
          $matches[1]=$matches[2];
          unset($matches[2]);
       }

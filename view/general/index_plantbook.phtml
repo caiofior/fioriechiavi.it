@@ -158,6 +158,11 @@ $dryades = $dryades->getFirst();
 if ($dryades->getRawData('link') != ''): ?>
  <a class="blank" href="<?php echo $dryades->getRawData('link'); ?>">Dryades</a> 
  <?php endif; 
+$florae = $linkProviderColl->filterByAttributeValue('florae','name');
+$florae = $florae->getFirst();
+if ($florae->getRawData('link') != ''): ?>
+ <a class="blank" href="<?php echo $florae->getRawData('link'); ?>">Florae.it</a> 
+<?php endif; 
  if ($taxa->getData('col_id') != '') :?>
  <a class="blank" href="<?php echo $GLOBALS['db']->config->catalogOfLife->landingPage.urlencode($taxa->getData('col_id'));?>">Catalog of life</a>
 <?php endif; ?>

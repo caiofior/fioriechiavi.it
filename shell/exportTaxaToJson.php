@@ -103,6 +103,20 @@ while ($taxa = $taxaRes->fetch_object()) {
       WHERE parent_taxa_id='.$taxa->id);
    $taxa->dico=array();
    while ($dico = $dicoRes->fetch_object()) {
+      
+      preg_match_all('/{t([[:alnum:]\/]+)}/',$dico->text,$items);
+      if (is_array($items) && array_key_exists(1, $items)) {
+          $relTaxa = new \flora\taxa\Taxa($GLOBALS['db']);
+          foreach ($items[1] as $progessNumber) {
+              $relTaxa->loadFromAttributeValue($GLOBALS['db']->config->attributes->progress,$progessNumber);
+              if ($relTaxa->getData('id') != '') {
+                  $dico->text = str_replace('{t'.$progessNumber.'}', '<a href="#" class="gotoTaxa" data-taxaid="'.$relTaxa->getData('id').'">'.$relTaxa->getData('taxa_kind_initials').' '.$relTaxa->getData('name').'</a>', $dico->text);
+              } else {
+                  $dico->text = str_replace('{t'.$progessNumber.'}', $progessNumber, $dico->text);
+              }
+          }
+      }
+      
 	   if ($dico->photo_id > 0) {
 		  $dicoObj = new \flora\dico\DicoItem($GLOBALS['db']);
 		  $dicoObj->loadFromIdAndDico($taxa->id,$dico->id);
@@ -127,7 +141,6 @@ while ($taxa = $taxaRes->fetch_object()) {
    while ($attribute = $attributeRes->fetch_object()) {
       $taxa->attribute[]=$attribute;
    }
-      var_dump($taxa->attribute);
    $regionRes = $mysql->query('SELECT region.id,region.name FROM taxa_region
       LEFT JOIN region ON region.id=taxa_region.region_id
       WHERE taxa_id='.$taxa->id);
