@@ -193,7 +193,13 @@ case 'edit':
                   $actaPlanctorum->updateLink($taxa,$_REQUEST['link_actaplanctorum']);
                }
             }
-            
+            if (array_key_exists('link_dryades', $_REQUEST) && $_REQUEST['link_dryades'] != '') {
+               $dryades = $linkProviderColl->filterByAttributeValue('dryades','name');
+               $dryades = $dryades->getFirst();
+               if($dryades->getRawData('link') != $_REQUEST['link_dryades']) {
+                  $dryades->updateLink($taxa,$_REQUEST['link_dryades']);
+               }
+            }
             $log = new \log\Log($GLOBALS['db']);
             $log->add(
                     $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),
