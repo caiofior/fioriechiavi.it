@@ -1,0 +1,11 @@
+<?php   
+$content = new \content\content\Content($GLOBALS['db']);
+$content->loadFromLabel('privacy');?>
+<div>
+   <h2>
+      <?php echo $content->getData('title');?> <?php echo $content->getData('abstract');?>
+   </h2>
+   <div>
+      <?php echo $content->getData('content');?>
+   </div>
+</div>
