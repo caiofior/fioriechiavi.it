@@ -173,6 +173,10 @@ if($GLOBALS['db']->config->useCDN === true) : ?>
           <a class="blank" href="https://www.google.it/#q=site:www.actaplantarum.org+inurl:flora_info.php+<?php echo urlencode($taxa->getData('name'));?>"><?php echo $linkProvider->getData('name');?></a>: 
           <a class="blank" href="<?php echo $linkProvider->getRawData('link');?>"><?php echo $linkProvider->getRawData('link');?></a>      
           <input name="link_<?php echo $linkProvider->getData('name');?>" value="<?php echo htmlentities($linkProvider->getRawData('link'));?>">
+          <?php elseif($linkProvider->getData('name') == 'dryades') : ?>
+          <a class="blank" href="http://dbiodbs.units.it/carso/cercapiante01"><?php echo $linkProvider->getData('name');?></a>: 
+          <a class="blank" href="<?php echo $linkProvider->getRawData('link');?>"><?php echo $linkProvider->getRawData('link');?></a>      
+          <input name="link_<?php echo $linkProvider->getData('name');?>" value="<?php echo htmlentities($linkProvider->getRawData('link'));?>">
           <?php else : ?>
           <?php echo $linkProvider->getData('name');?>: 
           <a class="blank" href="<?php echo $linkProvider->getRawData('link');?>"><?php echo $linkProvider->getRawData('link');?></a>      
