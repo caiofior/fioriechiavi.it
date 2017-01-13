@@ -16,6 +16,12 @@ class LoginColl extends \ContentColl {
       * @return Zend_Db_Select Select is expected
       */
     protected function customSelect( \Zend\Db\Sql\Select $select,array $criteria ) {
+       $select->columns(array(
+                '*',
+                'role_id' => new \Zend\Db\Sql\Predicate\Expression('
+                ( SELECT `role_id` FROM `profile` WHERE `profile`.`id` = `login`.`profile_id` )
+               ')
+            ));
        $select = $this->setFilter($select,$criteria);
        return $select;
     }
@@ -42,6 +48,9 @@ class LoginColl extends \ContentColl {
     private function setFilter ($select,$criteria) {
       if (array_key_exists('profile_id', $criteria) && $criteria['profile_id'] != '') {
           $select->where('`profile_id` = '.intval($criteria['profile_id']));
+      }
+      if (array_key_exists('role_id', $criteria) && $criteria['role_id'] != '') {
+          $select->having('`role_id` = '.intval($criteria['role_id']));
       }
       return $select;
     }
