@@ -223,6 +223,7 @@ class TaxaExport {
                             fwrite($stream,':   '.$attribute->getRawData('value').PHP_EOL);
                         break;
                     }
+                    fwrite($stream,PHP_EOL);
                 }
                 $from = $attributeColl->filterByAttributeValue('Limite altitudinale inferiore','name')->getFirst()->getRawData('value');
                 $to = $attributeColl->filterByAttributeValue('Limite altitudinale superiore','name')->getFirst()->getRawData('value');

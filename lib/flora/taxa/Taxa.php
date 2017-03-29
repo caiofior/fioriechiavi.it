@@ -228,6 +228,7 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
      */
     public function addTaxaAttribute($name, $value) {
         $attibute = new \flora\taxa\TaxaAttribute($this->db);
+        $name = trim($name);
         $attibute->loadFromName($name);
         if ($attibute->getData('id') == '') {
             $attibute->setData($name, 'name');

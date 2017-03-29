@@ -105,9 +105,9 @@ switch ($_REQUEST['action']) {
                $value=str_replace("\"","\'",$value);
                '));
            if ($c == 0) {
-               echo fputcsv($out,array_keys($data),$separator);    
+               fputcsv($out,array_keys($data),$separator);    
            }
-           echo fputcsv($out,$data,$separator);
+           fputcsv($out,$data,$separator);
        }
        fclose($out);
        exit;
