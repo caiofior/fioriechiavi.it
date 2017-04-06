@@ -103,6 +103,7 @@ switch ($_REQUEST['action']) {
            }
            array_walk($data, create_function('&$value,$key','
                $value=str_replace("\"","\'",$value);
+			   $value=str_replace(array("\n","\r"),"",$value);
                '));
            if ($c == 0) {
                fputcsv($out,array_keys($data),$separator);    

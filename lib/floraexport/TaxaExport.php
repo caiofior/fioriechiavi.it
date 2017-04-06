@@ -147,6 +147,7 @@ class TaxaExport {
             }
             if ($taxa->getData('description') != '') {
                 $description = $taxa->getData('description');
+                
                 preg_match_all('/{t([[:alnum:]\/]+)}/',$description,$items);
                 if (is_array($items) && array_key_exists(1, $items)) {
                     $relTaxa = new \flora\taxa\Taxa($GLOBALS['db']);

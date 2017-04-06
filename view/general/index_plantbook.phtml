@@ -36,11 +36,15 @@ endif;
 <?php
 if ($taxa->getData('name') != '') : 
    $taxaParentColl = $taxa->getParentColl();
-   foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) : ?>
+   foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) : 
+     if ($key == 0) : ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxaParent->getData('id');?>">
-      <h<?php echo 1+$taxaParentColl->count()-$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
+      <h<?php echo 2+$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
    </a>
+   <?php else : ?>
+      <h<?php echo 2+$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
    <?php
+     endif;
    endforeach;
 endif;
 if (
