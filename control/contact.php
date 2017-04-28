@@ -74,7 +74,7 @@ switch ($_REQUEST['task']) {
                      ->setBody($body);
                   $GLOBALS['transport']->send($message);
                } catch (\Exception $e) {
-                  $this->getTemplate()->setBlock('middle','contact/errore.phtml');  
+                  $this->getTemplate()->setBlock('middle','contact/error.phtml');  
                }
                
             }
