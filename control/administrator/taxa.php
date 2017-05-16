@@ -80,8 +80,9 @@ case 'edit':
             $taxa->loadFromId($_REQUEST['id']);
          }
          if (!array_key_exists('is_list', $_REQUEST)) {
-            $_REQUEST['is_list']='';
+            $_REQUEST['is_list']=0;
          }
+         $_REQUEST['is_list']=intval($_REQUEST['is_list']);
          $taxa->setData($_REQUEST);
          if ($taxa->profileCanEdit($GLOBALS['profile'])) {
             $action='Crea';
