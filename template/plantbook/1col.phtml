@@ -120,6 +120,20 @@
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $rssUrl; ?>" title="RSS">
                                 <img class="social rss" src="template/plantbook/images/empty.png" alt="RSS" />
                             </a>
+                                                        <?php if($GLOBALS['db']->config->socialPages->android != '') : ?>
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->android; ?>" title="Google play">
+                                <img class="social android" src="template/leaf/images/empty.png" alt="Google play" />
+                            </a>
+                            <?php endif;
+                            if($GLOBALS['db']->config->socialPages->windows != '') : ?>
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->windows; ?>" title="Windows">
+                                <img class="social windows" src="template/leaf/images/empty.png" alt="Windows" />
+                            </a>
+                            <?php endif; if($GLOBALS['db']->config->socialPages->kindle != '') : ?>
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->kindle; ?>" title="kindle">
+                                <img class="social kindle" src="template/leaf/images/empty.png" alt="Kindle" />
+                            </a>
+                            <?php endif; ?>
                         </div>
                 </div>
                 <?php endif; ?>

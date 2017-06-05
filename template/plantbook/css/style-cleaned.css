@@ -47,6 +47,15 @@ img.social.issuu {
 img.social.scribd {
     background-position: -88px 0px;
 }
+img.social.android {
+    background-position: -110px 0px;
+}
+img.social.windows {
+    background-position: -132px 0px;
+}
+img.social.kindle {
+    background-position: -154px 0px;
+}
 /*-----start-header----*/
 .header{
 	background:#e3ec6f;
