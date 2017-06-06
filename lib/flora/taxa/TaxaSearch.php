@@ -53,6 +53,7 @@ class TaxaSearch extends \Content {
      * Updates full text data
      */
     private function updateFullText() {
+	    $this->db->query('SET group_concat_max_len=15000', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('UPDATE `taxa_search` SET 
             `text` = CONCAT(
             COALESCE((SELECT `name` FROM `taxa` WHERE `id` = ' . intval($this->taxa->getData('id')).'),""),
