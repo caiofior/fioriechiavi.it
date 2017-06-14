@@ -15,7 +15,10 @@ if (
 </div>
 <h2>Mappa dei taxa presenti</h2>
 <?php
-$statement = $GLOBALS['db']->query('
+$bConfig = $GLOBALS['config']->database->toArray();
+$bConfig['options']['buffer_results']=false;
+$db = new Zend\Db\Adapter\Adapter($bConfig);
+$resultSet = $db->query('
     SELECT `node`.`taxa_id` ,
     (SELECT 
         COUNT(*) FROM `taxa_search` AS `parent` 
@@ -36,10 +39,7 @@ $statement = $GLOBALS['db']->query('
 
     ) > 0
     ORDER BY `node`.`lft`
-    ');
-$resource = $statement->execute();
-$resultSet = new \Zend\Db\ResultSet\ResultSet();
-$resultSet->initialize($resource);
+    ',\Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
 $resultSet->current();
 $resultSet->next();
 while ($resultSet->valid()) : 
@@ -49,9 +49,6 @@ while ($resultSet->valid()) :
 <a class="taxaPreview" href="<?php echo $GLOBALS['db']->config->baseUrl;?>?id=<?php echo $data['taxa_id']; ?>">
 <?php echo str_repeat(' ', $data['depth']).$data['taxa_kind_initials'].' '.$data['name']; ?>
 </a>
-<?php  if ($GLOBALS['profile'] instanceof \login\user\Profile && $GLOBALS['profile']->getRole()->getData('id') >0 && $GLOBALS['profile']->getRole()->getData('id') <= 2 ) : ?>
-<a class="actions modify blank" title="Modifica" href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa&amp;action=edit&amp;id=<?php echo $data['taxa_id']; ?>">Modifica</a>
-<?php endif;?>
 </p>
 <?php 
     $resultSet->next();

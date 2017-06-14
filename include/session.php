@@ -79,6 +79,8 @@ else if (
    $facebookSession->getManager()->getStorage()->clear('facebook_id');
    if (is_numeric(session_id())) session_destroy();
    header('Location: '.$GLOBALS['db']->config->baseUrl);
+   ignore_user_abort (true);
+   require __DIR__.'/../view/map/middle.phtml';
    exit;
 }
 $profile = null;

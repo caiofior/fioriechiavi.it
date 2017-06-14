@@ -131,7 +131,7 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
         if (array_key_exists('eol_id', $this->data) && ($this->data['eol_id']=='' || $this->data['eol_id']==0)) {
             $this->data['eol_id']=null;
         }
-        if (array_key_exists('is_list', $this->data) && $this->data['eol_id']=='') {
+        if (!array_key_exists('is_list', $this->data)) {
             $this->data['is_list']=0;
         }
         $this->data['change_datetime'] = date('Y-m-d H:i:s');
