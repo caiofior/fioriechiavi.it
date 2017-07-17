@@ -90,6 +90,6 @@ function statusChangeCallback(response) {
       appId      : appId,
       cookie     : true,
       xfbml      : true,
-      version    : 'v2.2'
+      version    : 'v2.9'
     });
   }

@@ -8,7 +8,7 @@ $fb->loadFromId($argv[1]);
 $session = new Facebook\Facebook(array(
             'app_id' => $GLOBALS['db']->config->facebook->appId,
             'app_secret' => $GLOBALS['db']->config->facebook->appSecret,
-            'default_graph_version' => 'v2.2',
+            'default_graph_version' => 'v2.9',
             'default_access_token' =>$fb->getData('accessToken')
 ));
 $GLOBALS['profile'] = $fb->getProfile();
