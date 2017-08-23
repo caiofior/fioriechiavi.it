@@ -137,7 +137,7 @@ $(document).ready(function() {
          response);
       },
       select: function(event, ui) {
-        if(e.keyCode === 9) return event.preventDefault();
+        if(typeof e !== "undefined" && e.keyCode === 9) return event.preventDefault();
       }
    });
    $( "#attribute_value" ).autocomplete({
