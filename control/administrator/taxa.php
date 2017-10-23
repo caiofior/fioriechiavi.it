@@ -201,6 +201,13 @@ case 'edit':
                   $dryades->updateLink($taxa,$_REQUEST['link_dryades']);
                }
             }
+			if (array_key_exists('link_forum_actaplanctarum', $_REQUEST) && $_REQUEST['link_forum_actaplanctarum'] != '') {
+               $dryades = $linkProviderColl->filterByAttributeValue('forum_actaplanctarum','name');
+               $dryades = $dryades->getFirst();
+               if($dryades->getRawData('link') != $_REQUEST['link_forum_actaplanctarum']) {
+                  $dryades->updateLink($taxa,$_REQUEST['link_forum_actaplanctarum']);
+               }
+            }
             $log = new \log\Log($GLOBALS['db']);
             $log->add(
                     $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),

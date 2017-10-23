@@ -31,6 +31,7 @@ require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
 if (is_file(__DIR__.'/zendRequireCompiled.php')) {
    require __DIR__.'/zendRequireCompiled.php';
+   require __DIR__.'/moreZend.php';
 } else if (is_file(__DIR__.'/zendRequire.php')) {
    require __DIR__.'/zendRequire.php';
 } else {

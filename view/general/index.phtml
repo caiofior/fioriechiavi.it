@@ -37,13 +37,14 @@ endif;
 if ($taxa->getData('name') != '') : 
    $taxaParentColl = $taxa->getParentColl();
    foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) : 
-   if ($key == 0) : ?>
+     if ($key == 0) : ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxaParent->getData('id');?>">
       <h<?php echo 2+$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
    </a>
    <?php else : ?>
       <h<?php echo 2+$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
-   <?php endif;
+   <?php
+   	 endif;
    endforeach;
 endif;
 if (
@@ -229,6 +230,11 @@ if ($actaPlanctorum->getRawData('link') != ''): ?>
  <?php else : ?>
  <a class="blank" href="https://www.google.it/#q=site:www.actaplantarum.org+inurl:flora_info.php+<?php echo urlencode($taxa->getData('name'));?>">Cerca scheda su Acta plantorum</a>
  <?php endif; 
+$forumActaPlanctorum = $linkProviderColl->filterByAttributeValue('forum_actaplanctarum','name');
+$forumActaPlanctorum = $forumActaPlanctorum->getFirst();
+if ($forumActaPlanctorum->getRawData('link') != ''): ?>
+ <a class="blank" href="<?php echo $forumActaPlanctorum->getRawData('link'); ?>">Forum Acta plantorum</a>
+<?php endif; 
 $dryades = $linkProviderColl->filterByAttributeValue('dryades','name');
 $dryades = $dryades->getFirst();
 if ($dryades->getRawData('link') != ''): ?>
