@@ -17,8 +17,8 @@ if (rand(0,10) == 0) {
         closedir($handle); 
     }
 }
-if (!extension_loaded('mcrypt')) {
-    throw new Exception('Mcrypt extension is required',1604061516);
+if (!extension_loaded('openssl') && !extension_loaded('mcrypt')) {
+    throw new Exception('Openssl or Mcrypt extension is required',1604061516);
 }
 if (!extension_loaded('curl')) {
     throw new Exception('cURL extension is required',1604061518);
