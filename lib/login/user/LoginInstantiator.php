@@ -88,9 +88,7 @@ class LoginInstantiator implements \login\user\UserInstantiator {
          $GLOBALS['mail']->msgHTML(ob_get_clean());
          $GLOBALS['mail']->Subject = 'Registrazione sul sito '.$GLOBALS['config']->siteName;
          $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
-         foreach($adminColl->getItems() as $admin) {
-            $GLOBALS['mail']->addAddress($admin->getData('username'), $GLOBALS['config']->siteName);
-         }
+         $GLOBALS['mail']->addAddress($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
          $GLOBALS['mail']->send();
                  
       }
