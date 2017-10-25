@@ -13,16 +13,14 @@ if (array_key_exists('sEcho', $_REQUEST)) {
       foreach($profileColl->getItems() as $key => $profile) {
          $row=array();
          foreach($columns as $column) {
+            $column = preg_replace('/[^\.]*\./', '', $column);
             $user = $profile->getUserColl()->getFirst(); 
-            $data = $profile->getRawData($column);
+            $data = $profile->getRawData($column);            
             if ($column == 'username') {
                 $data = $user->getRawData('username');
                 if ($data == '') {
                     $data = $profile->getRawData('email');
                 }
-            }
-            if ($column == 'creation_datetime' || $column == 'last_login_datetime') {
-                $data = $user->getRawData($column);
             }
             if ($column == 'active') {
                $checked='';

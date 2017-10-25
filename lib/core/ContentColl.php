@@ -72,7 +72,7 @@ abstract class ContentColl {
         $select = $this->customSelect($this->content->getTable()->getSql()->select(),$criteria);
         if (array_key_exists('sColumns', $criteria) && $criteria['sColumns'] != '') {
            $this->columns= explode(',', $criteria['sColumns']);
-        } 
+        }
         if (array_key_exists('iSortingCols', $criteria) && is_array($this->columns)) {
             for ($c =0; $c < $criteria['iSortingCols'];$c++) {
                 $sort = ' ASC';
