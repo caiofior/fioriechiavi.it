@@ -28,19 +28,12 @@ switch ($_REQUEST['action']) {
 		if($fb->getRawData('isNew') == 1) {
                      ob_start();
                      require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_user.php';
-                     $html = new \Zend\Mime\Part(ob_get_clean());
-                     $html->type = 'text/html';
-                     
-                     $body = new \Zend\Mime\Message();
-                     $body->setParts(array($html));
-                     
-                     $message = new \Zend\Mail\Message();
-                     $message
-                        ->addTo($GLOBALS['profile']->getData('email'))
-                        ->addFrom($GLOBALS['config']->mail_from)
-                        ->setSubject('Nuovo utente sul sito '.$GLOBALS['config']->siteName)
-                        ->setBody($body);
-                     $GLOBALS['transport']->send($message);
+                     $GLOBALS['mail']->msgHTML(ob_get_clean());
+                     $GLOBALS['mail']->Subject = 'Nuovo utente sul sito '.$GLOBALS['config']->siteName;
+                     $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+                     $GLOBALS['mail']->addAddress($GLOBALS['profile']->getData('email'), $GLOBALS['config']->siteName);
+                     $GLOBALS['mail']->send();
+                  
 		}
                 if ($GLOBALS['db']->config->background->useAJAX == true) {
 		    $argv=array(1=>$fb->getData('userID'));

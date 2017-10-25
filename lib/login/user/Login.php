@@ -68,19 +68,11 @@ class Login extends \Content implements \login\user\User
         
          ob_start();
          require $this->db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'recover.php';
-         $html = new \Zend\Mime\Part(ob_get_clean());
-         $html->type = 'text/html';
-
-         $body = new \Zend\Mime\Message();
-         $body->setParts(array($html));
-
-         $message = new \Zend\Mail\Message();
-         $message
-            ->addTo($this->data['username'])
-            ->addFrom($GLOBALS['config']->mail_from)
-            ->setSubject('Recupero password del sito '.$GLOBALS['config']->siteName)
-            ->setBody($body);
-         $GLOBALS['transport']->send($message);
+         $GLOBALS['mail']->msgHTML(ob_get_clean());
+         $GLOBALS['mail']->Subject = 'Recupero password del sito '.$GLOBALS['config']->siteName;
+         $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+         $GLOBALS['mail']->addAddress($this->data['username'], $GLOBALS['config']->siteName);
+         $GLOBALS['mail']->send();
 
         $this->data['password']=md5($password);
         $this->update();
@@ -112,19 +104,12 @@ class Login extends \Content implements \login\user\User
       $this->update();
       ob_start();
       require $this->db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'changelogin.php';
-      $html = new \Zend\Mime\Part(ob_get_clean());
-      $html->type = 'text/html';
-
-      $body = new \Zend\Mime\Message();
-      $body->setParts(array($html));
-
-      $message = new \Zend\Mail\Message();
-      $message
-         ->addTo($this->data['username'])
-         ->addFrom($GLOBALS['config']->mail_from)
-         ->setSubject('Conferma modifica email/username per accedere al sito '.$GLOBALS['config']->siteName)
-         ->setBody($body);
-      $GLOBALS['transport']->send($message);
+      $GLOBALS['mail']->msgHTML(ob_get_clean());
+      $GLOBALS['mail']->Subject = 'Conferma modifica email/username per accedere al sito '.$GLOBALS['config']->siteName;
+      $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+      $GLOBALS['mail']->addAddress($this->data['username'], $GLOBALS['config']->siteName);
+      $GLOBALS['mail']->send();
+      
     }
     /**
      * Confirms the new login

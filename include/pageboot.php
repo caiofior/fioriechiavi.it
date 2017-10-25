@@ -31,7 +31,6 @@ require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
 if (is_file(__DIR__.'/zendRequireCompiled.php')) {
    require __DIR__.'/zendRequireCompiled.php';
-   require __DIR__.'/moreZend.php';
 } else if (is_file(__DIR__.'/zendRequire.php')) {
    require __DIR__.'/zendRequire.php';
 } else {
@@ -42,6 +41,9 @@ $loader = new Zend\Loader\StandardAutoloader(array(
 ));
 $loader->register();
 }
+require __DIR__.'/../lib/PHPMailer-master/src/PHPMailer.php';
+require __DIR__.'/../lib/PHPMailer-master/src/SMTP.php';
+require __DIR__.'/../lib/PHPMailer-master/src/Exception.php';
 if (!isset($configArray) || !is_array($configArray)) {
     throw new Exception('Config file is wrong',1512250909);
 }
@@ -105,10 +107,26 @@ if ($config->mail_from == '') {
    throw new \Exception('Sender email is required',1409011411);
 }
 if(!is_null($config->smtp)) {
-   $transport = new Zend\Mail\Transport\Smtp();
-   $transport->setOptions(new Zend\Mail\Transport\SmtpOptions($config->smtp->toArray()));
-} else {
-   $transport = new Zend\Mail\Transport\Sendmail();
+   
+   $mail = new \PHPMailer\PHPMailer\PHPMailer();
+   $mail->SMTPOptions = array(
+       'ssl' => array(
+           'verify_peer' => false,
+           'verify_peer_name' => false,
+           'allow_self_signed' => true
+       )
+   );
+   $mail->isSMTP();
+   
+   $mail->Host = $config->smtp->host;
+   $mail->Port = $config->smtp->port;
+   $mail->SMTPSecure = $config->smtp->connection_config->ssl;
+
+   $mail->SMTPAuth = $config->smtp->connection_class=='login';
+
+   $mail->Username = $config->smtp->connection_config->username;
+   $mail->Password = $config->smtp->connection_config->password;
+
 }
 if (PHP_SAPI != 'cli') {
    require 'session.php';

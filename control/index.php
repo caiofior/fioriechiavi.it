@@ -79,35 +79,20 @@ switch ($_REQUEST['action']) {
            try{
                   ob_start();
                   require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_observation.php';
-                  $html = new \Zend\Mime\Part(ob_get_clean());
-                  $html->type = 'text/html';
-
-                  $body = new \Zend\Mime\Message();
-                  $body->setParts(array($html));
-
-                  $message = new \Zend\Mail\Message();
-                  $message
-                     ->addTo($GLOBALS['config']->mail_from)
-                     ->addFrom($GLOBALS['config']->mail_from)
-                     ->setSubject('Nuova osservazionione sul sito'.$GLOBALS['config']->siteName)
-                     ->setBody($body);
-                  $GLOBALS['transport']->send($message);
+                  $GLOBALS['mail']->msgHTML(ob_get_clean());
+                  $GLOBALS['mail']->Subject = 'Nuova osservazionione sul sito'.$GLOBALS['config']->siteName;
+                  $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+                  $GLOBALS['mail']->addAddress($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+                  $GLOBALS['mail']->send();                  
 
                   ob_start();
                   require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_observation.php';
-                  $html = new \Zend\Mime\Part(ob_get_clean());
-                  $html->type = 'text/html';
-
-                  $body = new \Zend\Mime\Message();
-                  $body->setParts(array($html));
-
-                  $message = new \Zend\Mail\Message();
-                  $message
-                     ->addTo($GLOBALS['profile']->getData('email'))
-                     ->addFrom($GLOBALS['config']->mail_from)
-                     ->setSubject('Nuova osservazionione sul sito'.$GLOBALS['config']->siteName)
-                     ->setBody($body);
-                  $GLOBALS['transport']->send($message);
+                  $GLOBALS['mail']->msgHTML(ob_get_clean());
+                  $GLOBALS['mail']->Subject = 'Nuova osservazionione sul sito'.$GLOBALS['config']->siteName;
+                  $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+                  $GLOBALS['mail']->addAddress($GLOBALS['profile']->getData('email'), $GLOBALS['config']->siteName);
+                  $GLOBALS['mail']->send();                  
+                  
            } catch (\Exception $e) {}
            header('Location: '.$GLOBALS['db']->config->baseUrl.'index.php?id='.$taxa->getData('id').'&insertObservation=1');
            exit;

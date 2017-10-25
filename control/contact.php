@@ -44,35 +44,21 @@ switch ($_REQUEST['task']) {
                try{
                   ob_start();
                   require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_message.php';
-                  $html = new \Zend\Mime\Part(ob_get_clean());
-                  $html->type = 'text/html';
-
-                  $body = new \Zend\Mime\Message();
-                  $body->setParts(array($html));
-
-                  $message = new \Zend\Mail\Message();
-                  $message
-                     ->addTo($GLOBALS['config']->mail_from)
-                     ->addFrom($GLOBALS['config']->mail_from)
-                     ->setSubject('Messaggio dal sito'.$GLOBALS['config']->siteName)
-                     ->setBody($body);
-                  $GLOBALS['transport']->send($message);
-
+                  
+                  $GLOBALS['mail']->msgHTML(ob_get_clean());
+                  $GLOBALS['mail']->Subject = 'Messaggio dal sito'.$GLOBALS['config']->siteName;
+                  $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+                  $GLOBALS['mail']->addAddress($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+                  $GLOBALS['mail']->send();
+                  
                   ob_start();
                   require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_message.php';
-                  $html = new \Zend\Mime\Part(ob_get_clean());
-                  $html->type = 'text/html';
-
-                  $body = new \Zend\Mime\Message();
-                  $body->setParts(array($html));
-
-                  $message = new \Zend\Mail\Message();
-                  $message
-                     ->addTo($_REQUEST['mail'])
-                     ->addFrom($GLOBALS['config']->mail_from)
-                     ->setSubject('Messaggio al sito'.$GLOBALS['config']->siteName)
-                     ->setBody($body);
-                  $GLOBALS['transport']->send($message);
+                  $GLOBALS['mail']->msgHTML(ob_get_clean());
+                  $GLOBALS['mail']->Subject = 'Messaggio dal sito'.$GLOBALS['config']->siteName;
+                  $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+                  $GLOBALS['mail']->addAddress($_REQUEST['mail'], $GLOBALS['config']->siteName);
+                  $GLOBALS['mail']->send();
+                  
                } catch (\Exception $e) {
                   $this->getTemplate()->setBlock('middle','contact/error.phtml');  
                }

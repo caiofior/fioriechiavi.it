@@ -75,38 +75,24 @@ class LoginInstantiator implements \login\user\UserInstantiator {
       $profile->update();
       ob_start();
       require $db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'register.php';
-      $html = new \Zend\Mime\Part(ob_get_clean());
-      $html->type = 'text/html';
+      $GLOBALS['mail']->msgHTML(ob_get_clean());
+      $GLOBALS['mail']->Subject = 'Registrazione sul sito '.$GLOBALS['config']->siteName;
+      $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
+      $GLOBALS['mail']->addAddress($login, $GLOBALS['config']->siteName);
+      $GLOBALS['mail']->send();
 
-      $body = new \Zend\Mime\Message();
-      $body->setParts(array($html));
-
-      $message = new \Zend\Mail\Message();
-      $message
-         ->addTo($login)
-         ->addFrom($GLOBALS['config']->mail_from)
-         ->setSubject('Registrazione sul sito '.$GLOBALS['config']->siteName)
-         ->setBody($body);
-      $GLOBALS['transport']->send($message);
       
       if ($adminColl->count() > 0 ) {
          ob_start();
          require $db->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_user.php';
-         $html = new \Zend\Mime\Part(ob_get_clean());
-         $html->type = 'text/html';
-
-         $body = new \Zend\Mime\Message();
-         $body->setParts(array($html));
-
-         $message = new \Zend\Mail\Message();
+         $GLOBALS['mail']->msgHTML(ob_get_clean());
+         $GLOBALS['mail']->Subject = 'Registrazione sul sito '.$GLOBALS['config']->siteName;
+         $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
          foreach($adminColl->getItems() as $admin) {
-            $message->addTo($admin->getData('username'));
+            $GLOBALS['mail']->addAddress($admin->getData('username'), $GLOBALS['config']->siteName);
          }
+         $GLOBALS['mail']->send();
                  
-         $message->addFrom($GLOBALS['config']->mail_from)
-            ->setSubject('Registrazione sul sito '.$GLOBALS['config']->siteName)
-            ->setBody($body);
-         $GLOBALS['transport']->send($message);
       }
       return $user;
    }
