@@ -14,4 +14,9 @@ class TaxaKind extends \Content
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
       parent::__construct($db, 'taxa_kind');
    }
+   
+   public function insert() {
+   		unset($this->data['id']);
+        parent::insert();
+    }
 }

@@ -15,8 +15,8 @@ $(document).ready(function() {
         "aoColumnDefs":  getDatatableMetadata(this) ,
         "drawCallback": function( ) {
             $("td.isactive input").click(function (e) {
-               aPos = us.fnGetPosition( $(this).parent()[0] );
-               aData = us.fnGetData( aPos[0] );
+               var aPos = us.fnGetPosition( $(this).parent()[0] );
+               var aData = us.fnGetData( aPos[0] );
                $.ajax({
                   data: {
                     "action":"isactive",

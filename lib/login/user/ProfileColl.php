@@ -29,7 +29,7 @@ class ProfileColl extends \ContentColl {
       $select->columns(array(
           '*'
           ));
-      $select->join('profile_role', 'profile_role.id=profile.role_id', array('*'), \Zend\Db\Sql\Select::JOIN_LEFT);
+      $select->join('profile_role', 'profile_role.id=profile.role_id', array('description'), \Zend\Db\Sql\Select::JOIN_LEFT);
       $select->join('login', 'login.profile_id=profile.id', array('*'), \Zend\Db\Sql\Select::JOIN_LEFT);
       if (array_key_exists('role_id', $criteria) && $criteria['role_id'] != '') {
           $select->where('`profile`.`role_id` = '.intval($criteria['role_id']));

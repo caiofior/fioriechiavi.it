@@ -307,7 +307,8 @@ class TaxaExport {
                         if ($dicoItem->getData('photo_id') >0) {
 							fwrite($stream,'![]('.$basePath.$dicoItem->getPhotoUrl().')'.PHP_EOL);
 							fwrite($stream,PHP_EOL);
-						}                        
+						}
+                  fwrite($stream,PHP_EOL);
                     }
                 }
                 fwrite($stream,PHP_EOL.'---------------'.PHP_EOL.PHP_EOL);

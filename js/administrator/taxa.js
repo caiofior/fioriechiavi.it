@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    $.fn.dataTable.ext.errMode = 'none';
     ct = $("#taxa").dataTable({
         "oLanguage":  {
                 "sUrl": "js/common/datatables/lang/it.json"
