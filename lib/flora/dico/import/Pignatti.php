@@ -42,6 +42,12 @@ class Pignatti implements \flora\dico\import\Import {
             $positions[$row['id']][]=$lastPosition.'1';
          }
          $row['id'] = $lastPosition = array_shift($positions[$row['id']]);
+         if (is_null($row['id'])) {
+            $row['incomplete']=true;
+            $dicoItemColl->errors = new \stdClass();
+            $dicoItemColl->errors->message = 'There is one item with more than two questions';
+            $dicoItemColl->errors->code = 1410141232;
+         }
          if (!is_numeric($row['taxa_id'])) {
             $row['taxa_id']=null;
          }

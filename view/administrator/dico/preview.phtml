@@ -16,6 +16,9 @@ if (property_exists($dicoItemColl,'errors')) {
       case 1410141230 : ?>
     <p class="errorMessage"><span>Ci sono delle voci non correttamente appariate <?php echo $dicoItemColl->errors->items; ?></span></p>
 <?php break;
+      case 1410141232 : ?>
+    <p class="errorMessage"><span>Ci sono voci con più di due domande.</span></p>
+<?php break;
    }
 }
 $positions = array();
