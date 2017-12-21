@@ -24,7 +24,7 @@ case 'update':
          }
    } else if ($_REQUEST['action'] == 'edit' && array_key_exists('submit', $_REQUEST)) {
        if (!array_key_exists('is_list', $_REQUEST)) {
-            $_REQUEST['is_list']='';
+            $_REQUEST['is_list']=0;
        }
        
        if ($dico->getData('is_list') == 1) {

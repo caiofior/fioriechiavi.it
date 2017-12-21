@@ -64,7 +64,7 @@ foreach ($dicoItemColl->getItems() as $dicoItem):
       $missing=' missing';
 ?>
 <div>
-   <?php echo str_repeat('&#160;', strlen($dicoItem->getData('id'))-1); ?>
+   <?php echo str_repeat('&#160;', min(0,strlen($dicoItem->getData('id')-1))); ?>
    <?php echo (key_exists($dicoItem->getData('id'), $positions)?$positions[$dicoItem->getData('id')]:''); ?>
    <span id="d<?php echo $dicoItem->getData('id'); ?>" class="editable<?php echo $missing;?>"><?php echo $label;?></span>
    <a class="editDicoItem actions edit" href="#"title="Modifica">Modifica</a>

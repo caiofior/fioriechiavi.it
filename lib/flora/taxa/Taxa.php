@@ -522,10 +522,8 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
      */
     public function getLinkProviderColl() {
 		$linkProviderColl = new \flora\linkprovider\LinkProviderColl($this->db);
-		if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
-            $linkProviderColl->setTaxa($this);
-            $linkProviderColl->loadAll();
-      }
+        $linkProviderColl->setTaxa($this);
+        $linkProviderColl->loadAll();
       return $linkProviderColl;
 	}
 
