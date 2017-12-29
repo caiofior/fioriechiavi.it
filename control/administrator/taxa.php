@@ -205,7 +205,14 @@ case 'edit':
                $dryades = $linkProviderColl->filterByAttributeValue('forum_actaplanctarum','name');
                $dryades = $dryades->getFirst();
                if($dryades->getRawData('link') != $_REQUEST['link_forum_actaplanctarum']) {
-                  $dryades->updateLink($taxa,$_REQUEST['link_forum_actaplanctarum']);
+			     $url = $_REQUEST['link_forum_actaplanctarum'];
+				 $queryString = parse_url($_REQUEST['link_forum_actaplanctarum'],PHP_URL_QUERY);
+				 parse_str($queryString,$queryParts);
+				 if (is_array($queryParts) && key_exists('p',$queryParts)) {
+				 	$url = str_replace('?'.$queryString,'?p='.$queryParts['p'],$url);
+				 }
+				 $url = preg_replace('/#.*/','',$url);
+                  $dryades->updateLink($taxa,$url);
                }
             }
             $log = new \log\Log($GLOBALS['db']);
