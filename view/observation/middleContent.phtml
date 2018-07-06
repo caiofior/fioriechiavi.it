@@ -50,16 +50,17 @@ foreach ($taxaObservationColl->getItems() as $index=>$taxaObservation):
 <?php endforeach;
 if ($taxaObservationColl->count() > 1) {
     $radius = 8-log10($taxaObservationColl->getMultiPoint()->envelope()->area());
-    
+
 }
-$pointsString .=']'; 
+$pointsString .=']';
 $centroid = $taxaObservationColl->getMultiPoint()->centroid();
 if (is_object($centroid)) :
 ?>
 <script>
-    points = <?php echo $pointsString; ?>;
-    centroid = {latitude:<?php echo $centroid->y(); ?>,longitude:<?php echo $centroid->x(); ?>};
-    radius = <?php echo intval($radius); ?>;
+    var mapBoxToken = "<?php echo $GLOBALS['db']->config->mapBoxToken; ?>";
+    var points = <?php echo $pointsString; ?>;
+    var centroid = {latitude:<?php echo $centroid->y(); ?>,longitude:<?php echo $centroid->x(); ?>};
+    var radius = <?php echo intval($radius); ?>;
     if(typeof map == "undefined") {
     	window.onload = function () {updateMap();}
     } else {

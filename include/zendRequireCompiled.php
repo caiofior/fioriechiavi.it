@@ -16949,7 +16949,7 @@ abstract class AbstractContainer extends ArrayObject
      * @param  string $key
      * @return mixed
      */
-    public function offsetGet($key)
+    public function &offsetGet($key)
     {
         if (!$this->offsetExists($key)) {
             return;

@@ -15,7 +15,7 @@ class RegionColl extends \ContentColl {
        */
       public function loadAll(array $criteria=null) {
           parent::loadAll($criteria);
-          if (sizeof($criteria) == 0 && $this->count() == 0) {
+          if (is_array($criteria) && sizeof($criteria) == 0 && $this->count() == 0) {
               $defaultRegionFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
                   .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'sql'.DIRECTORY_SEPARATOR.'region.sql';
               if (is_file($defaultRegionFile)) {

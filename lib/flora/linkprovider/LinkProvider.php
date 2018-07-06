@@ -49,6 +49,10 @@ class LinkProvider extends \Content
          require __DIR__ . '/provider/Florae.php';   
          $retriveClass = new \flora\linkprovider\provider\Florae();
          break;
+         case 'floritaly':
+         require __DIR__ . '/provider/FlorItaly.php';   
+         $retriveClass = new \flora\linkprovider\provider\FlorItaly();
+         break;
       }
       if (is_object($retriveClass)) {
          $link = $retriveClass->retrive($taxa);

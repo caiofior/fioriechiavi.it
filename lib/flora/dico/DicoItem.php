@@ -20,7 +20,7 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
     * @param \Zend\Db\Adapter\Adapter $db
     */
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
-      set_error_handler(create_function('', ''),E_USER_WARNING);
+      set_error_handler(function(){},E_USER_WARNING);
       parent::__construct($db, 'dico_item');
       restore_error_handler();
    }

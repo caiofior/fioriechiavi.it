@@ -201,7 +201,7 @@ case 'edit':
                   $dryades->updateLink($taxa,$_REQUEST['link_dryades']);
                }
             }
-			if (array_key_exists('link_forum_actaplanctarum', $_REQUEST) && $_REQUEST['link_forum_actaplanctarum'] != '') {
+            if (array_key_exists('link_forum_actaplanctarum', $_REQUEST) && $_REQUEST['link_forum_actaplanctarum'] != '') {
                $dryades = $linkProviderColl->filterByAttributeValue('forum_actaplanctarum','name');
                $dryades = $dryades->getFirst();
                if($dryades->getRawData('link') != $_REQUEST['link_forum_actaplanctarum']) {
@@ -213,6 +213,14 @@ case 'edit':
 				 }
 				 $url = preg_replace('/#.*/','',$url);
                   $dryades->updateLink($taxa,$url);
+               }
+            }
+            
+            if (array_key_exists('link_floritaly', $_REQUEST) && $_REQUEST['link_floritaly'] != '') {
+               $floritaly = $linkProviderColl->filterByAttributeValue('floritaly','name');
+               $floritaly = $floritaly->getFirst();
+               if($floritaly->getRawData('link') != $_REQUEST['link_floritaly']) {
+                  $floritaly->updateLink($taxa,$_REQUEST['link_floritaly']);
                }
             }
             $log = new \log\Log($GLOBALS['db']);

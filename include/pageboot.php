@@ -65,7 +65,30 @@ $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
    }   
 }
 $db->config = $config;
- 
+$logName = __DIR__.'/../log';
+if(!is_dir($logName)) {
+   mkdir($logName);
+}
+$logName .= '/'.date('Y-m').'.csv';
+$s = array();
+$s['HTTP_USER_AGENT']=$_SERVER['HTTP_USER_AGENT'];
+$s['REMOTE_ADDR']='';
+if (key_exists('HTTP_X_FORWARDED_FOR',$_SERVER)) {
+$s['REMOTE_ADDR']=$_SERVER['HTTP_X_FORWARDED_FOR'];
+}
+if ($s['REMOTE_ADDR']=='') {
+   $s['REMOTE_ADDR']=$_SERVER['REMOTE_ADDR'];
+}
+$s['REQUEST_METHOD']=$_SERVER['REQUEST_METHOD'];
+$s['REQUEST_URI']=$_SERVER['REQUEST_URI'];
+$s['REQUEST_TIME']=date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME']);
+$s = array_map(function($val) {
+return str_replace(',','',$val);
+},$s);
+if (!is_file($logName) || filesize($logName)==0) {
+   file_put_contents($logName,implode(',',array_keys($s)).PHP_EOL);
+}
+file_put_contents($logName,implode(',',$s).PHP_EOL,FILE_APPEND);
 require __DIR__.'/../lib/floraobservation/Autoload.php';
 floraobservation\Autoload::getInstance();
 
@@ -78,7 +101,7 @@ $template->setBlock('footer','general/footer.phtml');
 $control = $template->createControl();
 $control->setBaseDir(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'control');
 $connected = true;
-set_error_handler(create_function('', ''));
+set_error_handler(function(){});
 try{
 $db->getDriver()->getConnection()->connect();
 } catch (\Exception $e) {
@@ -94,6 +117,7 @@ if (!$connected) {
         header('HTTP/1.1 503 Service Temporarily Unavailable');
         header('Status: 503 Service Temporarily Unavailable');
         header('Retry-After: 300');
+        $GLOBALS['profile']=null;
         $GLOBALS['user']=null;
         $control->addValidationMessage('error','errore nelle nostre macchine');
         $template->setBlock('middle','error/middle.phtml');

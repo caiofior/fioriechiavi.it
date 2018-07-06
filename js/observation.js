@@ -1,31 +1,26 @@
 function updateMap() {
         $(document).ready(function() {
-        if (typeof google != 'undefined' && $('#map-canvas').length > 0) {  
-        latLong = new google.maps.LatLng(centroid.latitude,centroid.longitude);
-        if (typeof map == 'undefined' ) {
-            map = new google.maps.Map($('#map-canvas')[0],{
-                        zoom: radius,
-                        scrollwheel: false,
-                        center: latLong
-                    });
-            markers=[];
-        }
-        
-        $.each(markers, function(index, marker) {
-            marker.setMap(null);
-        });
-        count = 0;
-        $.each(points, function(index, point) {
-            markers[markers.length] = new google.maps.Marker({
-                 position: new google.maps.LatLng(point.latitude, point.longitude),
-                  map: map,
-                  label: String.fromCharCode(65+count++)
-            });
+        if ($('#map-canvas').length > 0) {
+
+         mapboxgl.accessToken = mapBoxToken;
+         var map = new mapboxgl.Map({
+            container: 'map-canvas',
+            style: 'mapbox://styles/mapbox/outdoors-v9',
+            center: [centroid.longitude,centroid.latitude],
+            zoom: radius
          });
-         map.setZoom(radius);
-         map.setCenter(latLong);
+         var count = 0;
+         $.each(points, function(index, point) {
+            var el = $("<div>"+ String.fromCharCode(65+count++)+"</div>");
+            new mapboxgl.Marker(el[0])
+           .setLngLat([point.longitude,point.latitude])
+           .addTo(map);
+
+
+
+
+          });
         }
-        
         $(".fancybox").fancybox();
         });
 }
@@ -38,6 +33,6 @@ $("#observationContent").on("click","#paginationContainer a.pageSelector",functi
         success : function (data) {
                 $("#observationContent").html(data);
         }
-    }); 
+    });
     e.preventDefault();
 });

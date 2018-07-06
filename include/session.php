@@ -78,9 +78,18 @@ else if (
    $auth->getStorage()->clear();
    $facebookSession->getManager()->getStorage()->clear('facebook_id');
    if (is_numeric(session_id())) session_destroy();
-   header('Location: '.$GLOBALS['db']->config->baseUrl);
    ignore_user_abort (true);
+   set_time_limit(0);
+   header('Location: '.$GLOBALS['db']->config->baseUrl,true);
+   header('Connection: close',true);
+   header("Content-Encoding: none\r\n",true);
+   header("Content-Length: 0", true);
+   fastcgi_finish_request();
+   ob_start();
    require __DIR__.'/../view/map/middle.phtml';
+   ob_end_flush();
+   ob_flush(); 
+   flush();
    exit;
 }
 $profile = null;
