@@ -22,17 +22,26 @@ $(document).ready(function() {
    });
    if($(".github").css("display") != "none") {
     if (typeof searchTerm != 'undefined' && searchTerm != "") {
+      var images =[];
       $.getJSON( "https://www.googleapis.com/customsearch/v1?q="+searchTerm+"&cx="+cx+"&key="+key+"&num=7", function( data ) {
         $.each(data["items"],function (key,value) {
-           if (   
+           if (
 	          typeof value["pagemap"] == "object" &&
 	   	  typeof value["pagemap"]["cse_thumbnail"] == "object") {
+         images.push(value);
 	      $("#imageSnipets").append(
 	      "<div><a href=\""+value["link"]+"\" target=\"_blank\"><img src=\""+
 	      value["pagemap"]["cse_thumbnail"][0]["src"]+
 	      "\" alt=\""+value["title"]+"\"/><br/><span>"+value["title"]+"</span></a></div>"
 	      );
 	   }
+        });
+        $.ajax({
+           type: "POST",
+           url:window.location.href+"&action=saveGoogleSearch",
+           data:JSON.stringify(images),
+           contentType: "application/json; charset=utf-8",
+           dataType: "json"
         });
      });
    }

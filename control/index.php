@@ -10,7 +10,7 @@ if (array_key_exists('id', $_REQUEST) && $taxa->getRawData('status') == 0) {
     curl_setopt($handle, CURLOPT_URL, $GLOBALS['config']->baseUrl.'/undefined_location.html');
     curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($handle);
-    header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found'); 
+    header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
     echo $response;
     exit;
 }
@@ -38,7 +38,7 @@ switch ($_REQUEST['action']) {
             $taxaObservation->setData(strip_tags($_REQUEST['title']),'title');
 
             require $GLOBALS['db']->baseDir.'lib/parsedown/Parsedown.php';
-            $taxaObservation->setData(Parsedown::instance()->line(strip_tags($_REQUEST['description'])),'description'); 
+            $taxaObservation->setData(Parsedown::instance()->line(strip_tags($_REQUEST['description'])),'description');
             $taxaObservation->setData($GLOBALS['profile']->getData('id'),'profile_id');
             $taxaObservation->setData(0,'valid');
             $taxaObservation->setPoint(new \Point(floatval($_REQUEST['longitude']),floatval($_REQUEST['latitude'])));
@@ -75,7 +75,7 @@ switch ($_REQUEST['action']) {
                 $taxaObservationImage->moveInsert($targetFile);
             }
            }
-           
+
            try{
                   ob_start();
                   require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_observation.php';
@@ -83,7 +83,7 @@ switch ($_REQUEST['action']) {
                   $GLOBALS['mail']->Subject = 'Nuova osservazionione sul sito'.$GLOBALS['config']->siteName;
                   $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
                   $GLOBALS['mail']->addAddress($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
-                  $GLOBALS['mail']->send();                  
+                  $GLOBALS['mail']->send();
 
                   ob_start();
                   require $GLOBALS['db']->baseDir.DIRECTORY_SEPARATOR.'mail'.DIRECTORY_SEPARATOR.'new_observation.php';
@@ -91,8 +91,8 @@ switch ($_REQUEST['action']) {
                   $GLOBALS['mail']->Subject = 'Nuova osservazionione sul sito'.$GLOBALS['config']->siteName;
                   $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
                   $GLOBALS['mail']->addAddress($GLOBALS['profile']->getData('email'), $GLOBALS['config']->siteName);
-                  $GLOBALS['mail']->send();                  
-                  
+                  $GLOBALS['mail']->send();
+
            } catch (\Exception $e) {}
            header('Location: '.$GLOBALS['db']->config->baseUrl.'index.php?id='.$taxa->getData('id').'&insertObservation=1');
            exit;
@@ -114,10 +114,29 @@ switch ($_REQUEST['action']) {
              'label'=>$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'),
              'value'=>$GLOBALS['config']->baseUrl.'index.php?id='.$taxa->getData('id')
          );
-      } 
+      }
       header('Content-Type: application/json');
       header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
       echo json_encode($result);
+      exit;
+   break;
+   case 'saveGoogleSearch':
+      $googleSearchResult = json_decode(html_entity_decode(file_get_contents('php://input')),true);
+      if (is_null($googleSearchResult)) {
+         var_dump(json_last_error_msg());
+      }
+      if (is_array($googleSearchResult)) {
+         $GLOBALS['db']->query('DELETE FROM `google_search` WHERE `taxa_id`='.intval($_GET['id']), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+         foreach ($googleSearchResult as $item) {
+            $GLOBALS['db']->query('INSERT INTO `google_search` SET
+               `thumbnail`= "'.$item['pagemap']['cse_thumbnail'][0]['src'].'",
+               `title`= "'.$item['title'].'",
+               `link`= "'.$item['link'].'",
+               `datetime`=NOW(),
+               `taxa_id`='.intval($_GET['id']), \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+
+         }
+      }
       exit;
    break;
 }
