@@ -1,20 +1,20 @@
 <?php
 $sessionDir = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'tmp';
 if (!is_dir($sessionDir)) {
-    mkdir($sessionDir); 
+    mkdir($sessionDir);
 }
 if (!is_dir($sessionDir)) {
     throw new Exception('Unable to create temporary directory '.$sessionDir,1512250906);
 }
 if (rand(0,10) == 0) {
     if ($handle = opendir($sessionDir)) {
-        while (false !== ($file = readdir($handle))) { 
+        while (false !== ($file = readdir($handle))) {
             $filelastmodified = filemtime($sessionDir .DIRECTORY_SEPARATOR. $file);
             if(is_file($sessionDir .DIRECTORY_SEPARATOR. $file) && (time() - $filelastmodified) > 24*60) {
                unlink($sessionDir . DIRECTORY_SEPARATOR . $file);
             }
         }
-        closedir($handle); 
+        closedir($handle);
     }
 }
 if (!extension_loaded('openssl') && !extension_loaded('mcrypt')) {
@@ -54,7 +54,7 @@ if (sizeof($baktrace) < 1)
    throw new Exception ('No backtrace available to create base path', 0710141057);
 $db->baseDir = dirname($baktrace[0]['file']).DIRECTORY_SEPARATOR;
 $db->baseDir = str_replace('/shell/', '/', $db->baseDir);
-try{  
+try{
 $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
 } catch (\Exception  $e) {
    if(preg_match('/Cache directory \'(.*)\' not found or not a directory/',$e->getMessage(),$catches)){
@@ -62,7 +62,7 @@ $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
       $db->cache = Zend\Cache\StorageFactory::factory($config->cache->toArray());
    } else {
       throw $e;
-   }   
+   }
 }
 $db->config = $config;
 $logName = __DIR__.'/../log';
@@ -71,6 +71,7 @@ if(!is_dir($logName)) {
 }
 $logName .= '/'.date('Y-m').'.csv';
 $s = array();
+
 $s['HTTP_USER_AGENT']=$_SERVER['HTTP_USER_AGENT'];
 $s['REMOTE_ADDR']='';
 if (key_exists('HTTP_X_FORWARDED_FOR',$_SERVER)) {
@@ -82,6 +83,10 @@ if ($s['REMOTE_ADDR']=='') {
 $s['REQUEST_METHOD']=$_SERVER['REQUEST_METHOD'];
 $s['REQUEST_URI']=$_SERVER['REQUEST_URI'];
 $s['REQUEST_TIME']=date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME']);
+$s['SESSIONID']='';
+if (isset($_COOKIE) && is_array($_COOKIE) && key_exists('abbrevia',$_COOKIE)) {
+   $s['SESSIONID']=$_COOKIE['abbrevia'];
+}
 $s = array_map(function($val) {
 return str_replace(',','',$val);
 },$s);
@@ -131,7 +136,7 @@ if ($config->mail_from == '') {
    throw new \Exception('Sender email is required',1409011411);
 }
 if(!is_null($config->smtp)) {
-   
+
    $mail = new \PHPMailer\PHPMailer\PHPMailer();
    $mail->SMTPOptions = array(
        'ssl' => array(
@@ -141,7 +146,7 @@ if(!is_null($config->smtp)) {
        )
    );
    $mail->isSMTP();
-   
+
    $mail->Host = $config->smtp->host;
    $mail->Port = $config->smtp->port;
    $mail->SMTPSecure = $config->smtp->connection_config->ssl;
@@ -157,7 +162,7 @@ if (PHP_SAPI != 'cli') {
 }
 if (array_key_exists('autocomplete', $_GET) && array_key_exists('domain', $_GET)) {
    if (!array_key_exists('term', $_GET))
-      $_GET['term']=null;     
+      $_GET['term']=null;
    $providerColl = new \abbrevia\domain\DomainColl($db);
    $providerColl->loadAll(array('cod_dominio'=>$_GET['domain'],'sSearch'=>$_GET['term']));
    $result=array();
@@ -166,9 +171,8 @@ if (array_key_exists('autocomplete', $_GET) && array_key_exists('domain', $_GET)
           'label'=>$item->getData($_GET['col'][1]),
           'id'=>$item->getData($_GET['col'][0])
               );
-   } 
+   }
    header('Content-Type: application/json');
    echo json_encode($result);
    exit;
 }
-
