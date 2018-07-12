@@ -84,7 +84,9 @@ else if (
    header('Connection: close',true);
    header("Content-Encoding: none\r\n",true);
    header("Content-Length: 0", true);
-   fastcgi_finish_request();
+   if (function_exists('fastcgi_finish_request')) {
+       fastcgi_finish_request();
+   }
    ob_start();
    require __DIR__.'/../view/map/middle.phtml';
    ob_end_flush();

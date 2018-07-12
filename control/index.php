@@ -145,8 +145,5 @@ $this->getTemplate()->setBlock('middle','general/index.phtml');
 $fileName = 'general/index_'.dirname($this->getTemplate()->getTemplate()).'.phtml';
 $filePath = 'view/'.$fileName;
 if(is_file($GLOBALS['db']->baseDir.$filePath)) {
-    $this->getTemplate()->setBlock('middle',$fileName);    
+    $this->getTemplate()->setBlock('middle',$fileName);
 }
-
-
-
