@@ -1,9 +1,9 @@
 <?php
 $ob_started = false;
+$mapfile = __DIR__.'/map_static.html';
 if (
-      property_exists($GLOBALS['db'],'cache') &&
-		$GLOBALS['db']->cache instanceof Zend\Cache\Storage\Adapter\AbstractAdapter &&
-      $GLOBALS['db']->cache->getItem('map') == ''
+      !is_file($mapfile) ||
+      filesize($mapfile) == 0 
         ) :
    $ob_started = true;
    ob_start();
@@ -54,8 +54,8 @@ while ($resultSet->valid()) :
     $resultSet->next();
 endwhile;
 else :
-   echo $GLOBALS['db']->cache->getItem('map');
+   echo file_get_contents($mapfile);
 endif;
 if ($ob_started == true) {
-   $GLOBALS['db']->cache->setItem('map',ob_get_flush());
+   file_put_contents($mapfile, ob_get_flush());
 }
