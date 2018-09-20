@@ -12,7 +12,7 @@
     'moreDicoItems'=>'Fam.:Gen.'
 ));
     if($moreDicoItemTaxaColl->count() > 0): ?>
-    Taxa più rappresentati:  
+    Taxa più rappresentati:
     <?php foreach($moreDicoItemTaxaColl->getItems() as $moreDicoItemTaxa) : ?>
     <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $moreDicoItemTaxa->getData('id');?>"><?php echo $moreDicoItemTaxa->getRawData('taxa_kind_initials').' '.$moreDicoItemTaxa->getData('name') ?></a>
 <?php endforeach;
@@ -23,7 +23,7 @@ endif;
 $taxa = $this->object;
 $title = $GLOBALS['db']->config->siteName;
 if ($taxa->getData('id') != 1 && $taxa->getData('name') != '' ) :
-    $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name'); 
+    $title = $taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name');
 endif;
 ?>
 <article itemscope itemtype="http://schema.org/Article">
@@ -34,21 +34,21 @@ endif;
 <?php endif; ?>
 </header>
 <?php
-if ($taxa->getData('name') != '') : 
+if ($taxa->getData('name') != '') :
    $taxaParentColl = $taxa->getParentColl();
-   foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) : 
+   foreach(array_reverse($taxaParentColl->getItems()) as $key => $taxaParent) :
      if ($key == 0) : ?>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>index.php?id=<?php echo $taxaParent->getData('id');?>">
-      <h<?php echo 2+$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
+      <h<?php echo 2+$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>
    </a>
    <?php else : ?>
-      <h<?php echo 2+$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>   
+      <h<?php echo 2+$key;?>><?php echo $taxaParent->getRawData('taxa_kind_initials').' '.$taxaParent->getData('name'); ?></h<?php echo 1+$taxaParentColl->count()-$key;?>>
    <?php
    	 endif;
    endforeach;
 endif;
 if (
-          $GLOBALS['db']->config->adsense != '' && 
+          $GLOBALS['db']->config->adsense != '' &&
           !(
                array_key_exists('profile', $GLOBALS) &&
                is_object($GLOBALS['profile']) &&
@@ -60,13 +60,13 @@ if (
 		       )
                )
            )
-  ) { 
+  ) {
 echo $GLOBALS['db']->config->adsense;
 } ?>
 
 
 <div>
-<?php if($taxa->getRawData('taxa_kind_ord') > 3) : ?>    
+<?php if($taxa->getRawData('taxa_kind_ord') > 3) : ?>
     <?php if ($GLOBALS['profile'] instanceof \login\user\Profile) : ?>
         <?php if (array_key_exists('insertObservation', $_GET) && $_GET['insertObservation']== 1) : ?>
             <p>Grazie della segnalazione, sarà visibile non appena approvata dallo staff di <?php echo $GLOBALS['db']->config->siteName; ?></p>
@@ -100,17 +100,17 @@ if ($GLOBALS['db']->config->attributes->progress != '') {
 }
 echo $description;
 ?>
-</div>    
+</div>
 <?php endif;
-require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php'); 
+require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php');
 require (__DIR__.DIRECTORY_SEPARATOR.'adddicoitems.php');
 if ($taxa->getData('description') != '') :
-require (__DIR__.DIRECTORY_SEPARATOR.'map.php'); 
+require (__DIR__.DIRECTORY_SEPARATOR.'map.php');
 $attributeColl = $taxa->getTaxaAttributeColl();
    if ($attributeColl->count() > 0) : ?>
 <div class="attribute_list">
       <?php foreach($attributeColl->getItems() as $attribute) :
-         switch ($attribute->getData('name')) : 
+         switch ($attribute->getData('name')) :
             case 'Inizio fioritura' :
             break;
             case 'Fine fioritura' :
@@ -132,7 +132,7 @@ $attributeColl = $taxa->getTaxaAttributeColl();
                echo $attribute->getRawData('value');?>
             </span>
       </p>
-            <?php 
+            <?php
             break;
           case 'Ciclo riproduttivo' : ?>
       <p>
@@ -151,7 +151,7 @@ $attributeColl = $taxa->getTaxaAttributeColl();
                echo $attribute->getRawData('value');?>
             </span>
       </p>
-            <?php 
+            <?php
             break;
             case 'Portamento' : ?>
       <p>
@@ -174,7 +174,7 @@ $attributeColl = $taxa->getTaxaAttributeColl();
                echo $attribute->getRawData('value');?>
             </span>
       </p>
-            <?php 
+            <?php
             break;
             default:
             ?>
@@ -189,7 +189,7 @@ $attributeColl = $taxa->getTaxaAttributeColl();
 </div>
 <div class="clear"></div>
 <footer>
-<?php  
+<?php
 if (
         $attributeColl->filterByAttributeValue('Limite altitudinale inferiore','name')->getFirst()->getRawData('value') != '' &&
         $attributeColl->filterByAttributeValue('Limite altitudinale superiore','name')->getFirst()->getRawData('value') != ''
@@ -206,7 +206,7 @@ if (
    $imageColl = $taxa->getTaxaImageColl();
    if ($imageColl->count() > 0) : ?>
 <div class="image_list">
-      <?php foreach($imageColl->getItems() as $key=>$image) : 
+      <?php foreach($imageColl->getItems() as $key=>$image) :
       $itemPropImage = '';
       if ($key == 0) {
           $itemPropImage = 'itemprop="image"';
@@ -229,22 +229,22 @@ if ($actaPlanctorum->getRawData('link') != ''): ?>
  <a class="blank" href="<?php echo $actaPlanctorum->getRawData('link'); ?>">Acta plantorum</a>
  <?php else : ?>
  <a class="blank" href="https://www.google.it/#q=site:www.actaplantarum.org+inurl:flora_info.php+<?php echo urlencode($taxa->getData('name'));?>">Cerca scheda su Acta plantorum</a>
- <?php endif; 
+ <?php endif;
 $forumActaPlanctorum = $linkProviderColl->filterByAttributeValue('forum_actaplanctarum','name');
 $forumActaPlanctorum = $forumActaPlanctorum->getFirst();
 if ($forumActaPlanctorum->getRawData('link') != ''): ?>
  <a class="blank" href="<?php echo $forumActaPlanctorum->getRawData('link'); ?>">Forum Acta plantorum</a>
-<?php endif; 
+<?php endif;
 $floritaly = $linkProviderColl->filterByAttributeValue('floritaly','name');
 $floritaly = $floritaly->getFirst();
 $dryades = $linkProviderColl->filterByAttributeValue('dryades','name');
 $dryades = $dryades->getFirst();
 if ($floritaly->getRawData('link') != ''): ?>
- <a class="blank" href="<?php echo $floritaly->getRawData('link'); ?>">Floritaly</a> 
+ <a class="blank" href="<?php echo $floritaly->getRawData('link'); ?>">Floritaly</a>
 <?php endif;
 if ($dryades->getRawData('link') != ''): ?>
- <a class="blank" href="<?php echo $dryades->getRawData('link'); ?>">Dryades</a> 
- <?php endif; 
+ <a class="blank" href="<?php echo $dryades->getRawData('link'); ?>">Dryades</a>
+ <?php endif;
  if ($taxa->getData('col_id') != '') :?>
  <a class="blank" href="<?php echo $GLOBALS['db']->config->catalogOfLife->landingPage.urlencode($taxa->getData('col_id'));?>">Catalog of life</a>
 <?php endif; ?>
@@ -267,10 +267,26 @@ var key = "<?php echo $GLOBALS['db']->config->search->key; ?>";
 </script>
 <?php
 endif;
-require (__DIR__.DIRECTORY_SEPARATOR.'observations.php'); 
+require (__DIR__.DIRECTORY_SEPARATOR.'observations.php');
 ?>
 <h2>Immagini dal web</h2>
+<?php
+$googleLinkColl = $taxa->getGoogleLinkColl();
+foreach($googleLinkColl->getItems() as $c=>$googleLink):?>
+<div style="float:left;">
+  <a href="<?php echo $googleLink->getData('link'); ?>">
+    <img src="<?php echo $googleLink->getData('thumbnail'); ?>" alt="<?php echo $googleLink->getData('title'); ?>">
+ <br>
+ <span><?php echo $googleLink->getData('title'); ?></span>
+ </a>
+</div>
+<?php if ($c+1 % 4 == 0) :?>
+  <br>
+<?php endif; ?>
+<?php endforeach;
+if ($googleLinkColl->count() == 0) : ?>
 <div id="imageSnipets"></div>
+<?php endif; ?>
 <div class="clear"></div>
 <?php $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
 $newTaxaColl->loadAll(array(
@@ -287,7 +303,7 @@ if($newTaxaColl->count() > 0): ?>
 <div id="newtaxa">
    <h2> Ultime novità </h2>
    <div class="latestTaxa">
-   <?php foreach($newTaxaColl->getItems() as $newTaxa) : 
+   <?php foreach($newTaxaColl->getItems() as $newTaxa) :
       $image = null;
       $imageColl = $newTaxa->getTaxaImageColl();
       $imageColl->shuffle();

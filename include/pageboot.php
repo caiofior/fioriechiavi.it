@@ -83,6 +83,10 @@ if ($s['REMOTE_ADDR']=='') {
 $s['REQUEST_METHOD']=$_SERVER['REQUEST_METHOD'];
 $s['REQUEST_URI']=$_SERVER['REQUEST_URI'];
 $s['REQUEST_TIME']=date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME']);
+$s['HTTP_REFERER']='';
+if (key_exists('HTTP_REFERER',$_SERVER)) {
+    $s['HTTP_REFERER']=$_SERVER['HTTP_REFERER'];
+}
 $s['SESSIONID']='';
 if (isset($_COOKIE) && is_array($_COOKIE) && key_exists('abbrevia',$_COOKIE)) {
    $s['SESSIONID']=$_COOKIE['abbrevia'];
