@@ -52,6 +52,9 @@ switch ($_REQUEST['task']) {
    case 'link':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'link.php';
       break;
+   case 'access':
+      require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'access.php';
+      break;      
    default:
       $this->getTemplate()->setBlock('middle','administrator/dashboard.phtml');
       break;
