@@ -373,7 +373,7 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
             $dicoItemColl->loadAll(array('parent_taxa_id' => $this->data['id'], 'status' => true));
             if ($edit == true) {
                 if ($dicoItemColl->count() == 0) {
-                    for ($c = 0; $c < 2; $c++) {
+                    for ($c = \flora\dico\DicoItem::maxCode; $c >= 0; $c--) {
                         $dicoItem = $dicoItemColl->addItem();
                         $dicoItem->setData($c, 'id');
                         $dicoItem->setData(true, 'incomplete');
@@ -383,7 +383,7 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
 
                         $siblingCode = $dicoItem->getSiblingCode();
                         $siblingDicoItemColl = $dicoItemColl->filterByAttributeValue($siblingCode, 'id');
-                        for ($c = 0; $c < (\flora\dico\DicoItem::maxCode - $siblingDicoItemColl->count()); $c++) {
+                        for ($c = (\flora\dico\DicoItem::maxCode - $siblingDicoItemColl->count()-1); $c >= 0 ;$c--) {
                             $dicoItemSibling = $dicoItemColl->addItem();
                             $dicoItemSibling->setData($siblingCode, 'id');
                             $dicoItemSibling->setData(true, 'incomplete');
@@ -526,5 +526,13 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
         $linkProviderColl->loadAll();
       return $linkProviderColl;
 	}
+  public function getGoogleLinkColl() {
+    $googleLinkColl = new \flora\linkprovider\GoogleLinkColl($this->db);
+    if (array_key_exists('id', $this->data) && $this->data['id'] != '') {
+        $criteria['taxa_id'] = $this->data['id'];
+        $googleLinkColl->loadAll($criteria);
+    }
+    return $googleLinkColl;
+  }
 
 }

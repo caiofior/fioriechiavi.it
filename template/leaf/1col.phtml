@@ -34,7 +34,7 @@
 <link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->baseUrl.$GLOBALS['template']->getUrlModifyTimestamp('/style/general/index.css');?>" property="stylesheet"/>
 <!-- Custom Theme files -->
 <!--webfont-->
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,700,300,600,800,400' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,700,300,600,800,400' rel='stylesheet' type='text/css'>
 <?php if($GLOBALS['db']->config->useCDN === true) : ?>
 <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
 <?php else: ?>
@@ -64,8 +64,8 @@
 
 	</script>
         <?php endif; ?>
-	<!-- header-section-starts -->	
-        <div id="fb-root"></div>
+	<!-- header-section-starts -->
+        <div role="plugin" id="fb-root"></div>
 	<header class="header">
 		<div class="container">
 			<div class="col-sm-4 header-left">
@@ -89,7 +89,7 @@
                             <a rel="nofollow" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->facebook; ?>" title="Facebook">
                                 <img class="social facebook" src="template/leaf/images/empty.png" alt="Facebook" />
                             </a>
-                            <?php endif; 
+                            <?php endif;
                             if($GLOBALS['db']->config->socialPages->googlePlus != '') : ?>
                             <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->googlePlus; ?>" title="Google +">
                                 <img class="social google" src="template/leaf/images/empty.png" alt="Google +" />
@@ -141,13 +141,13 @@
                     <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png">
                 </a>
 	</header>
-	<div class="content">
+	<main class="content">
 		<div class="features-section">
 			<div class="container">
                             <?php $GLOBALS['template']->renderBlock('middle'); ?>
 			</div>
 		</div>
-	</div>
+	</main>
 	<footer class="footer">
             <script>appId="<?php echo $GLOBALS['db']->config->facebook->appId?>";</script>
             <?php if($GLOBALS['db']->config->useCDN === true) : ?>

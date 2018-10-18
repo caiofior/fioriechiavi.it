@@ -8,7 +8,7 @@ class Florae implements \flora\linkprovider\provider\Provider {
     * Get plant reference from actaplanctorum site
     */
    public function retrive (\flora\taxa\Taxa $taxa) {
-      $url = 'https://www.florae.it/xhr.php?task=taxa&action=search&name='.urlencode($taxa->getData('name')).'&col_id='.urlencode($taxa->getData('col_id')).'&eol_id='.urlencode($taxa->getData('eol_id'));
+      $url = 'http://www.florae.it/xhr.php?task=taxa&action=search&name='.urlencode($taxa->getData('name')).'&col_id='.urlencode($taxa->getData('col_id')).'&eol_id='.urlencode($taxa->getData('eol_id'));
       $ch = curl_init($url);
       curl_setopt_array($ch,array(
            CURLOPT_RETURNTRANSFER => true,
