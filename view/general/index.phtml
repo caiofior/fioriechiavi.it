@@ -1,4 +1,4 @@
-<form method="post" action="#">
+<form method="post" role="search" action="#">
    <label for="taxasearch">Cerca: </label>
    <input id="taxasearch" type="search" name="taxasearch" value="">
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>search.php">Ricerca avanzata</a>
@@ -17,7 +17,7 @@
     <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $moreDicoItemTaxa->getData('id');?>"><?php echo $moreDicoItemTaxa->getRawData('taxa_kind_initials').' '.$moreDicoItemTaxa->getData('name') ?></a>
 <?php endforeach;
 endif;
-?></span>   
+?></span>
 </form>
 <?php
 $taxa = $this->object;
@@ -101,8 +101,10 @@ if ($GLOBALS['db']->config->attributes->progress != '') {
 echo $description;
 ?>
 </div>
-<?php endif;
-require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php');
+<?php endif; ?>
+</article>
+<aside>
+<?php require (__DIR__.DIRECTORY_SEPARATOR.'dicoitems.php');
 require (__DIR__.DIRECTORY_SEPARATOR.'adddicoitems.php');
 if ($taxa->getData('description') != '') :
 require (__DIR__.DIRECTORY_SEPARATOR.'map.php');
@@ -188,7 +190,6 @@ $attributeColl = $taxa->getTaxaAttributeColl();
       endforeach; ?>
 </div>
 <div class="clear"></div>
-<footer>
 <?php
 if (
         $attributeColl->filterByAttributeValue('Limite altitudinale inferiore','name')->getFirst()->getRawData('value') != '' &&
@@ -351,6 +352,5 @@ if($newTaxaColl->count() > 0): ?>
    </div>
    </div>
 <?php endif;?>
-</footer>
+</aside>
 <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/privacy.php">Privacy</a>
-</article>

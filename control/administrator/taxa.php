@@ -22,7 +22,7 @@ if (array_key_exists('sEcho', $_REQUEST)) {
             } else if ($column == 'taxa_kind_id') {
                $data=$taxa->getRawData('taxa_kind_initials');
             } else if ($column == 'actions') {
-               
+
                $data = '
                    <a class="actions modify" title="Modifica" href="?task=taxa&amp;action=edit&amp;id='.$taxa->getData('id').'">Modifica</a>
                    <a class="actions delete" title="Cancella" href="?task=taxa&amp;action=delete&amp;id='.$taxa->getData('id').'">Cancella</a>
@@ -30,11 +30,11 @@ if (array_key_exists('sEcho', $_REQUEST)) {
                    if ($taxa->getRawData('status') == true) {
                    $data .= '
                                           <a class="actions view blank" title="Modifica" href="'.$GLOBALS['db']->config->baseUrl.'?id='.$taxa->getData('id').'">Visualizza</a>
-                       ';     
+                       ';
                    }
-               
-            } 
-            $row[] = $data;     
+
+            }
+            $row[] = $data;
          }
          $result['aaData'][]=$row;
       }
@@ -45,11 +45,11 @@ if (array_key_exists('sEcho', $_REQUEST)) {
 if (!array_key_exists('action',$_REQUEST)) {
    $_REQUEST['action']=null;
 }
-       
+
 switch ($_REQUEST['action']) {
 case 'edit':
    $this->getTemplate()->setBlock('middle','administrator/taxa/edit.phtml');
-   $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml');  
+   $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml');
    if (
             array_key_exists('xhrValidate', $_REQUEST) ||
             array_key_exists('submit', $_REQUEST) ||
@@ -66,15 +66,15 @@ case 'edit':
               (
               array_key_exists('submit', $_REQUEST) ||
               array_key_exists('submit_back', $_REQUEST) ||
-              array_key_exists('submit_create_key', $_REQUEST) 
+              array_key_exists('submit_create_key', $_REQUEST)
               ) && $this->formIsValid()) {
-         
+
          if (array_key_exists('submit_create_key', $_REQUEST)) {
             $dico = new \flora\dico\Dico($GLOBALS['db']);
             $dico->insert();
             $_REQUEST['dico_id']=$dico->getData('id');
          }
-         
+
          $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
          if (array_key_exists('id', $_REQUEST) && is_numeric($_REQUEST['id'])) {
             $taxa->loadFromId($_REQUEST['id']);
@@ -90,8 +90,8 @@ case 'edit':
             if (!array_key_exists('id', $_REQUEST) || !is_numeric($_REQUEST['id'])) {
                $taxa->insert();
             } else {
-               $action='Modifica'; 
-               $secondUpdate = true;   
+               $action='Modifica';
+               $secondUpdate = true;
             }
 
 
@@ -156,7 +156,7 @@ case 'edit':
                if (
                        isset($_FILES) &&
                        is_array($_FILES) &&
-                       is_array($_FILES['traditional_image']) && 
+                       is_array($_FILES['traditional_image']) &&
                        $_FILES['traditional_image']['error'] ==0 &&
                        $_FILES['traditional_image']['name'] != '' &&
                        is_file($_FILES['traditional_image']['tmp_name'])
@@ -215,7 +215,7 @@ case 'edit':
                   $dryades->updateLink($taxa,$url);
                }
             }
-            
+
             if (array_key_exists('link_floritaly', $_REQUEST) && $_REQUEST['link_floritaly'] != '') {
                $floritaly = $linkProviderColl->filterByAttributeValue('floritaly','name');
                $floritaly = $floritaly->getFirst();
@@ -243,10 +243,10 @@ case 'edit':
          }
          flush();
          sleep(2);
-         exit(); 
+         exit();
       }
    }
-   break; 
+   break;
    case 'deleteadddico':
     if (array_key_exists('add_dico_id', $_REQUEST) &&  $_REQUEST['add_dico_id'] != '') {
         $addDico = new \flora\dico\AddDico($GLOBALS['db']);
@@ -266,7 +266,7 @@ case 'add_dico':
         $taxa->addDico(array('name'=>$_REQUEST['dico_name']));
     }
     $this->getTemplate()->setBlock('middle','administrator/taxa/edit.phtml');
-    $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml'); 
+    $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml');
     break;
 case 'delete' :
    $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
@@ -287,7 +287,7 @@ case 'taxaattributelist' :
    if (array_key_exists('attribute_name_list',$_REQUEST) && $_REQUEST['attribute_name_list'] != '') {
       parse_str ($_REQUEST['attribute_name_list'],$excludeAttributes);
       $excludeAttributes = $excludeAttributes['attribute_name_list'];
-      
+
    }
    $taxaAttributeColl = new \flora\taxa\TaxaAttributeColl($GLOBALS['db']);
    $taxaAttributeColl->loadAll($_REQUEST);
@@ -299,7 +299,7 @@ case 'taxaattributelist' :
       $result[] = array(
           'label'=>$taxaAttribute->getData('name')
       );
-   } 
+   }
    header('Content-Type: application/json');
    header('Pragma: cache');
    header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 60*60*24));
@@ -316,7 +316,7 @@ case 'taxaattributelistvalue' :
          $result[] = array(
              'label'=>$taxaAttributeValue['value']
          );
-      } 
+      }
    }
    header('Content-Type: application/json');
    header('Pragma: cache');
@@ -326,13 +326,13 @@ case 'taxaattributelistvalue' :
    exit;
    break;
 case 'jeditable':
-   
+
    if (
-           array_key_exists('taxa_id', $_REQUEST) && 
+           array_key_exists('taxa_id', $_REQUEST) &&
            is_numeric($_REQUEST['taxa_id']) &&
-           array_key_exists('id', $_REQUEST) && 
+           array_key_exists('id', $_REQUEST) &&
            $_REQUEST['id'] != '' &&
-           array_key_exists('value', $_REQUEST) && 
+           array_key_exists('value', $_REQUEST) &&
            $_REQUEST['value'] != ''
       ) {
       $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
@@ -340,7 +340,7 @@ case 'jeditable':
       $taxa->addAttributeById(substr($_REQUEST['id'],4),$_REQUEST['value']);
       echo $taxa->getAttributeById(substr($_REQUEST['id'],4));
    }
-   
+
    exit;
    break;
 case 'taxakindlist':
@@ -380,7 +380,7 @@ case 'imageupload':
    // usleep(5000);
 
    $targetDir = $GLOBALS['db']->baseDir  . DIRECTORY_SEPARATOR . 'tmp';
-   
+
    if (!is_dir($targetDir)) {
       mkdir($targetDir);
    }
@@ -440,7 +440,7 @@ case 'imageupload':
                    }
            }
            closedir($dir);
-   }	
+   }
 
 
    if (!$out = @fopen($filePath.'.part', $chunks ? 'ab' : 'wb')) {
@@ -465,7 +465,7 @@ case 'imageupload':
                    echo json_encode($m);
                    exit;
            }
-   } else {	
+   } else {
            if (!$in = @fopen('php://input', 'rb')) {
                    $m->error->code = 101;
                    $m->error->message = 'Errore nello spostamento del file caricato';
@@ -483,9 +483,9 @@ case 'imageupload':
 
    // Check if file has been uploaded
    if (!$chunks || $chunk == $chunks - 1) {
-           // Strip the temp .part suffix off 
+           // Strip the temp .part suffix off
            rename($filePath.'.part', $filePath);
-   }  
+   }
    $m = new stdClass();
    $m->jsonrpc = 2.0;
    $m->result = $fileName;
@@ -519,6 +519,10 @@ case 'get_eol_id_list':
          CURLOPT_TIMEOUT => 10,
     ));
     $response = json_decode(curl_exec($ch));
+    if(curl_getinfo($ch,CURLINFO_HTTP_CODE)!= 200) {    
+      echo 'Errore di connessione. '.curl_getinfo($ch,CURLINFO_REDIRECT_URL);
+      exit;
+    }
     if (is_object($response)) {
         require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'eolList.phtml';
     }
@@ -527,6 +531,6 @@ case 'get_eol_id_list':
    break;
 default:
    $this->getTemplate()->setBlock('middle','administrator/taxa/list.phtml');
-   $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml');  
+   $this->getTemplate()->setBlock('footer','administrator/taxa/footer.phtml');
 break;
 }

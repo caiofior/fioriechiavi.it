@@ -73,17 +73,22 @@ if (is_array($_REQUEST) && !key_exists('no_log',$_REQUEST)) {
     }
     $logName .= '/'.date('Y-m').'.csv';
     $s = array();
-    
-    $s['HTTP_USER_AGENT']=$_SERVER['HTTP_USER_AGENT'];
+    if (key_exists('HTTP_USER_AGENT', $_SERVER)) {
+      $s['HTTP_USER_AGENT']=$_SERVER['HTTP_USER_AGENT'];
+    }
     $s['REMOTE_ADDR']='';
     if (key_exists('HTTP_X_FORWARDED_FOR',$_SERVER)) {
     $s['REMOTE_ADDR']=$_SERVER['HTTP_X_FORWARDED_FOR'];
     }
-    if ($s['REMOTE_ADDR']=='') {
+    if ($s['REMOTE_ADDR']=='' && key_exists('REMOTE_ADDR', $_SERVER)) {
        $s['REMOTE_ADDR']=$_SERVER['REMOTE_ADDR'];
     }
-    $s['REQUEST_METHOD']=$_SERVER['REQUEST_METHOD'];
-    $s['REQUEST_URI']=$_SERVER['REQUEST_URI'];
+    if (key_exists('REQUEST_METHOD', $_SERVER)) {
+      $s['REQUEST_METHOD']=$_SERVER['REQUEST_METHOD'];
+    }
+    if (key_exists('REQUEST_URI', $_SERVER)) {
+      $s['REQUEST_URI']=$_SERVER['REQUEST_URI'];
+    }
     $s['REQUEST_TIME']=date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME']);
     $s['HTTP_REFERER']='';
     if (key_exists('HTTP_REFERER',$_SERVER)) {
