@@ -5,7 +5,7 @@ $(document).ready(function() {
                 "sUrl": "js/common/datatables/lang/it.json"
          },
         "bStateSave" : true,
-        "aaSorting": [[ 1, "desc" ]],
+        "aaSorting": [[ 0, "desc" ]],
         "bJQueryUI": true,
         "bProcessing": true,
         "bServerSide": true,

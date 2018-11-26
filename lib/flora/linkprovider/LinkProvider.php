@@ -56,7 +56,7 @@ class LinkProvider extends \Content
       }
       if (is_object($retriveClass)) {
          $link = $retriveClass->retrive($taxa);
-         if ($link !== false) {
+         if ($link !== false && $link != '') {
             $this->rawData['link'] = $link;
             $taxa->getDb()->query('DELETE FROM `link_taxa`
                WHERE `provider_id` = '.intval($this->getData('id')).' AND `taxa_id` = '.intval($taxa->getData('id'))
