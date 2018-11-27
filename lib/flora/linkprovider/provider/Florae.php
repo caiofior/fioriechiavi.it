@@ -16,10 +16,20 @@ class Florae implements \flora\linkprovider\provider\Provider {
            CURLOPT_TIMEOUT => 10,
       ));
       $response = curl_exec($ch);
+      if(curl_errno ($ch)>0) {
+         return false;
+      }
+      if(curl_getinfo ($ch,CURLINFO_HTTP_CODE) != 200) {
+         return false;
+      }   
       if ($response == '') {
          return false;
       } else {
-         return json_decode($response);
+         $decodedResponse = json_decode($response);
+         if (json_last_error() != 0) {
+            return false;
+         }
+         return $decodedResponse; 
       }
    }
 }
