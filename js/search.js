@@ -38,6 +38,11 @@ $("#searchForm").on("click","a.showNext",function (e) {
         el.find("div select").trigger("change",{dontReset:true});
     }
     e.preventDefault();
+}).on("change",function (e) {
+      try{
+         ga('send', 'pageview', $("#searchForm").attr("action")+"?"+$("#searchForm").serialize());
+      }
+      catch(e) {}
 });
 $("#searchForm").on("click","a.selectAll",function (e) {
     $(this).parent().find("div input[type=hidden]").val(1);
@@ -57,7 +62,7 @@ $("#searchForm").on("change","input[type!=hidden],select[name!=separator]",funct
 function updateForm(el, e,data) {
     if (
             typeof data !== 'object' ||
-            !data.hasOwnProperty("dontReset") || 
+            !data.hasOwnProperty("dontReset") ||
             data.dontReset !== true
             ) {
         $("#start").val(0);
@@ -76,8 +81,8 @@ function updateForm(el, e,data) {
         async : false,
         success : function (data) {
             $.each(data,function(name,value) {
-                $("#"+name).html(value);    
+                $("#"+name).html(value);
             });
         }
-    }); 
+    });
 }
