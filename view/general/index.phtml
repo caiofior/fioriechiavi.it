@@ -236,8 +236,13 @@ $forumActaPlanctorum = $forumActaPlanctorum->getFirst();
 if ($forumActaPlanctorum->getRawData('link') != ''): ?>
  <a class="blank" href="<?php echo $forumActaPlanctorum->getRawData('link'); ?>">Forum Acta plantorum</a>
 <?php endif;
+$floritaly = $linkProviderColl->filterByAttributeValue('floritaly','name');
+$floritaly = $floritaly->getFirst();
 $dryades = $linkProviderColl->filterByAttributeValue('dryades','name');
 $dryades = $dryades->getFirst();
+if ($floritaly->getRawData('link') != ''): ?>
+ <a class="blank" href="<?php echo $floritaly->getRawData('link'); ?>">Floritaly</a>
+<?php endif;
 if ($dryades->getRawData('link') != ''): ?>
  <a class="blank" href="<?php echo $dryades->getRawData('link'); ?>">Dryades</a>
  <?php endif;
@@ -266,7 +271,23 @@ endif;
 require (__DIR__.DIRECTORY_SEPARATOR.'observations.php');
 ?>
 <h2>Immagini dal web</h2>
+<?php
+$googleLinkColl = $taxa->getGoogleLinkColl();
+foreach($googleLinkColl->getItems() as $c=>$googleLink):?>
+<div style="float:left;">
+  <a href="<?php echo $googleLink->getData('link'); ?>">
+    <img src="<?php echo $googleLink->getData('thumbnail'); ?>" alt="<?php echo $googleLink->getData('title'); ?>">
+ <br>
+ <span><?php echo $googleLink->getData('title'); ?></span>
+ </a>
+</div>
+<?php if ($c+1 % 4 == 0) :?>
+  <br>
+<?php endif; ?>
+<?php endforeach;
+if ($googleLinkColl->count() == 0) : ?>
 <div id="imageSnipets"></div>
+<?php endif; ?>
 <div class="clear"></div>
 <?php $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
 $newTaxaColl->loadAll(array(
