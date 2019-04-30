@@ -1,0 +1,10 @@
+<?php 
+$term = $this->object;
+$title = $GLOBALS['db']->config->siteName;
+if ($term instanceof \dictionary\Term) {
+    $title .= ' :: Dizionario - '.$term->getData('term');
+} else {
+    $title .= ' :: Dizionario';
+}
+?>
+<title><?php echo $title;?></title>

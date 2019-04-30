@@ -53,7 +53,7 @@ class TaxaSearch extends \Content {
      * Updates full text data
      */
     private function updateFullText() {
-	    $this->db->query('SET group_concat_max_len=15000', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+	$this->db->query('SET group_concat_max_len=30000', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
         $this->db->query('UPDATE `taxa_search` SET 
             `text` = CONCAT(
             COALESCE((SELECT `name` FROM `taxa` WHERE `id` = ' . intval($this->taxa->getData('id')).'),""),
@@ -87,15 +87,19 @@ class TaxaSearch extends \Content {
             array_unique($altitudeValues);
             if(sizeof($altitudeValues)>1) {
                 $step = $this->db->config->attributes->altitudeStep;
-                $min = floor(min($altitudeValues)/$step)*$step;
-                $max = ceil(max($altitudeValues)/$step)*$step;
+                if (!is_numeric(min($altitudeValues)) || !is_numeric(max($altitudeValues))) {
+                  echo 'Altitudine errata nel taxa '.$this->taxa->getData('id').PHP_EOL;
+                } else {
+                  $min = floor(min($altitudeValues)/$step)*$step;
+                  $max = ceil(max($altitudeValues)/$step)*$step;
 
-                foreach (range($min,$max,$step) as $altitudeStep) {
-                    $this->db->query('INSERT IGNORE INTO `taxa_search_attribute` 
-                        SET `taxa_id` = ' . intval($this->taxa->getData('id')).',
-                            `attribute_id`=1,
-                            `value`= '.$altitudeStep.'
-                            ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);        
+                  foreach (range($min,$max,$step) as $altitudeStep) {
+                      $this->db->query('INSERT IGNORE INTO `taxa_search_attribute` 
+                          SET `taxa_id` = ' . intval($this->taxa->getData('id')).',
+                              `attribute_id`=1,
+                              `value`= '.$altitudeStep.'
+                              ', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);        
+                  }
                 }
             }
         }

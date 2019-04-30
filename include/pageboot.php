@@ -26,7 +26,10 @@ if (!extension_loaded('curl')) {
 if (!extension_loaded('mysql') && !extension_loaded('mysqli')) {
     throw new Exception('Mysql extension is required',1604061517);
 }
-session_save_path($sessionDir);
+if (php_sapi_name() != 'cli') {
+   session_save_path($sessionDir);
+}
+
 require __DIR__.'/../config/config.php';
 //require __DIR__.'/monitoring.php';
 if (is_file(__DIR__.'/zendRequireCompiled.php')) {
@@ -108,6 +111,8 @@ if (is_array($_REQUEST) && !key_exists('no_log',$_REQUEST)) {
 }
 require __DIR__.'/../lib/floraobservation/Autoload.php';
 floraobservation\Autoload::getInstance();
+require __DIR__.'/../lib/dictionary/Autoload.php';
+dictionary\Autoload::getInstance();
 
 $template = new Template(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,$config->template);
 $template->setBlock('head','general/head.phtml');

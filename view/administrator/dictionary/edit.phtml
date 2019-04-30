@@ -1,0 +1,64 @@
+<?php
+$term = new \dictionary\Term($GLOBALS['db']);
+$canEdit = true;
+if (array_key_exists('id', $_REQUEST)) {
+   $term->loadFromId($_REQUEST['id']);
+} else {
+   $term->setData($_REQUEST);
+}
+if($GLOBALS['db']->config->useCDN === true) : ?>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/plupload/2.1.1/jquery.ui.plupload/css/jquery.ui.plupload.css">
+<?php else: ?>
+<link rel="stylesheet" href="js/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css">
+<?php endif; ?>
+<link rel="stylesheet" href="<?php echo $GLOBALS['db']->config->staticUrl.$GLOBALS['template']->getUrlModifyTimestamp('style/administrator/taxa.css');?>">
+<div id="breadcrump">
+   <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php">Home</a></p> &gt; <p><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Elenco dei taxa</a></p> &gt; <h2>Modifica un taxa</h2>
+</div>
+<div>
+<form method="post" action="#" enctype="multipart/form-data">
+   <input type="hidden" id="id" name="id" value="<?php echo $term->getData('id')?>">
+   <div>
+      <input type="submit" name="submit" value="Salva">
+      <input type="submit" name="submit_back" value="Salva e torna">
+   </div>
+   <div>
+   <label for="term">Termine</label>
+   <input id="term" name="term" value="<?php echo $term->getData('term')?>">
+   </div>
+   <div>
+   <label for="abbreviation">Abbreviazione</label>
+   <input id="abbreviation" name="abbreviation" value="<?php echo $term->getData('abbreviation')?>">
+   </div>
+   <div>
+      <label for="description">Descrizione</label> <a class="loadMarkup" href="#">Carica Markup</a>
+      <textarea id="description" name="description"><?php echo $term->getData('description')?></textarea>
+   </div>
+   <div>
+       <label>Aggiungi file</label>
+       <input type="file" accept="image/*" name="traditional_image"/>
+   </div>    
+   <div>
+      <div id="uploader">
+         <p>Il tuo browser non ha Flash, Silverlight e non supporta HTML5.</p>
+      </div>
+   </div>
+   <div id="image_template">
+    <?php 
+    $image =new \dictionary\TermImage($GLOBALS['db']);
+       require __DIR__.'/imageBlock.phtml'; 
+    ?>
+    </div>
+   <div id="image_list">
+      <?php
+      $imageColl = $term->getTermImageColl(); 
+      foreach ($imageColl->getItems() as $image) {
+      require __DIR__.'/imageBlock.phtml'; }
+      ?>
+   </div>
+   <div>
+      <input type="submit" name="submit" value="Salva">
+      <input type="submit" name="submit_back" value="Salva e torna">
+   </div>
+</form>
+</div>

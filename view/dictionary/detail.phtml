@@ -1,0 +1,18 @@
+<?php
+$term = $this->object;
+?>
+<h2><?php echo $term->getData('term'); ?></h2>
+<div>
+    <p><em><?php echo $term->getData('abbreviation'); ?></em></p>
+    <p><?php echo $term->getData('description'); ?></p>
+    <?php $termImage = $term->getTermImageColl(array('iDisplayStart'=>0,'iDisplayLength'=>1))->getFirst();
+    $thumbnailImageUrl = null;
+    try {
+    $thumbnailImageUrl = $termImage->getUrl(array('x'=>600,'y'=>400));
+    } catch (Exception $e) {}
+    if (!is_null($thumbnailImageUrl)) : ?>
+    <a class="fancybox" href="<?php echo $termImage->getUrl(); ?>">
+    <img src="<?php echo $thumbnailImageUrl; ?>">
+    </a>
+    <?php endif; ?>
+</div>

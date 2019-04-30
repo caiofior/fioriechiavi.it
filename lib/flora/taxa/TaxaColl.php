@@ -111,6 +111,17 @@ class TaxaColl extends \ContentColl {
             $select->where(' (SELECT COUNT(`taxa_image`.`id`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa`.`id`) = 1 ');
          }
       }
+      if (array_key_exists('rand', $criteria) && $criteria['rand'] != '') {
+          $resultSet = $this->content->getDb()->query('SELECT MAX(`id`) FROM `taxa`'
+                    , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+          $resultSet = current(current($resultSet->toArray()));
+          
+          $taxaIds = array();
+          for ($c=0; $c < 10; $c++) {
+             $taxaIds[] = rand(1,$resultSet); 
+          }
+         $select->where(new \Zend\Db\Sql\Predicate\Expression('`taxa`.`id` IN ('.implode(',',$taxaIds).')'));
+      }
       if (array_key_exists('moreDicoItems', $criteria) && $criteria['moreDicoItems'] != '') {
          $select->columns(array('*','dico_item_count'=>new \Zend\Db\Sql\Predicate\Expression('(SELECT COUNT(*) FROM `dico_item` WHERE  `dico_item`.`parent_taxa_id`=`taxa`.`id` )')));
          $initials = explode(':',$criteria['moreDicoItems']);

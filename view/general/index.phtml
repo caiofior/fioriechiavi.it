@@ -4,7 +4,20 @@
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>search.php">Ricerca avanzata</a>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>map.php">Taxa presenti</a>
    <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>observation.php">Osservazioni botaniche</a>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>presentation.php">Argomento e limiti</a>
+   <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>dictionary.php">Dizionario</a>
    <br/>
+   <?php 
+   $ob_started = false;
+   $moreTaxafile = __DIR__.'/more_taxa.html';
+   if (
+         is_file($moreTaxafile) &&
+         filesize($moreTaxafile) > 0 
+           ) :
+      echo file_get_contents($moreTaxafile);
+   else :        
+      ob_start();
+   ?>
    <span><?php $moreDicoItemTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
     $moreDicoItemTaxaColl->loadAll(array(
     'iDisplayStart'=>0,
@@ -16,6 +29,8 @@
     <?php foreach($moreDicoItemTaxaColl->getItems() as $moreDicoItemTaxa) : ?>
     <a href="<?php echo $GLOBALS['db']->config->baseUrl;?>/index.php?id=<?php echo $moreDicoItemTaxa->getData('id');?>"><?php echo $moreDicoItemTaxa->getRawData('taxa_kind_initials').' '.$moreDicoItemTaxa->getData('name') ?></a>
 <?php endforeach;
+   endif;
+   file_put_contents($moreTaxafile, ob_get_flush());
 endif;
 ?></span>
 </form>
@@ -290,16 +305,27 @@ if ($googleLinkColl->count() == 0) : ?>
 <?php endif; ?>
 <div class="clear"></div>
 <?php $newTaxaColl  = new \flora\taxa\TaxaColl($GLOBALS['db']);
-$newTaxaColl->loadAll(array(
-    'iDisplayStart'=>0,
-    'iDisplayLength'=>2,
-    'sColumns'=>'change_datetime',
-    'iSortingCols'=>'1',
-    'iSortCol_0'=>'0',
-    'sSortDir_0'=>'DESC',
-    'images'=>1
-));
-$newTaxaColl->shuffle();
+   $ob_started = false;
+   $newTaxafile = __DIR__.'/new_taxa.html';
+   if (
+         is_file($newTaxafile) &&
+         (time() - filemtime($newTaxafile)) > 7200
+           ) {
+         unlink($newTaxafile);
+   }
+   if (
+         is_file($newTaxafile) &&
+         filesize($newTaxafile) > 0 
+           ) :
+           echo file_get_contents($newTaxafile);
+   else:
+      ob_start();
+   $newTaxaColl->loadAll(array(
+       'iDisplayStart'=>0,
+       'iDisplayLength'=>2,
+       'rand'=>1,
+       'images'=>1
+   ));
 if($newTaxaColl->count() > 0): ?>
 <div id="newtaxa">
    <h2> Ultime novità </h2>
@@ -307,7 +333,6 @@ if($newTaxaColl->count() > 0): ?>
    <?php foreach($newTaxaColl->getItems() as $newTaxa) :
       $image = null;
       $imageColl = $newTaxa->getTaxaImageColl();
-      $imageColl->shuffle();
       if ($imageColl->count() > 0) {
          $image = $imageColl->getFirst();
       }
@@ -324,7 +349,10 @@ if($newTaxaColl->count() > 0): ?>
    </div>
 </div>
 <div class="clear"></div>
-<?php endif; ?>
+<?php endif; 
+   file_put_contents($newTaxafile, ob_get_flush());
+endif;
+?>
 <?php
    if ($taxa->getData('id') == 1) :
       $content = new \content\content\Content($GLOBALS['db']);

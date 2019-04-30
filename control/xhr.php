@@ -5,13 +5,13 @@ if (!array_key_exists('action', $_REQUEST))
          $_REQUEST['action']=null;
 switch ($_REQUEST['task']) {
    case 'user':
-      switch ($_REQUEST['action']) {      
+      switch ($_REQUEST['action']) {
          case 'login':
             $result = (object) array('valid' => false);
             $auth = new Zend\Authentication\AuthenticationService();
             if (
                     array_key_exists('username', $_REQUEST) &&
-                    array_key_exists('password', $_REQUEST)        
+                    array_key_exists('password', $_REQUEST)
                     ) {
             $authAdapter = new \login\Auth($GLOBALS['db'],$_REQUEST['username'], $_REQUEST['password']);
             $authResult = $auth->authenticate($authAdapter);
@@ -22,7 +22,7 @@ switch ($_REQUEST['task']) {
                $result->valid = true;
                $result->token = $user->getProfile()->getData('token');
                     }
-                    
+
             }
             if (array_key_exists('callback', $_REQUEST)) {
                echo $_REQUEST['callback'].'('.json_encode( $result ).')';
@@ -34,8 +34,8 @@ switch ($_REQUEST['task']) {
             $result = (object) array('valid' => false);
             if (
                     array_key_exists('usernameRecover', $_REQUEST) &&
-                    $_REQUEST['usernameRecover']!='' && 
-                    filter_var($_REQUEST['usernameRecover'], FILTER_VALIDATE_EMAIL)      
+                    $_REQUEST['usernameRecover']!='' &&
+                    filter_var($_REQUEST['usernameRecover'], FILTER_VALIDATE_EMAIL)
                     ) {
                $user = \login\user\LoginInstantiator::getLoginInstance($GLOBALS['db'], $_REQUEST['usernameRecover']);
                if(is_object($user)) {
@@ -43,15 +43,15 @@ switch ($_REQUEST['task']) {
                   $user->resetPassword();
               }
             }
-            
+
             if (array_key_exists('callback', $_REQUEST)) {
                   echo $_REQUEST['callback'].'('.json_encode( $result ).')';
                } else {
                   echo json_encode( $result );
-            }   
+            }
          break;
          case 'register':
-            $result = (object) array('valid' => false);            
+            $result = (object) array('valid' => false);
             if (
                     filter_var($_REQUEST['username'], FILTER_VALIDATE_EMAIL) &&
                     strlen($_REQUEST['password']) > 3
@@ -65,7 +65,7 @@ switch ($_REQUEST['task']) {
                      $result->valid = true;
                      $result->token = $user->getProfile()->getData('token');
                   } catch (\Exception $e) {}
-                  
+
                }
             }
             if (array_key_exists('callback', $_REQUEST)) {
@@ -84,7 +84,7 @@ switch ($_REQUEST['task']) {
                     array_key_exists('eol_id', $_REQUEST) &&
                     $_REQUEST['eol_id'] != ''
                   ) {
-               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa` 
+               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa`
                 WHERE `eol_id`=' . intval($_REQUEST['eol_id'])
                     , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
                $resultSet = $resultSet->toArray();
@@ -97,7 +97,7 @@ switch ($_REQUEST['task']) {
                     array_key_exists('eol_id', $_REQUEST) &&
                     $_REQUEST['eol_id'] != ''
                   ) {
-               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa` 
+               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa`
                 WHERE `col_id`="' . addslashes($_REQUEST['col_id']).'"'
                     , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
                $resultSet = $resultSet->toArray();
@@ -110,8 +110,9 @@ switch ($_REQUEST['task']) {
                     array_key_exists('name', $_REQUEST) &&
                     $_REQUEST['name'] != ''
                   ) {
-               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa` 
-                WHERE `name` LIKE "%' . addslashes($_REQUEST['name']).'%"'
+               $resultSet = $GLOBALS['db']->query('SELECT `id` FROM `taxa`
+                WHERE `name` LIKE "' . addslashes($_REQUEST['name']).'%"
+                ORDER BY LENGTH(`name`) ASC'
                     , \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
                $resultSet = $resultSet->toArray();
                if (sizeof($resultSet)>0) {
@@ -124,8 +125,8 @@ switch ($_REQUEST['task']) {
                echo json_encode($GLOBALS['db']->config->baseUrl.'index.php?id='.intval($taxaId));
             }
          break;
-      }      
-   break;  
+      }
+   break;
    case 'observation':
       switch ($_REQUEST['action']) {
          case 'signal':
@@ -149,7 +150,7 @@ switch ($_REQUEST['task']) {
                              array_key_exists('longitude',$observationData) &&
                              array_key_exists('datetime',$observationData)
                              ) {
-                        
+
                         try {
                            $dateTime = new \DateTime($observationData['datetime']);
                         } catch (\Exception $e) {
@@ -180,8 +181,8 @@ switch ($_REQUEST['task']) {
                   echo $_REQUEST['callback'].'('.json_encode( $result ).')';
                } else {
                   echo json_encode( $result );
-            }  
-         break; 
+            }
+         break;
          case 'appendimage':
             $result = (object) array('valid' => false);
             file_put_contents('/tmp/request.txt', var_export($_REQUEST,true));
@@ -208,7 +209,7 @@ switch ($_REQUEST['task']) {
                               $imgFileName = $rawTmpFile.'.gif';
                            break;
                            case IMAGETYPE_JPEG :
-                           case IMAGETYPE_JPEG2000 :   
+                           case IMAGETYPE_JPEG2000 :
                               $imgFileName = $rawTmpFile.'.jpeg';
                            break;
                            case IMAGETYPE_PNG :
@@ -247,7 +248,7 @@ switch ($_REQUEST['task']) {
                                  $GLOBALS['mail']->setFrom($GLOBALS['config']->mail_from, $GLOBALS['config']->siteName);
                                  $GLOBALS['mail']->addAddress($GLOBALS['profile']->getData('email'), $GLOBALS['config']->siteName);
                                  $GLOBALS['mail']->send();
-                                 
+
                           } catch (\Exception $e) {}
 
 
@@ -265,7 +266,7 @@ switch ($_REQUEST['task']) {
                   echo $_REQUEST['callback'].'('.json_encode( $result ).')';
                } else {
                   echo json_encode( $result );
-            }  
+            }
          break;
       }
    break;

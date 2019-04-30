@@ -1,22 +1,22 @@
 <?php
-namespace flora\taxa;
+namespace dictionary;
 /**
- * Taxa Image Class
+ * Term Image Class
  *
  * @author caiofior
  */
-class TaxaImage extends \Content
+class TermImage extends \Content
 {
    /**
     * Base directory
     */
-   const imageBaseDir = 'images/taxa';
+   const imageBaseDir = 'images/term';
    /**
     * Associates the database table
     * @param \Zend\Db\Adapter\Adapter $db
     */
    public function __construct(\Zend\Db\Adapter\Adapter $db) {
-      parent::__construct($db, 'taxa_image');
+      parent::__construct($db, 'term_image');
    }
    /**
     * Deprecated, see moveInsert

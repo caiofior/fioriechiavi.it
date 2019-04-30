@@ -2,6 +2,7 @@
 <ul>
    <?php if ($role->getData('id') >0 && $role->getData('id') <= 2) : ?>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=taxa">Taxa</a></li>
+   <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=dictionary">Vocabolario</a></li>
    <?php endif; ?>
    <li><a href="<?php echo $GLOBALS['db']->config->baseUrl;?>administrator.php?task=observation">Osservazioni</a></li>
    <?php if ($role->getData('id') >0 && $role->getData('id') <= 1) : ?>

@@ -28,6 +28,9 @@ switch ($_REQUEST['task']) {
    case 'taxa':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'taxa.php';       
       break;
+   case 'dictionary':
+      require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'dictionary.php';       
+      break;
    case 'region':
       require __DIR__.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'region.php';       
       break;

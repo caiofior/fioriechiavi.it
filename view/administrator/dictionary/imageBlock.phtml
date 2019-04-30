@@ -1,0 +1,12 @@
+<?php 
+$display = '';
+if($image->getUrl() == '') {
+   $display = 'style="display:none;"';
+}
+?>           
+         <div class="imgContainer" <?php echo $display;?>>
+            <input type="hidden" name="image_name_list[]" value="" />
+            <input type="hidden" name="image_id_list[]" value="<?php echo $image->getData('id');?>" />
+            <img src="<?php echo $GLOBALS['db']->config->staticUrl.$image->getUrl();?>"/>
+            <a class="image actions delete" href="#">Cancella</a>
+         </div>

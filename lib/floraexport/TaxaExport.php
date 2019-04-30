@@ -108,10 +108,20 @@ class TaxaExport {
         $taxaDone=array();
         $taxa = new \flora\taxa\Taxa($GLOBALS['db']);
         if ($this->rootId == 1) {
-            fwrite($stream, '#1 '.$this->db->config->siteName.' - Chiave d\'insieme'.PHP_EOL.PHP_EOL);
+            fwrite($stream, '# '.$this->db->config->siteName.' - Chiave d\'insieme'.PHP_EOL.PHP_EOL);
+            $content = new \content\content\Content($GLOBALS['db']);
+            $content->loadFromLabel('presentation');
+            fwrite($stream,$content->getData('content'));
+            fwrite($stream, '# Dizionario'.PHP_EOL.PHP_EOL);
+            $termColl = new \dictionary\TermColl($GLOBALS['db']);
+            $termColl->loadAll();
+            foreach($termColl->getItems() as $index=>$term) {
+               fwrite($stream,'**'.$term->getData('term').'**: '.$term->getData('description').PHP_EOL.PHP_EOL);
+            }
+            
         } else {
             $taxa->loadFromId($this->rootId);
-            fwrite($stream, '#1 '.$this->db->config->siteName.' - Chiave '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name').PHP_EOL.PHP_EOL);
+            fwrite($stream, '# '.$this->db->config->siteName.' - Chiave '.$taxa->getRawData('taxa_kind_initials').' '.$taxa->getData('name').PHP_EOL.PHP_EOL);
             
             
         }
@@ -334,11 +344,11 @@ class TaxaExport {
                 case 'doc':
                 case 'docx':
                 case 'pdf':
-                    $cmd = 'pandoc --toc-depth=5 -f markdown+definition_lists+line_blocks --latex-engine=xelatex -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
+                    $cmd = 'pandoc --toc-depth=5 -f markdown+definition_lists+line_blocks --latex-engine=xelatex --self-contained --data-dir=/tmp -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
                 case 'epub':
                     file_put_contents('php://stderr', 'Exporting'.str_repeat(' ', 20)."\r");
                     if (!isset($cmd)) {
-                        $cmd = 'pandoc --toc-depth=5 -t '.$format.' -f markdown+definition_lists+line_blocks -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
+                        $cmd = 'pandoc --toc-depth=5 -t '.$format.' -f markdown+definition_lists+line_blocks --self-contained --data-dir=/tmp -s -o '.$tempFileName.'.'.$format.' '.$tempFileName.' 2>&1';
                     }
                     $error = shell_exec($cmd);
                     unlink($tempFileName);

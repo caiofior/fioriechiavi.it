@@ -97,7 +97,7 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
         unset($this->data['taxa_kind_id_name']);
         unset($this->data['taxa_kind_ord']);
         unset($this->data['dico_id']);
-		unset($this->data['id']);
+        unset($this->data['id']);
         if (array_key_exists('eol_id', $this->data) && ($this->data['eol_id']=='' || $this->data['eol_id']==0)) {
             $this->data['eol_id']=null;
         }
