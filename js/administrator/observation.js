@@ -10,7 +10,7 @@ $(document).ready(function() {
         "bServerSide": true,
         "sAjaxSource": "#",
          "fnServerParams": function ( aoData ) {
-            aoData.push({ "name": "task", "value": "observation" });  
+            aoData.push({ "name": "task", "value": "observation" });
          },
         "aoColumnDefs":  getDatatableMetadata(this),
         "drawCallback": function( ) {
@@ -34,23 +34,22 @@ $(document).ready(function() {
     tinymce.init({
       selector: "textarea"
     });
-    if (typeof google != 'undefined') {
-        latLong = new google.maps.LatLng(latitude, longitude);
-        map = new google.maps.Map($('#map-canvas')[0],{
-            zoom: 12,
-            scrollwheel: false,
-            center: latLong
-        });
-        marker = new google.maps.Marker({
-              position: latLong,
-              map: map,
-	      draggable:true
-        });
-	$("#update_position").show().click(function(e){
-	  $("#latitude").attr("readonly",false).val(marker.getPosition().lat());
-	  $("#longitude").attr("readonly",false).val(marker.getPosition().lng());
-	});
-    }
+
+    mapboxgl.accessToken = mapBoxToken;
+    var map = new mapboxgl.Map({
+       container: 'map-canvas',
+       style: 'mapbox://styles/mapbox/outdoors-v9',
+       center: [longitude,latitude],
+       zoom: 12
+    });
+    var marker = new mapboxgl.Marker({
+      draggable: true
+    }).setLngLat([longitude,latitude])
+    .addTo(map);
+    $("#update_position").show().click(function(e){
+	  $("#latitude").attr("readonly",false).val(marker.getLngLat().lat);
+	  $("#longitude").attr("readonly",false).val(marker.getLngLat().lng);
+	 });
     $.datepicker.setDefaults($.datepicker.regional["it"]);
     $("#update_datetime").click(function(e){
         $("#datetime").attr("readonly",false).datepicker({ "dateFormat": "yy-mm-dd"});
