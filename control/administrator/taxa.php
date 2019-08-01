@@ -509,11 +509,11 @@ case 'get_col_id_list':
     ));
     $responseString = curl_exec($ch);
     if(curl_errno ($ch)>0) {
-         return 'Errore di collegamento al server '.curl_errno ($ch);
+         echo 'Errore di collegamento al server '.curl_error ($ch);
          exit;
     }
     if(curl_getinfo ($ch,CURLINFO_HTTP_CODE) != 200) {
-         return 'Errore di collegamento al server '.curl_getinfo ($ch,CURLINFO_HTTP_CODE);
+         echo 'Errore di connessione. '.curl_getinfo($ch,CURLINFO_HTTP_CODE).' '.curl_getinfo($ch,CURLINFO_REDIRECT_URL);
          exit;
     }
     $response = @unserialize($responseString);
@@ -535,19 +535,22 @@ case 'get_eol_id_list':
     ));
     $response = json_decode(curl_exec($ch));
     if(curl_errno ($ch)>0) {
-         return 'Errore di collegamento al server '.curl_errno ($ch);
+         echo 'Errore di collegamento al server '.curl_error ($ch);
          exit;
     }
     if(curl_getinfo($ch,CURLINFO_HTTP_CODE)!= 200) {    
-      echo 'Errore di connessione. '.curl_getinfo($ch,CURLINFO_REDIRECT_URL);
+      echo 'Errore di connessione. '.curl_getinfo($ch,CURLINFO_HTTP_CODE).' '.curl_getinfo($ch,CURLINFO_REDIRECT_URL);
       exit;
     }
     if (json_last_error() != 0) {
-         return 'Errore nell\'interpretare la risposta ';
+         echo 'Errore nell\'interpretare la risposta ';
          exit;
     }
     if (is_object($response)) {
         require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'administrator'.DIRECTORY_SEPARATOR.'taxa'.DIRECTORY_SEPARATOR.'eolList.phtml';
+    } else {
+         echo 'Errore nell\' interprestazione del risultato '.$responseString;
+         exit;
     }
    }
    exit;
