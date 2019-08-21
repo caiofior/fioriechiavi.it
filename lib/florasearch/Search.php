@@ -121,7 +121,15 @@ class Search {
             'id'=>new \Zend\Db\Sql\Expression('`taxa`.`id`'),
             'name'=>new \Zend\Db\Sql\Expression('`taxa`.`name`'),
             'taxa_kind_initials'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`initials`'),
-            'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`name`')
+            'taxa_kind_id_name'=>new \Zend\Db\Sql\Expression('`taxa_kind`.`name`'),
+            'status' => new \Zend\Db\Sql\Predicate\Expression('
+                (               
+                    IFNULL(LENGTH(taxa.description),0)+
+                    IFNULL((SELECT COUNT(`value`) FROM `taxa_attribute_value` WHERE `taxa_attribute_value`.`taxa_id`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`filename`) FROM `taxa_image` WHERE `taxa_image`.`taxa_id`=`taxa`.`id`),0)+
+                    IFNULL((SELECT COUNT(`id`) FROM `dico_item` WHERE `dico_item`.`parent_taxa_id`=`taxa`.`id`),0)
+                ) > 0
+               ')
         ));
         if (
                 array_key_exists('start', $this->request) &&
