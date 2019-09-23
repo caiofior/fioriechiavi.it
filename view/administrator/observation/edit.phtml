@@ -43,7 +43,7 @@ if (array_key_exists('id', $_REQUEST)) {
         try {
         $thumbnailImageUrl = $taxaObservationImage->getUrl(array('x'=>600,'y'=>400));
         } catch (Exception $e) {}
-        if (!is_null($thumbnailImageUrl)) : ?>        
+        if (!is_null($thumbnailImageUrl)) : ?>
         <img src="<?php echo $thumbnailImageUrl; ?>">
         <?php
             else :
@@ -69,7 +69,7 @@ if (array_key_exists('id', $_REQUEST)) {
    </div>
     <p><a id="show_metadata" href="#">Visualizza metadati</a></p>
    <div id="metadata" style="display: none;">
-   <?php 
+   <?php
     if (function_exists('exif_read_data') && is_file($imagePath)) :
     $exif = exif_read_data($taxaObservationImage->getPath());
     foreach ($exif as $key => $section) :
@@ -87,7 +87,7 @@ if (array_key_exists('id', $_REQUEST)) {
    <div>
       <input type="submit" name="submit" value="Salva">
       <input type="submit" name="submit_back" value="Salva e torna">
-      <input type="button" style="display:none;" id="update_position" name="update_position" value="Aggiorna posizione">     
+      <input type="button" style="display:none;" id="update_position" name="update_position" value="Aggiorna posizione">
    </div>
    <div>
 	<label for="latitude">Latitudine</label>
@@ -98,8 +98,11 @@ if (array_key_exists('id', $_REQUEST)) {
         <input id="longitude" name="longitude" readonly="readonly" value="<?php echo $taxaObservation->getPoint()->x();?>">
    </div>
 </form>
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.css' rel='stylesheet' />
 <script>
 //<![CDATA[
+var mapBoxToken = "<?php echo $GLOBALS['db']->config->mapBoxToken; ?>";
 var latitude = <?php echo $taxaObservation->getPoint()->y(); ?>;
 var longitude = <?php echo $taxaObservation->getPoint()->x(); ?>;
 //]]>

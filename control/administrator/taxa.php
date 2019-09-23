@@ -223,13 +223,6 @@ case 'edit':
                   $floritaly->updateLink($taxa,$_REQUEST['link_floritaly']);
                }
             }
-            if (array_key_exists('link_florae', $_REQUEST) && $_REQUEST['link_florae'] != '') {
-               $florae = $linkProviderColl->filterByAttributeValue('florae','name');
-               $florae = $florae->getFirst();
-               if($florae->getRawData('link') != $_REQUEST['link_florae']) {
-                  $florae->updateLink($taxa,$_REQUEST['link_florae']);
-               }
-            }
             $log = new \log\Log($GLOBALS['db']);
             $log->add(
                     $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),

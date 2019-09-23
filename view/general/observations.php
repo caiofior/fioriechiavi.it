@@ -45,13 +45,20 @@ if ($taxaObservationColl->count() > 1) {
 </div>
 <?php $pointsString .=']'; 
 $centroid = $taxaObservationColl->getMultiPoint()->centroid();
-if (is_object($GLOBALS['db']->config->search) && $GLOBALS['db']->config->search->key != '') : ?>
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $GLOBALS['db']->config->search->key; ?>"></script>
+if ($GLOBALS['db']->config->mapBoxToken != '') : ?>
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+  integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+  crossorigin=""></script>
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.css' rel='stylesheet' />
 <?php endif; ?>
 <script>
-    points = <?php echo $pointsString; ?>;
-    centroid = {latitude:<?php echo $centroid->y(); ?>,longitude:<?php echo $centroid->x(); ?>};
-    radius = <?php echo $radius; ?>;
+    var mapBoxToken = "<?php echo $GLOBALS['db']->config->mapBoxToken; ?>";
+    var points = <?php echo $pointsString; ?>;
+    var latitude = <?php echo $centroid->y(); ?>;
+    var longitude = <?php echo $centroid->x(); ?>;
+    var radius = <?php echo intval($radius); ?>;
 </script>
 <?php 
 endif;
