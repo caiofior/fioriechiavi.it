@@ -48,7 +48,9 @@ class DicoItem extends \Content implements \flora\dico\DicoItemInt
           'id'=>$this->data['id']
       ))->current();
       if (is_object($data)) {
-          $this->data = array_filter($data->getArrayCopy(),  create_function('$val', 'return !is_null($val);'));
+          $this->data = array_filter($data->getArrayCopy(), function($val) {
+            return !is_null($val);
+          });
           $this->rawData = $this->data;
       } else {
          $this->data = array (
