@@ -155,9 +155,7 @@ class Taxa extends \Content implements \flora\dico\DicoInt {
         foreach ($this->getTaxaImageColl()->getItems() as $image) {
             $image->delete();
         }
-        foreach ($this->getTaxaAttributeColl()->getItems() as $attribute) {
-            $attribute->delete();
-        }
+        $this->deleteAllTaxaAttributes();
         foreach ($this->getAddDicoColl()->getItems() as $addDico) {
             $addDico->delete();
         }

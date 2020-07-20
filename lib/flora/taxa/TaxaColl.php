@@ -102,7 +102,7 @@ class TaxaColl extends \ContentColl {
          $criteria['sSearch']=$criteria['term'];
       }
       if (array_key_exists('sSearch', $criteria) && $criteria['sSearch'] != '') {
-         $select->where(' ( `taxa`.`name` LIKE "'.addslashes($criteria['sSearch']).'%" OR `taxa`.`description` LIKE "'.addslashes($criteria['sSearch']).'%" ) ');
+         $select->where(' `taxa`.`name` LIKE "'.addslashes($criteria['sSearch']).'%" ');
       }
       if (array_key_exists('images', $criteria) && $criteria['images'] != '') {
          if ($criteria['images'] == 0 ) {

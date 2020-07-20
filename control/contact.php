@@ -21,6 +21,9 @@ switch ($_REQUEST['task']) {
          if (!array_key_exists('message', $_REQUEST) ||$_REQUEST['message']=='') {
              $this->addValidationMessage('message','Il messaggio è obbligatorio');
          }
+         if (base64_encode($_REQUEST['check']) !== $_REQUEST['expected']) {
+            $control->addValidationMessage('check','Controllo errato');
+         }
          if (array_key_exists('submit', $_REQUEST) && $this->formIsValid()) {
             require __DIR__.'/../lib/contact/Autoload.php';
             contact\Autoload::getInstance();

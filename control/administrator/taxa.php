@@ -236,6 +236,13 @@ case 'edit':
                   $floritaly->updateLink($taxa,$_REQUEST['link_floritaly']);
                }
             }
+            if (array_key_exists('link_florae', $_REQUEST) && $_REQUEST['link_florae'] != '') {
+               $florae = $linkProviderColl->filterByAttributeValue('florae','name');
+               $florae = $florae->getFirst();
+               if($florae->getRawData('link') != $_REQUEST['link_florae']) {
+                  $florae->updateLink($taxa,$_REQUEST['link_florae']);
+               }
+            }
             $log = new \log\Log($GLOBALS['db']);
             $log->add(
                     $GLOBALS['db']->config->baseUrl.'administrator.php?task=taxa&action=edit&id='.$taxa->getData('id'),
@@ -538,6 +545,8 @@ case 'get_eol_id_list':
          CURLOPT_RETURNTRANSFER => true,
          CURLOPT_CONNECTTIMEOUT => 10,
          CURLOPT_TIMEOUT => 10,
+         CURLOPT_SSL_VERIFYHOST => false,
+         CURLOPT_SSL_VERIFYPEER => false
     ));
     $response = json_decode(curl_exec($ch));
     if(curl_errno ($ch)>0) {
