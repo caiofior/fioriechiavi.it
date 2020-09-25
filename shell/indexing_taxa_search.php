@@ -190,6 +190,7 @@ function server_resource_monitoring() {
         32767=>'E_ALL'
     );
     $error = error_get_last();
+    if(is_null($error)) return;
     $error_message = '';
     if ($error['type'] != 2 &&
             $error['type'] != 8 &&
