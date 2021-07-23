@@ -134,6 +134,11 @@
                                 <img class="social kindle" src="template/leaf/images/empty.png" alt="Kindle" />
                             </a>
                             <?php endif; ?>
+                            <?php if($GLOBALS['db']->config->socialPages->wordpress != '') : ?>
+                            <a rel="publisher" class="blank notextdecoration" href="<?php echo $GLOBALS['db']->config->socialPages->wordpress; ?>" title="Wordpress plugin">
+                                <img class="social wordpress" src="template/leaf/images/empty.png" alt="Wordpress" />
+                            </a>
+                            <?php endif; ?>
                         </div>
                 </div>
                 <?php endif; ?>
