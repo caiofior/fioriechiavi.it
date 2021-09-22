@@ -31,6 +31,7 @@ else if (
    if (is_array($spamList)) {
       foreach($spamList as $spam) {
          if (preg_match($spam,$_REQUEST['username'])) {
+            sleep(10);
             $_REQUEST['username']='';
          }
       }
