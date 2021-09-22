@@ -27,6 +27,14 @@ else if (
         array_key_exists('password', $_REQUEST)
         ) {
    $_REQUEST['task']='register';
+   $spamList = $GLOBALS['db']->config->spam->toArray();
+   if (is_array($spamList)) {
+      foreach($spamList as $spam) {
+         if (preg_match($spam,$_REQUEST['username'])) {
+            $_REQUEST['username']='';
+         }
+      }
+   }
    if(array_key_exists('xhrValidate', $_REQUEST)) {
       if (!filter_var($_REQUEST['username'], FILTER_VALIDATE_EMAIL)) {
          $control->addValidationMessage('username_register','Inserisci una mail valida');
@@ -37,6 +45,10 @@ else if (
       if ($_REQUEST['password'] !== $_REQUEST['passwordr']) {
          $control->addValidationMessage('password_register','Le due password non coincidono');
       }
+      if (base64_encode($_REQUEST['check']) !== $_REQUEST['expected']) {
+         sleep(10);
+         $control->addValidationMessage('check','Controllo errato');
+      }
       if ($control->formIsValid()) {
          $user = \login\user\LoginInstantiator::getLoginInstance($db, $_REQUEST['username']);
          if(is_object($user) && $user->getData('username') != '') {
@@ -44,10 +56,16 @@ else if (
          }
       }
    } else {
-      if ($_REQUEST['username'] == '') {
-         $control->addValidationMessage('username_register','Nome utente vuoto');
-      } else if ($_REQUEST['password'] == '') {
-         $control->addValidationMessage('password_register','Password vuota');
+      if (!filter_var($_REQUEST['username'], FILTER_VALIDATE_EMAIL)) {
+         $control->addValidationMessage('username_register','Inserisci una mail valida');
+      }
+      if (strlen($_REQUEST['password'])< 3) {
+         $control->addValidationMessage('password_register','La password deve avere almeno tre caratteri');
+      } else if ($_REQUEST['password'] !== $_REQUEST['passwordr']) {
+         $control->addValidationMessage('password_register','Le due password non coincidono');
+      } else if (base64_encode($_REQUEST['check']) !== $_REQUEST['expected']) {
+         sleep(10);
+         $control->addValidationMessage('check','Controllo errato');
       } else {
          $user = \login\user\LoginInstantiator::createLoginInstance($db, $_REQUEST['username'],$_REQUEST['password']);
       }

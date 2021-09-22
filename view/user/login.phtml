@@ -45,6 +45,15 @@ Accedi tramite facebook
    <label for="passwordr_register">Ripeti la password</label>
    <input type="password" name="passwordr" id="passwordr_register" value="" />
    </div>
+   <div>
+   <?php 
+   $firstNumber = rand(0,9);
+   $secondNumber = rand(0,9);
+   ?>
+   <label for="check"><?php echo $GLOBALS['numberAsLetters'][$firstNumber];?> + <?php echo $GLOBALS['numberAsLetters'][$secondNumber];?></label>
+   <input type="number" name="check" id="check" value="" />   
+   <input type="hidden" name="expected" id="expected" value="<?php echo base64_encode($firstNumber+$secondNumber);?>" />   
+   </div>
    <input type="submit" name="register" value="Registrati">
    <p>Attiva il tuo utente, segui istruzioni nella mail che ti verrà inviata</p>
 </form>

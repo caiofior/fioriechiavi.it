@@ -193,3 +193,15 @@ if (array_key_exists('autocomplete', $_GET) && array_key_exists('domain', $_GET)
    echo json_encode($result);
    exit;
 }
+$GLOBALS['numberAsLetters'] = array(
+   0=>'Zero',
+   1=>'Uno',
+   2=>'Due',
+   3=>'Tre',
+   4=>'Quattro',
+   5=>'Cinque',
+   6=>'Sei',
+   7=>'Sette',
+   8=>'Otto',
+   9=>'Nove'
+);
