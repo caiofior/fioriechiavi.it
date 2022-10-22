@@ -35,6 +35,7 @@ class Autoload {
       }
       require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'phpqrcode-git'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'full'.DIRECTORY_SEPARATOR.'qrlib.php';
       require __DIR__.DIRECTORY_SEPARATOR.'TaxaExport.php';
+      require __DIR__.DIRECTORY_SEPARATOR.'GmiExport.php';
       return self::$instance;
    }
 }

@@ -358,6 +358,7 @@ class PluginClassLoader implements PluginClassLocator
      *
      * @return ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->plugins);
@@ -564,6 +565,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @see    Countable::count()
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->data);
@@ -575,6 +577,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @see    Iterator::current()
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         $this->skipNextIteration = false;
@@ -587,6 +590,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @see    Iterator::key()
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->data);
@@ -598,6 +602,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @see    Iterator::next()
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         if ($this->skipNextIteration) {
@@ -614,6 +619,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @see    Iterator::rewind()
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         $this->skipNextIteration = false;
@@ -626,6 +632,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @see    Iterator::valid()
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return ($this->key() !== null);
@@ -638,6 +645,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @param  mixed $offset
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $this->__isset($offset);
@@ -650,6 +658,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @param  mixed $offset
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->__get($offset);
@@ -663,6 +672,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @param  mixed $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->__set($offset, $value);
@@ -675,6 +685,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * @param  mixed $offset
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->__unset($offset);
@@ -2625,6 +2636,7 @@ class Result implements
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         if ($this->currentComplete) {
@@ -2675,8 +2687,10 @@ class Result implements
         } elseif ($r === false) {
             throw new Exception\RuntimeException($this->resource->error);
         }
-
         // dereference
+        if (!is_array($this->currentData)) {
+            $this->currentData=array();
+        }
         for ($i = 0, $count = count($this->statementBindValues['keys']); $i < $count; $i++) {
             $this->currentData[$this->statementBindValues['keys'][$i]] = $this->statementBindValues['values'][$i];
         }
@@ -2712,6 +2726,7 @@ class Result implements
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         $this->currentComplete = false;
@@ -2728,6 +2743,7 @@ class Result implements
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -2739,6 +2755,7 @@ class Result implements
      * @throws Exception\RuntimeException
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         if ($this->position !== 0) {
@@ -2756,6 +2773,7 @@ class Result implements
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         if ($this->currentComplete) {
@@ -2775,6 +2793,7 @@ class Result implements
      * @throws Exception\RuntimeException
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         if ($this->isBuffered === false) {
@@ -3349,6 +3368,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         if ($this->buffer === null) {
@@ -3365,6 +3385,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -3375,6 +3396,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         if ($this->buffer === null) {
@@ -3394,6 +3416,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         if (is_array($this->buffer) && isset($this->buffer[$this->position])) {
@@ -3412,6 +3435,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         if (!is_array($this->buffer)) {
@@ -3429,6 +3453,7 @@ abstract class AbstractResultSet implements Iterator, ResultSetInterface
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         if ($this->count !== null) {
@@ -7994,6 +8019,7 @@ class Filesystem extends AbstractAdapter implements
      *
      * @return FilesystemIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         $options   = $this->getOptions();
@@ -11381,6 +11407,8 @@ use Serializable;
  */
 class PriorityQueue implements Countable, IteratorAggregate, Serializable
 {
+    public function __serialize() {$this->serialize();}
+    public function __unserialize($data) {$this->unserialize($data);}
     const EXTR_DATA     = 0x00000001;
     const EXTR_PRIORITY = 0x00000002;
     const EXTR_BOTH     = 0x00000003;
@@ -11479,6 +11507,7 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->items);
@@ -11516,6 +11545,7 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
      *
      * @return SplPriorityQueue
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         $queue = $this->getQueue();
@@ -12029,6 +12059,8 @@ use Serializable;
  */
 class SplPriorityQueue extends \SplPriorityQueue implements Serializable
 {
+    public function __serialize() {$this->serialize();}
+    public function __unserialize($data) {$this->unserialize($data);}
     /**
      * @var int Seed used to ensure queue order for items of the same priority
      */
@@ -15078,6 +15110,7 @@ abstract class AbstractSessionArrayStorage implements
      * @param  mixed   $key
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return isset($_SESSION[$key]);
@@ -15089,6 +15122,7 @@ abstract class AbstractSessionArrayStorage implements
      * @param  mixed $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         if (isset($_SESSION[$key])) {
@@ -15105,6 +15139,7 @@ abstract class AbstractSessionArrayStorage implements
      * @param  mixed $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         $_SESSION[$key] = $value;
@@ -15116,6 +15151,7 @@ abstract class AbstractSessionArrayStorage implements
      * @param  mixed $key
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         unset($_SESSION[$key]);
@@ -15126,6 +15162,7 @@ abstract class AbstractSessionArrayStorage implements
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($_SESSION);
@@ -15157,6 +15194,7 @@ abstract class AbstractSessionArrayStorage implements
      *
      * @return ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($_SESSION);
@@ -15462,6 +15500,8 @@ namespace Zend\Session\Storage;
  */
 class SessionArrayStorage extends AbstractSessionArrayStorage
 {
+    public function __serialize() {$this->serialize();}
+    public function __unserialize($data) {$this->unserialize($data);}
     /**
      * Get Offset
      *
@@ -15507,6 +15547,8 @@ use Serializable;
  */
 class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Countable
 {
+    public function __serialize() {$this->serialize();}
+    public function __unserialize($data) {$this->unserialize($data);}
     /**
      * Properties of the object have their normal functionality
      * when accessed as list (var_dump, foreach, etc.).
@@ -15653,6 +15695,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->storage);
@@ -15709,6 +15752,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      *
      * @return \Iterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         $class = $this->iteratorClass;
@@ -15762,6 +15806,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      * @param  mixed $key
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return isset($this->storage[$key]);
@@ -15773,6 +15818,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      * @param  mixed $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function &offsetGet($key)
     {
         $ret = null;
@@ -15791,6 +15837,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      * @param  mixed $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         $this->storage[$key] = $value;
@@ -15802,6 +15849,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      * @param  mixed $key
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         if ($this->offsetExists($key)) {
@@ -16442,6 +16490,7 @@ class PriorityList implements Iterator, Countable
     /**
      * {@inheritDoc}
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         $this->sort();
@@ -16451,6 +16500,7 @@ class PriorityList implements Iterator, Countable
     /**
      * {@inheritDoc}
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         $this->sorted || $this->sort();
@@ -16462,6 +16512,7 @@ class PriorityList implements Iterator, Countable
     /**
      * {@inheritDoc}
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         $this->sorted || $this->sort();
@@ -16471,6 +16522,7 @@ class PriorityList implements Iterator, Countable
     /**
      * {@inheritDoc}
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         $node = next($this->items);
@@ -16481,6 +16533,7 @@ class PriorityList implements Iterator, Countable
     /**
      * {@inheritDoc}
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return current($this->items) !== false;
@@ -16497,6 +16550,7 @@ class PriorityList implements Iterator, Countable
     /**
      * {@inheritDoc}
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return $this->count;
@@ -17160,6 +17214,8 @@ namespace Zend\Session;
  */
 class Container extends AbstractContainer
 {
+    public function __serialize() {$this->serialize();}
+    public function __unserialize($data) {$this->unserialize($data);}
     /**
      * Retrieve a specific key in the container
      *
@@ -17981,6 +18037,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      * @param  string $name
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($name)
     {
         return (isset($this->data[$name]));
@@ -17992,6 +18049,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      * @param  string $name
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($name)
     {
         return (isset($this->data[$name])) ? $this->data[$name] : null;
@@ -18015,6 +18073,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      * @param mixed $maxLength
      * @throws Exception\InvalidArgumentException
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($name, $value, $errata = null, $maxLength = null)
     {
         $position = false;
@@ -18057,6 +18116,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      * @param  string $name
      * @return ParameterContainer
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($name)
     {
         if (is_int($name) && isset($this->positions[$name])) {
@@ -18251,6 +18311,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->data);
@@ -18261,6 +18322,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->data);
@@ -18271,6 +18333,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         return next($this->data);
@@ -18281,6 +18344,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->data);
@@ -18291,6 +18355,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return (current($this->data) !== false);
@@ -18299,6 +18364,7 @@ class ParameterContainer implements Iterator, ArrayAccess, Countable
     /**
      * Rewind
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         reset($this->data);
@@ -23611,6 +23677,7 @@ class PredicateSet implements PredicateInterface, Countable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->predicates);
@@ -26962,6 +27029,7 @@ class ValidatorChain implements
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->validators);
