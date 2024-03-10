@@ -1,0 +1,34 @@
+<?php
+echo 'Start at '.date('d/m/Y H:i:s').PHP_EOL;
+if(!array_key_exists('db', $GLOBALS)) {
+    require __DIR__.'/../include/pageboot.php';
+}
+$fName = 'php://stdout';
+if (is_array($argv) && array_key_exists('1', $argv)) {
+    $fName = $argv[1];    
+}
+$fh = fopen ($fName, 'w');
+var_dump($fh);
+$statement = $GLOBALS['db']->query('
+   SELECT * FROM `taxa` WHERE taxa_kind_id = (SELECT `id` FROM `taxa_kind` WHERE `name`="Specie")   
+');
+$resultSet = new \Zend\Db\ResultSet\ResultSet();
+$resultSet->initialize($statement->execute());
+$words = [];
+do {
+    $name = strtolower($resultSet->current()->name);
+    $aName = explode (' ',$name);
+    $word = array_shift($aName);
+    $words[$word]='';
+    $word = array_pop($aName);
+    $words[$word]='';
+    $resultSet->next();
+} while ($resultSet->valid());
+$words = array_keys($words); 
+sort($words);
+foreach($words as $n=>$word) {
+    fwrite($fh, ($n+1)." ".$word.PHP_EOL);
+}
+fclose($fh);
+echo 'Memory '.  number_format(memory_get_peak_usage()/1024/1024,2).' M'.PHP_EOL;
+echo 'End at '.date('d/m/Y H:i:s').PHP_EOL;

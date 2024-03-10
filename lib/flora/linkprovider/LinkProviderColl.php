@@ -74,7 +74,7 @@ class LinkProviderColl extends \ContentColl {
      */
     public function retriveFirst() {
 		foreach($this->getItems() as $linkProvider) {
-			$dateTime = date_create($linkProvider->getRawData('datetime'));
+			$dateTime = date_create($linkProvider->getRawData('datetime')??'');
 			if( 
                $linkProvider->getRawData('fixed') != 1 &&
 					$linkProvider->getRawData('link') == '' && 
