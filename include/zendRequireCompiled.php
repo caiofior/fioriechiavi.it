@@ -13441,7 +13441,7 @@ class SessionManager extends AbstractManager
             $oldSessionData = $_SESSION;
         }
 
-        session_start();
+        @session_start();
 
         if ($oldSessionData instanceof \Traversable
             || (! empty($oldSessionData) && is_array($oldSessionData))
@@ -15547,7 +15547,7 @@ use Serializable;
  */
 class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Countable
 {
-    public function __serialize() {$this->serialize();}
+    public function __serialize() {return (array)$this->serialize();}
     public function __unserialize($data) {$this->unserialize($data);}
     /**
      * Properties of the object have their normal functionality
@@ -15938,6 +15938,9 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      */
     public function unserialize($data)
     {
+        if (is_array($data)) {
+            $data = reset($data);
+        }
         $ar                        = unserialize($data);
         $this->protectedProperties = array_keys(get_object_vars($this));
 

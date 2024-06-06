@@ -51,7 +51,15 @@ if (!isset($configArray) || !is_array($configArray)) {
     throw new Exception('Config file is wrong',1512250909);
 }
 $config = new Zend\Config\Config($configArray);
-$db = new Zend\Db\Adapter\Adapter($config->database->toArray());
+
+class Container extends Zend\Db\Adapter\Adapter {
+    public $baseDir = null;
+    public $cache = null;
+    public $config = null;
+    public $session = null;
+}
+
+$db = new Container($config->database->toArray());
 $baktrace = debug_backtrace();
 if (sizeof($baktrace) < 1)
    throw new Exception ('No backtrace available to create base path', 0710141057);
