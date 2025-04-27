@@ -66,7 +66,7 @@ abstract class ContentColl {
       * Load all contents
       * @param array $criteria Filtering criteria
       */
-    public function loadAll(array $criteria=null) {
+    public function loadAll(?array $criteria=null) {
         if (is_null($criteria))
             $criteria = array();
         $select = $this->customSelect($this->content->getTable()->getSql()->select(),$criteria);

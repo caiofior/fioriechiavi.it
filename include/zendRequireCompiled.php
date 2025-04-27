@@ -875,7 +875,7 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
      * @param Profiler\ProfilerInterface $profiler
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($driver, Platform\PlatformInterface $platform = null, ResultSet\ResultSetInterface $queryResultPrototype = null, Profiler\ProfilerInterface $profiler = null)
+    public function __construct($driver, ?Platform\PlatformInterface $platform = null, ?ResultSet\ResultSetInterface $queryResultPrototype = null, ?Profiler\ProfilerInterface $profiler = null)
     {
         // first argument can be an array of parameters
         $parameters = array();
@@ -972,7 +972,7 @@ class Adapter implements AdapterInterface, Profiler\ProfilerAwareInterface
      * @throws Exception\InvalidArgumentException
      * @return Driver\StatementInterface|ResultSet\ResultSet
      */
-    public function query($sql, $parametersOrQueryMode = self::QUERY_MODE_PREPARE, ResultSet\ResultSetInterface $resultPrototype = null)
+    public function query($sql, $parametersOrQueryMode = self::QUERY_MODE_PREPARE, ?ResultSet\ResultSetInterface $resultPrototype = null)
     {
         if (is_string($parametersOrQueryMode) && in_array($parametersOrQueryMode, array(self::QUERY_MODE_PREPARE, self::QUERY_MODE_EXECUTE))) {
             $mode = $parametersOrQueryMode;
@@ -1546,7 +1546,7 @@ class Mysqli implements DriverInterface, Profiler\ProfilerAwareInterface
      * @param null|Result $resultPrototype
      * @param array $options
      */
-    public function __construct($connection, Statement $statementPrototype = null, Result $resultPrototype = null, array $options = array())
+    public function __construct($connection, ?Statement $statementPrototype = null, ?Result $resultPrototype = null, array $options = array())
     {
         if (!$connection instanceof Connection) {
             $connection = new Connection($connection);
@@ -4072,7 +4072,7 @@ class ServiceManager implements ServiceLocatorInterface, ContainerInterface
      *
      * @param ConfigInterface $config
      */
-    public function __construct(ConfigInterface $config = null)
+    public function __construct(?ConfigInterface $config = null)
     {
         if ($config) {
             $config->configureServiceManager($this);
@@ -5276,7 +5276,7 @@ abstract class AbstractPluginManager extends ServiceManager implements ServiceLo
      *
      * @param null|ConfigInterface $configuration
      */
-    public function __construct(ConfigInterface $configuration = null)
+    public function __construct(?ConfigInterface $configuration = null)
     {
         parent::__construct($configuration);
         $this->addInitializer(function ($instance) {
@@ -9567,7 +9567,7 @@ class AdapterOptions extends AbstractOptions
      * @param  StorageInterface|null $adapter
      * @return AdapterOptions
      */
-    public function setAdapter(StorageInterface $adapter = null)
+    public function setAdapter(?StorageInterface $adapter = null)
     {
         $this->adapter = $adapter;
         return $this;
@@ -12076,6 +12076,7 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
      * @param  mixed $priority
      * @return void
      */
+     #[\ReturnTypeWillChange]
     public function insert($datum, $priority)
     {
         if (!is_array($priority)) {
@@ -13213,9 +13214,9 @@ abstract class AbstractManager implements Manager
      * @throws Exception\RuntimeException
      */
     public function __construct(
-        Config $config = null,
-        Storage $storage = null,
-        SaveHandler $saveHandler = null,
+        ?Config $config = null,
+        ?Storage $storage = null,
+        ?SaveHandler $saveHandler = null,
         array $validators = array()
     ) {
         // init config
@@ -13386,9 +13387,9 @@ class SessionManager extends AbstractManager
      * @throws Exception\RuntimeException
      */
     public function __construct(
-        Config\ConfigInterface $config = null,
-        Storage\StorageInterface $storage = null,
-        SaveHandler\SaveHandlerInterface $saveHandler = null,
+        ?Config\ConfigInterface $config = null,
+        ?Storage\StorageInterface $storage = null,
+        ?SaveHandler\SaveHandlerInterface $saveHandler = null,
         array $validators = array()
     ) {
         parent::__construct($config, $storage, $saveHandler, $validators);
@@ -13402,7 +13403,7 @@ class SessionManager extends AbstractManager
      */
     public function sessionExists()
     {
-        $sid = defined('SID') ? constant('SID') : false;
+        $sid = false;
         if ($sid !== false && $this->getId()) {
             return true;
         }
@@ -13494,7 +13495,7 @@ class SessionManager extends AbstractManager
      * @param  array $options See {@link $defaultDestroyOptions}
      * @return void
      */
-    public function destroy(array $options = null)
+    public function destroy(?array $options = null)
     {
         if (!$this->sessionExists()) {
             return;
@@ -16645,7 +16646,7 @@ abstract class AbstractContainer extends ArrayObject
      * @param  Manager                            $manager
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($name = 'Default', Manager $manager = null)
+    public function __construct($name = 'Default', ?Manager $manager = null)
     {
         if (!preg_match('/^[a-z0-9][a-z0-9_\\\\]+$/i', $name)) {
             throw new Exception\InvalidArgumentException(
@@ -16668,7 +16669,7 @@ abstract class AbstractContainer extends ArrayObject
      * @param  Manager $manager
      * @return void
      */
-    public static function setDefaultManager(Manager $manager = null)
+    public static function setDefaultManager(?Manager $manager = null)
     {
         static::$defaultManager = $manager;
     }
@@ -16713,7 +16714,7 @@ abstract class AbstractContainer extends ArrayObject
      * @return Container
      * @throws Exception\InvalidArgumentException
      */
-    protected function setManager(Manager $manager = null)
+    protected function setManager(?Manager $manager = null)
     {
         if (null === $manager) {
             $manager = static::getDefaultManager();
@@ -17315,7 +17316,7 @@ class AuthenticationService implements AuthenticationServiceInterface
      * @param  Storage\StorageInterface $storage
      * @param  Adapter\AdapterInterface $adapter
      */
-    public function __construct(Storage\StorageInterface $storage = null, Adapter\AdapterInterface $adapter = null)
+    public function __construct(?Storage\StorageInterface $storage = null, ?Adapter\AdapterInterface $adapter = null)
     {
         if (null !== $storage) {
             $this->setStorage($storage);
@@ -17384,7 +17385,7 @@ class AuthenticationService implements AuthenticationServiceInterface
      * @return Result
      * @throws Exception\RuntimeException
      */
-    public function authenticate(Adapter\AdapterInterface $adapter = null)
+    public function authenticate(?Adapter\AdapterInterface $adapter = null)
     {
         if (!$adapter) {
             if (!$adapter = $this->getAdapter()) {
@@ -17546,7 +17547,7 @@ class Session implements StorageInterface
      * @param  mixed $member
      * @param  SessionManager $manager
      */
-    public function __construct($namespace = null, $member = null, SessionManager $manager = null)
+    public function __construct($namespace = null, $member = null, ?SessionManager $manager = null)
     {
         if ($namespace !== null) {
             $this->namespace = $namespace;
@@ -18428,7 +18429,7 @@ class StatementContainer implements StatementContainerInterface
      * @param string|null $sql
      * @param ParameterContainer|null $parameterContainer
      */
-    public function __construct($sql = null, ParameterContainer $parameterContainer = null)
+    public function __construct($sql = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($sql) {
             $this->setSql($sql);
@@ -19046,7 +19047,7 @@ class TableGateway extends AbstractTableGateway
      *
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($table, AdapterInterface $adapter, $features = null, ResultSetInterface $resultSetPrototype = null, Sql $sql = null)
+    public function __construct($table, AdapterInterface $adapter, $features = null, ?ResultSetInterface $resultSetPrototype = null, ?Sql $sql = null)
     {
         // table
         if (!(is_string($table) || $table instanceof TableIdentifier || is_array($table))) {
@@ -19346,8 +19347,8 @@ class EventFeature extends AbstractFeature implements EventsCapableInterface
      * @param EventFeature\TableGatewayEvent $tableGatewayEvent
      */
     public function __construct(
-        EventManagerInterface $eventManager = null,
-        EventFeature\TableGatewayEvent $tableGatewayEvent = null
+        ?EventManagerInterface $eventManager = null,
+        ?EventFeature\TableGatewayEvent $tableGatewayEvent = null
     ) {
         $this->eventManager = ($eventManager instanceof EventManagerInterface)
                             ? $eventManager
@@ -19593,7 +19594,7 @@ class Sql
      * @param null|string|array|TableIdentifier $table
      * @param null|Platform\AbstractPlatform    $sqlPlatform @deprecated since version 3.0
      */
-    public function __construct(AdapterInterface $adapter, $table = null, Platform\AbstractPlatform $sqlPlatform = null)
+    public function __construct(?AdapterInterface $adapter, $table = null, ?Platform\AbstractPlatform $sqlPlatform = null)
     {
         $this->adapter = $adapter;
         if ($table) {
@@ -19686,7 +19687,7 @@ class Sql
      *
      * @return StatementInterface
      */
-    public function prepareStatementForSqlObject(PreparableSqlInterface $sqlObject, StatementInterface $statement = null, AdapterInterface $adapter = null)
+    public function prepareStatementForSqlObject(?PreparableSqlInterface $sqlObject, ?StatementInterface $statement = null, ?AdapterInterface $adapter = null)
     {
         $adapter   = $adapter ?: $this->adapter;
         $statement = $statement ?: $adapter->getDriver()->createStatement();
@@ -19704,7 +19705,7 @@ class Sql
      *
      * @deprecated Deprecated in 2.4. Use buildSqlString() instead
      */
-    public function getSqlStringForSqlObject(SqlInterface $sqlObject, PlatformInterface $platform = null)
+    public function getSqlStringForSqlObject(?SqlInterface $sqlObject, ?PlatformInterface $platform = null)
     {
         $platform = ($platform) ?: $this->adapter->getPlatform();
         return $this->sqlPlatform->setSubject($sqlObject)->getSqlString($platform);
@@ -19718,7 +19719,7 @@ class Sql
      *
      * @throws Exception\InvalidArgumentException
      */
-    public function buildSqlString(SqlInterface $sqlObject, AdapterInterface $adapter = null)
+    public function buildSqlString(?SqlInterface $sqlObject, ?AdapterInterface $adapter = null)
     {
         return $this
             ->sqlPlatform
@@ -19792,7 +19793,7 @@ interface SqlInterface
      *
      * @return string
      */
-    public function getSqlString(PlatformInterface $adapterPlatform = null);
+    public function getSqlString(?PlatformInterface $adapterPlatform = null);
 }
 
 /**
@@ -19891,7 +19892,7 @@ class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInter
      *
      * @throws Exception\RuntimeException
      */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    public function getSqlString(?PlatformInterface $adapterPlatform = null)
     {
         if (! $this->subject instanceof SqlInterface) {
             throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\SqlInterface, thus calling prepareStatement() has no effect');
@@ -19915,7 +19916,7 @@ use Zend\Db\Sql\Platform\AbstractPlatform;
 
 class SqlServer extends AbstractPlatform
 {
-    public function __construct(SelectDecorator $selectDecorator = null)
+    public function __construct(?SelectDecorator $selectDecorator = null)
     {
         $this->setTypeDecorator('Zend\Db\Sql\Select', ($selectDecorator) ?: new SelectDecorator());
         $this->setTypeDecorator('Zend\Db\Sql\Ddl\CreateTable', new Ddl\CreateTableDecorator());
@@ -20028,7 +20029,7 @@ class Platform extends AbstractPlatform
      *
      * @throws Exception\RuntimeException
      */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    public function getSqlString(?PlatformInterface $adapterPlatform = null)
     {
         if (! $this->subject instanceof SqlInterface) {
             throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\SqlInterface, thus calling prepareStatement() has no effect');
@@ -20104,7 +20105,7 @@ class IbmDb2 extends AbstractPlatform
     /**
      * @param SelectDecorator $selectDecorator
      */
-    public function __construct(SelectDecorator $selectDecorator = null)
+    public function __construct(?SelectDecorator $selectDecorator = null)
     {
         $this->setTypeDecorator('Zend\Db\Sql\Select', ($selectDecorator) ?: new SelectDecorator());
     }
@@ -20124,7 +20125,7 @@ use Zend\Db\Sql\Platform\AbstractPlatform;
 
 class Oracle extends AbstractPlatform
 {
-    public function __construct(SelectDecorator $selectDecorator = null)
+    public function __construct(?SelectDecorator $selectDecorator = null)
     {
         $this->setTypeDecorator('Zend\Db\Sql\Select', ($selectDecorator) ?: new SelectDecorator());
     }
@@ -20190,7 +20191,7 @@ abstract class AbstractSql implements SqlInterface
     /**
      * {@inheritDoc}
      */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    public function getSqlString(?PlatformInterface $adapterPlatform = null)
     {
         $adapterPlatform = ($adapterPlatform) ?: new DefaultAdapterPlatform;
         return $this->buildSqlString($adapterPlatform);
@@ -20203,9 +20204,9 @@ abstract class AbstractSql implements SqlInterface
      * @return string
      */
     protected function buildSqlString(
-        PlatformInterface $platform,
-        DriverInterface $driver = null,
-        ParameterContainer $parameterContainer = null
+        ?PlatformInterface $platform,
+        ?DriverInterface $driver = null,
+        ?ParameterContainer $parameterContainer = null
     ) {
         $this->localizeVariables();
 
@@ -20245,10 +20246,10 @@ abstract class AbstractSql implements SqlInterface
      * @throws Exception\RuntimeException
      */
     protected function processExpression(
-        ExpressionInterface $expression,
-        PlatformInterface $platform,
-        DriverInterface $driver = null,
-        ParameterContainer $parameterContainer = null,
+        ?ExpressionInterface $expression,
+        ?PlatformInterface $platform,
+        ?DriverInterface $driver = null,
+        ?ParameterContainer $parameterContainer = null,
         $namedParameterPrefix = null
     ) {
         $namedParameterPrefix = ! $namedParameterPrefix
@@ -20414,10 +20415,10 @@ abstract class AbstractSql implements SqlInterface
      * @return string
      */
     protected function processSubSelect(
-        Select $subselect,
-        PlatformInterface $platform,
-        DriverInterface $driver = null,
-        ParameterContainer $parameterContainer = null
+        ?Select $subselect,
+        ?PlatformInterface $platform,
+        ?DriverInterface $driver = null,
+        ?ParameterContainer $parameterContainer = null
     ) {
         if ($this instanceof PlatformDecoratorInterface) {
             $decorator = clone $this;
@@ -20454,9 +20455,9 @@ abstract class AbstractSql implements SqlInterface
      */
     protected function resolveColumnValue(
         $column,
-        PlatformInterface $platform,
-        DriverInterface $driver = null,
-        ParameterContainer $parameterContainer = null,
+        ?PlatformInterface $platform,
+        ?DriverInterface $driver = null,
+        ?ParameterContainer $parameterContainer = null,
         $namedParameterPrefix = null
     ) {
         $namedParameterPrefix = ! $namedParameterPrefix
@@ -20497,9 +20498,9 @@ abstract class AbstractSql implements SqlInterface
      */
     protected function resolveTable(
         $table,
-        PlatformInterface $platform,
-        DriverInterface $driver = null,
-        ParameterContainer $parameterContainer = null
+        ?PlatformInterface $platform,
+        ?DriverInterface $driver = null,
+        ?ParameterContainer $parameterContainer = null
     ) {
         $schema = null;
         if ($table instanceof TableIdentifier) {
@@ -21070,14 +21071,14 @@ class Select extends AbstractPreparableSql
         return $table . ($alias ? ' AS ' . $alias : '');
     }
 
-    protected function processStatementStart(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processStatementStart(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->combine !== array()) {
             return array('(');
         }
     }
 
-    protected function processStatementEnd(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processStatementEnd(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->combine !== array()) {
             return array(')');
@@ -21092,7 +21093,7 @@ class Select extends AbstractPreparableSql
      * @param ParameterContainer $parameterContainer
      * @return null|array
      */
-    protected function processSelect(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processSelect(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         $expr = 1;
 
@@ -21170,7 +21171,7 @@ class Select extends AbstractPreparableSql
         }
     }
 
-    protected function processJoins(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processJoins(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if (!$this->joins) {
             return;
@@ -21218,7 +21219,7 @@ class Select extends AbstractPreparableSql
         return array($joinSpecArgArray);
     }
 
-    protected function processWhere(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processWhere(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->where->count() == 0) {
             return;
@@ -21228,7 +21229,7 @@ class Select extends AbstractPreparableSql
         );
     }
 
-    protected function processGroup(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processGroup(PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->group === null) {
             return;
@@ -21250,7 +21251,7 @@ class Select extends AbstractPreparableSql
         return array($groups);
     }
 
-    protected function processHaving(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processHaving(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->having->count() == 0) {
             return;
@@ -21260,7 +21261,7 @@ class Select extends AbstractPreparableSql
         );
     }
 
-    protected function processOrder(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processOrder(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if (empty($this->order)) {
             return;
@@ -21290,7 +21291,7 @@ class Select extends AbstractPreparableSql
         return array($orders);
     }
 
-    protected function processLimit(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processLimit(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->limit === null) {
             return;
@@ -21302,7 +21303,7 @@ class Select extends AbstractPreparableSql
         return array($platform->quoteValue($this->limit));
     }
 
-    protected function processOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processOffset(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->offset === null) {
             return;
@@ -21315,7 +21316,7 @@ class Select extends AbstractPreparableSql
         return array($platform->quoteValue($this->offset));
     }
 
-    protected function processCombine(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processCombine(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->combine == array()) {
             return;
@@ -21371,7 +21372,7 @@ class Select extends AbstractPreparableSql
      * @param ParameterContainer $parameterContainer
      * @return string
      */
-    protected function resolveTable($table, PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function resolveTable($table, ?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         $alias = null;
 
@@ -21541,7 +21542,7 @@ class Update extends AbstractPreparableSql
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 
-    protected function processUpdate(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processUpdate(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         $setSql = array();
         foreach ($this->set as $column => $value) {
@@ -21566,7 +21567,7 @@ class Update extends AbstractPreparableSql
         );
     }
 
-    protected function processWhere(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processWhere(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->where->count() == 0) {
             return;
@@ -21756,7 +21757,7 @@ class Insert extends AbstractPreparableSql
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 
-    protected function processInsert(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processInsert(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->select) {
             return;
@@ -21789,7 +21790,7 @@ class Insert extends AbstractPreparableSql
         );
     }
 
-    protected function processSelect(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processSelect(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if (!$this->select) {
             return;
@@ -21992,7 +21993,7 @@ class Delete extends AbstractPreparableSql
      *
      * @return string
      */
-    protected function processDelete(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processDelete(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         return sprintf(
             $this->specifications[static::SPECIFICATION_DELETE],
@@ -22007,7 +22008,7 @@ class Delete extends AbstractPreparableSql
      *
      * @return null|string
      */
-    protected function processWhere(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processWhere(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->where->count() == 0) {
             return;
@@ -22086,7 +22087,7 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
      * @param $parameters
      * @return null
      */
-    protected function processLimitOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, &$sqls, &$parameters)
+    protected function processLimitOffset(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null, &$sqls=null, &$parameters=null)
     {
         if ($this->limit === null && $this->offset === null) {
             return;
@@ -22298,7 +22299,7 @@ class CreateTable extends AbstractSql implements SqlInterface
      *
      * @return string[]
      */
-    protected function processTable(PlatformInterface $adapterPlatform = null)
+    protected function processTable(?PlatformInterface $adapterPlatform = null)
     {
         return array(
             $this->isTemporary ? 'TEMPORARY ' : '',
@@ -22311,7 +22312,7 @@ class CreateTable extends AbstractSql implements SqlInterface
      *
      * @return string[][]|null
      */
-    protected function processColumns(PlatformInterface $adapterPlatform = null)
+    protected function processColumns(?PlatformInterface $adapterPlatform = null)
     {
         if (! $this->columns) {
             return;
@@ -22331,7 +22332,7 @@ class CreateTable extends AbstractSql implements SqlInterface
      *
      * @return array|string
      */
-    protected function processCombinedby(PlatformInterface $adapterPlatform = null)
+    protected function processCombinedby(?PlatformInterface $adapterPlatform = null)
     {
         if ($this->constraints && $this->columns) {
             return $this->specifications['combinedBy'];
@@ -22343,7 +22344,7 @@ class CreateTable extends AbstractSql implements SqlInterface
      *
      * @return string[][]|null
      */
-    protected function processConstraints(PlatformInterface $adapterPlatform = null)
+    protected function processConstraints(?PlatformInterface $adapterPlatform = null)
     {
         if (!$this->constraints) {
             return;
@@ -22363,7 +22364,7 @@ class CreateTable extends AbstractSql implements SqlInterface
      *
      * @return string[]
      */
-    protected function processStatementEnd(PlatformInterface $adapterPlatform = null)
+    protected function processStatementEnd(?PlatformInterface $adapterPlatform = null)
     {
         return array("\n)");
     }
@@ -22404,7 +22405,7 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
      * @param PlatformInterface $adapterPlatform
      * @return array
      */
-    protected function processTable(PlatformInterface $adapterPlatform = null)
+    protected function processTable(?PlatformInterface $adapterPlatform = null)
     {
         $table = ($this->isTemporary ? '#' : '') . ltrim($this->table, '#');
         return array(
@@ -22592,12 +22593,12 @@ class AlterTable extends AbstractSql implements SqlInterface
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 
-    protected function processTable(PlatformInterface $adapterPlatform = null)
+    protected function processTable(?PlatformInterface $adapterPlatform = null)
     {
         return array($adapterPlatform->quoteIdentifier($this->table));
     }
 
-    protected function processAddColumns(PlatformInterface $adapterPlatform = null)
+    protected function processAddColumns(?PlatformInterface $adapterPlatform = null)
     {
         $sqls = array();
         foreach ($this->addColumns as $column) {
@@ -22607,7 +22608,7 @@ class AlterTable extends AbstractSql implements SqlInterface
         return array($sqls);
     }
 
-    protected function processChangeColumns(PlatformInterface $adapterPlatform = null)
+    protected function processChangeColumns(?PlatformInterface $adapterPlatform = null)
     {
         $sqls = array();
         foreach ($this->changeColumns as $name => $column) {
@@ -22620,7 +22621,7 @@ class AlterTable extends AbstractSql implements SqlInterface
         return array($sqls);
     }
 
-    protected function processDropColumns(PlatformInterface $adapterPlatform = null)
+    protected function processDropColumns(?PlatformInterface $adapterPlatform = null)
     {
         $sqls = array();
         foreach ($this->dropColumns as $column) {
@@ -22630,7 +22631,7 @@ class AlterTable extends AbstractSql implements SqlInterface
         return array($sqls);
     }
 
-    protected function processAddConstraints(PlatformInterface $adapterPlatform = null)
+    protected function processAddConstraints(?PlatformInterface $adapterPlatform = null)
     {
         $sqls = array();
         foreach ($this->addConstraints as $constraint) {
@@ -22640,7 +22641,7 @@ class AlterTable extends AbstractSql implements SqlInterface
         return array($sqls);
     }
 
-    protected function processDropConstraints(PlatformInterface $adapterPlatform = null)
+    protected function processDropConstraints(?PlatformInterface $adapterPlatform = null)
     {
         $sqls = array();
         foreach ($this->dropConstraints as $constraint) {
@@ -22736,7 +22737,7 @@ class AlterTableDecorator extends AlterTable implements PlatformDecoratorInterfa
      * @param PlatformInterface $adapterPlatform
      * @return array
      */
-    protected function processAddColumns(PlatformInterface $adapterPlatform = null)
+    protected function processAddColumns(?PlatformInterface $adapterPlatform = null)
     {
         $sqls = array();
 
@@ -22802,7 +22803,7 @@ class AlterTableDecorator extends AlterTable implements PlatformDecoratorInterfa
      * @param PlatformInterface $adapterPlatform
      * @return array
      */
-    protected function processChangeColumns(PlatformInterface $adapterPlatform = null)
+    protected function processChangeColumns(?PlatformInterface $adapterPlatform = null)
     {
         $sqls = array();
         foreach ($this->changeColumns as $name => $column) {
@@ -22984,7 +22985,7 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
     /**
      * {@inheritDoc}
      */
-    protected function processColumns(PlatformInterface $platform = null)
+    protected function processColumns(?PlatformInterface $platform = null)
     {
         if (! $this->columns) {
             return;
@@ -23161,7 +23162,7 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
      * @param  array              $sqls
      * @param  array              $parameters
      */
-    protected function processLimitOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, &$sqls, &$parameters)
+    protected function processLimitOffset(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null, &$sqls=null, &$parameters=null)
     {
         if ($this->limit === null && $this->offset === null) {
             return;
@@ -23304,7 +23305,7 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
      * @param $parameters
      * @return null
      */
-    protected function processLimitOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, &$sqls, &$parameters)
+    protected function processLimitOffset(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null, &$sqls=null, &$parameters=null)
     {
         if ($this->limit === null && $this->offset === null) {
             return;
@@ -23404,7 +23405,7 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
         }
     }
 
-    protected function processLimit(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processLimit(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->limit === null && $this->offset !== null) {
             return array('');
@@ -23420,7 +23421,7 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
         return array($this->limit);
     }
 
-    protected function processOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
+    protected function processOffset(?PlatformInterface $platform, ?DriverInterface $driver = null, ?ParameterContainer $parameterContainer = null)
     {
         if ($this->offset === null) {
             return;
@@ -23517,7 +23518,7 @@ class PredicateSet implements PredicateInterface, Countable
      * @param  null|array $predicates
      * @param  string $defaultCombination
      */
-    public function __construct(array $predicates = null, $defaultCombination = self::COMBINED_BY_AND)
+    public function __construct(?array $predicates = null, $defaultCombination = self::COMBINED_BY_AND)
     {
         $this->defaultCombination = $defaultCombination;
         if ($predicates) {
@@ -26356,7 +26357,7 @@ interface TranslatorAwareInterface
      *             Default is null, which skips setTranslatorTextDomain
      * @return self
      */
-    public function setTranslator(TranslatorInterface $translator = null, $textDomain = null);
+    public function setTranslator(?TranslatorInterface $translator = null, $textDomain = null);
 
     /**
      * Returns translator used in object
@@ -26798,7 +26799,7 @@ abstract class AbstractValidator implements
      * @return AbstractValidator
      * @throws Exception\InvalidArgumentException
      */
-    public function setTranslator(Translator\TranslatorInterface $translator = null, $textDomain = null)
+    public function setTranslator(?Translator\TranslatorInterface $translator = null, $textDomain = null)
     {
         $this->abstractOptions['translator'] = $translator;
         if (null !== $textDomain) {
@@ -26869,7 +26870,7 @@ abstract class AbstractValidator implements
      * @return void
      * @throws Exception\InvalidArgumentException
      */
-    public static function setDefaultTranslator(Translator\TranslatorInterface $translator = null, $textDomain = null)
+    public static function setDefaultTranslator(?Translator\TranslatorInterface $translator = null, $textDomain = null)
     {
         static::$defaultTranslator = $translator;
         if (null !== $textDomain) {
@@ -27070,7 +27071,7 @@ class ValidatorChain implements
      * @param  null|array $options Options to pass to validator constructor (if not already instantiated)
      * @return ValidatorInterface
      */
-    public function plugin($name, array $options = null)
+    public function plugin($name, ?array $options = null)
     {
         $plugins = $this->getPluginManager();
         return $plugins->get($name, $options);
@@ -27452,7 +27453,7 @@ class EmailAddress extends AbstractValidator
      * @param Hostname $hostnameValidator OPTIONAL
      * @return EmailAddress Provides a fluent interface
      */
-    public function setHostnameValidator(Hostname $hostnameValidator = null)
+    public function setHostnameValidator(?Hostname $hostnameValidator = null)
     {
         $this->options['hostnameValidator'] = $hostnameValidator;
 
@@ -29154,7 +29155,7 @@ class Hostname extends AbstractValidator
      * @param Ip $ipValidator OPTIONAL
      * @return Hostname;
      */
-    public function setIpValidator(Ip $ipValidator = null)
+    public function setIpValidator(?Ip $ipValidator = null)
     {
         if ($ipValidator === null) {
             $ipValidator = new Ip();

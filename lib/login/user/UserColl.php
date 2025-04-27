@@ -28,7 +28,7 @@ class UserColl {
      * Loads all elements
      * @param array $criteria
      */
-    public function loadAll(array $criteria=null) {
+    public function loadAll(?array $criteria=null) {
         $loginColl = new \login\user\LoginColl($this->content->getDb());
         $loginColl->loadAll(array('profile_id'=>$this->content->getData('id')));
         foreach($loginColl->getItems() as $login) {

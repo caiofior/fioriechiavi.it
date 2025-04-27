@@ -131,7 +131,7 @@ else
     * @param array $parameters
     * @return string
     */
-   public function getUrlParameters(array $parameters = null) {
+   public function getUrlParameters(?array $parameters = null) {
       $get = $_GET;
       if (is_array($parameters))
          $get = array_merge ($get,$parameters);

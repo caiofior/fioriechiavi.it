@@ -13,7 +13,7 @@ class TaxaKindColl extends \ContentColl {
        * Check if default taxa  categoriesare loaded
        * @param array $criteria
        */
-      public function loadAll(array $criteria=null) {
+      public function loadAll(?array $criteria=null) {
           parent::loadAll($criteria);
           if (sizeof(array_filter($criteria)) == 0 && $this->count() == 0) {
               $defaultTaxaKindFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'

@@ -13,7 +13,7 @@ class RegionColl extends \ContentColl {
        * Check if default regions are loaded
        * @param array $criteria
        */
-      public function loadAll(array $criteria=null) {
+      public function loadAll(?array $criteria=null) {
           parent::loadAll($criteria);
           if (is_array($criteria) && sizeof($criteria) == 0 && $this->count() == 0) {
               $defaultRegionFile = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
