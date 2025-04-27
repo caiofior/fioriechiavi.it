@@ -14,7 +14,9 @@ class LoginInstantiator implements \login\user\UserInstantiator {
     */
    public static function getLoginInstance(\Zend\Db\Adapter\Adapter $db ,$login) {
       $user = new \login\user\Login($db);
-      $user->loadFromId($login);
+      if(!empty($login)) {
+         $user->loadFromId($login);
+      }
       if (sizeof($user->getData()) == 0)
          $user = null;
       return $user;

@@ -2961,7 +2961,7 @@ abstract class AbstractPlatform implements PlatformInterface
 
         $parts = preg_split(
             '/([^0-9,a-z,A-Z$_:])/i',
-            $identifier,
+            $identifier??'',
             -1,
             PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
         );

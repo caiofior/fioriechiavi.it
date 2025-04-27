@@ -108,7 +108,10 @@ abstract class Content {
                trigger_error ('Primary key with multiple columns in table '.$table,E_USER_WARNING);
             
             $primary_key = $primary_key->current();
-            self::$metadata[$table]['primaryKey']=  $primary_key['Column_name'];  
+            if(!is_array($primary_key)) {
+                $primary_key=array();
+            }
+            self::$metadata[$table]['primaryKey']=  $primary_key['Column_name']??'';  
             if (
                 property_exists($this->db,'cache') &&
 		$this->db->cache instanceof Zend\Cache\Storage\Adapter\AbstractAdapter
